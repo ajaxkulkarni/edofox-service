@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+	<!-- result maps -->
+	<resultMap id="questions" type="com.rns.web.edo.service.dao.domain.EdoQuestion">
+		<id column="qn_id" property="id" />
+		<result column="question" property="question" />
+		<result column="chapter_id" property="chapter.chapterId" />
+		<result column="chapter_name" property="chapter.chapterName" />
+		<result column="response_option" property="response" />
+		<result column="result" property="result" />
+		<result column="correct_answer" property="answer" />
+	</resultMap>
+
+	<select id="getTestResult" resultMap="questions" parameterType="com.rns.web.edo.service.bo.domain.EdoStudent">
+		SELECT * FROM end_test where student_id = ${id} AND test_id like '${test.id}' AND quest_id = ${test.currentQuestion.id};
+	</select>
+	
+	<select id="getQuestion" resultMap="questions" parameterType="Integer">
+		SELECT * FROM oes_questions as questions JOIN oes_chapters as chapters ON questions.chapter_id = chapters.chapter_id where qn_id = ${value};
+	</select>
+	
+	<!-- <select id="getTestUnsolved" resultMap="questions" parameterType="com.rns.web.edo.service.bo.domain.EdoStudent">
+		SELECT * FROM test_question_set as sets join oes_questions as questions ON sets.quest_id = questions.qn_id 
+        where quest_id NOT IN (select quest_id from end_test where student_id = ${id} AND test_id like '${test.id}') AND test_id like '${test.id}';
+	</select> -->
+</mapper>

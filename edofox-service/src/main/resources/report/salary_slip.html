@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+
+<head>
+
+<link href="report.css" rel="stylesheet"/>
+
+
+</head>
+
+<body>
+
+
+    <div>
+
+
+        <div>
+            <div>
+
+
+                <h3><span><strong>{companyName}</strong><h4><strong>Salary Slip</strong></h4></span></h3>
+                <h4><span><strong> Month & Year : </strong>{month} {year}</span></h4>
+                
+
+                <h4><span><strong>Employee number : </strong>{employeeId}</span></h4>
+                <h4><span><strong>Name : </strong>{name}</span></h4>
+
+                <h4><span><strong> Designation:  </strong> {designation}</span></h4>
+
+
+                <h4><span><strong>PF a/c number : </strong>{pfNumber}</span></h4>
+                <h4><span><strong>Mode of Payment : </strong>Bank</span></h4>
+
+				<hr/>
+
+                <div>
+                    <table >
+                            <tr>
+                                <th class="srNo">#</th>
+                                <th>Earnings</th>
+                                <th>Payable</th>
+
+                            </tr>
+                            <tr>
+                                <td class="srNo">1</td>
+                                <td>Basic Salary</td>
+                                <td>{basicSalary}</td>
+
+                            </tr>
+                            {benefits}
+                            <tr>
+                                <td class="srNo"></td>
+                                <td><strong>Total Benefits</strong></td>
+                                <td><strong>{totalBenefits}</strong></td>
+                             </tr>
+
+                    </table>
+					<br/>
+					<br/>
+					<br/>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="srNo">#</th>
+                                <th>Deductions</th>
+                                <th>Amount </th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {deductions}
+                            <tr>
+                                <td class="srNo"></td>
+                                <td><strong>Total deductions</strong></td>
+                                <td><strong>{totalDeductions}</strong></td>
+                             </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+				
+				<hr/>
+				
+				<br/>
+				<br/>
+
+                <h4><span><strong>Gross Salary : {employeeSalary} </strong></span></h4>
+                <h4><span><strong>Payable salary : {payableSalary} </strong></span></h4>
+                <br/>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+</body>
+
+
+
+</html>
