@@ -54,7 +54,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		// convert json string to object
 		try {
 			String fileName = "test_" + student.getTest().getId() + ".json";
-			result = mapper.readValue(new File(filePath + "\\" + fileName), EdoTest.class);
+			result = mapper.readValue(new File(filePath + fileName), EdoTest.class);
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
