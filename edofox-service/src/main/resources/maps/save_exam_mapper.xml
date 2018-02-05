@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+
+
+	<!-- <select id="getTestResult" resultMap="map"
+		parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+
+	</select> -->
+
+	<insert id="saveTestResult" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		<!-- <foreach collection="test.test" item="question" index="index">
+		insert into test_result (test_id,student_id,question_id,option_selected,flagged) values(${test.id}, ${student.id},${question.qn_id}, '${question.answer}',0);
+		</foreach> -->
+		insert into test_result (test_id,student_id,question_id,option_selected,flagged) values
+		<foreach item="question" index="index" collection="test.test" open="(" separator="),(" close=")">
+            ${test.id}, ${student.id},${question.qn_id}, '${question.answer}',${question.flagged}
+        </foreach>
+	</insert>
+	
+	<insert id="saveTestStatus" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		insert into test_status (test_id, student_id, status, solved, correct, flagged, score) 
+		values(${test.id}, ${student.id}, 'COMPLETED', ${test.solvedCount}, ${test.correctCount}, ${test.flaggedCount}, ${test.score});
+	</insert>
+
+
+</mapper>

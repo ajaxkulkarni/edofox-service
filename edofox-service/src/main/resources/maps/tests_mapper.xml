@@ -3,18 +3,8 @@
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
-	<!-- result maps -->
-	<resultMap id="questions" type="com.rns.web.edo.service.dao.domain.EdoQuestion">
-		<id column="qn_id" property="id" />
-		<result column="question" property="question" />
-		<result column="chapter_id" property="chapter.chapterId" />
-		<result column="chapter_name" property="chapter.chapterName" />
-		<result column="response_option" property="response" />
-		<result column="result" property="result" />
-		<result column="correct_answer" property="answer" />
-	</resultMap>
 
-	<select id="getTestResult" resultMap="questions" parameterType="com.rns.web.edo.service.bo.domain.EdoStudent">
+	<select id="getTestResult" resultMap="questions" parameterType="com.rns.web.edo.service.domain.EdoStudent">
 		SELECT * FROM end_test where student_id = ${id} AND test_id like '${test.id}' AND quest_id = ${test.currentQuestion.id};
 	</select>
 	

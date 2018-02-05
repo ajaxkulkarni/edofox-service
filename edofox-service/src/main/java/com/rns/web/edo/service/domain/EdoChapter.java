@@ -1,4 +1,4 @@
-package com.rns.web.edo.service.dao.domain;
+package com.rns.web.edo.service.domain;
 
 public class EdoChapter {
 

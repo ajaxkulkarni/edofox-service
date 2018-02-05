@@ -1,30 +1,32 @@
 package com.rns.web.edo.service.domain;
 
-import com.rns.web.edo.service.bo.domain.EdoStudent;
-
 public class EdoServiceResponse {
 	
-	private String responseText;
-	private Integer status;
+	private EdoApiStatus status;
 	private EdoStudent student;
+	private EdoTest test;
 	
-	public String getResponseText() {
-		return responseText;
+	public EdoServiceResponse() {
+		setStatus(new EdoApiStatus());
 	}
-	public void setResponseText(String responseText) {
-		this.responseText = responseText;
-	}
-	public Integer getStatus() {
-		return status;
-	}
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
+	
 	public EdoStudent getStudent() {
 		return student;
 	}
 	public void setStudent(EdoStudent student) {
 		this.student = student;
+	}
+	public EdoTest getTest() {
+		return test;
+	}
+	public void setTest(EdoTest test) {
+		this.test = test;
+	}
+	public EdoApiStatus getStatus() {
+		return status;
+	}
+	public void setStatus(EdoApiStatus status) {
+		this.status = status;
 	}
 
 }

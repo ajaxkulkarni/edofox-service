@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+	<!-- result maps -->
+	<resultMap id="testQuestionsMap"
+		type="com.rns.web.edo.service.domain.EdoTestQuestionMap">
+		<result column="question_id" property="question.qn_id" />
+		<result column="question" property="question.question" />
+		<result column="option1" property="question.option1" />
+		<result column="option2" property="question.option2" />
+		<result column="option3" property="question.option3" />
+		<result column="option4" property="question.option4" />
+		<result column="subject" property="question.subject" />
+
+		<result column="test_id" property="test.id" />
+		<result column="test_name" property="test.name" />
+		<result column="no_of_questions" property="test.noOfQuestions" />
+		<result column="total_marks" property="test.totalMarks" />
+		<result column="duration" property="test.duration" />
+
+
+	</resultMap>
+
+
+	<select id="getExam" resultMap="testQuestionsMap" parameterType="Integer">
+		SELECT * FROM test
+		join test_questions_map on test.test_id =
+		test_questions_map.test_id
+		join test_questions on
+		test_questions_map.question_id = test_questions.id
+		join test_subjects
+		on test_questions.subject_id = test_subjects.subject_id
+		where
+		test.test_id = ${value} order by test_questions_map.id asc
+
+	</select>
+
+	<resultMap id="testStudentMap" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
+		<result column="id" property="mapId" />
+		<result column="status" property="status" />
+	</resultMap>
+
+	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
+		SELECT * FROM test_status where student_id=${student.id} AND test_id=${test.id}
+	</select>
+	
+	<!-- result maps -->
+	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">
+		<result column="question_id" property="qn_id" />
+		<result column="question" property="question" />
+		<result column="option1" property="option1" />
+		<result column="option2" property="option2" />
+		<result column="option3" property="option3" />
+		<result column="option4" property="option4" />
+		<result column="correct_answer" property="correctAnswer"/>
+		<result column="weightage" property="weightage"/>
+		<result column="negative_marks" property="negativeMarks"/>
+	</resultMap>
+	
+	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">
+		SELECT * FROM test_questions_map 
+		join test_questions on test_questions_map.question_id = test_questions.id
+		where test_questions_map.test_id = ${value} order by test_questions_map.id asc
+
+	</select>
+	
+	<resultMap id="testAnswersMap" type="com.rns.web.edo.service.domain.EdoTestQuestionMap">
+		<result column="question_id" property="question.qn_id" />
+		<result column="question" property="question.question" />
+		<result column="option1" property="question.option1" />
+		<result column="option2" property="question.option2" />
+		<result column="option3" property="question.option3" />
+		<result column="option4" property="question.option4" />
+		<result column="subject" property="question.subject" />
+		<result column="correct_answer" property="question.correctAnswer"/>
+		<result column="weightage" property="question.weightage"/>
+		<result column="negative_marks" property="question.negativeMarks"/>
+		<result column="option_selected" property="question.answer"/>
+		
+
+		<result column="test_id" property="test.id" />
+		<result column="test_name" property="test.name" />
+		<result column="no_of_questions" property="test.noOfQuestions" />
+		<result column="total_marks" property="test.totalMarks" />
+		<result column="duration" property="test.duration" />
+		<result column="score" property="test.score"/>
+		<result column="solved" property="test.solvedCount"/>
+		<result column="correct" property="test.correctCount"/>
+		<result column="flagged" property="test.flaggedCount"/>
+
+	</resultMap>
+	
+	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		SELECT * FROM test 
+		join test_questions_map on test.test_id = test_questions_map.test_id
+		join test_questions on test_questions_map.question_id = test_questions.id
+		join test_subjects on test_questions.subject_id = test_subjects.subject_id
+		left join test_status on test.test_id = test_status.test_id
+		left join test_result on test.test_id = test_result.test_id AND test_status.student_id = test_result.student_id AND test_questions.id = test_result.question_id
+		where
+		test.test_id = ${test.id} AND test_status.student_id = ${student.id} AND test_status.student_id order by test_questions_map.id asc
+
+	</select>
+
+</mapper>

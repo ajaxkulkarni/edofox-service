@@ -9,6 +9,8 @@
 	</typeAliases> -->
     <mappers>
         <mapper resource="maps/tests_mapper.xml" />
+        <mapper resource="maps/exam_mapper.xml" />
+        <mapper resource="maps/save_exam_mapper.xml" />
     </mappers>
     <!-- <setting name="logImpl" value="LOG4J"/> -->
 </configuration>

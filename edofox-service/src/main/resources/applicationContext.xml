@@ -33,12 +33,12 @@
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/wwwedofo_db" />
+		<!-- <property name="url" value="jdbc:mysql://localhost:3306/wwwedofo_db" />
 		<property name="username" value="wwwedofo_reso" />
-		<property name="password" value="wicked@smile" />
-		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edofox" />
+		<property name="password" value="wicked@smile" /> -->
+		<property name="url" value="jdbc:mysql://localhost:3306/edo" />
 		<property name="username" value="root" />
-		<property name="password" value="" /> -->
+		<property name="password" value="" />
 		<property name="testOnReturn" value="true" />
 		<property name="testOnBorrow" value="true" />
 		<property name="testWhileIdle" value="true" />

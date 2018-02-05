@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 
 public class CommonUtils {
@@ -72,16 +73,16 @@ public class CommonUtils {
 	}
 
 	private static void okResponse(EdoServiceResponse response) {
-		response.setStatus(200);
-		response.setResponseText(EdoConstants.RESPONSE_OK);
+		response.setStatus(new EdoApiStatus());
 	}
 	
 	public static EdoServiceResponse setResponse(EdoServiceResponse response, String status) {
 		if(StringUtils.equals(EdoConstants.RESPONSE_OK, status)) {
 			okResponse(response);
 		} else {
-			response.setStatus(-111);
-			response.setResponseText(status);
+			response.setStatus(new EdoApiStatus());
+			response.getStatus().setStatusCode(-111);
+			response.getStatus().setResponseText(status);
 		}
 		return response;
 	}

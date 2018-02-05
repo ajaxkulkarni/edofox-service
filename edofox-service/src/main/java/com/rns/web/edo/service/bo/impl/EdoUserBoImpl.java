@@ -2,21 +2,29 @@ package com.rns.web.edo.service.bo.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.rns.web.edo.service.bo.api.EdoUserBo;
-import com.rns.web.edo.service.bo.domain.EdoStudent;
-import com.rns.web.edo.service.bo.domain.EdoTest;
 import com.rns.web.edo.service.dao.EdoTestsDao;
-import com.rns.web.edo.service.dao.domain.EdoQuestion;
+import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoQuestion;
+import com.rns.web.edo.service.domain.EdoServiceRequest;
+import com.rns.web.edo.service.domain.EdoServiceResponse;
+import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.EdoTestQuestionMap;
+import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.LoggingUtil;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -44,12 +52,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		this.testsDao = testsDao;
 	}
 
-	public EdoStudent getTestResult(EdoStudent student) {
-		if (student == null || student.getId() == null || student.getTest() == null || student.getTest().getId() == null) {
-			return null;
+	public EdoServiceResponse getTestResult(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if (request.getStudent() == null || request.getStudent().getId() == null || request.getTest() == null || request.getTest().getId() == null) {
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+			return response;
 		}
 		// create ObjectMapper instance
-		ObjectMapper mapper = new ObjectMapper();
+		/*ObjectMapper mapper = new ObjectMapper();
 		EdoTest result = null;
 		// convert json string to object
 		try {
@@ -84,8 +94,125 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 			}
+		}*/
+		List<EdoTestQuestionMap> map = testsDao.getExamResult(request);
+		
+		if(CollectionUtils.isNotEmpty(map)) {
+			EdoTest test = map.get(0).getTest();
+			for(EdoTestQuestionMap mapper: map) {
+				test.getTest().add(mapper.getQuestion());
+			}
+			response.setTest(test);
 		}
-		return student;
+		
+		return response;
+	}
+
+	public EdoTest getTest(Integer testId, Integer studenId) {
+		if(testId == null) {
+			return null;
+		}
+		
+		try {
+			EdoTestStudentMap inputMap = new EdoTestStudentMap();
+			inputMap.setTest(new EdoTest(testId));
+			inputMap.setStudent(new EdoStudent(studenId));
+			EdoTestStudentMap studentMap = testsDao.getTestStatus(inputMap);
+			if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
+				EdoTest result = new EdoTest();
+				result.setSubmitted(true);
+				return result;
+			}
+			
+			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
+			
+			if(CollectionUtils.isNotEmpty(map)) {
+				EdoTest result = map.get(0).getTest();
+				Integer count = 1;
+				for(EdoTestQuestionMap mapper: map) {
+					if(mapper.getQuestion() != null) {
+						mapper.getQuestion().setId(count);
+						if(!result.getSubjects().contains(mapper.getQuestion().getSubject())) {
+							result.getSubjects().add(mapper.getQuestion().getSubject());
+						}
+						result.getTest().add(mapper.getQuestion());
+						count++;
+					}
+				}
+				return result;
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		
+		return null;
+	}
+
+	public EdoApiStatus saveTest(EdoServiceRequest request) {
+		EdoTest test = request.getTest();
+		if(request.getStudent() == null || test == null) {
+			return new EdoApiStatus(-111, ERROR_IN_PROCESSING);
+		}
+		
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			EdoTestStudentMap inputMap = new EdoTestStudentMap();
+			inputMap.setTest(test);
+			inputMap.setStudent(request.getStudent());
+			EdoTestStudentMap map = testsDao.getTestStatus(inputMap);
+			if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
+				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
+				status.setStatusCode(STATUS_ERROR);
+				LoggingUtil.logMessage("Already submitted this test for student=>" + request.getStudent().getId());
+				return status;
+			}
+			
+			List<EdoQuestion> questions = testsDao.getExamQuestions(test.getId());
+			if(CollectionUtils.isEmpty(questions)) {
+				status.setResponseText(ERROR_IN_PROCESSING);
+				status.setStatusCode(STATUS_ERROR);
+				return status;
+			}
+			
+			Integer solvedCount = 0;
+			Integer correctCount = 0;
+			Integer flaggedCount = 0;
+			BigDecimal score = BigDecimal.ZERO;
+			for(EdoQuestion answered: test.getTest()) {
+				if(StringUtils.isNotBlank(answered.getAnswer())) {
+					for(EdoQuestion question: questions) {
+						if(question.getQn_id() == answered.getQn_id() && StringUtils.equalsIgnoreCase(answered.getAnswer(), question.getCorrectAnswer())) {
+							correctCount++;
+							if(question.getWeightage() != null) {
+								score = score.add(new BigDecimal(question.getWeightage()));
+							}
+							break;
+						} else {
+							if(question.getNegativeMarks() != null) {
+								score = score.subtract(new BigDecimal(question.getNegativeMarks()));
+							}
+							break;
+						}
+					}
+					solvedCount++;
+				}
+				if(answered.getFlagged() != null && answered.getFlagged() == 1) {
+					flaggedCount++;
+				}
+			}
+			test.setCorrectCount(correctCount);
+			test.setFlaggedCount(flaggedCount);
+			test.setSolvedCount(solvedCount);
+			test.setScore(score);
+			testsDao.saveTestResult(request);
+			testsDao.saveTestStatus(request);
+		} catch (Exception e) {
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_IN_PROCESSING);
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return status;
 	}
 
 }

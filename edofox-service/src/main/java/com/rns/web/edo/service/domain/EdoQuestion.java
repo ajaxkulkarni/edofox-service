@@ -1,5 +1,8 @@
-package com.rns.web.edo.service.dao.domain;
+package com.rns.web.edo.service.domain;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EdoQuestion {
 	
 	private Integer id;
@@ -15,6 +18,11 @@ public class EdoQuestion {
 	private String subject;
 	private String answer;
 	private boolean isCorrect;
+	private Integer flagged;
+	private String correctAnswer;
+	private Integer weightage;
+	private Integer negativeMarks;
+	
 	
 	public String getOption1() {
 		return option1;
@@ -96,6 +104,30 @@ public class EdoQuestion {
 	}
 	public void setCorrect(boolean isCorrect) {
 		this.isCorrect = isCorrect;
+	}
+	public Integer getFlagged() {
+		return flagged;
+	}
+	public void setFlagged(Integer flagged) {
+		this.flagged = flagged;
+	}
+	public String getCorrectAnswer() {
+		return correctAnswer;
+	}
+	public void setCorrectAnswer(String correctAnswer) {
+		this.correctAnswer = correctAnswer;
+	}
+	public Integer getWeightage() {
+		return weightage;
+	}
+	public void setWeightage(Integer weightage) {
+		this.weightage = weightage;
+	}
+	public Integer getNegativeMarks() {
+		return negativeMarks;
+	}
+	public void setNegativeMarks(Integer negativeMarks) {
+		this.negativeMarks = negativeMarks;
 	}
 
 }
