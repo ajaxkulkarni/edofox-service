@@ -10,5 +10,7 @@ public interface EdoUserBo {
 	EdoServiceResponse getTestResult(EdoServiceRequest request);
 	EdoTest getTest(Integer testId, Integer studentId);
 	EdoApiStatus saveTest(EdoServiceRequest request);
+	EdoFile getQuestionImage(Integer questionId, String imageType);
+	
 	
 }

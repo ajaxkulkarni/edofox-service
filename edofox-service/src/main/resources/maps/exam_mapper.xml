@@ -13,6 +13,11 @@
 		<result column="option3" property="question.option3" />
 		<result column="option4" property="question.option4" />
 		<result column="subject" property="question.subject" />
+		<result column="question_img_url" property="question.questionImageUrl" />
+		<result column="option1_img_url" property="question.option1ImageUrl" />
+		<result column="option2_img_url" property="question.option2ImageUrl" />
+		<result column="option3_img_url" property="question.option3ImageUrl" />
+		<result column="option4_img_url" property="question.option4ImageUrl" />
 
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
@@ -57,6 +62,11 @@
 		<result column="correct_answer" property="correctAnswer"/>
 		<result column="weightage" property="weightage"/>
 		<result column="negative_marks" property="negativeMarks"/>
+		<result column="question_img_url" property="questionImageUrl" />
+		<result column="option1_img_url" property="option1ImageUrl" />
+		<result column="option2_img_url" property="option2ImageUrl" />
+		<result column="option3_img_url" property="option3ImageUrl" />
+		<result column="option4_img_url" property="option4ImageUrl" />
 	</resultMap>
 	
 	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">
@@ -78,7 +88,11 @@
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>
 		<result column="option_selected" property="question.answer"/>
-		
+		<result column="question_img_url" property="question.questionImageUrl" />
+		<result column="option1_img_url" property="question.option1ImageUrl" />
+		<result column="option2_img_url" property="question.option2ImageUrl" />
+		<result column="option3_img_url" property="question.option3ImageUrl" />
+		<result column="option4_img_url" property="question.option4ImageUrl" />
 
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
@@ -103,5 +117,11 @@
 		test.test_id = ${test.id} AND test_status.student_id = ${student.id} AND test_status.student_id order by test_questions_map.id asc
 
 	</select>
+	
+	
+	<select id="getQuestion" resultMap="questions" parameterType="Integer">
+		SELECT * FROM test_questions where id = ${value};
+	</select>
+	
 
 </mapper>

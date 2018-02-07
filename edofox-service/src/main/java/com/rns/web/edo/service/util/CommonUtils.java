@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -58,7 +59,7 @@ public class CommonUtils {
 	}
 
 
-	public static String getFileName(String filePath) {
+	public static String getFileExtension(String filePath) {
 		String[] tokens = StringUtils.split(filePath, ".");
 		if(tokens == null || tokens.length == 0) {
 			return null;

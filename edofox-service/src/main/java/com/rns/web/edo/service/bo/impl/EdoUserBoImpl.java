@@ -1,18 +1,16 @@
 package com.rns.web.edo.service.bo.impl;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -23,6 +21,7 @@ import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.LoggingUtil;
 
@@ -130,12 +129,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				EdoTest result = map.get(0).getTest();
 				Integer count = 1;
 				for(EdoTestQuestionMap mapper: map) {
-					if(mapper.getQuestion() != null) {
-						mapper.getQuestion().setId(count);
-						if(!result.getSubjects().contains(mapper.getQuestion().getSubject())) {
-							result.getSubjects().add(mapper.getQuestion().getSubject());
+					EdoQuestion question = mapper.getQuestion();
+					if(question != null) {
+						question.setId(count);
+						setQuestionURLs(question);
+						if(!result.getSubjects().contains(question.getSubject())) {
+							result.getSubjects().add(question.getSubject());
 						}
-						result.getTest().add(mapper.getQuestion());
+						result.getTest().add(question);
 						count++;
 					}
 				}
@@ -147,6 +148,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		return null;
+	}
+
+	private void setQuestionURLs(EdoQuestion question) {
+		if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/question");
+		}
+		if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option1");
+		}
+		if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option2");
+		}
+		if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option3");
+		}
+		if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option4");
+		}
 	}
 
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
@@ -213,6 +232,39 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return status;
+	}
+
+	public EdoFile getQuestionImage(Integer questionId, String imageType) {
+		
+		try {
+			EdoFile file = new EdoFile();
+			EdoQuestion question = testsDao.getQuestion(questionId);
+			if(question == null) {
+				return null;
+			}
+			String path = null;
+			if(StringUtils.equals(imageType, "question")) {
+				path = question.getQuestionImageUrl();
+			} else if (StringUtils.equals(imageType, "option1")) {
+				path = question.getOption1ImageUrl();
+			} else if (StringUtils.equals(imageType, "option2")) {
+				path = question.getOption2ImageUrl();
+			} else if (StringUtils.equals(imageType, "option3")) {
+				path = question.getOption3ImageUrl();
+			} else if (StringUtils.equals(imageType, "option4")) {
+				path = question.getOption4ImageUrl();
+			}
+			
+			if(path != null) {
+				InputStream is = new FileInputStream(path);
+				file.setContent(is);
+				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));
+			}
+			return file;
+		} catch (Exception e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+		}
+		return null;
 	}
 
 }

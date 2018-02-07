@@ -7,15 +7,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
-import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.LoggingUtil;
@@ -84,6 +86,25 @@ public class EdoUserController {
 		}
 		LoggingUtil.logMessage("Save Test result Response");
 		return response;
+	}
+	
+	@GET
+	@Path("/getImage/{questionId}/{imageType}")
+	@Produces(MediaType.MULTIPART_FORM_DATA)
+	public Response getImage(@PathParam("questionId") Integer questionId, @PathParam("imageType") String imageType) {
+		//LoggingUtil.logObject("Image request:", userId);
+		try {
+			EdoFile file = userBo.getQuestionImage(questionId, imageType);
+			if(file != null) {
+				ResponseBuilder response = Response.ok(file.getContent());
+				response.header("Content-Disposition", "filename=" + file.getFileName());
+				return response.build();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 }

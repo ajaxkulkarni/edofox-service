@@ -23,6 +23,11 @@ public class EdoQuestion {
 	private Integer weightage;
 	private Integer negativeMarks;
 	
+	private String questionImageUrl;
+	private String option1ImageUrl;
+	private String option2ImageUrl;
+	private String option3ImageUrl;
+	private String option4ImageUrl;
 	
 	public String getOption1() {
 		return option1;
@@ -128,6 +133,36 @@ public class EdoQuestion {
 	}
 	public void setNegativeMarks(Integer negativeMarks) {
 		this.negativeMarks = negativeMarks;
+	}
+	public String getQuestionImageUrl() {
+		return questionImageUrl;
+	}
+	public void setQuestionImageUrl(String questionImageUrl) {
+		this.questionImageUrl = questionImageUrl;
+	}
+	public String getOption1ImageUrl() {
+		return option1ImageUrl;
+	}
+	public void setOption1ImageUrl(String option1ImageUrl) {
+		this.option1ImageUrl = option1ImageUrl;
+	}
+	public String getOption2ImageUrl() {
+		return option2ImageUrl;
+	}
+	public void setOption2ImageUrl(String option2ImageUrl) {
+		this.option2ImageUrl = option2ImageUrl;
+	}
+	public String getOption3ImageUrl() {
+		return option3ImageUrl;
+	}
+	public void setOption3ImageUrl(String option3ImageUrl) {
+		this.option3ImageUrl = option3ImageUrl;
+	}
+	public String getOption4ImageUrl() {
+		return option4ImageUrl;
+	}
+	public void setOption4ImageUrl(String option4ImageUrl) {
+		this.option4ImageUrl = option4ImageUrl;
 	}
 
 }

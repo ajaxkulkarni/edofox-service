@@ -8,10 +8,6 @@
 		SELECT * FROM end_test where student_id = ${id} AND test_id like '${test.id}' AND quest_id = ${test.currentQuestion.id};
 	</select>
 	
-	<select id="getQuestion" resultMap="questions" parameterType="Integer">
-		SELECT * FROM oes_questions as questions JOIN oes_chapters as chapters ON questions.chapter_id = chapters.chapter_id where qn_id = ${value};
-	</select>
-	
 	<!-- <select id="getTestUnsolved" resultMap="questions" parameterType="com.rns.web.edo.service.bo.domain.EdoStudent">
 		SELECT * FROM test_question_set as sets join oes_questions as questions ON sets.quest_id = questions.qn_id 
         where quest_id NOT IN (select quest_id from end_test where student_id = ${id} AND test_id like '${test.id}') AND test_id like '${test.id}';
