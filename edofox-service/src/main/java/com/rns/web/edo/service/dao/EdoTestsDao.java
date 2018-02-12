@@ -27,5 +27,6 @@ public interface EdoTestsDao {
 	//Analysis
 	EdoTest getExamAnalysis(Integer value);
 	List<EdoQuestion> getQuestionAnalysis(Integer value);
+	List<EdoStudent> getStudentResults(Integer value);
 	
 }

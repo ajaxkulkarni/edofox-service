@@ -1,10 +1,13 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.List;
+
 public class EdoServiceResponse {
 	
 	private EdoApiStatus status;
 	private EdoStudent student;
 	private EdoTest test;
+	private List<EdoStudent> students;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -27,6 +30,14 @@ public class EdoServiceResponse {
 	}
 	public void setStatus(EdoApiStatus status) {
 		this.status = status;
+	}
+
+	public List<EdoStudent> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<EdoStudent> students) {
+		this.students = students;
 	}
 
 }

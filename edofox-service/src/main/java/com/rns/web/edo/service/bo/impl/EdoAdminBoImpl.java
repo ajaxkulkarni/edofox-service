@@ -1,6 +1,5 @@
 package com.rns.web.edo.service.bo.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +16,7 @@ import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
+import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
@@ -105,6 +105,27 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				}
 				response.setTest(analysis);
 			}
+		} catch (Exception e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getTestResults(EdoTest test) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(test == null || test.getId() == null) {
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		try {
+			EdoTest analysis = testsDao.getExamAnalysis(test.getId());
+			if(analysis == null || analysis.getId() == null || analysis.getAnalysis() == null || analysis.getAnalysis().getStudentsAppeared() == null) {
+				LoggingUtil.logMessage("No test result found for ID .." + test.getId());
+				response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_RESULT_NOT_FOUND));
+				return response;
+			}
+			List<EdoStudent> students = testsDao.getStudentResults(test.getId());
+			response.setStudents(students);
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}

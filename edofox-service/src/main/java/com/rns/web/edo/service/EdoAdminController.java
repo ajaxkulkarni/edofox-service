@@ -35,7 +35,7 @@ public class EdoAdminController {
 	@Path("/getTestAnalysis")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public EdoServiceResponse getTestResults(EdoServiceRequest request) {
+	public EdoServiceResponse getTestAnalysis(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Get Test Analysis Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
@@ -44,6 +44,22 @@ public class EdoAdminController {
 			e.printStackTrace();
 		}
 		LoggingUtil.logMessage("Get Test analysis Response");
+		return response;
+	}
+	
+	@POST
+	@Path("/getTestResults")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getTestResults(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get Test Results Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response =  adminBo.getTestResults(request.getTest());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Get Test Results Response");
 		return response;
 	}
 	

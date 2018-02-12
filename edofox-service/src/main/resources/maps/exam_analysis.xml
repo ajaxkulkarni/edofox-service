@@ -54,5 +54,22 @@
 		on result.question_id = test_questions_map.question_id where test_questions_map.test_id = ${value};
 	</select>
 	
+	<resultMap id="students" type="com.rns.web.edo.service.domain.EdoStudent">
+
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="email" property="email" />
+		<result column="roll_no" property="rollNo" />
+		<result column="score" property="analysis.score" />
+		<result column="correct" property="analysis.correctCount" />
+		<result column="solved" property="analysis.solvedCount" />
+		<result column="flagged" property="analysis.flaggedCount" />
+		
+	</resultMap>
+	
+	<select id="getStudentResults" resultMap="students" parameterType="Integer">
+		select * from test_status join student on test_status.student_id = student.id where test_status.test_id = ${value} order by test_status.score desc
+	</select>
+	
 
 </mapper>

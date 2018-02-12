@@ -6,5 +6,6 @@ import com.rns.web.edo.service.domain.EdoTest;
 public interface EdoAdminBo {
 	
 	EdoServiceResponse getTestAnalysis(EdoTest test);
+	EdoServiceResponse getTestResults(EdoTest test);
 
 }
