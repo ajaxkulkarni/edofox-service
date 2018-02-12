@@ -152,19 +152,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	private void setQuestionURLs(EdoQuestion question) {
 		if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/question");
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_QUESTION);
 		}
 		if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option1");
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
 		}
 		if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option2");
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
 		}
 		if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option3");
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
 		}
 		if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/option4");
+			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
 		}
 	}
 
@@ -243,15 +243,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				return null;
 			}
 			String path = null;
-			if(StringUtils.equals(imageType, "question")) {
+			if(StringUtils.equals(imageType, ATTR_QUESTION)) {
 				path = question.getQuestionImageUrl();
-			} else if (StringUtils.equals(imageType, "option1")) {
+			} else if (StringUtils.equals(imageType, ATTR_OPTION1)) {
 				path = question.getOption1ImageUrl();
-			} else if (StringUtils.equals(imageType, "option2")) {
+			} else if (StringUtils.equals(imageType, ATTR_OPTION2)) {
 				path = question.getOption2ImageUrl();
-			} else if (StringUtils.equals(imageType, "option3")) {
+			} else if (StringUtils.equals(imageType, ATTR_OPTION3)) {
 				path = question.getOption3ImageUrl();
-			} else if (StringUtils.equals(imageType, "option4")) {
+			} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
 				path = question.getOption4ImageUrl();
 			}
 			

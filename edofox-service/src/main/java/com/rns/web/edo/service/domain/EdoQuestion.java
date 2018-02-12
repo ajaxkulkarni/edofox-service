@@ -29,6 +29,8 @@ public class EdoQuestion {
 	private String option3ImageUrl;
 	private String option4ImageUrl;
 	
+	private EDOQuestionAnalysis analysis;
+	
 	public String getOption1() {
 		return option1;
 	}
@@ -163,6 +165,13 @@ public class EdoQuestion {
 	}
 	public void setOption4ImageUrl(String option4ImageUrl) {
 		this.option4ImageUrl = option4ImageUrl;
+	}
+	
+	public EDOQuestionAnalysis getAnalysis() {
+		return analysis;
+	}
+	public void setAnalysis(EDOQuestionAnalysis analysis) {
+		this.analysis = analysis;
 	}
 
 }

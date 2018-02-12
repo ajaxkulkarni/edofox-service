@@ -11,8 +11,15 @@ public interface EdoConstants {
 	String ERROR_IN_PROCESSING = "Error in processing!";
 	String ERROR_INCOMPLETE_REQUEST = "Insufficient fields!";
 	String ERROR_TEST_ALREADY_SUBMITTED = "You already submitted this test ..";
+	String ERROR_RESULT_NOT_FOUND = "Test result for this test was not found";
 	
 	String TEST_STATUS_COMPLETED = "COMPLETED";
+	
+	String ATTR_QUESTION = "question";
+	String ATTR_OPTION4 = "option4";
+	String ATTR_OPTION3 = "option3";
+	String ATTR_OPTION2 = "option2";
+	String ATTR_OPTION1 = "option1";
 	
 	//DEV
 	String TESTS_JSON_PATH = "F:\\Resoneuronance\\Edofox\\Document\\tests";

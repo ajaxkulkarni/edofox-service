@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+	<!-- result maps -->
+	<resultMap id="examAnalysis" type="com.rns.web.edo.service.domain.EdoTest">
+
+		<result column="testId" property="id" />
+		<result column="test_name" property="name" />
+		<result column="no_of_questions" property="noOfQuestions" />
+		<result column="total_marks" property="totalMarks" />
+		<result column="duration" property="duration" />
+		<result column="studentsAppeared" property="analysis.studentsAppeared" />
+		<result column="avgScore" property="analysis.averageScore" />
+		<result column="avgCorrect" property="analysis.averageCorrect" />
+		<result column="avgSolved" property="analysis.averageAttempted" />
+
+	</resultMap>
+	
+	<resultMap id="questionAnalysis" type="com.rns.web.edo.service.domain.EdoQuestion">
+		<result column="question_id" property="qn_id" />
+		<result column="question" property="question" />
+		<result column="option1" property="option1" />
+		<result column="option2" property="option2" />
+		<result column="option3" property="option3" />
+		<result column="option4" property="option4" />
+		<result column="correct_answer" property="correctAnswer"/>
+		<result column="weightage" property="weightage"/>
+		<result column="negative_marks" property="negativeMarks"/>
+		<result column="question_img_url" property="questionImageUrl" />
+		<result column="option1_img_url" property="option1ImageUrl" />
+		<result column="option2_img_url" property="option2ImageUrl" />
+		<result column="option3_img_url" property="option3ImageUrl" />
+		<result column="option4_img_url" property="option4ImageUrl" />
+		<result column="optionCount" property="analysis.optionCount" />
+		<result column="option_selected" property="analysis.optionSelected" />
+		<result column="subject" property="subject" />
+		
+	</resultMap>
+	
+	
+	<select id="getExamAnalysis" resultMap="examAnalysis" parameterType="Integer">
+		select * from test left join (select  count(student_id) as studentsAppeared, avg(score) as avgScore, avg(correct) as avgCorrect, avg(solved) as avgSolved, test_id as testId from test_status 
+		where test_id=${value} group by test_id) as result on test.test_id = result.testId;
+
+	</select>
+	
+	<select id="getQuestionAnalysis" resultMap="questionAnalysis" parameterType="Integer">
+		select * from test_questions_map
+		join test_questions on test_questions.id = test_questions_map.question_id
+		join test_subjects on test_questions.subject_id = test_subjects.subject_id
+		left join (select count(*) as optionCount,test_id, question_id, option_selected from test_result group by option_selected, test_id, question_id) as result
+		on result.question_id = test_questions_map.question_id where test_questions_map.test_id = ${value};
+	</select>
+	
+
+</mapper>

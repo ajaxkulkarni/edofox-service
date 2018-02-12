@@ -24,6 +24,7 @@ public class EdoTest {
 	private Integer flaggedCount;
 	private BigDecimal score;
 	private boolean submitted;
+	private EDOTestAnalysis analysis;
 	
 	public EdoTest() {
 		
@@ -141,6 +142,14 @@ public class EdoTest {
 
 	public void setSubmitted(boolean submitted) {
 		this.submitted = submitted;
+	}
+
+	public EDOTestAnalysis getAnalysis() {
+		return analysis;
+	}
+
+	public void setAnalysis(EDOTestAnalysis analysis) {
+		this.analysis = analysis;
 	}
 	
 }

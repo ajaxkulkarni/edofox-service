@@ -3,13 +3,14 @@ package com.rns.web.edo.service.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -139,5 +140,16 @@ public class CommonUtils {
 		return value.toString();
 	}
 	
+	public static BigDecimal getPercent(Integer divident, Integer divider) {
+		if(divident == null || divider == null) {
+			return BigDecimal.ZERO;
+		}
+		if(divider <= 0) {
+			return BigDecimal.ZERO;
+		}
+		BigDecimal value = new BigDecimal(divident).divide(new BigDecimal(divider));
+		value = value.round(new MathContext(2, RoundingMode.HALF_UP)).multiply(new BigDecimal(100));
+		return value;
+	}
 	
 }

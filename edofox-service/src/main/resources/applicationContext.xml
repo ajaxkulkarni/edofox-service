@@ -15,11 +15,14 @@
 	<context:component-scan base-package="com.rns.web.edo.service" />
 
 	<bean id="userBo" class="com.rns.web.edo.service.bo.impl.EdoUserBoImpl">
-		<!-- <property name="sessionFactory" ref="sqlSessionFactory" /> -->
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
-		<!-- <property name="filePath" value="F:\Resoneuronance\Edofox\Document\tests\"/> -->
 		<property name="filePath" value="/home/wwwedofox/public_html/test/json_test_files/"/>
+	</bean>
+
+	<bean id="adminBo" class="com.rns.web.edo.service.bo.impl.EdoAdminBoImpl">
+		<property name="executor" ref="executor" />
+		<property name="testsDao" ref="testsDao" />
 	</bean>
 
 
@@ -33,9 +36,9 @@
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<!-- <property name="url" value="jdbc:mysql://localhost:3306/wwwedofo_db" />
-		<property name="username" value="wwwedofo_reso" />
-		<property name="password" value="wicked@smile" /> -->
+		<!-- <property name="url" value="jdbc:mysql://localhost:3306/shahu_test_exam" />
+		<property name="username" value="root" />
+		<property name="password" value="WickedSmile2018!" /> -->
 		<property name="url" value="jdbc:mysql://localhost:3306/edo" />
 		<property name="username" value="root" />
 		<property name="password" value="" />
