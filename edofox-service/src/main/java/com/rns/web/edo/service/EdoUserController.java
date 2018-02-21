@@ -90,14 +90,15 @@ public class EdoUserController {
 	
 	@GET
 	@Path("/getImage/{questionId}/{imageType}")
-	@Produces(MediaType.MULTIPART_FORM_DATA)
+	//@Produces(MediaType.MULTIPART_FORM_DATA)
+	@Produces("image/png")
 	public Response getImage(@PathParam("questionId") Integer questionId, @PathParam("imageType") String imageType) {
 		//LoggingUtil.logObject("Image request:", userId);
 		try {
 			EdoFile file = userBo.getQuestionImage(questionId, imageType);
 			if(file != null) {
 				ResponseBuilder response = Response.ok(file.getContent());
-				response.header("Content-Disposition", "filename=" + file.getFileName());
+				//response.header("Content-Disposition", "filename=" + file.getFileName());
 				return response.build();
 			}
 
