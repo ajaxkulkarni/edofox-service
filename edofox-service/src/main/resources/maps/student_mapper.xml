@@ -42,7 +42,7 @@
 		UPDATE student_institute set payment_id = '${payment.paymentId}' WHERE student_id =
 		${id} AND status != 'Completed' AND package_id IN
 		<foreach item="package" index="index" collection="packages"
-			open="(" separator="),(" close=")">
+			open="(" separator="," close=")">
 			${package.id}
 		</foreach>
 
