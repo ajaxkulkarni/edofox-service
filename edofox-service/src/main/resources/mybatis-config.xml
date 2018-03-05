@@ -12,6 +12,7 @@
         <mapper resource="maps/exam_mapper.xml" />
         <mapper resource="maps/save_exam_mapper.xml" />
         <mapper resource="maps/exam_analysis.xml" />
+        <mapper resource="maps/student_mapper.xml" />
     </mappers>
     <!-- <setting name="logImpl" value="LOG4J"/> -->
 </configuration>

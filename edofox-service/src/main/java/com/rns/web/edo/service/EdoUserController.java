@@ -1,25 +1,32 @@
 package com.rns.web.edo.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
+import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
+import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.LoggingUtil;
 
 @Component
@@ -106,6 +113,48 @@ public class EdoUserController {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@POST
+	@Path("/getPackages")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getPackages(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get packages Request :" + request);
+		EdoServiceResponse response = userBo.getPackages(request.getInstitute());
+		LoggingUtil.logMessage("Get packages Response");
+		return response;
+	}
+	
+	@POST
+	@Path("/registerStudentPackages")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse registerStudentPackages(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Register packages Request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response = userBo.registerStudent(request.getStudent());
+		LoggingUtil.logMessage("Register packages Response");
+		return response;
+	}
+	
+	@GET
+	@Path("/processPayment")
+	//@Produces(MediaType.APPLICATION_JSON)
+	public Response processPayment(@QueryParam("id") String id, @QueryParam("transaction_id") String transactionId, @QueryParam("payment_id") String paymentId) {
+		LoggingUtil.logMessage("Process payment Request :" + id + " : " + transactionId);
+		EdoApiStatus response = userBo.processPayment(id, transactionId, paymentId);
+		String urlString = EdoConstants.UI_HOST + "success.html";
+		if(response == null || response.getStatusCode() != EdoConstants.STATUS_OK) {
+			urlString = EdoConstants.UI_HOST + "error.html";
+		}
+		URI url = null;
+		try {
+			url = new URI(urlString);
+		} catch (URISyntaxException e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return Response.temporaryRedirect(url).build();
 	}
 	
 }

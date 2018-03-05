@@ -13,7 +13,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
+import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -24,6 +27,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.LoggingUtil;
+import com.rns.web.edo.service.util.PaymentUtil;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -265,6 +269,85 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
 		return null;
+	}
+
+	public EdoServiceResponse getPackages(EDOInstitute institute) {
+		if(institute == null || institute.getId() == null) {
+			return new EdoServiceResponse(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+		}
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			response.setPackages(testsDao.getInstituePackages(institute.getId()));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse registerStudent(EdoStudent student) {
+		if(student == null || StringUtils.isBlank(student.getPhone()) || CollectionUtils.isEmpty(student.getPackages())) {
+			return new EdoServiceResponse(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+		}
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			if(student.getPayment() != null && student.getPayment().isOffline()) {
+				student.getPayment().setMode("Offline");
+			} else {
+				EdoPaymentStatus payment = new EdoPaymentStatus();
+				payment.setMode("Online");
+				student.setPayment(payment);
+			}
+			if(student.getId() == null) {
+				testsDao.saveStudent(student);
+				LoggingUtil.logMessage("Saved Student is =>" + student.getId());
+				if(student.getId() != null) {
+					testsDao.createStudentPackage(student);
+				}
+			} else {
+				testsDao.createStudentPackage(student);
+			}
+			LoggingUtil.logMessage("Transaction ID is =>" + student.getTransactionId());
+			BigDecimal amount = BigDecimal.ZERO;
+			for(EDOPackage p: student.getPackages()) {
+				if(p.getPrice() != null) {
+					amount = p.getPrice().add(amount);
+				}
+			}
+			if(!student.getPayment().isOffline()) {
+				EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId());
+				if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
+					student.setPayment(paymentResponse);
+					testsDao.updatePaymentId(student);
+				}
+				response.setPaymentStatus(paymentResponse);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoApiStatus processPayment(String id, String transactionId, String paymentId) {
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			boolean validPayment = PaymentUtil.getPaymentStatus(id);
+			if(validPayment) {
+				EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
+				paymentStatus.setPaymentId(id);
+				paymentStatus.setResponseText("Completed");
+				testsDao.updatePayment(paymentStatus);
+			} else {
+				EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
+				paymentStatus.setPaymentId(id);
+				paymentStatus.setResponseText("Failed");
+				testsDao.updatePayment(paymentStatus);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return status;
 	}
 
 }

@@ -8,11 +8,18 @@ public class EdoServiceResponse {
 	private EdoStudent student;
 	private EdoTest test;
 	private List<EdoStudent> students;
+	private EDOInstitute institute;
+	private List<EDOPackage> packages;
+	private EdoPaymentStatus paymentStatus;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
 	}
 	
+	public EdoServiceResponse(EdoApiStatus edoApiStatus) {
+		setStatus(edoApiStatus);
+	}
+
 	public EdoStudent getStudent() {
 		return student;
 	}
@@ -38,6 +45,30 @@ public class EdoServiceResponse {
 
 	public void setStudents(List<EdoStudent> students) {
 		this.students = students;
+	}
+
+	public EDOInstitute getInstitute() {
+		return institute;
+	}
+
+	public void setInstitute(EDOInstitute institute) {
+		this.institute = institute;
+	}
+
+	public List<EDOPackage> getPackages() {
+		return packages;
+	}
+
+	public void setPackages(List<EDOPackage> packages) {
+		this.packages = packages;
+	}
+
+	public EdoPaymentStatus getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(EdoPaymentStatus paymentStatus) {
+		this.paymentStatus = paymentStatus;
 	}
 
 }

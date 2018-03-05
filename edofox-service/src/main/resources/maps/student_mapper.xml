@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+	<!-- result maps -->
+	<resultMap id="packages" type="com.rns.web.edo.service.domain.EDOPackage">
+		<result column="package_name" property="name" />
+		<result column="price" property="price" />
+		<result column="institute_id" property="institute.id" />
+		<result column="institute_name" property="institute.name" />
+
+	</resultMap>
+
+	<select id="getInstituePackages" resultMap="packages"
+		parameterType="Integer">
+		select * from institute join packages on institute.id =
+		packages.institute_id
+		where institute.status = 'Active' AND
+		institute.id =${value};
+
+	</select>
+
+	<insert id="saveStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into student
+		(name, email, mobile_no, password, roll_no, gender, school_district, date_of_birth, caste_category )
+		values('${name}', '${email}', '${phone}', '${password}', 0, '${gender}', '${schoolDistrict}', '${dob}', '${casteCategory}');
+	</insert>
+
+	<insert id="createStudentPackage" parameterType="com.rns.web.edo.service.domain.EdoStudent"
+		useGeneratedKeys="true" keyProperty="transactionId" keyColumn="id">
+		insert into student_institute
+		(student_id,institute_id,package_id,status,exam_mode,payment_mode) values
+		<foreach item="package" index="index" collection="packages"
+			open="(" separator="),(" close=")">
+			${id},${package.institute.id}, ${package.id}, 'Created', '${examMode}', '${payment.mode}'
+		</foreach>
+	</insert>
+
+	<update id="updatePaymentId" parameterType="com.rns.web.edo.service.domain.EdoStudent">
+		UPDATE student_institute set payment_id = '${payment.paymentId}' WHERE student_id =
+		${id} AND status != 'Completed' AND package_id IN
+		<foreach item="package" index="index" collection="packages"
+			open="(" separator="),(" close=")">
+			${package.id}
+		</foreach>
+
+	</update>
+
+	<update id="updatePayment" parameterType="com.rns.web.edo.service.domain.EdoPaymentStatus">
+		UPDATE student_institute set status = '${responseText}' WHERE payment_id = '${paymentId}';
+	</update>
+
+</mapper>

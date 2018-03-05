@@ -2,6 +2,8 @@ package com.rns.web.edo.service.dao;
 
 import java.util.List;
 
+import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoStudent;
@@ -28,5 +30,12 @@ public interface EdoTestsDao {
 	EdoTest getExamAnalysis(Integer value);
 	List<EdoQuestion> getQuestionAnalysis(Integer value);
 	List<EdoStudent> getStudentResults(Integer value);
+	
+	//Student queries
+	List<EDOPackage> getInstituePackages(Integer instituteId);
+	Integer saveStudent(EdoStudent student);
+	Integer createStudentPackage(EdoStudent student);
+	Integer updatePaymentId(EdoStudent student);
+	Integer updatePayment(EdoPaymentStatus status);
 	
 }
