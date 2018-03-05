@@ -6,7 +6,7 @@ public interface EdoConstants {
 	//String HOST_NAME = "http://localhost:8080/edo-service/service/"; //DEV
 	
 	//String UI_HOST = "http://localhost:51050/registration/"; //DEV
-	String UI_HOST = "http://visionlatur.com/";
+	String UI_HOST = "http://www.visionlatur.com/mastertest/registration/";
 	
 	String RESPONSE_OK = "OK";
 	Integer STATUS_OK = 200;
