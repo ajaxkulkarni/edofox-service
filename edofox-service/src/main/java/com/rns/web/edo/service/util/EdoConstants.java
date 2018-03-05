@@ -2,7 +2,7 @@ package com.rns.web.edo.service.util;
 
 public interface EdoConstants {
 
-	String HOST_NAME = "http://172.104.47.180:8080/edofox/service/";
+	String HOST_NAME = "http://45.33.7.172:8080/edofox/service/";
 	//String HOST_NAME = "http://localhost:8080/edo-service/service/"; //DEV
 	
 	//String UI_HOST = "http://localhost:51050/registration/"; //DEV

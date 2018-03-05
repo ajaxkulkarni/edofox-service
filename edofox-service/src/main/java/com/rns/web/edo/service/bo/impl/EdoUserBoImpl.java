@@ -286,7 +286,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	public EdoServiceResponse registerStudent(EdoStudent student) {
-		if(student == null || StringUtils.isBlank(student.getPhone()) || CollectionUtils.isEmpty(student.getPackages())) {
+		if(student == null || StringUtils.isBlank(student.getPhone()) || CollectionUtils.isEmpty(student.getPackages()) || StringUtils.isBlank(student.getExamMode())) {
 			return new EdoServiceResponse(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 		}
 		EdoServiceResponse response = new EdoServiceResponse();
@@ -310,8 +310,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logMessage("Transaction ID is =>" + student.getTransactionId());
 			BigDecimal amount = BigDecimal.ZERO;
 			for(EDOPackage p: student.getPackages()) {
-				if(p.getPrice() != null) {
+				if(p.getPrice() != null && StringUtils.equals(student.getExamMode(), "Online")) {
 					amount = p.getPrice().add(amount);
+				} else if (p.getOfflinePrice() != null) {
+					amount = p.getOfflinePrice().add(amount);
 				}
 			}
 			if(!student.getPayment().isOffline()) {

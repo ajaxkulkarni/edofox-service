@@ -8,6 +8,7 @@
 		<result column="price" property="price" />
 		<result column="institute_id" property="institute.id" />
 		<result column="institute_name" property="institute.name" />
+		<result column="offline_price" property="offlinePrice" />
 
 	</resultMap>
 

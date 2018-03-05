@@ -12,6 +12,7 @@ public class EDOPackage {
 	private Integer id;
 	private String name;
 	private BigDecimal price;
+	private BigDecimal offlinePrice;
 	private EDOInstitute institute;
 	private boolean selected;
 	
@@ -44,6 +45,12 @@ public class EDOPackage {
 	}
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+	public BigDecimal getOfflinePrice() {
+		return offlinePrice;
+	}
+	public void setOfflinePrice(BigDecimal offlinePrice) {
+		this.offlinePrice = offlinePrice;
 	}
 	
 	
