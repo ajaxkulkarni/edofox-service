@@ -4,15 +4,20 @@
     "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
-	<!-- <typeAliases>
-		<typeAlias type="org.podcastpedia.domain.Podcast" alias="Podcast"/>
-	</typeAliases> -->
-    <mappers>
-        <mapper resource="maps/tests_mapper.xml" />
-        <mapper resource="maps/exam_mapper.xml" />
-        <mapper resource="maps/save_exam_mapper.xml" />
-        <mapper resource="maps/exam_analysis.xml" />
-        <mapper resource="maps/student_mapper.xml" />
-    </mappers>
-    <!-- <setting name="logImpl" value="LOG4J"/> -->
+	<settings>
+		<setting name="logImpl" value="LOG4J" />
+	</settings>
+
+	<!-- <typeAliases> <typeAlias type="org.podcastpedia.domain.Podcast" alias="Podcast"/> 
+		</typeAliases> -->
+	<mappers>
+		<mapper resource="maps/tests_mapper.xml" />
+		<mapper resource="maps/exam_mapper.xml" />
+		<mapper resource="maps/save_exam_mapper.xml" />
+		<mapper resource="maps/exam_analysis.xml" />
+		<mapper resource="maps/student_mapper.xml" />
+	</mappers>
+	<!-- <settings> <setting name="logImpl" value="LOG4J"/> </settings> -->
+
+
 </configuration>
