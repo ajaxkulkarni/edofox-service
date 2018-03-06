@@ -299,8 +299,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				student.setPayment(payment);
 			}
 			if(student.getId() == null) {
-				testsDao.saveStudent(student);
-				LoggingUtil.logMessage("Saved Student is =>" + student.getId());
+				//Check if the student with same phone exists
+				List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
+				
+				if(CollectionUtils.isEmpty(existingStudent)) {
+					testsDao.saveStudent(student);
+				} else {
+					student.setId(existingStudent.get(0).getId());
+				}
+				
+				LoggingUtil.logMessage("Student ID is =>" + student.getId());
 				if(student.getId() != null) {
 					testsDao.createStudentPackage(student);
 				}

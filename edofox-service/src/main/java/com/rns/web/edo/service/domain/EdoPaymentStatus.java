@@ -1,5 +1,7 @@
 package com.rns.web.edo.service.domain;
 
+import com.rns.web.edo.service.util.EdoConstants;
+
 public class EdoPaymentStatus extends EdoApiStatus {
 
 	private String paymentUrl;
@@ -8,7 +10,8 @@ public class EdoPaymentStatus extends EdoApiStatus {
 	private String mode;
 	
 	public EdoPaymentStatus() {
-		
+		setStatusCode(EdoConstants.STATUS_OK);
+		setResponseText(EdoConstants.RESPONSE_OK);
 	}
 	
 	public String getPaymentUrl() {

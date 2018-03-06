@@ -17,7 +17,7 @@ public class PaymentUtil implements EdoConstants {
 
 	public static EdoPaymentStatus paymentRequest(Double amount, EdoStudent student, Integer transactionId) {
 		EdoPaymentStatus status = new EdoPaymentStatus();
-
+		
 		PaymentOrder order = new PaymentOrder();
 
 		order.setName(student.getName());
@@ -94,7 +94,6 @@ public class PaymentUtil implements EdoConstants {
 				setPaymentStatus(status, "Provide a valid webhook url");
 			}
 		}
-		status.setStatusCode(EdoConstants.STATUS_OK);
 		return status;
 	}
 
