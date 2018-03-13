@@ -12,6 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
@@ -21,6 +22,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.LoggingUtil;
+import com.rns.web.edo.service.util.QuestionParser;
 
 public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
@@ -130,6 +132,48 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
+	}
+
+	public EdoServiceResponse getAllStudents(EDOInstitute institute) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(institute == null || institute.getId() == null) {
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		try {
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return null;
+	}
+
+	public EdoApiStatus fileUploadTestQuestions(String filePath, Integer firstQuestion, EdoTest test, Integer subjectId) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(StringUtils.isBlank(filePath) || firstQuestion == null || test == null || test.getId() == null) {
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		try {
+			List<EdoQuestion> questions = QuestionParser.parseQuestionPaper(filePath, firstQuestion);
+			if(CollectionUtils.isNotEmpty(questions)) {
+				for(EdoQuestion question: questions) {
+					question.setSubjectId(subjectId);
+					testsDao.saveQuestion(question);
+					if(question.getQn_id() != null) {
+						test.setCurrentQuestion(question);
+						testsDao.saveTestQuestion(test);
+						LoggingUtil.logMessage("... Saved question .. " + question.getId() + ":" + question.getQn_id());
+					}
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_IN_PROCESSING);
+		}
+		return status;
 	}
 
 

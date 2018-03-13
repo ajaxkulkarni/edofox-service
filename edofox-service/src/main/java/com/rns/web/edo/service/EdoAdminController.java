@@ -63,5 +63,21 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/uploadTest")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse uploadTest(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Upload Test Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setStatus(adminBo.fileUploadTestQuestions(request.getFilePath(), request.getFirstQuestion(), request.getTest(), request.getSubjectId()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Upload Test Response");
+		return response;
+	}
+	
 
 }

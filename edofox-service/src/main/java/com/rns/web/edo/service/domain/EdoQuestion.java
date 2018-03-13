@@ -22,7 +22,7 @@ public class EdoQuestion {
 	private String correctAnswer;
 	private Integer weightage;
 	private Integer negativeMarks;
-	
+	private Integer subjectId;
 	private String questionImageUrl;
 	private String option1ImageUrl;
 	private String option2ImageUrl;
@@ -172,6 +172,12 @@ public class EdoQuestion {
 	}
 	public void setAnalysis(EDOQuestionAnalysis analysis) {
 		this.analysis = analysis;
+	}
+	public Integer getSubjectId() {
+		return subjectId;
+	}
+	public void setSubjectId(Integer subjectId) {
+		this.subjectId = subjectId;
 	}
 
 }

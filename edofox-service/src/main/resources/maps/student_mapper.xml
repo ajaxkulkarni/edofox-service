@@ -64,5 +64,10 @@
 	<select id="getStudentByPhoneNumber" parameterType="com.rns.web.edo.service.domain.EdoPaymentStatus" resultMap="studentInfo" >
 		select * from student where mobile_no = '${phone}'
 	</select>
+	
+	<select id="getAllStudents"  parameterType="Integer" resultMap="studentInfo" >
+		select * from student join student_institute on student.id = student_institute.student_id 
+		where institute_id = ${value}
+	</select>
 
 </mapper>

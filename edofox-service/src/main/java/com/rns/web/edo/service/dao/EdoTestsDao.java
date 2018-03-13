@@ -40,4 +40,8 @@ public interface EdoTestsDao {
 	Integer updatePayment(EdoPaymentStatus status);
 	List<EdoStudent> getStudentByPhoneNumber(EdoStudent student);
 	
+	//Admin queries
+	Integer saveQuestion(EdoQuestion question);
+	Integer saveTestQuestion(EdoTest test);
+	
 }

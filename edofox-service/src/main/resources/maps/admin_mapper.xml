@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+
+
+	<insert id="saveQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion" useGeneratedKeys="true" keyProperty="qn_id" keyColumn="id">
+		insert into test_questions (question,option1,option2,option3,option4, subject_id) 
+		values ('${question}', '${option1}', '${option2}', '${option3}' , '${option4}', ${subjectId} );
+	</insert>
+	
+	<insert id="saveTestQuestion" parameterType="com.rns.web.edo.service.domain.EdoTest">
+		insert into test_questions_map (test_id, question_id) 
+		values (${id}, ${currentQuestion.id});
+	</insert>
+
+
+</mapper>

@@ -1,0 +1,146 @@
+package com.rns.web.edo.service.util;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import com.rns.web.edo.service.domain.EdoQuestion;
+
+public class QuestionParser {
+	
+	public static void main(String[] args) {
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Chem 02.tex";
+		Integer previousQuestion = 30;
+		Integer testId = null;
+		
+		parseQuestionPaper(fileName, previousQuestion);
+	}
+
+	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion) {
+		
+		List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
+		
+		BufferedReader reader;
+		String question = "", option1 = "", option2 = "", option3 = "", option4 = "";
+		Integer step = 0;
+		try {
+			reader = new BufferedReader(new FileReader(fileName));
+			String line = reader.readLine();
+			boolean isStartFound = false;
+			while (line != null) {
+				line = reader.readLine();
+				String trimmed = StringUtils.trimToEmpty(line);
+				if(StringUtils.isBlank(trimmed)) {
+					continue;
+				}
+				
+				if(StringUtils.equalsIgnoreCase("\\begin{document}", trimmed)) {
+					isStartFound = true;
+					System.out.println("Found!");
+					continue;
+				}
+				if(!isStartFound) {
+					continue;
+				}
+				
+				int indexOfPeriod = StringUtils.indexOf(trimmed, ".");
+				if(indexOfPeriod > 1 && indexOfPeriod < 5) {
+					
+					String questionNumber = StringUtils.substring(trimmed, 0, indexOfPeriod);
+					System.out.println("Question number =>" + questionNumber);
+					if(StringUtils.isNumeric(questionNumber)) {
+						Integer questionNo = new Integer(questionNumber);
+						if( (questionNo - 1) == previousQuestion) {
+							
+							System.out.println("Question =>" + question);
+							System.out.println("Option 1 =>" + option1);
+							System.out.println("Option 2 =>" + option2);
+							System.out.println("Option 3 =>" + option3);
+							System.out.println("Option 4 =>" + option4);
+							
+							if(StringUtils.isNotBlank(question)) {
+								EdoQuestion edoQuestion = new EdoQuestion();
+								edoQuestion.setQuestion(question);
+								edoQuestion.setOption1(option1);
+								edoQuestion.setOption2(option2);
+								edoQuestion.setOption3(option3);
+								edoQuestion.setOption4(option4);
+								edoQuestion.setId(questionNo);
+								questions.add(edoQuestion);
+							}
+							
+							question = ""; 
+							option1 = ""; 
+							option2 = ""; 
+							option3 = "";
+							option4 = "";
+							
+							
+							previousQuestion = questionNo;
+							question = StringUtils.substring(trimmed, indexOfPeriod + 1, trimmed.length());
+							System.out.println("Question is =>" + question);
+							step = 1;
+						}
+					}
+					continue;
+				}
+				
+				int indexOfOption1 = StringUtils.indexOf(trimmed, "(A)");
+				if(indexOfOption1 == 0) {
+					option1 = option1 + StringUtils.substring(trimmed, 3, trimmed.length());
+					step = 2;
+					continue;
+				}
+				
+				int indexOfOption2 = StringUtils.indexOf(trimmed, "(B)");
+				if(indexOfOption2 == 0) {
+					option2 = option2 + StringUtils.substring(trimmed, 3, trimmed.length());
+					step = 3;
+					continue;
+				}
+				
+				int indexOfOption3 = StringUtils.indexOf(trimmed, "(C)");
+				if(indexOfOption3 == 0) {
+					option3 = option3 + StringUtils.substring(trimmed, 3, trimmed.length());
+					step = 4;
+					continue;
+				}
+				
+				int indexOfOption4 = StringUtils.indexOf(trimmed, "(D)");
+				if(indexOfOption4 == 0) {
+					option4 = option4 + StringUtils.substring(trimmed, 3, trimmed.length());
+					step = 5;
+					continue;
+				}
+				
+				
+				if(step == 1) {
+					question = question + trimmed;
+				} else if (step == 2) {
+					option1 = option1 + trimmed;
+				} else if (step == 3) {
+					option2 = option2 + trimmed;
+				} else if (step == 4) {
+					option3 = option3 + trimmed;
+				} else if (step == 5) {
+					option4 = option4 + trimmed;
+				}
+				
+				
+				//System.out.println(trimmed);
+				
+				//System.out.println("..........");
+			}
+			reader.close();
+		} catch (IOException e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+		}
+		return questions;
+	}
+
+}
