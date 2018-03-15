@@ -3,6 +3,9 @@ package com.rns.web.edo.service.util;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,15 +16,17 @@ import com.rns.web.edo.service.domain.EdoQuestion;
 
 public class QuestionParser {
 	
+	private static final String ANS_PARSE_KEY = ".Ans.:";
+
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Chem 02.tex";
-		Integer previousQuestion = 30;
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Math 01.tex";
+		Integer previousQuestion = 60;
 		Integer testId = null;
 		
-		parseQuestionPaper(fileName, previousQuestion);
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Solutions\\Math 01.tex").get(0).getOption4());
 	}
 
-	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion) {
+	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
 		
 		List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
 		
@@ -39,20 +44,20 @@ public class QuestionParser {
 					continue;
 				}
 				
-				if(StringUtils.equalsIgnoreCase("\\begin{document}", trimmed)) {
+				if(StringUtils.equalsIgnoreCase("\\begin{document}", trimmed) || StringUtils.equalsIgnoreCase("\\end{document}", trimmed)) {
 					isStartFound = true;
 					System.out.println("Found!");
 					continue;
 				}
+				
 				if(!isStartFound) {
 					continue;
 				}
-				
 				int indexOfPeriod = StringUtils.indexOf(trimmed, ".");
-				if(indexOfPeriod > 1 && indexOfPeriod < 5) {
+				if(indexOfPeriod >= 1 && indexOfPeriod < 5) {
 					
 					String questionNumber = StringUtils.substring(trimmed, 0, indexOfPeriod);
-					System.out.println("Question number =>" + questionNumber);
+					//System.out.println("Question number =>" + questionNumber);
 					if(StringUtils.isNumeric(questionNumber)) {
 						Integer questionNo = new Integer(questionNumber);
 						if( (questionNo - 1) == previousQuestion) {
@@ -70,7 +75,8 @@ public class QuestionParser {
 								edoQuestion.setOption2(option2);
 								edoQuestion.setOption3(option3);
 								edoQuestion.setOption4(option4);
-								edoQuestion.setId(questionNo);
+								edoQuestion.setId(previousQuestion);
+								parseSolution(previousQuestion, edoQuestion, solutionPath);
 								questions.add(edoQuestion);
 							}
 							
@@ -137,10 +143,70 @@ public class QuestionParser {
 				//System.out.println("..........");
 			}
 			reader.close();
+			
+			if(StringUtils.isNotBlank(question)) {
+				EdoQuestion edoQuestion = new EdoQuestion();
+				edoQuestion.setQuestion(question);
+				edoQuestion.setOption1(option1);
+				edoQuestion.setOption2(option2);
+				edoQuestion.setOption3(option3);
+				edoQuestion.setOption4(option4);
+				edoQuestion.setId(previousQuestion);
+				parseSolution(previousQuestion, edoQuestion, solutionPath);
+				questions.add(edoQuestion);
+			}
+			
 		} catch (IOException e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
 		return questions;
+	}
+	
+	public static void parseSolution(Integer questionNumber, EdoQuestion question, String filePath) {
+		BufferedReader reader;
+		
+		try {
+			reader = new BufferedReader(new FileReader(filePath));
+			String line = reader.readLine();
+			String answer = "";
+			boolean answerFound = false;
+			while (line != null) {
+				line = reader.readLine();
+				String trimmed = StringUtils.trimToEmpty(line);
+				
+				if(StringUtils.isBlank(trimmed)) {
+					continue;
+				}
+				
+				int indexOfNextAnswer = StringUtils.indexOf(trimmed, questionNumber + 1 + ANS_PARSE_KEY);
+				if(indexOfNextAnswer == 0) {
+					break;
+				}
+				
+				if(answerFound) {
+					answer = answer + trimmed;
+					continue;
+				}
+				
+				int indexOfAnswer = StringUtils.indexOf(trimmed, questionNumber + ANS_PARSE_KEY);
+				if(indexOfAnswer == 0 || answerFound) {
+					answerFound = true;
+					String correctAnswer = StringUtils.trimToEmpty(StringUtils.substring(trimmed, questionNumber.toString().length() + ANS_PARSE_KEY.length(), trimmed.length()));
+					if(StringUtils.contains(correctAnswer, "A")) {
+						question.setCorrectAnswer(EdoConstants.ATTR_OPTION1);
+					} else if (StringUtils.contains(correctAnswer, "B")) {
+						question.setCorrectAnswer(EdoConstants.ATTR_OPTION2);
+					} else if (StringUtils.contains(correctAnswer, "C")) {
+						question.setCorrectAnswer(EdoConstants.ATTR_OPTION3);
+					} else if (StringUtils.contains(correctAnswer, "D")) {
+						question.setCorrectAnswer(EdoConstants.ATTR_OPTION4);
+					}
+				}
+			}
+			question.setSolution(answer);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
 	}
 
 }

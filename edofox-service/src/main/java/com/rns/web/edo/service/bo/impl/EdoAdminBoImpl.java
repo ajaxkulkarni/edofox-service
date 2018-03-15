@@ -9,6 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
@@ -148,7 +149,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return null;
 	}
 
-	public EdoApiStatus fileUploadTestQuestions(String filePath, Integer firstQuestion, EdoTest test, Integer subjectId) {
+	@Transactional
+	public EdoApiStatus fileUploadTestQuestions(String filePath, Integer firstQuestion, EdoTest test, Integer subjectId, String solutionPath) {
 		EdoApiStatus status = new EdoApiStatus();
 		if(StringUtils.isBlank(filePath) || firstQuestion == null || test == null || test.getId() == null) {
 			status.setStatusCode(STATUS_ERROR);
@@ -156,7 +158,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			return status;
 		}
 		try {
-			List<EdoQuestion> questions = QuestionParser.parseQuestionPaper(filePath, firstQuestion);
+			//String exceptionAn = null;
+			List<EdoQuestion> questions = QuestionParser.parseQuestionPaper(filePath, firstQuestion, solutionPath);
 			if(CollectionUtils.isNotEmpty(questions)) {
 				for(EdoQuestion question: questions) {
 					question.setSubjectId(subjectId);

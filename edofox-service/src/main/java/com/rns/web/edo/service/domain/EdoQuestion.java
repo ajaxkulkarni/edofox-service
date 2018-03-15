@@ -28,6 +28,8 @@ public class EdoQuestion {
 	private String option2ImageUrl;
 	private String option3ImageUrl;
 	private String option4ImageUrl;
+	private String solution;
+	private String solutionImageUrl;
 	
 	private EDOQuestionAnalysis analysis;
 	
@@ -178,6 +180,18 @@ public class EdoQuestion {
 	}
 	public void setSubjectId(Integer subjectId) {
 		this.subjectId = subjectId;
+	}
+	public String getSolution() {
+		return solution;
+	}
+	public void setSolution(String solution) {
+		this.solution = solution;
+	}
+	public String getSolutionImageUrl() {
+		return solutionImageUrl;
+	}
+	public void setSolutionImageUrl(String solutionImageUrl) {
+		this.solutionImageUrl = solutionImageUrl;
 	}
 
 }

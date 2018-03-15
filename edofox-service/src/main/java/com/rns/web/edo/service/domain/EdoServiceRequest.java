@@ -8,6 +8,7 @@ public class EdoServiceRequest {
 	private String filePath;
 	private Integer firstQuestion;
 	private Integer subjectId;
+	private String solutionPath;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -55,6 +56,14 @@ public class EdoServiceRequest {
 
 	public void setSubjectId(Integer subjectId) {
 		this.subjectId = subjectId;
+	}
+
+	public String getSolutionPath() {
+		return solutionPath;
+	}
+
+	public void setSolutionPath(String solutionPath) {
+		this.solutionPath = solutionPath;
 	}
 	
 }

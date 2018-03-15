@@ -71,7 +71,7 @@ public class EdoAdminController {
 		LoggingUtil.logMessage("Upload Test Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			response.setStatus(adminBo.fileUploadTestQuestions(request.getFilePath(), request.getFirstQuestion(), request.getTest(), request.getSubjectId()));
+			response.setStatus(adminBo.fileUploadTestQuestions(request.getFilePath(), request.getFirstQuestion(), request.getTest(), request.getSubjectId(), request.getSolutionPath()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

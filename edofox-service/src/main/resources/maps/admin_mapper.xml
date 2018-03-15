@@ -6,13 +6,13 @@
 
 
 	<insert id="saveQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion" useGeneratedKeys="true" keyProperty="qn_id" keyColumn="id">
-		insert into test_questions (question,option1,option2,option3,option4, subject_id) 
-		values ('${question}', '${option1}', '${option2}', '${option3}' , '${option4}', ${subjectId} );
+		insert into test_questions (question,option1,option2,option3,option4, subject_id, correct_answer, solution) 
+		values ("${question}", "${option1}", "${option2}", "${option3}" , "${option4}", "${subjectId}", "${correctAnswer}", "${solution}" );
 	</insert>
 	
 	<insert id="saveTestQuestion" parameterType="com.rns.web.edo.service.domain.EdoTest">
-		insert into test_questions_map (test_id, question_id) 
-		values (${id}, ${currentQuestion.id});
+		insert into test_questions_map (test_id, question_id, question_number) 
+		values (${id}, ${currentQuestion.qn_id}, ${currentQuestion.id});
 	</insert>
 
 
