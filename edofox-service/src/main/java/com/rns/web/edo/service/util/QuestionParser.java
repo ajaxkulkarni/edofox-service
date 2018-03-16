@@ -16,14 +16,14 @@ import com.rns.web.edo.service.domain.EdoQuestion;
 
 public class QuestionParser {
 	
-	private static final String ANS_PARSE_KEY = ".Ans.:";
+	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Math 01.tex";
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\New Files\\Revised\\maths-Revise\\Math 02.tex";
 		Integer previousQuestion = 60;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Solutions\\Math 01.tex").get(0).getOption4());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Solutions\\Math 02.tex").get(9).getSolution());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
@@ -44,7 +44,7 @@ public class QuestionParser {
 					continue;
 				}
 				
-				if(StringUtils.equalsIgnoreCase("\\begin{document}", trimmed) || StringUtils.equalsIgnoreCase("\\end{document}", trimmed)) {
+				if(StringUtils.equalsIgnoreCase("\\\\begin{document}", trimmed) || StringUtils.equalsIgnoreCase("\\\\end{document}", trimmed)) {
 					isStartFound = true;
 					System.out.println("Found!");
 					continue;
@@ -158,6 +158,7 @@ public class QuestionParser {
 			
 		} catch (IOException e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
 		}
 		return questions;
 	}
@@ -178,8 +179,8 @@ public class QuestionParser {
 					continue;
 				}
 				
-				int indexOfNextAnswer = StringUtils.indexOf(trimmed, questionNumber + 1 + ANS_PARSE_KEY);
-				if(indexOfNextAnswer == 0) {
+				//int indexOfNextAnswer = StringUtils.indexOf(trimmed, questionNumber + 1 + ANS_PARSE_KEY);
+				if(StringUtils.contains(trimmed, ANS_PARSE_KEY) && answerFound) {
 					break;
 				}
 				
@@ -187,7 +188,6 @@ public class QuestionParser {
 					answer = answer + trimmed;
 					continue;
 				}
-				
 				int indexOfAnswer = StringUtils.indexOf(trimmed, questionNumber + ANS_PARSE_KEY);
 				if(indexOfAnswer == 0 || answerFound) {
 					answerFound = true;
