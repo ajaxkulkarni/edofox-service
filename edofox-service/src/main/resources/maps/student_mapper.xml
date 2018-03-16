@@ -37,7 +37,17 @@
 			open="(" separator="),(" close=")">
 			${id},${package.institute.id}, ${package.id}, 'Created', '${examMode}', '${payment.mode}'
 		</foreach>
+		<!-- (${id},${currentPackage.institute.id}, ${currentPackage.id}, 'Created', '${examMode}', '${payment.mode}')
+		ON DUPLICATE KEY UPDATE exam_mode = '${examMode}', payment_mode = '${payment.mode}' -->
 	</insert>
+	
+	<delete id="deleteExistingPackages" parameterType="com.rns.web.edo.service.domain.EdoStudent" >
+		delete from student_institute where 
+		<foreach item="package" index="index" collection="packages"
+			open="(" separator=") OR (" close=")">
+			student_id = ${id} AND package_id = ${package.id}
+		</foreach>
+	</delete>
 
 	<update id="updatePaymentId" parameterType="com.rns.web.edo.service.domain.EdoStudent">
 		UPDATE student_institute set payment_id = '${payment.paymentId}' WHERE student_id =

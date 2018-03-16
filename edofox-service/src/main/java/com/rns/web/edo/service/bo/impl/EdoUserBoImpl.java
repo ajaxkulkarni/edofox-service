@@ -310,10 +310,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				
 				LoggingUtil.logMessage("Student ID is =>" + student.getId());
 				if(student.getId() != null) {
-					testsDao.createStudentPackage(student);
+					updateStudentPackages(student);
 				}
 			} else {
-				testsDao.createStudentPackage(student);
+				updateStudentPackages(student);
 			}
 			LoggingUtil.logMessage("Transaction ID is =>" + student.getTransactionId());
 			BigDecimal amount = BigDecimal.ZERO;
@@ -337,6 +337,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	private void updateStudentPackages(EdoStudent student) {
+		testsDao.deleteExistingPackages(student);
+		testsDao.createStudentPackage(student);
 	}
 
 	public EdoApiStatus processPayment(String id, String transactionId, String paymentId) {
