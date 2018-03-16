@@ -62,16 +62,15 @@ public class EdoUserController {
 		return response;
 	}
 	
-	@GET
-	@Path("/getTest/{testId}/{studentId}")
+	@POST
+	@Path("/getTest")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public EdoServiceResponse getTest(@PathParam("testId") Integer testId, @PathParam ("studentId") Integer studentId) {
-		LoggingUtil.logMessage("Get Test Request :" + testId);
+	public EdoServiceResponse getTest(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get Test Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			EdoTest test =  userBo.getTest(testId, studentId);
-			response.setTest(test);
+			response =  userBo.getTest(request.getTest().getId(), request.getStudent().getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -155,6 +154,18 @@ public class EdoUserController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return Response.temporaryRedirect(url).build();
+	}
+	
+	@POST
+	@Path("/completePayment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse completePayment(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Complete payment Request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setPaymentStatus(userBo.completePayment(request.getTest(), request.getStudent()));
+		LoggingUtil.logMessage("Complete payment Response");
+		return response;
 	}
 	
 }

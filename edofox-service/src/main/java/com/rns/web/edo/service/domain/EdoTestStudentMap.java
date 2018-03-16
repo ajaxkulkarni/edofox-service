@@ -1,11 +1,14 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.Date;
+
 public class EdoTestStudentMap {
 
 	private EdoTest test;
 	private EdoStudent student;
 	private String status;
 	private Integer mapId;
+	private Date registerDate;
 	
 	public EdoTest getTest() {
 		return test;
@@ -31,7 +34,11 @@ public class EdoTestStudentMap {
 	public void setMapId(Integer mapId) {
 		this.mapId = mapId;
 	}
-	
-	
+	public Date getRegisterDate() {
+		return registerDate;
+	}
+	public void setRegisterDate(Date registerDate) {
+		this.registerDate = registerDate;
+	}
 	
 }

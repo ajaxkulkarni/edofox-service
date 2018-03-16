@@ -44,7 +44,10 @@
 
 	<resultMap id="testStudentMap" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
 		<result column="id" property="mapId" />
-		<result column="status" property="status" />
+		<result column="testStatus" property="status" />
+		<result column="start_date" property="test.startDate"/>
+		<result column="end_date" property="test.endDate"/>
+		<result column="registerDate" property="registerDate"/>
 	</resultMap>
 
 	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
@@ -122,6 +125,12 @@
 	<select id="getQuestion" resultMap="questions" parameterType="Integer">
 		SELECT * FROM test_questions where id = ${value};
 	</select>
+	
+	<select id="getStudentActivePackage"  parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap" resultMap="testStudentMap" >
+		SELECT *, test.status as testStatus, student_institute.created_date as registerDate FROM student_institute join test on student_institute.package_id = test.package_id 
+		where test_id = ${test.id} AND student_id = ${student.id} AND student_institute.status = 'Completed' ;
+	</select>
+	
 	
 
 </mapper>

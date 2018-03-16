@@ -2,6 +2,7 @@ package com.rns.web.edo.service.domain;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -25,6 +26,8 @@ public class EdoTest {
 	private BigDecimal score;
 	private boolean submitted;
 	private EDOTestAnalysis analysis;
+	private Date startDate;
+	private Date endDate;
 	
 	public EdoTest() {
 		
@@ -150,6 +153,22 @@ public class EdoTest {
 
 	public void setAnalysis(EDOTestAnalysis analysis) {
 		this.analysis = analysis;
+	}
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 	
 }

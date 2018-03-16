@@ -75,9 +75,17 @@
 		select * from student where mobile_no = '${phone}'
 	</select>
 	
+	<select id="getStudentById" parameterType="Integer" resultMap="studentInfo" >
+		select * from student where id = ${value}
+	</select>
+	
 	<select id="getAllStudents"  parameterType="Integer" resultMap="studentInfo" >
 		select * from student join student_institute on student.id = student_institute.student_id 
 		where institute_id = ${value}
 	</select>
-
+	
+	<select id="getTestPackage"  parameterType="Integer" resultMap="packages" >
+		select * from test join packages on test.package_id = packages.id where test.test_id = ${value}
+	</select>
+	
 </mapper>

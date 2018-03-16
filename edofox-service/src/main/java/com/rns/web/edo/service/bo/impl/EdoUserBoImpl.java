@@ -3,6 +3,8 @@ package com.rns.web.edo.service.bo.impl;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -111,9 +113,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	public EdoTest getTest(Integer testId, Integer studenId) {
+	public EdoServiceResponse getTest(Integer testId, Integer studenId) {
+		EdoServiceResponse response = new EdoServiceResponse();
 		if(testId == null) {
-			return null;
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+			return response;
 		}
 		
 		try {
@@ -122,9 +126,34 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			inputMap.setStudent(new EdoStudent(studenId));
 			EdoTestStudentMap studentMap = testsDao.getTestStatus(inputMap);
 			if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
-				EdoTest result = new EdoTest();
-				result.setSubmitted(true);
-				return result;
+				response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
+				return response;
+			}
+			
+			studentMap = testsDao.getStudentActivePackage(inputMap);
+			if(studentMap == null) {
+				//Test or package not active
+				response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_PAID, ERROR_TEST_NOT_PAID));
+				return response;
+			}
+			
+			if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
+				response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
+				return response;
+			}
+			
+			EdoTest mapTest = studentMap.getTest();
+			if(mapTest != null) {
+				if(mapTest.getStartDate() != null && mapTest.getStartDate().getTime() > new Date().getTime()) {
+					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be availble on " + CommonUtils.convertDate(mapTest.getStartDate())));
+					return response;
+				}
+				if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime()) {
+					if(studentMap.getRegisterDate() != null && studentMap.getRegisterDate().getTime() < mapTest.getEndDate().getTime()) {
+						response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
+						return response;
+					}
+				}
 			}
 			
 			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
@@ -144,14 +173,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						count++;
 					}
 				}
-				return result;
+				response.setTest(result);
 			}
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
 		}
 		
-		return null;
+		return response;
 	}
 
 	private void setQuestionURLs(EdoQuestion question) {
@@ -315,28 +345,32 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			} else {
 				updateStudentPackages(student);
 			}
-			LoggingUtil.logMessage("Transaction ID is =>" + student.getTransactionId());
-			BigDecimal amount = BigDecimal.ZERO;
-			for(EDOPackage p: student.getPackages()) {
-				if(p.getPrice() != null && StringUtils.equals(student.getExamMode(), "Online")) {
-					amount = p.getPrice().add(amount);
-				} else if (p.getOfflinePrice() != null) {
-					amount = p.getOfflinePrice().add(amount);
-				}
-			}
-			if(!student.getPayment().isOffline()) {
-				EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId());
-				if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
-					student.setPayment(paymentResponse);
-					testsDao.updatePaymentId(student);
-				}
-				response.setPaymentStatus(paymentResponse);
-			}
+			completePayment(student, response);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	private void completePayment(EdoStudent student, EdoServiceResponse response) {
+		LoggingUtil.logMessage("Transaction ID is =>" + student.getTransactionId());
+		BigDecimal amount = BigDecimal.ZERO;
+		for(EDOPackage p: student.getPackages()) {
+			if(p.getPrice() != null && StringUtils.equals(student.getExamMode(), "Online")) {
+				amount = p.getPrice().add(amount);
+			} else if (p.getOfflinePrice() != null) {
+				amount = p.getOfflinePrice().add(amount);
+			}
+		}
+		if(!student.getPayment().isOffline()) {
+			EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId());
+			if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
+				student.setPayment(paymentResponse);
+				testsDao.updatePaymentId(student);
+			}
+			response.setPaymentStatus(paymentResponse);
+		}
 	}
 
 	private void updateStudentPackages(EdoStudent student) {
@@ -363,6 +397,42 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return status;
+	}
+
+	public EdoPaymentStatus completePayment(EdoTest test, EdoStudent student) {
+		EdoPaymentStatus status = new EdoPaymentStatus();
+		if(test == null || test.getId() == null || student == null || student.getId() == null) {
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		try {
+			EdoStudent existing = testsDao.getStudentById(student.getId());
+			if(existing == null) {
+				status.setStatusCode(STATUS_ERROR);
+				status.setResponseText(ERROR_STUDENT_NOT_FOUND);
+				return status;
+			}
+			EDOPackage pkg = testsDao.getTestPackage(test.getId());
+			if(pkg != null) {
+				List<EDOPackage> packages = new ArrayList<EDOPackage>();
+				packages.add(pkg);
+				EdoPaymentStatus payment = new EdoPaymentStatus();
+				payment.setMode("Online");
+				payment.setOffline(false);
+				existing.setPayment(payment);
+				existing.setPackages(packages);
+				existing.setExamMode(student.getExamMode());
+				updateStudentPackages(existing);
+				EdoServiceResponse response = new EdoServiceResponse();
+				completePayment(existing, response);
+				return response.getPaymentStatus();
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return null;
 	}
 
 }

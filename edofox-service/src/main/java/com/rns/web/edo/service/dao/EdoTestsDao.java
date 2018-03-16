@@ -13,7 +13,6 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 
 public interface EdoTestsDao {
 
-	char[] getstu = null;
 	//Fetch queries
 	List<EdoQuestion> getTestResult(EdoStudent student);
 	List<EdoQuestion> getExamQuestions(Integer value);
@@ -21,6 +20,7 @@ public interface EdoTestsDao {
 	List<EdoTestQuestionMap> getExam(Integer value);
 	List<EdoTestQuestionMap> getExamResult(EdoServiceRequest request);
 	EdoTestStudentMap getTestStatus(EdoTestStudentMap map); 
+	EdoTestStudentMap getStudentActivePackage(EdoTestStudentMap map);
 	
 	//Save queries
 	Integer saveTestResult(EdoServiceRequest request);
@@ -40,6 +40,8 @@ public interface EdoTestsDao {
 	Integer updatePaymentId(EdoStudent student);
 	Integer updatePayment(EdoPaymentStatus status);
 	List<EdoStudent> getStudentByPhoneNumber(EdoStudent student);
+	EDOPackage getTestPackage(Integer testId);
+	EdoStudent getStudentById(Integer id);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);
