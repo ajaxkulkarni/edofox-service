@@ -79,5 +79,21 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/uploadSolution")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse uploadSolution(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Upload Solutions Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setStatus(adminBo.fileUploadTestSolutions(request.getFilePath(), request.getTest(), request.getSubjectId()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Upload Solutions Response");
+		return response;
+	}
+	
 
 }
