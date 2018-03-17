@@ -16,7 +16,7 @@
 	</insert>
 	
 	<update id="updateSolution" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
-		UPDATE test_questions set correct_answer = '${correctAnswer}', solution = '${solution}' WHERE id = ${qn_id}
+		UPDATE test_questions set correct_answer = "${correctAnswer}", solution = "${solution}"  WHERE id = ${qn_id}
 	</update>
 
 
