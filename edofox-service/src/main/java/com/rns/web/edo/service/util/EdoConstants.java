@@ -5,7 +5,7 @@ public interface EdoConstants {
 	String HOST_NAME = "http://45.33.7.172:8080/edofox/service/";
 	//String HOST_NAME = "http://localhost:8080/edo-service/service/"; //DEV
 	
-	//String UI_HOST = "http://localhost:51050/registration/"; //DEV
+	//String UI_HOST = "http://localhost:59370/registration/"; //DEV
 	String UI_HOST = "http://www.visionlatur.com/mastertest/registration/";
 	
 	String RESPONSE_OK = "OK";
@@ -28,17 +28,19 @@ public interface EdoConstants {
 	String ERROR_TEST_EXPIRED = "Sorry. This test is already expired ..";
 	String ERROR_STUDENT_NOT_FOUND = "Student profile not found!";
 	
-	
+	String COMMA_SEPARATOR = ", ";
 	
 	String TEST_STATUS_COMPLETED = "COMPLETED";
 	String STATUS_ACTIVE = "Active";
-	
 	
 	String ATTR_QUESTION = "question";
 	String ATTR_OPTION4 = "option4";
 	String ATTR_OPTION3 = "option3";
 	String ATTR_OPTION2 = "option2";
 	String ATTR_OPTION1 = "option1";
+	
+	String MAIL_TYPE_SUBSCRIPTION = "SubscriptionMail";
+	String MAIL_TYPE_ACTIVATED = "PackageActivated";
 	
 	//DEV
 	String TESTS_JSON_PATH = "F:\\Resoneuronance\\Edofox\\Document\\tests";

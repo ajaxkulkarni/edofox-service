@@ -14,6 +14,10 @@
 		insert into test_questions_map (test_id, question_id, question_number) 
 		values (${id}, ${currentQuestion.qn_id}, ${currentQuestion.id});
 	</insert>
+	
+	<update id="updateSolution" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
+		UPDATE test_questions set correct_answer = '${correctAnswer}', solution = '${solution}' WHERE id = ${qn_id}
+	</update>
 
 
 </mapper>

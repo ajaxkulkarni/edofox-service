@@ -180,5 +180,36 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return status;
 	}
 
+	public EdoApiStatus fileUploadTestSolutions(String filePath, EdoTest test, Integer subjectId) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(StringUtils.isBlank(filePath) || test == null || test.getId() == null) {
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		try {
+			List<EdoQuestion> testQuestions = testsDao.getExamQuestions(test.getId());
+			//String exceptionAn = null;
+			if(CollectionUtils.isNotEmpty(testQuestions)) {
+				for(EdoQuestion question: testQuestions) {
+					if(question.getQuestionNumber() == null) {
+						continue;
+					}
+					if(question.getSubjectId() != subjectId) {
+						continue;
+					}
+					QuestionParser.parseSolution(question.getQuestionNumber(), question, filePath);
+					testsDao.updateSolution(question);
+					LoggingUtil.logMessage("Uploaded solution for .." + question.getQuestionNumber() + " : " + question.getQn_id());
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_IN_PROCESSING);
+		}
+		return status;
+	}
+
 
 }

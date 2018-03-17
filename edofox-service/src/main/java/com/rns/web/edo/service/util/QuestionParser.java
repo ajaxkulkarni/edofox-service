@@ -19,11 +19,11 @@ public class QuestionParser {
 	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Question Papers\\Chem 01.tex";
-		Integer previousQuestion = 45;
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Question Papers\\Bio 02.tex";
+		Integer previousQuestion = 0;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Solutions\\Chem 01.tex").size());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Solutions\\Bio 02.tex").size());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
@@ -201,6 +201,7 @@ public class QuestionParser {
 					} else if (StringUtils.contains(correctAnswer, "D")) {
 						question.setCorrectAnswer(EdoConstants.ATTR_OPTION4);
 					}
+					System.out.println("Answer:" + question.getCorrectAnswer());
 				}
 			}
 			question.setSolution(answer);

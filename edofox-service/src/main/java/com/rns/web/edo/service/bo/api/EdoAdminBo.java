@@ -11,5 +11,5 @@ public interface EdoAdminBo {
 	EdoServiceResponse getTestResults(EdoTest test);
 	EdoServiceResponse getAllStudents(EDOInstitute institute);
 	EdoApiStatus fileUploadTestQuestions(String filePath, Integer firstQuestion, EdoTest test, Integer subjectId, String solutionPath);
-
+	EdoApiStatus fileUploadTestSolutions(String filePath, EdoTest test, Integer subjectId);
 }

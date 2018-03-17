@@ -1,21 +1,121 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<meta charset="ISO-8859-1">
-<title>Insert title here</title>
+   <title>Latur Vision| Print Receipt</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        .print_div {
+            max-width: 800px;
+            background: white;
+            box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+            display: block;
+            margin: 32px auto;
+            padding: 16px;
+            border-radius: 10px;
+        }
+        
+        .sub_heading {
+            font-size: 25px;
+            font-family: roboto;
+            text-align: center;
+            border-bottom: 1px solid #44BD48;
+            color: rgba(0, 0, 0, 0.28);
+            margin-bottom: 16px;
+        }
+        
+        #receipt_info_table td {
+            color: rgba(0, 0, 0, 0.59);
+            font-weight: 500;
+            border: 0;
+        }
+        
+        #create_btn,
+        #create_btn:hover,
+        #create_btn:focus,
+        #create_btn:active {
+            /*    background-color: #18A263;*/
+            background: #18A263;
+            background: linear-gradient(#1CD881, #18A263);
+            color: white;
+            border-radius: 20px;
+            text-transform: capitalize;
+            font-size: 14px !important;
+            display: block;
+            margin: auto;
+        }
+
+    </style>
 </head>
+
 <body>
 
-Hello {name},
-<br/> <br/>
-Thank you for showing interest in us.
-<br/> <br/>
-Our associates will contact you shortly for activating your account.
-<br/> <br/>
+    <div class="container">
+        <div class="print_div" id="print_div">
 
-Best Regards, <br/>
-Team HR Easy <br/>
+            <h2 class="sub_heading">You have registered successfully!</h2>
+            <p></p>
 
+            <table class="table table-responsive" id="receipt_info_table">
+                <tbody>
+                    <tr>
+                        <td>Student Name</td>
+                        <td>{name}</td>
+                    </tr>
+                    <tr>
+                        <td>Student Phone</td>
+                        <td>{phone}</td>
+                    </tr>
+                    <tr>
+                        <td>Package(s) Purchased</td>
+                        <td>{packages}</td>
+                    </tr>
+                    <tr>
+                        <td>Exam Mode</td>
+                        <td>{examMode}</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Mode</td>
+                        <td>{paymentMode}</td>
+                    </tr>
+                    <tr>
+                        <td>Payment ID (Only for online payment)</td>
+                        <td>{paymentId}</td>
+                    </tr>
+                    <tr>
+                        <td>Transaction ID (Only for online payment)</td>
+                        <td>{transactionId}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Login at <a href="http://test.edofox.com">http://test.edofox.com</a> with your registered mobile number and password for online exams and exam results</p>
+            <p>Offline exams will take place at the Latur center</p>
+            <p>For any queries, contact Kiran Kore @ <a href='tel:9561860956'>9561860956</a></p>
+            
+        </div>
+        <!-- <div>
+            <button class="btn btn-lg" id="create_btn" onclick="printContent('print_div')">Print Receipt</button>
+        </div> -->
+    </div>
+
+
+
+    <script>
+        function printContent(el) {
+            var restorepage = document.body.innerHTML;
+            var printcontent = document.getElementById(el).innerHTML;
+            document.body.innerHTML = printcontent;
+            window.print();
+            document.body.innerHTML = restorepage;
+        }
+
+    </script>
 
 </body>
+
 </html>

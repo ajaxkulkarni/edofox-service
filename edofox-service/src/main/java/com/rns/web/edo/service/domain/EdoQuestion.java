@@ -30,6 +30,7 @@ public class EdoQuestion {
 	private String option4ImageUrl;
 	private String solution;
 	private String solutionImageUrl;
+	private Integer questionNumber;
 	
 	private EDOQuestionAnalysis analysis;
 	
@@ -192,6 +193,12 @@ public class EdoQuestion {
 	}
 	public void setSolutionImageUrl(String solutionImageUrl) {
 		this.solutionImageUrl = solutionImageUrl;
+	}
+	public Integer getQuestionNumber() {
+		return questionNumber;
+	}
+	public void setQuestionNumber(Integer questionNumber) {
+		this.questionNumber = questionNumber;
 	}
 
 }

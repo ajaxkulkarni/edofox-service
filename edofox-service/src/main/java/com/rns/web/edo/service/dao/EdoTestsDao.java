@@ -46,5 +46,6 @@ public interface EdoTestsDao {
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);
 	Integer saveTestQuestion(EdoTest test);
+	Integer updateSolution(EdoQuestion question);
 	
 }

@@ -28,6 +28,7 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
 
@@ -346,6 +347,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				updateStudentPackages(student);
 			}
 			completePayment(student, response);
+			EdoMailUtil edoMailUtil = new EdoMailUtil(MAIL_TYPE_SUBSCRIPTION);
+			edoMailUtil.setStudent(student);
+			executor.execute(edoMailUtil);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
