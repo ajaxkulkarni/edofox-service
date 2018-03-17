@@ -161,6 +161,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			//String exceptionAn = null;
 			List<EdoQuestion> questions = QuestionParser.parseQuestionPaper(filePath, firstQuestion, solutionPath);
 			if(CollectionUtils.isNotEmpty(questions)) {
+				LoggingUtil.logMessage("Total questions parsed =>" + questions.size());
 				for(EdoQuestion question: questions) {
 					question.setSubjectId(subjectId);
 					testsDao.saveQuestion(question);

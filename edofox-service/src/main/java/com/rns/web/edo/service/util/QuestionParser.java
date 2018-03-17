@@ -19,11 +19,11 @@ public class QuestionParser {
 	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\New Files\\Revised\\maths-Revise\\Math 02.tex";
-		Integer previousQuestion = 60;
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Question Papers\\Chem 01.tex";
+		Integer previousQuestion = 45;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\Solutions\\Math 02.tex").get(9).getSolution());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Solutions\\Chem 01.tex").size());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
@@ -57,16 +57,16 @@ public class QuestionParser {
 				if(indexOfPeriod >= 1 && indexOfPeriod < 5) {
 					
 					String questionNumber = StringUtils.substring(trimmed, 0, indexOfPeriod);
-					//System.out.println("Question number =>" + questionNumber);
+					LoggingUtil.logMessage("Question number =>" + questionNumber);
 					if(StringUtils.isNumeric(questionNumber)) {
 						Integer questionNo = new Integer(questionNumber);
 						if( (questionNo - 1) == previousQuestion) {
 							
-							System.out.println("Question =>" + question);
-							System.out.println("Option 1 =>" + option1);
-							System.out.println("Option 2 =>" + option2);
-							System.out.println("Option 3 =>" + option3);
-							System.out.println("Option 4 =>" + option4);
+							LoggingUtil.logMessage("Question =>" + question);
+							LoggingUtil.logMessage("Option 1 =>" + option1);
+							LoggingUtil.logMessage("Option 2 =>" + option2);
+							LoggingUtil.logMessage("Option 3 =>" + option3);
+							LoggingUtil.logMessage("Option 4 =>" + option4);
 							
 							if(StringUtils.isNotBlank(question)) {
 								EdoQuestion edoQuestion = new EdoQuestion();
