@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-   <title>Vision Latur</title>
+   <title>Latur Vision| Print Receipt</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -58,7 +58,7 @@
     <div class="container">
         <div class="print_div" id="print_div">
 
-            <h2 class="sub_heading">You have registered successfully!</h2>
+            <h2 class="sub_heading">Following packages have been activated for you - </h2>
             <p></p>
 
             <table class="table table-responsive" id="receipt_info_table">
@@ -68,21 +68,10 @@
                         <td>{name}</td>
                     </tr>
                     <tr>
-                        <td>Student Phone</td>
-                        <td>{phone}</td>
-                    </tr>
-                    <tr>
-                        <td>Package(s) Purchased</td>
+                        <td>Package(s) Activated</td>
                         <td>{packages}</td>
                     </tr>
-                    <tr>
-                        <td>Exam Mode</td>
-                        <td>{examMode}</td>
-                    </tr>
-                    <tr>
-                        <td>Payment Mode</td>
-                        <td>{paymentMode}</td>
-                    </tr>
+                    
                     <tr>
                         <td>Payment ID (Only for online payment)</td>
                         <td>{paymentId}</td>
@@ -95,10 +84,7 @@
             </table>
             <p>Login at <a href="http://test.edofox.com">http://test.edofox.com</a> with your registered mobile number and password for online exams and exam results</p>
             <p>Offline exams will take place at the Latur center</p>
-            <p>For any queries, contact Kiran Kore @ <a href='tel:9561860956'>9561860956</a> or visit <a href="http://visionlatur.com/"> http://visionlatur.com/ </a></p>
-            
-            <p style="color:red">Note: Please complete the payment online / offline to have complete access to Vision Latur features</p>
-            
+            <p>For any queries, contact Kiran Kore @ <a href='tel:9561860956'>9561860956 </a> or visit <a href="http://visionlatur.com/"> http://visionlatur.com/ </a></p>
         </div>
         <!-- <div>
             <button class="btn btn-lg" id="create_btn" onclick="printContent('print_div')">Print Receipt</button>

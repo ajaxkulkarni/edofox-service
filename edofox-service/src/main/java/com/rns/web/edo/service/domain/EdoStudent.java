@@ -24,6 +24,7 @@ public class EdoStudent {
 	private String dob;
 	private String casteCategory;
 	private String examMode;
+	private EDOPackage currentPackage;
 
 	public EdoStudent() {
 
@@ -151,6 +152,14 @@ public class EdoStudent {
 
 	public void setExamMode(String examMode) {
 		this.examMode = examMode;
+	}
+
+	public EDOPackage getCurrentPackage() {
+		return currentPackage;
+	}
+
+	public void setCurrentPackage(EDOPackage currentPackage) {
+		this.currentPackage = currentPackage;
 	}
 	
 }

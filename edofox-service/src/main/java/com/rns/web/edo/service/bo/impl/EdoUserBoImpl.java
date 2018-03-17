@@ -29,6 +29,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
+import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
 
@@ -347,14 +348,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				updateStudentPackages(student);
 			}
 			completePayment(student, response);
-			EdoMailUtil edoMailUtil = new EdoMailUtil(MAIL_TYPE_SUBSCRIPTION);
-			edoMailUtil.setStudent(student);
-			executor.execute(edoMailUtil);
+			
+			//SMS and email
+			notifyStudent(student, MAIL_TYPE_SUBSCRIPTION);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	private void notifyStudent(EdoStudent student, String mailType) {
+		EdoMailUtil edoMailUtil = new EdoMailUtil(mailType);
+		edoMailUtil.setStudent(student);
+		executor.execute(edoMailUtil);
+		
+		EdoSMSUtil edoSMSUtil = new EdoSMSUtil(mailType);
+		edoSMSUtil.setStudent(student);
+		executor.execute(edoSMSUtil);
 	}
 
 	private void completePayment(EdoStudent student, EdoServiceResponse response) {
@@ -390,7 +401,27 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
 				paymentStatus.setPaymentId(id);
 				paymentStatus.setResponseText("Completed");
+				paymentStatus.setOffline(false);
 				testsDao.updatePayment(paymentStatus);
+				List<EdoStudent> studentPackages = testsDao.getStudentByPayment(id);
+				if(CollectionUtils.isNotEmpty(studentPackages)) {
+					EdoStudent edoStudent = new EdoStudent();
+					List<EDOPackage> packages = new ArrayList<EDOPackage>();
+					for(EdoStudent student: studentPackages) {
+						if(student.getCurrentPackage() != null) {
+							packages.add(student.getCurrentPackage());
+						}
+						edoStudent.setName(student.getName());
+						edoStudent.setPhone(student.getPhone());
+						edoStudent.setEmail(student.getEmail());
+					}
+					if(transactionId != null) {
+						edoStudent.setTransactionId(new Integer(StringUtils.removeStart(transactionId, "T")));
+					}
+					edoStudent.setPackages(packages);
+					edoStudent.setPayment(paymentStatus);
+					notifyStudent(edoStudent, MAIL_TYPE_ACTIVATED);
+				}
 			} else {
 				EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
 				paymentStatus.setPaymentId(id);
@@ -399,6 +430,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_IN_PROCESSING);
 		}
 		return status;
 	}

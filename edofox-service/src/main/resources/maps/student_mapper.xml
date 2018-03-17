@@ -68,8 +68,9 @@
 		<result column="name" property="name" />
 		<result column="email" property="email" />
 		<result column="mobile_no" property="phone" />
-
+		<result column="package_name" property="currentPackage.name"/>				
 	</resultMap>
+	
 	
 	<select id="getStudentByPhoneNumber" parameterType="com.rns.web.edo.service.domain.EdoPaymentStatus" resultMap="studentInfo" >
 		select * from student where mobile_no = '${phone}'
@@ -86,6 +87,13 @@
 	
 	<select id="getTestPackage"  parameterType="Integer" resultMap="packages" >
 		select * from test join packages on test.package_id = packages.id where test.test_id = ${value}
+	</select>
+	
+	<select id="getStudentByPayment" parameterType="String" resultMap="studentInfo" >
+		SELECT * FROM student_institute 
+		join student on student.id = student_institute.student_id
+		join packages on student_institute.package_id = packages.id
+		where student_institute.payment_id = '${value}';
 	</select>
 	
 </mapper>

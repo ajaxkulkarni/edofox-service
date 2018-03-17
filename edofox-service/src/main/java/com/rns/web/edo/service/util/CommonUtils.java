@@ -11,10 +11,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
+import com.rns.web.edo.service.domain.EdoStudent;
 
 public class CommonUtils {
 	
@@ -151,5 +154,43 @@ public class CommonUtils {
 		value = value.round(new MathContext(2, RoundingMode.HALF_UP)).multiply(new BigDecimal(100));
 		return value;
 	}
+	
+	public static String extractPackages(EdoStudent student) {
+		String packages = "";
+		if(CollectionUtils.isNotEmpty(student.getPackages())) {
+			for(EDOPackage pkg: student.getPackages()) {
+				packages = packages + pkg.getName() + EdoConstants.COMMA_SEPARATOR;
+			}
+		}
+		packages = StringUtils.removeEnd(packages, EdoConstants.COMMA_SEPARATOR);
+		return packages;
+	}
+	
+	public static String prepareStudentNotification(String result, EdoStudent student) {
+		if (student != null) {
+			result = StringUtils.replace(result, "{name}", CommonUtils.getStringValue(student.getName()));
+			//result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(user.getPassword()));
+			result = StringUtils.replace(result, "{gender}", CommonUtils.getStringValue(student.getGender()));
+			result = StringUtils.replace(result, "{phone}", CommonUtils.getStringValue(student.getPhone()));
+			result = StringUtils.replace(result, "{examMode}", CommonUtils.getStringValue(student.getExamMode()));
+			result = StringUtils.replace(result, "{packages}", CommonUtils.extractPackages(student));
+			if(student.getPayment() != null) {
+				if(student.getPayment().isOffline()) {
+					result = StringUtils.replace(result, "{paymentMode}", "Offline");
+				} else {
+					result = StringUtils.replace(result, "{paymentMode}",  "Online");
+				}
+				result = StringUtils.replace(result, "{paymentId}", CommonUtils.getStringValue(student.getPayment().getPaymentId()));
+				result = StringUtils.replace(result, "{transactionId}", CommonUtils.getStringValue(student.getTransactionId()));
+			} else {
+				result = StringUtils.replace(result, "{paymentMode}", "");
+				result = StringUtils.replace(result, "{paymentId}", "");
+				result = StringUtils.replace(result, "{transactionId}", "");
+			}
+			
+		}
+		return result;
+	}
+
 	
 }

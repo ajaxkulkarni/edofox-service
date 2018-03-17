@@ -94,35 +94,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		try {
 			//boolean attachCv = false;
 			String result = readMailContent(message);
-			if (student != null) {
-				result = StringUtils.replace(result, "{name}", CommonUtils.getStringValue(student.getName()));
-				//result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(user.getPassword()));
-				result = StringUtils.replace(result, "{gender}", CommonUtils.getStringValue(student.getGender()));
-				result = StringUtils.replace(result, "{phone}", CommonUtils.getStringValue(student.getPhone()));
-				result = StringUtils.replace(result, "{examMode}", CommonUtils.getStringValue(student.getExamMode()));
-				String packages = "";
-				if(CollectionUtils.isNotEmpty(student.getPackages())) {
-					for(EDOPackage pkg: student.getPackages()) {
-						packages = packages + pkg.getName() + COMMA_SEPARATOR;
-					}
-				}
-				packages = StringUtils.removeEnd(packages, COMMA_SEPARATOR);
-				result = StringUtils.replace(result, "{packages}", packages);
-				if(student.getPayment() != null) {
-					if(student.getPayment().isOffline()) {
-						result = StringUtils.replace(result, "{paymentMode}", "Offline");
-					} else {
-						result = StringUtils.replace(result, "{paymentMode}",  "Online");
-					}
-					result = StringUtils.replace(result, "{paymentId}", CommonUtils.getStringValue(student.getPayment().getPaymentId()));
-					result = StringUtils.replace(result, "{transactionId}", CommonUtils.getStringValue(student.getTransactionId()));
-				} else {
-					result = StringUtils.replace(result, "{paymentMode}", "");
-					result = StringUtils.replace(result, "{paymentId}", "");
-					result = StringUtils.replace(result, "{transactionId}", "");
-				}
-				
-			}
+			result = CommonUtils.prepareStudentNotification(result, student);
 			
 			//message.setContent(result, "text/html");
 			message.setContent(result, "text/html; charset=utf-8");
@@ -140,13 +112,10 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		return "";
 	}
 
-
-	
 	public void run() {
 		sendMail();
 	}
 
-	
 	private String readMailContent(Message message) throws FileNotFoundException, MessagingException {
 		String contentPath = "";
 		contentPath = "email/" + MAIL_TEMPLATES.get(type);
@@ -166,14 +135,14 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private static Map<String, String> MAIL_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "subscription_mail.html");
-			put(MAIL_TYPE_SUBSCRIPTION, "package_active.html");
+			put(MAIL_TYPE_ACTIVATED, "package_active.html");
 		}
 	});
 
 	private static Map<String, String> MAIL_SUBJECTS = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "Thank you for subscribing to Vision Latur!");
-			put(MAIL_TYPE_SUBSCRIPTION, "Your test package is now active!");
+			put(MAIL_TYPE_ACTIVATED, "Your test package is now active!");
 		}
 	});
 
