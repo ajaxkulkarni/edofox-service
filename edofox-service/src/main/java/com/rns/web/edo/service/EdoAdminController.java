@@ -95,5 +95,21 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/revaluateResult")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse revaluateResult(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Revaluate Solutions Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setStatus(adminBo.revaluateResult(request));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Revaluate Solutions Response");
+		return response;
+	}
+	
 
 }

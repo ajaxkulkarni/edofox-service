@@ -41,6 +41,7 @@ public interface EdoConstants {
 	
 	String MAIL_TYPE_SUBSCRIPTION = "SubscriptionMail";
 	String MAIL_TYPE_ACTIVATED = "PackageActivated";
+	String MAIL_TYPE_TEST_RESULT = "TestResult";
 	
 	//DEV
 	String TESTS_JSON_PATH = "F:\\Resoneuronance\\Edofox\\Document\\tests";

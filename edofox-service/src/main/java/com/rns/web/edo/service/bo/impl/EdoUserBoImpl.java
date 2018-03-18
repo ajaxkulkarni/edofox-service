@@ -224,42 +224,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			List<EdoQuestion> questions = testsDao.getExamQuestions(test.getId());
+			
 			if(CollectionUtils.isEmpty(questions)) {
 				status.setResponseText(ERROR_IN_PROCESSING);
 				status.setStatusCode(STATUS_ERROR);
 				return status;
 			}
-			
-			Integer solvedCount = 0;
-			Integer correctCount = 0;
-			Integer flaggedCount = 0;
-			BigDecimal score = BigDecimal.ZERO;
-			for(EdoQuestion answered: test.getTest()) {
-				if(StringUtils.isNotBlank(answered.getAnswer())) {
-					for(EdoQuestion question: questions) {
-						if(question.getQn_id() == answered.getQn_id() && StringUtils.equalsIgnoreCase(answered.getAnswer(), question.getCorrectAnswer())) {
-							correctCount++;
-							if(question.getWeightage() != null) {
-								score = score.add(new BigDecimal(question.getWeightage()));
-							}
-							break;
-						} else {
-							if(question.getNegativeMarks() != null) {
-								score = score.subtract(new BigDecimal(question.getNegativeMarks()));
-							}
-							break;
-						}
-					}
-					solvedCount++;
-				}
-				if(answered.getFlagged() != null && answered.getFlagged() == 1) {
-					flaggedCount++;
-				}
-			}
-			test.setCorrectCount(correctCount);
-			test.setFlaggedCount(flaggedCount);
-			test.setSolvedCount(solvedCount);
-			test.setScore(score);
+			CommonUtils.calculateTestScore(test, questions);
 			testsDao.saveTestResult(request);
 			testsDao.saveTestStatus(request);
 		} catch (Exception e) {
@@ -269,7 +240,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return status;
 	}
-
+	
 	public EdoFile getQuestionImage(Integer questionId, String imageType) {
 		
 		try {

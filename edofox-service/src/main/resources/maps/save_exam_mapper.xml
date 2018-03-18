@@ -24,6 +24,10 @@
 		insert into test_status (test_id, student_id, status, solved, correct, flagged, score) 
 		values(${test.id}, ${student.id}, 'COMPLETED', ${test.solvedCount}, ${test.correctCount}, ${test.flaggedCount}, ${test.score});
 	</insert>
-
+	
+	<update id="updateTestStatus" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		update test_status set solved = ${test.solvedCount}, correct = ${test.correctCount}, score = ${test.score} 
+		where test_id = ${test.id} AND student_id = ${student.id}
+	</update>
 
 </mapper>

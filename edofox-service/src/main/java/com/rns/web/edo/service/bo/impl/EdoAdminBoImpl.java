@@ -17,11 +17,14 @@ import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
+import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.QuestionParser;
 
@@ -205,6 +208,41 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_IN_PROCESSING);
+		}
+		return status;
+	}
+
+	public EdoApiStatus revaluateResult(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(request.getStudent() == null || request.getTest().getId() == null || request.getTest() == null || request.getTest().getId() == null) {
+			status.setResponseText(ERROR_INCOMPLETE_REQUEST);
+			status.setStatusCode(STATUS_ERROR);
+		}
+		try {
+			
+			List<EdoQuestion> questions = testsDao.getExamQuestions(request.getTest().getId());
+			List<EdoTestQuestionMap> map = testsDao.getExamResult(request);
+			List<EdoQuestion> solved = new ArrayList<EdoQuestion>();
+			if(CollectionUtils.isNotEmpty(map)) {
+				for(EdoTestQuestionMap mapper: map) {
+					solved.add(mapper.getQuestion());
+				}
+				request.getTest().setName(map.get(0).getTest().getName());
+				request.getTest().setTotalMarks(map.get(0).getTest().getTotalMarks());
+				request.getTest().setTest(solved);
+				CommonUtils.calculateTestScore(request.getTest(), questions);
+				testsDao.updateTestStatus(request);
+				EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+				smsUtil.setTest(request.getTest());
+				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
+				smsUtil.setStudent(student);
+				executor.execute(smsUtil);
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
 		}

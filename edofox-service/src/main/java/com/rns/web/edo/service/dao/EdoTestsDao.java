@@ -25,6 +25,7 @@ public interface EdoTestsDao {
 	//Save queries
 	Integer saveTestResult(EdoServiceRequest request);
 	Integer saveTestStatus(EdoServiceRequest request);
+	Integer updateTestStatus(EdoServiceRequest request);
 	//public List<EdoQuestion> getTestUnsolved(EdoStudent student);
 	
 	//Analysis

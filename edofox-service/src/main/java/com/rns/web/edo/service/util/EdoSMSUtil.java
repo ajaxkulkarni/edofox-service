@@ -1,5 +1,6 @@
 package com.rns.web.edo.service.util;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.rmi.server.SkeletonMismatchException;
 import java.util.Base64.Encoder;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.EdoTest;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -22,6 +24,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
 	private EdoStudent student;
 	private String type;
+	private EdoTest test;
+	
 	
 	public EdoSMSUtil() {
 	
@@ -53,6 +57,10 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 			/*message = StringUtils.replace(message, "{name}", student.getName());
 			message = StringUtils.replace(message, "{transactionId}", CommonUtils.getStringValue(student.getTransactionId()));*/
 			message = CommonUtils.prepareStudentNotification(message, student);
+			
+			if(test != null) {
+				message = CommonUtils.prepareTestNotification(message, test);
+			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 			ClientConfig config = new DefaultClientConfig();
 			Client client = Client.create(config);
@@ -74,20 +82,38 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	}
 
 	public static void main(String[] args) {
-		EdoSMSUtil mail = new EdoSMSUtil(MAIL_TYPE_SUBSCRIPTION);
+		EdoSMSUtil mail = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
 		EdoStudent s = new EdoStudent();
 		s.setPhone("9423040642");
 		s.setName("Ajinkya C Kulkarni");
+		EdoTest t = new EdoTest();
+		t.setSolvedCount(11);
+		t.setCorrectCount(11);
+		t.setTotalMarks(1800);
+		t.setName("JEE 2018");
+		t.setScore(new BigDecimal(123));
+		mail.setTest(t);
 		mail.setStudent(s);
 		mail.sendSMS();
 	}
 	
+	public EdoTest getTest() {
+		return test;
+	}
+
+	public void setTest(EdoTest test) {
+		this.test = test;
+	}
+
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "Hi {name}, Welcome to Vision Latur. Please complete the payment in order to have full access to Vision Latur features.");
 			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your Vision Latur package {packages} is activated. Transaction ID - {transactionId}.");
+			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your Vision Latur {testName} final result is - "
+					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}"
+					+ "\nYou can also review the results by logging in to vision latur dashboard at visionlatur.com."
+					+ "\nYou will get the state wide rank report soon. All the best for the next exam!");
 		}
 	});
-	
 	
 }
