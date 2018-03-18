@@ -233,6 +233,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.calculateTestScore(test, questions);
 			testsDao.saveTestResult(request);
 			testsDao.saveTestStatus(request);
+			
+			EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+			smsUtil.setTest(test);
+			EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
+			smsUtil.setStudent(student);
+			executor.execute(smsUtil);
+			
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
