@@ -1,6 +1,8 @@
 package com.rns.web.edo.service.domain;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EDOTestAnalysis {
 	
@@ -8,6 +10,7 @@ public class EDOTestAnalysis {
 	private BigDecimal averageScore;
 	private BigDecimal averageCorrect;
 	private BigDecimal averageAttempted;
+	private Map<String, BigDecimal> subjectWiseScore = new HashMap<String, BigDecimal>();
 	
 	public Integer getStudentsAppeared() {
 		return studentsAppeared;
@@ -32,6 +35,12 @@ public class EDOTestAnalysis {
 	}
 	public void setAverageAttempted(BigDecimal averageAttempted) {
 		this.averageAttempted = averageAttempted;
+	}
+	public Map<String, BigDecimal> getSubjectWiseScore() {
+		return subjectWiseScore;
+	}
+	public void setSubjectWiseScore(Map<String, BigDecimal> subjectWiseScore) {
+		this.subjectWiseScore = subjectWiseScore;
 	}
 	
 }

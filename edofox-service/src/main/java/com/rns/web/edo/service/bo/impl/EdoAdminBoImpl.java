@@ -15,6 +15,7 @@ import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
+import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -53,10 +54,18 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			return response;
 		}
 		try {
-			EdoTest analysis = testsDao.getExamAnalysis(test.getId());
+			List<EdoTest> records = testsDao.getExamAnalysis(test.getId());
+			
+			if(CollectionUtils.isEmpty(records)) {
+				return response;
+			}
+			
+			EdoTest analysis = records.get(0);
+			response.setTest(analysis);
+			
 			if(analysis == null || analysis.getId() == null || analysis.getAnalysis() == null || analysis.getAnalysis().getStudentsAppeared() == null) {
 				LoggingUtil.logMessage("No test result found for ID .." + test.getId());
-				response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_RESULT_NOT_FOUND));
+				//response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_RESULT_NOT_FOUND));
 				return response;
 			}
 			List<EdoQuestion> questionAnalysis = testsDao.getQuestionAnalysis(test.getId());
@@ -124,7 +133,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			return response;
 		}
 		try {
-			EdoTest analysis = testsDao.getExamAnalysis(test.getId());
+			List<EdoTest> records = testsDao.getExamAnalysis(test.getId());
+			
+			if(CollectionUtils.isEmpty(records)) {
+				return response;
+			}
+			
+			EdoTest analysis = records.get(0);
+			
 			if(analysis == null || analysis.getId() == null || analysis.getAnalysis() == null || analysis.getAnalysis().getStudentsAppeared() == null) {
 				LoggingUtil.logMessage("No test result found for ID .." + test.getId());
 				response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_RESULT_NOT_FOUND));

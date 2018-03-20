@@ -29,7 +29,7 @@ public interface EdoTestsDao {
 	//public List<EdoQuestion> getTestUnsolved(EdoStudent student);
 	
 	//Analysis
-	EdoTest getExamAnalysis(Integer value);
+	List<EdoTest> getExamAnalysis(Integer value);
 	List<EdoQuestion> getQuestionAnalysis(Integer value);
 	List<EdoStudent> getStudentResults(Integer value);
 	

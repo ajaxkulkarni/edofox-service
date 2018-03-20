@@ -41,8 +41,9 @@
 	
 	
 	<select id="getExamAnalysis" resultMap="examAnalysis" parameterType="Integer">
-		select * from test left join (select  count(student_id) as studentsAppeared, avg(score) as avgScore, avg(correct) as avgCorrect, avg(solved) as avgSolved, test_id as testId from test_status 
-		where test_id=${value} group by test_id) as result on test.test_id = result.testId;
+	select * from test left join 
+(select  count(student_id) as studentsAppeared, avg(score) as avgScore, avg(correct) as avgCorrect, avg(solved) as avgSolved, test_id as testId 
+from test_status group by test_id) as result on test.test_id = result.testId where test.test_id = ${value};
 
 	</select>
 	

@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,7 @@ import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
@@ -65,49 +68,36 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 			return response;
 		}
-		// create ObjectMapper instance
-		/*ObjectMapper mapper = new ObjectMapper();
-		EdoTest result = null;
-		// convert json string to object
-		try {
-			String fileName = "test_" + student.getTest().getId() + ".json";
-			result = mapper.readValue(new File(filePath + fileName), EdoTest.class);
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		if (result == null || CollectionUtils.isEmpty(result.getTest())) {
-			return student;
-		}
-		student.getTest().setTest(result.getTest());
-		// Get solved questions
-		// List<EdoQuestion> unsolved = testsDao.getTestUnsolved(student);
-		for (EdoQuestion question : result.getTest()) {
-			EdoQuestion currentQuestion = testsDao.getQuestion(question.getQn_id());
-			if (currentQuestion != null) {
-				question.setAnswer(currentQuestion.getAnswer());
-				question.setChapter(currentQuestion.getChapter());
-				student.getTest().setCurrentQuestion(currentQuestion);
-				List<EdoQuestion> solved = testsDao.getTestResult(student);
-				if (CollectionUtils.isNotEmpty(solved)) {
-					question.setResponse(solved.get(0).getResponse());
-					//System.out.println("Response:" + question.getResponse());
-					question.setResult(solved.get(0).getResult());
-					if(StringUtils.equals(StringUtils.trim(question.getResponse()), StringUtils.trim(question.getAnswer()))) {
-						question.setCorrect(true);
-					}
-				}
-			}
-		}*/
 		List<EdoTestQuestionMap> map = testsDao.getExamResult(request);
+		
+		Map<String, BigDecimal> subjectWiseScore = new HashMap<String, BigDecimal>();
 		
 		if(CollectionUtils.isNotEmpty(map)) {
 			EdoTest test = map.get(0).getTest();
 			for(EdoTestQuestionMap mapper: map) {
-				test.getTest().add(mapper.getQuestion());
+				EdoQuestion question = mapper.getQuestion();
+				test.getTest().add(question);
+				if(StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
+					continue;
+				}
+				BigDecimal score = subjectWiseScore.get(question.getSubject());
+				if(score == null) {
+					score = new BigDecimal(0);
+				}
+				if(StringUtils.equalsIgnoreCase(question.getAnswer(), question.getCorrectAnswer())) {
+					if (question.getWeightage() != null) {
+						score = score.add(new BigDecimal(question.getWeightage()));
+					}
+				} else if (question.getNegativeMarks() != null) {
+					score = score.subtract(new BigDecimal(question.getNegativeMarks()));
+				}
+				subjectWiseScore.put(question.getSubject(), score);
+				
+			}
+			if(!subjectWiseScore.isEmpty()) {
+				EDOTestAnalysis analysis = new EDOTestAnalysis();
+				analysis.setSubjectWiseScore(subjectWiseScore);
+				test.setAnalysis(analysis);
 			}
 			response.setTest(test);
 		}

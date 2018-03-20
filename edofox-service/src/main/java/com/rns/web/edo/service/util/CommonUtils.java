@@ -229,6 +229,7 @@ public class CommonUtils {
 				if (answered.getFlagged() != null && answered.getFlagged() == 1) {
 					flaggedCount++;
 				}
+				System.out.println(answered.getQn_id() + " -- " + answered.getAnswer() + " -- " + answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + score);
 			}
 
 		}
