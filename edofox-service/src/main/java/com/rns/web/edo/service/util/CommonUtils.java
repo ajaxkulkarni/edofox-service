@@ -148,8 +148,9 @@ public class CommonUtils {
 		if (divider <= 0) {
 			return BigDecimal.ZERO;
 		}
-		BigDecimal value = new BigDecimal(divident).divide(new BigDecimal(divider));
-		value = value.round(new MathContext(2, RoundingMode.HALF_UP)).multiply(new BigDecimal(100));
+		MathContext mc = new MathContext(2, RoundingMode.HALF_UP);
+		BigDecimal value = new BigDecimal(divident).divide(new BigDecimal(divider), mc);
+		value = value.round(mc).multiply(new BigDecimal(100), mc);
 		return value;
 	}
 
