@@ -9,6 +9,7 @@ public class EdoTestStudentMap {
 	private String status;
 	private Integer mapId;
 	private Date registerDate;
+	private String studentAccess;
 	
 	public EdoTest getTest() {
 		return test;
@@ -39,6 +40,12 @@ public class EdoTestStudentMap {
 	}
 	public void setRegisterDate(Date registerDate) {
 		this.registerDate = registerDate;
+	}
+	public String getStudentAccess() {
+		return studentAccess;
+	}
+	public void setStudentAccess(String studentAccess) {
+		this.studentAccess = studentAccess;
 	}
 	
 }

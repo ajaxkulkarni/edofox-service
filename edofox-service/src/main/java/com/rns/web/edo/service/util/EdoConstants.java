@@ -32,7 +32,7 @@ public interface EdoConstants {
 	
 	String TEST_STATUS_COMPLETED = "COMPLETED";
 	String STATUS_ACTIVE = "Active";
-	
+	String ACCESS_LEVEL_ADMIN = "Admin";
 	String ATTR_QUESTION = "question";
 	String ATTR_OPTION4 = "option4";
 	String ATTR_OPTION3 = "option3";

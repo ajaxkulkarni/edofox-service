@@ -48,6 +48,7 @@
 		<result column="start_date" property="test.startDate"/>
 		<result column="end_date" property="test.endDate"/>
 		<result column="registerDate" property="registerDate"/>
+		<result column="student_access" property="studentAccess"/>
 	</resultMap>
 
 	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
@@ -130,7 +131,7 @@
 	
 	<select id="getStudentActivePackage"  parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap" resultMap="testStudentMap" >
 		SELECT *, test.status as testStatus, student_institute.created_date as registerDate FROM student_institute join test on student_institute.package_id = test.package_id 
-		where test_id = ${test.id} AND student_id = ${student.id} AND student_institute.status = 'Completed' ;
+		where test_id = ${test.id} AND student_id = ${student.id} AND (student_institute.status = 'Completed' OR student_institute.student_access = 'Admin') ;
 	</select>
 	
 	

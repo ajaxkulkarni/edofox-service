@@ -129,21 +129,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				return response;
 			}
 			
-			if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
-				response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
-				return response;
-			}
-			
-			EdoTest mapTest = studentMap.getTest();
-			if(mapTest != null) {
-				if(mapTest.getStartDate() != null && mapTest.getStartDate().getTime() > new Date().getTime()) {
-					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be availble on " + CommonUtils.convertDate(mapTest.getStartDate())));
+			if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
+				if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
+					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
 					return response;
 				}
-				if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime()) {
-					if(studentMap.getRegisterDate() != null && studentMap.getRegisterDate().getTime() < mapTest.getEndDate().getTime()) {
-						response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
+				
+				EdoTest mapTest = studentMap.getTest();
+				if(mapTest != null) {
+					if(mapTest.getStartDate() != null && mapTest.getStartDate().getTime() > new Date().getTime()) {
+						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be availble on " + CommonUtils.convertDate(mapTest.getStartDate())));
 						return response;
+					}
+					if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime()) {
+						if(studentMap.getRegisterDate() != null && studentMap.getRegisterDate().getTime() < mapTest.getEndDate().getTime()) {
+							response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
+							return response;
+						}
 					}
 				}
 			}

@@ -19,11 +19,11 @@ public class QuestionParser {
 	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Question Papers\\Bio 02.tex";
-		Integer previousQuestion = 0;
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL JEE 2018\\maths-Revise\\Math 03.tex";
+		Integer previousQuestion = 60;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL NEET 2018\\Solutions\\Bio 02.tex").size());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL JEE 2018\\Solutions\\Math 03.tex").size());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
@@ -68,17 +68,7 @@ public class QuestionParser {
 							LoggingUtil.logMessage("Option 3 =>" + option3);
 							LoggingUtil.logMessage("Option 4 =>" + option4);
 							
-							if(StringUtils.isNotBlank(question)) {
-								EdoQuestion edoQuestion = new EdoQuestion();
-								edoQuestion.setQuestion(question);
-								edoQuestion.setOption1(option1);
-								edoQuestion.setOption2(option2);
-								edoQuestion.setOption3(option3);
-								edoQuestion.setOption4(option4);
-								edoQuestion.setId(previousQuestion);
-								parseSolution(previousQuestion, edoQuestion, solutionPath);
-								questions.add(edoQuestion);
-							}
+							addQuestion(previousQuestion, solutionPath, questions, question, option1, option2, option3, option4);
 							
 							question = ""; 
 							option1 = ""; 
@@ -144,23 +134,33 @@ public class QuestionParser {
 			}
 			reader.close();
 			
-			if(StringUtils.isNotBlank(question)) {
-				EdoQuestion edoQuestion = new EdoQuestion();
-				edoQuestion.setQuestion(question);
-				edoQuestion.setOption1(option1);
-				edoQuestion.setOption2(option2);
-				edoQuestion.setOption3(option3);
-				edoQuestion.setOption4(option4);
-				edoQuestion.setId(previousQuestion);
-				parseSolution(previousQuestion, edoQuestion, solutionPath);
-				questions.add(edoQuestion);
-			}
+			addQuestion(previousQuestion, solutionPath, questions, question, option1, option2, option3, option4);
 			
 		} catch (IOException e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 			e.printStackTrace();
 		}
 		return questions;
+	}
+
+	private static void addQuestion(Integer previousQuestion, String solutionPath, List<EdoQuestion> questions, String question, String option1, String option2,
+			String option3, String option4) {
+		if(StringUtils.isNotBlank(question)) {
+			EdoQuestion edoQuestion = new EdoQuestion();
+			edoQuestion.setQuestion(latextCorrect(question));
+			edoQuestion.setOption1(latextCorrect(option1));
+			edoQuestion.setOption2(latextCorrect(option2));
+			edoQuestion.setOption3(latextCorrect(option3));
+			edoQuestion.setOption4(latextCorrect(option4));
+			edoQuestion.setId(previousQuestion);
+			parseSolution(previousQuestion, edoQuestion, solutionPath);
+			questions.add(edoQuestion);
+		}
+	}
+	
+	private static String latextCorrect(String value) {
+		value = StringUtils.replace(value, "{", " { ");
+		return StringUtils.replace(value, "}", " } ");
 	}
 	
 	public static void parseSolution(Integer questionNumber, EdoQuestion question, String filePath) {
@@ -204,7 +204,7 @@ public class QuestionParser {
 					System.out.println("Answer:" + question.getCorrectAnswer());
 				}
 			}
-			question.setSolution(answer);
+			question.setSolution(latextCorrect(answer));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
