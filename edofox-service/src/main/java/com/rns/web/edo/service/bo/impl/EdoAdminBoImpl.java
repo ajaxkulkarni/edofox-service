@@ -183,6 +183,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				LoggingUtil.logMessage("Total questions parsed =>" + questions.size());
 				for(EdoQuestion question: questions) {
 					question.setSubjectId(subjectId);
+					question.setWeightage(4);
+					question.setNegativeMarks(1);
 					testsDao.saveQuestion(question);
 					if(question.getQn_id() != null) {
 						test.setCurrentQuestion(question);

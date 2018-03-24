@@ -183,16 +183,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_QUESTION);
 		}
 		if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
+			question.setOption1ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
 		}
 		if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
+			question.setOption2ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
 		}
 		if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
+			question.setOption3ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
 		}
 		if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
+			question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
 		}
 	}
 
