@@ -7,7 +7,7 @@
 
 	<insert id="saveQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion" useGeneratedKeys="true" keyProperty="qn_id" keyColumn="id">
 		insert into test_questions (question,option1,option2,option3,option4, subject_id, correct_answer, solution, weightage, negative_marks) 
-		values ("${question}", "${option1}", "${option2}", "${option3}" , "${option4}", "${subjectId}", "${correctAnswer}", "${solution}", ${question.weightage}, ${question.negativeMarks});
+		values ("${question}", "${option1}", "${option2}", "${option3}" , "${option4}", "${subjectId}", "${correctAnswer}", "${solution}", ${weightage}, ${negativeMarks});
 	</insert>
 	
 	<insert id="saveTestQuestion" parameterType="com.rns.web.edo.service.domain.EdoTest">
