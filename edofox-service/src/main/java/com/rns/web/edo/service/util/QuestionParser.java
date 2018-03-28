@@ -19,11 +19,11 @@ public class QuestionParser {
 	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL JEE 2018\\maths-Revise\\Math 03.tex";
-		Integer previousQuestion = 60;
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Mathematics1.tex";
+		Integer previousQuestion = 100;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL JEE 2018\\Solutions\\Math 03.tex").size());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\Maths1.tex").size());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
@@ -50,6 +50,10 @@ public class QuestionParser {
 					continue;
 				}
 				
+				if(!validLatex(trimmed)) {
+					continue;
+				}
+				
 				if(!isStartFound) {
 					continue;
 				}
@@ -57,11 +61,10 @@ public class QuestionParser {
 				if(indexOfPeriod >= 1 && indexOfPeriod < 5) {
 					
 					String questionNumber = StringUtils.substring(trimmed, 0, indexOfPeriod);
-					LoggingUtil.logMessage("Question number =>" + questionNumber);
 					if(StringUtils.isNumeric(questionNumber)) {
 						Integer questionNo = new Integer(questionNumber);
 						if( (questionNo - 1) == previousQuestion) {
-							
+							LoggingUtil.logMessage("Question number =>" + questionNumber);
 							LoggingUtil.logMessage("Question =>" + question);
 							LoggingUtil.logMessage("Option 1 =>" + option1);
 							LoggingUtil.logMessage("Option 2 =>" + option2);
@@ -81,9 +84,10 @@ public class QuestionParser {
 							question = StringUtils.substring(trimmed, indexOfPeriod + 1, trimmed.length());
 							System.out.println("Question is =>" + question);
 							step = 1;
+							continue;
 						}
 					}
-					continue;
+					
 				}
 				
 				int indexOfOption1 = StringUtils.indexOf(trimmed, "(A)");
@@ -143,6 +147,19 @@ public class QuestionParser {
 		return questions;
 	}
 
+	private static boolean validLatex(String trimmed) {
+		if(StringUtils.contains(trimmed, "\\\\multicolumn{")) {
+			return false;
+		}
+		if(StringUtils.equalsIgnoreCase(trimmed, "&")) {
+			return false;
+		}
+		if(StringUtils.equals(trimmed, "} &")) {
+			return false;
+		}
+		return true;
+	}
+
 	private static void addQuestion(Integer previousQuestion, String solutionPath, List<EdoQuestion> questions, String question, String option1, String option2,
 			String option3, String option4) {
 		if(StringUtils.isNotBlank(question)) {
@@ -160,11 +177,18 @@ public class QuestionParser {
 	
 	private static String latextCorrect(String value) {
 		value = StringUtils.replace(value, "{", " { ");
-		return StringUtils.replace(value, "}", " } ");
+		value = StringUtils.replace(value, "}", " } ");
+		value = StringUtils.replace(value,"\\\\begin { array }", "\\\\begin{array}");
+		value = StringUtils.replace(value,"$", "$ ");
+		return value;
 	}
 	
 	public static void parseSolution(Integer questionNumber, EdoQuestion question, String filePath) {
 		BufferedReader reader;
+		
+		if(StringUtils.isEmpty(filePath)) {
+			return;
+		}
 		
 		try {
 			reader = new BufferedReader(new FileReader(filePath));
@@ -192,16 +216,16 @@ public class QuestionParser {
 				if(indexOfAnswer == 0 || answerFound) {
 					answerFound = true;
 					String correctAnswer = StringUtils.trimToEmpty(StringUtils.substring(trimmed, questionNumber.toString().length() + ANS_PARSE_KEY.length(), trimmed.length()));
-					if(StringUtils.contains(correctAnswer, "A")) {
+					if(StringUtils.containsIgnoreCase(correctAnswer, "A")) {
 						question.setCorrectAnswer(EdoConstants.ATTR_OPTION1);
-					} else if (StringUtils.contains(correctAnswer, "B")) {
+					} else if (StringUtils.containsIgnoreCase(correctAnswer, "B")) {
 						question.setCorrectAnswer(EdoConstants.ATTR_OPTION2);
-					} else if (StringUtils.contains(correctAnswer, "C")) {
+					} else if (StringUtils.containsIgnoreCase(correctAnswer, "C")) {
 						question.setCorrectAnswer(EdoConstants.ATTR_OPTION3);
-					} else if (StringUtils.contains(correctAnswer, "D")) {
+					} else if (StringUtils.containsIgnoreCase(correctAnswer, "D")) {
 						question.setCorrectAnswer(EdoConstants.ATTR_OPTION4);
 					}
-					System.out.println("Answer:" + question.getCorrectAnswer());
+					System.out.println(question.getId() + " --- Answer:" + question.getCorrectAnswer());
 				}
 			}
 			question.setSolution(latextCorrect(answer));

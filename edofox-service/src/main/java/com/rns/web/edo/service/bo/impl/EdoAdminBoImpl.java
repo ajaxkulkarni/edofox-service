@@ -126,7 +126,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
-	public EdoServiceResponse getTestResults(EdoTest test) {
+	public EdoServiceResponse getTestResults(EdoTest test, String dataFilePath) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		if(test == null || test.getId() == null) {
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
@@ -147,6 +147,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return response;
 			}
 			List<EdoStudent> students = testsDao.getStudentResults(test.getId());
+			//TODO To be removed later
+			
 			response.setStudents(students);
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
@@ -178,13 +180,20 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		try {
 			//String exceptionAn = null;
+			EdoQuestion currentQuestion = test.getCurrentQuestion();
+			if(currentQuestion == null || currentQuestion.getWeightage() == null) {
+				currentQuestion = new EdoQuestion();
+				currentQuestion.setWeightage(4);
+				currentQuestion.setNegativeMarks(1);
+			}
+			
 			List<EdoQuestion> questions = QuestionParser.parseQuestionPaper(filePath, firstQuestion, solutionPath);
 			if(CollectionUtils.isNotEmpty(questions)) {
 				LoggingUtil.logMessage("Total questions parsed =>" + questions.size());
 				for(EdoQuestion question: questions) {
 					question.setSubjectId(subjectId);
-					question.setWeightage(4);
-					question.setNegativeMarks(1);
+					question.setWeightage(currentQuestion.getWeightage());
+					question.setNegativeMarks(currentQuestion.getNegativeMarks());
 					testsDao.saveQuestion(question);
 					if(question.getQn_id() != null) {
 						test.setCurrentQuestion(question);

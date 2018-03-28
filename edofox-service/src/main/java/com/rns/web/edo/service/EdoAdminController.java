@@ -55,7 +55,7 @@ public class EdoAdminController {
 		LoggingUtil.logMessage("Get Test Results Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			response =  adminBo.getTestResults(request.getTest());
+			response =  adminBo.getTestResults(request.getTest(), request.getFilePath());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

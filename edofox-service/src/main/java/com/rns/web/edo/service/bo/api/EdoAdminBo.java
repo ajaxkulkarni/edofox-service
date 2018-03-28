@@ -9,7 +9,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 public interface EdoAdminBo {
 	
 	EdoServiceResponse getTestAnalysis(EdoTest test);
-	EdoServiceResponse getTestResults(EdoTest test);
+	EdoServiceResponse getTestResults(EdoTest test, String dataFilePath);
 	EdoServiceResponse getAllStudents(EDOInstitute institute);
 	EdoApiStatus fileUploadTestQuestions(String filePath, Integer firstQuestion, EdoTest test, Integer subjectId, String solutionPath);
 	EdoApiStatus fileUploadTestSolutions(String filePath, EdoTest test, Integer subjectId);
