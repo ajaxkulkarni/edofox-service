@@ -192,6 +192,7 @@ public class QuestionParser {
 		value = StringUtils.replace(value, "\\cos" , "\\cos ");
 		value = StringUtils.replace(value, "\\sec" , "\\sec ");
 		value = StringUtils.replace(value, "\\cosec" , "\\cosec ");
+		value = StringUtils.replace(value, "<" , " < ");
 		String dashedLine = "\\_\\_";
 		for(int i = 0; i < 10; i++) {
 			value = StringUtils.replace(value, dashedLine , "$ " + dashedLine + " $ ");

@@ -12,19 +12,21 @@
 		<result column="option2" property="question.option2" />
 		<result column="option3" property="question.option3" />
 		<result column="option4" property="question.option4" />
+		<result column="option5" property="question.option5" />
 		<result column="subject" property="question.subject" />
 		<result column="question_img_url" property="question.questionImageUrl" />
 		<result column="option1_img_url" property="question.option1ImageUrl" />
 		<result column="option2_img_url" property="question.option2ImageUrl" />
 		<result column="option3_img_url" property="question.option3ImageUrl" />
 		<result column="option4_img_url" property="question.option4ImageUrl" />
+		<result column="question_type" property="question.type" />
+		<result column="metaData" property="question.metaData" />
 
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
 		<result column="no_of_questions" property="test.noOfQuestions" />
 		<result column="total_marks" property="test.totalMarks" />
 		<result column="duration" property="test.duration" />
-
 
 	</resultMap>
 
@@ -63,6 +65,7 @@
 		<result column="option2" property="option2" />
 		<result column="option3" property="option3" />
 		<result column="option4" property="option4" />
+		<result column="option5" property="option5" />
 		<result column="correct_answer" property="correctAnswer"/>
 		<result column="weightage" property="weightage"/>
 		<result column="negative_marks" property="negativeMarks"/>
@@ -73,6 +76,7 @@
 		<result column="option4_img_url" property="option4ImageUrl" />
 		<result column="subject_id" property="subjectId"/>
 		<result column="question_number" property="questionNumber"/>
+		<result column="question_type" property="type" />
 	</resultMap>
 	
 	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">

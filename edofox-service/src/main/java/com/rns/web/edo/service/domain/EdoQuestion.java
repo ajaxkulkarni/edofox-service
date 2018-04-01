@@ -13,6 +13,7 @@ public class EdoQuestion {
 	private String option2;
 	private String option3;
 	private String option4;
+	private String option5;
 	private String response;
 	private Integer result;
 	private String subject;
@@ -31,7 +32,8 @@ public class EdoQuestion {
 	private String solution;
 	private String solutionImageUrl;
 	private Integer questionNumber;
-	
+	private String type;
+	private String metaData;
 	private EDOQuestionAnalysis analysis;
 	
 	public String getOption1() {
@@ -199,6 +201,24 @@ public class EdoQuestion {
 	}
 	public void setQuestionNumber(Integer questionNumber) {
 		this.questionNumber = questionNumber;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getMetaData() {
+		return metaData;
+	}
+	public void setMetaData(String metaData) {
+		this.metaData = metaData;
+	}
+	public String getOption5() {
+		return option5;
+	}
+	public void setOption5(String option5) {
+		this.option5 = option5;
 	}
 
 }

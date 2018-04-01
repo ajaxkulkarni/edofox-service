@@ -11,7 +11,7 @@
 	<!-- <typeAliases> <typeAlias type="org.podcastpedia.domain.Podcast" alias="Podcast"/> 
 		</typeAliases> -->
 	<mappers>
-		<mapper resource="maps/tests_mapper.xml" />
+		<!-- <mapper resource="maps/tests_mapper.xml" /> -->
 		<mapper resource="maps/exam_mapper.xml" />
 		<mapper resource="maps/save_exam_mapper.xml" />
 		<mapper resource="maps/exam_analysis.xml" />

@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.ArrayUtil;
 
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -213,7 +215,7 @@ public class CommonUtils {
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
 				for (EdoQuestion question : questions) {
 					if (question.getQn_id() != null &&  answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
-						if (StringUtils.equalsIgnoreCase(answered.getAnswer(), question.getCorrectAnswer())) {
+						if (checkAnswer(answered, question)) {
 							correctCount++;
 							if (question.getWeightage() != null) {
 								score = score.add(new BigDecimal(question.getWeightage()));
@@ -242,4 +244,28 @@ public class CommonUtils {
 		LoggingUtil.logMessage("Evaluated the test - " + test.getCorrectCount() + " .. " + test.getScore());
 	}
 
+	public static boolean checkAnswer(EdoQuestion answered, EdoQuestion question) {
+		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
+			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
+			if(ArrayUtils.isNotEmpty(correctAnswers)) {
+				for(String correctAnswer: correctAnswers) {
+					if(!StringUtils.contains(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(correctAnswer))) {
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()));
+	}
+
+	/*public static void main(String[] args) {
+		EdoQuestion question = new EdoQuestion();
+		//question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
+		question.setCorrectAnswer("asd");
+		EdoQuestion answer = new EdoQuestion();
+		answer.setAnswer("asd");
+		System.out.println(checkAnswer(answer, question));
+	}*/
+	
 }
