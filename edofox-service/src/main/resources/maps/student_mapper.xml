@@ -26,7 +26,7 @@
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		insert into student
 		(name, email, mobile_no, password, roll_no, gender, school_district, date_of_birth, caste_category )
-		values('${name}', '${email}', '${phone}', '${password}', 0, '${gender}', '${schoolDistrict}', '${dob}', '${casteCategory}');
+		values('${name}', '${email}', '${phone}', '${password}', '${rollNo}', '${gender}', '${schoolDistrict}', '${dob}', '${casteCategory}');
 	</insert>
 
 	<insert id="createStudentPackage" parameterType="com.rns.web.edo.service.domain.EdoStudent"

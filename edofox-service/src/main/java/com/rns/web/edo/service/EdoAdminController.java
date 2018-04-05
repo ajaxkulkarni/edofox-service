@@ -111,5 +111,21 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/uploadStudents")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse uploadStudents(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Upload Students Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setStatus(adminBo.bulkUploadStudents(request));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Upload Students Response");
+		return response;
+	}
+	
 
 }

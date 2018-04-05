@@ -276,5 +276,40 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return status;
 	}
 
+	public EdoApiStatus bulkUploadStudents(EdoServiceRequest request) {
+		
+		if(CollectionUtils.isEmpty(request.getStudents())) {
+			return new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST);
+		}
+		
+		EdoApiStatus status = new EdoApiStatus();
+		
+		try {
+			
+			for(EdoStudent student: request.getStudents()) {
+				List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
+				
+				if(CollectionUtils.isEmpty(existingStudent)) {
+					testsDao.saveStudent(student);
+				} else {
+					student.setId(existingStudent.get(0).getId());
+				}
+				
+				LoggingUtil.logMessage("Student ID is =>" + student.getId());
+				if(student.getId() != null) {
+					testsDao.deleteExistingPackages(student);
+					testsDao.createStudentPackage(student);
+				}
+				LoggingUtil.logMessage("Added student == " + student.getRollNo() + " successfully!");
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+			status.setResponseText(ERROR_IN_PROCESSING);
+			status.setStatusCode(STATUS_OK);
+		}
+		return status;
+	}
+
 
 }

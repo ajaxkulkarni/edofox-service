@@ -1,5 +1,7 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.List;
+
 public class EdoServiceRequest {
 	
 	private EdoStudent student;
@@ -9,6 +11,7 @@ public class EdoServiceRequest {
 	private Integer firstQuestion;
 	private Integer subjectId;
 	private String solutionPath;
+	private List<EdoStudent> students;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -64,6 +67,14 @@ public class EdoServiceRequest {
 
 	public void setSolutionPath(String solutionPath) {
 		this.solutionPath = solutionPath;
+	}
+
+	public List<EdoStudent> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<EdoStudent> students) {
+		this.students = students;
 	}
 	
 }

@@ -338,6 +338,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				payment.setMode("Online");
 				student.setPayment(payment);
 			}
+			student.setRollNo(""); //For new student
 			if(student.getId() == null) {
 				//Check if the student with same phone exists
 				List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
