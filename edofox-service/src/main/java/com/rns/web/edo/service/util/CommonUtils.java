@@ -19,6 +19,7 @@ import org.apache.poi.util.ArrayUtil;
 
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
@@ -212,6 +213,9 @@ public class CommonUtils {
 		Integer flaggedCount = 0;
 		BigDecimal score = BigDecimal.ZERO;
 		for (EdoQuestion answered : test.getTest()) {
+			if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
+				setComplexAnswer(answered);
+			}
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
 				for (EdoQuestion question : questions) {
 					if (question.getQn_id() != null &&  answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
@@ -242,6 +246,23 @@ public class CommonUtils {
 		test.setScore(score);
 		
 		LoggingUtil.logMessage("Evaluated the test - " + test.getCorrectCount() + " .. " + test.getScore());
+	}
+
+	private static void setComplexAnswer(EdoQuestion answered) {
+		if(answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
+			StringBuilder answerBuilder = new StringBuilder();
+			for(EdoComplexOption option: answered.getComplexOptions()) {
+				if(CollectionUtils.isNotEmpty(option.getMatchOptions())) {
+					for(EdoComplexOption match: option.getMatchOptions()) {
+						if(match.isSelected()) {
+							answerBuilder.append(option.getOptionName()).append("-").append(match.getOptionName()).append(",");
+						}
+					}
+				}
+			}
+			answered.setAnswer(StringUtils.removeEnd(answerBuilder.toString(), ","));
+		}
+		
 	}
 
 	public static boolean checkAnswer(EdoQuestion answered, EdoQuestion question) {

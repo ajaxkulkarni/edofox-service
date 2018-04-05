@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -21,6 +22,7 @@ import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -160,6 +162,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(question != null) {
 						question.setId(count);
 						setQuestionURLs(question);
+						prepareMatchTypeQuestion(question);
 						if(!result.getSubjects().contains(question.getSubject())) {
 							result.getSubjects().add(question.getSubject());
 						}
@@ -176,6 +179,38 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		return response;
+	}
+
+	private void prepareMatchTypeQuestion(EdoQuestion question) {
+		if(question != null && StringUtils.equalsIgnoreCase(QUESTION_TYPE_MATCH, question.getType())) {
+			if(StringUtils.isBlank(question.getOption1()) || StringUtils.isBlank(question.getOption2())) {
+				return;
+			}
+			String[] leftCol = StringUtils.split(question.getOption1(), ",");
+			String[] rightCol = StringUtils.split(question.getOption2(), ",");
+			if(ArrayUtils.isNotEmpty(leftCol) && ArrayUtils.isNotEmpty(rightCol)) {
+				List<EdoComplexOption> options = new ArrayList<EdoComplexOption>();
+				for(String left: leftCol) {
+					if(StringUtils.isNotBlank(StringUtils.trimToEmpty(left))) {
+						EdoComplexOption option = new EdoComplexOption();
+						option.setOptionName(left);
+						List<EdoComplexOption> subOptions = new ArrayList<EdoComplexOption>();
+						for(String right: rightCol) {
+							EdoComplexOption subOption = new EdoComplexOption();
+							subOption.setOptionName(right);
+							subOptions.add(subOption);
+						}
+						if(CollectionUtils.isNotEmpty(subOptions)) {
+							option.setMatchOptions(subOptions);
+						}
+						options.add(option);
+					}
+				}
+				question.setComplexOptions(options);
+			}
+				
+		}
+		
 	}
 
 	private void setQuestionURLs(EdoQuestion question) {
@@ -223,14 +258,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				return status;
 			}
 			CommonUtils.calculateTestScore(test, questions);
-			testsDao.saveTestResult(request);
-			testsDao.saveTestStatus(request);
 			
-			EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
-			smsUtil.setTest(test);
-			EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
-			smsUtil.setStudent(student);
-			executor.execute(smsUtil);
+			if(request != null && request.getTest() != null && CollectionUtils.isNotEmpty(request.getTest().getTest())) {
+				testsDao.saveTestResult(request);
+				testsDao.saveTestStatus(request);
+				
+				EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+				smsUtil.setTest(test);
+				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
+				smsUtil.setStudent(student);
+				executor.execute(smsUtil);
+			}
 			
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);

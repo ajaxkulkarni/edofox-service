@@ -44,6 +44,8 @@ public interface EdoConstants {
 	String MAIL_TYPE_TEST_RESULT = "TestResult";
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
+	String QUESTION_TYPE_MATCH = "MATCH";
+	
 	
 	//DEV
 	String TESTS_JSON_PATH = "F:\\Resoneuronance\\Edofox\\Document\\tests";

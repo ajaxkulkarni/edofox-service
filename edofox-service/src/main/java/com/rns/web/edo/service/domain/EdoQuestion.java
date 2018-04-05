@@ -1,8 +1,12 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.List;
+
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class EdoQuestion {
 	
 	private Integer id;
@@ -35,6 +39,7 @@ public class EdoQuestion {
 	private String type;
 	private String metaData;
 	private EDOQuestionAnalysis analysis;
+	private List<EdoComplexOption> complexOptions;
 	
 	public String getOption1() {
 		return option1;
@@ -219,6 +224,12 @@ public class EdoQuestion {
 	}
 	public void setOption5(String option5) {
 		this.option5 = option5;
+	}
+	public List<EdoComplexOption> getComplexOptions() {
+		return complexOptions;
+	}
+	public void setComplexOptions(List<EdoComplexOption> complexOptions) {
+		this.complexOptions = complexOptions;
 	}
 
 }

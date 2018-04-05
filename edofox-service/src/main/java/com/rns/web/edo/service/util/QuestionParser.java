@@ -19,11 +19,11 @@ public class QuestionParser {
 	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Biology01.tex";
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Math 02.tex";
 		Integer previousQuestion = 100;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\Biology01.tex").size());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\Math 02.tex").size());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
@@ -192,6 +192,9 @@ public class QuestionParser {
 		value = StringUtils.replace(value, "\\cos" , "\\cos ");
 		value = StringUtils.replace(value, "\\sec" , "\\sec ");
 		value = StringUtils.replace(value, "\\cosec" , "\\cosec ");
+		value = StringUtils.replace(value, "<" , " < ");
+		value = StringUtils.replace(value, "\\int" , "\\int ");
+		value = StringUtils.replace(value, "\\log" , "\\log ");
 		value = StringUtils.replace(value, "<" , " < ");
 		String dashedLine = "\\_\\_";
 		for(int i = 0; i < 10; i++) {
