@@ -40,7 +40,7 @@
 		join test_subjects
 		on test_questions.subject_id = test_subjects.subject_id
 		where
-		test.test_id = ${value} order by test_questions_map.id asc
+		test.test_id = ${value} order by test_questions_map.question_number,test_questions_map.id asc
 
 	</select>
 
