@@ -19,11 +19,11 @@ public class QuestionParser {
 	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Math 02.tex";
-		Integer previousQuestion = 100;
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Chem 03.tex";
+		Integer previousQuestion = 50;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\Math 02.tex").size());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\Chem 03.tex").size());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {
@@ -64,12 +64,6 @@ public class QuestionParser {
 					if(StringUtils.isNumeric(questionNumber)) {
 						Integer questionNo = new Integer(questionNumber);
 						if( (questionNo - 1) == previousQuestion) {
-							LoggingUtil.logMessage("Question number =>" + questionNumber);
-							LoggingUtil.logMessage("Question =>" + question);
-							LoggingUtil.logMessage("Option 1 =>" + option1);
-							LoggingUtil.logMessage("Option 2 =>" + option2);
-							LoggingUtil.logMessage("Option 3 =>" + option3);
-							LoggingUtil.logMessage("Option 4 =>" + option4);
 							
 							addQuestion(previousQuestion, solutionPath, questions, question, option1, option2, option3, option4);
 							
@@ -175,6 +169,13 @@ public class QuestionParser {
 			edoQuestion.setId(previousQuestion);
 			parseSolution(previousQuestion, edoQuestion, solutionPath);
 			questions.add(edoQuestion);
+			
+			LoggingUtil.logMessage("Question number =>" + previousQuestion);
+			LoggingUtil.logMessage("Question =>" + edoQuestion.getQuestion());
+			LoggingUtil.logMessage("Option 1 =>" + edoQuestion.getOption1());
+			LoggingUtil.logMessage("Option 2 =>" + edoQuestion.getOption2());
+			LoggingUtil.logMessage("Option 3 =>" + edoQuestion.getOption3());
+			LoggingUtil.logMessage("Option 4 =>" + edoQuestion.getOption4());
 		}
 	}
 	
@@ -196,11 +197,14 @@ public class QuestionParser {
 		value = StringUtils.replace(value, "\\int" , "\\int ");
 		value = StringUtils.replace(value, "\\log" , "\\log ");
 		value = StringUtils.replace(value, "<" , " < ");
-		String dashedLine = "\\_\\_";
+		value = StringUtils.replace(value, "\\_" , "_");
+		/*String dashedLine = "\\_\\_";
+		String replacement = "__";
 		for(int i = 0; i < 10; i++) {
-			value = StringUtils.replace(value, dashedLine , "$ " + dashedLine + " $ ");
+			value = StringUtils.replace(value, dashedLine , "__" + replacement);
 			dashedLine = dashedLine + "\\_";
-		}
+			replacement = replacement + "__";
+		}*/
 		return value;
 	}
 	

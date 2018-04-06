@@ -1,6 +1,11 @@
 package com.rns.web.edo.service.domain;
 
+import java.io.IOException;
 import java.util.List;
+
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 public class EdoServiceRequest {
 	
@@ -75,6 +80,21 @@ public class EdoServiceRequest {
 
 	public void setStudents(List<EdoStudent> students) {
 		this.students = students;
+	}
+	
+	@Override
+	public String toString() {
+		
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (JsonGenerationException e) {
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 	
 }
