@@ -29,7 +29,7 @@
 		</init-param>
 		<init-param>
 			<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-			<param-value>com.rns.web.erp.service</param-value>
+			<param-value>com.rns.web.edo.service.EdoCORSFilter</param-value>
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
@@ -39,7 +39,7 @@
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
-	<filter>
+	<!-- <filter>
 		<filter-name>CORS</filter-name>
 		<filter-class>com.thetransactioncompany.cors.CORSFilter</filter-class>
 	</filter>
@@ -47,7 +47,7 @@
 	<filter-mapping>
 		<filter-name>CORS</filter-name>
 		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+	</filter-mapping> -->
 
 	<!-- <filter> <filter-name>CorsFilter</filter-name> <filter-class>org.apache.catalina.filters.CorsFilter</filter-class> 
 		</filter> <filter-mapping> <filter-name>CorsFilter</filter-name> <url-pattern>/*</url-pattern> 
