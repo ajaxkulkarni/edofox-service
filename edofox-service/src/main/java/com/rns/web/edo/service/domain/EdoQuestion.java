@@ -38,6 +38,7 @@ public class EdoQuestion {
 	private Integer questionNumber;
 	private String type;
 	private String metaData;
+	private String metaDataImageUrl;
 	private EDOQuestionAnalysis analysis;
 	private List<EdoComplexOption> complexOptions;
 	
@@ -230,6 +231,12 @@ public class EdoQuestion {
 	}
 	public void setComplexOptions(List<EdoComplexOption> complexOptions) {
 		this.complexOptions = complexOptions;
+	}
+	public String getMetaDataImageUrl() {
+		return metaDataImageUrl;
+	}
+	public void setMetaDataImageUrl(String metaDataImageUrl) {
+		this.metaDataImageUrl = metaDataImageUrl;
 	}
 
 }

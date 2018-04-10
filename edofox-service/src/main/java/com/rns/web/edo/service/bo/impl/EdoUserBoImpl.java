@@ -229,6 +229,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
 			question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
 		}
+		if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
+			question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
+		}
 	}
 
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
@@ -297,6 +300,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				path = question.getOption3ImageUrl();
 			} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
 				path = question.getOption4ImageUrl();
+			} else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
+				path = question.getMetaDataImageUrl();
 			}
 			
 			if(path != null) {

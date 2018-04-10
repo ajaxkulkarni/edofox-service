@@ -20,8 +20,8 @@
 		<result column="option3_img_url" property="question.option3ImageUrl" />
 		<result column="option4_img_url" property="question.option4ImageUrl" />
 		<result column="question_type" property="question.type" />
-		<result column="metaData" property="question.metaData" />
-
+		<result column="meta_data" property="question.metaData" />
+		<result column="meta_data_img_url" property="question.metaDataImageUrl" />
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
 		<result column="no_of_questions" property="test.noOfQuestions" />
