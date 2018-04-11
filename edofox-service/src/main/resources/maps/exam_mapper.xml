@@ -77,6 +77,8 @@
 		<result column="subject_id" property="subjectId"/>
 		<result column="question_number" property="questionNumber"/>
 		<result column="question_type" property="type" />
+		<result column="meta_data" property="metaData" />
+		<result column="meta_data_img_url" property="metaDataImageUrl" />
 	</resultMap>
 	
 	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">
