@@ -230,7 +230,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
 		}
 		if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-			question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
+			question.setMetaDataImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
 		}
 	}
 
