@@ -22,6 +22,8 @@
 		<result column="question_type" property="question.type" />
 		<result column="meta_data" property="question.metaData" />
 		<result column="meta_data_img_url" property="question.metaDataImageUrl" />
+		<result column="section" property="question.section" />
+		<result column="question_number" property="question.questionNumber"/>
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
 		<result column="no_of_questions" property="test.noOfQuestions" />

@@ -28,6 +28,7 @@ public class EdoTest {
 	private EDOTestAnalysis analysis;
 	private Date startDate;
 	private Date endDate;
+	private List<String> sections;
 	
 	public EdoTest() {
 		
@@ -169,6 +170,17 @@ public class EdoTest {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public List<String> getSections() {
+		if(sections == null) {
+			sections = new ArrayList<String>();
+		}
+		return sections;
+	}
+
+	public void setSections(List<String> sections) {
+		this.sections = sections;
 	}
 	
 }
