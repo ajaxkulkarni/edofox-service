@@ -29,6 +29,7 @@
 		<result column="no_of_questions" property="test.noOfQuestions" />
 		<result column="total_marks" property="test.totalMarks" />
 		<result column="duration" property="test.duration" />
+		<result column="test_ui" property="test.testUi"/>
 
 	</resultMap>
 
