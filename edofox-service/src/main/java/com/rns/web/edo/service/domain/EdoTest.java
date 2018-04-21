@@ -29,6 +29,7 @@ public class EdoTest {
 	private Date startDate;
 	private Date endDate;
 	private List<String> sections;
+	private String testUi;
 	
 	public EdoTest() {
 		
@@ -181,6 +182,14 @@ public class EdoTest {
 
 	public void setSections(List<String> sections) {
 		this.sections = sections;
+	}
+
+	public String getTestUi() {
+		return testUi;
+	}
+
+	public void setTestUi(String testUi) {
+		this.testUi = testUi;
 	}
 	
 }
