@@ -310,11 +310,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				testsDao.saveTestResult(request);
 				testsDao.saveTestStatus(request);
 				
-				EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+				//TODO: Temporary
+				/*EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
 				smsUtil.setTest(test);
 				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
 				smsUtil.setStudent(student);
-				executor.execute(smsUtil);
+				executor.execute(smsUtil);*/
 			}
 			
 		} catch (Exception e) {
