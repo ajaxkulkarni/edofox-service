@@ -184,12 +184,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 								sectionSets.put(question.getSection(), currentCount);
 							}
 						}
-						if(isRandomizeQuestions(result)) {
-							randomizeQuestions(result, sectionSets);
-						}
 						result.getTest().add(question);
 						count++;
 					}
+				}
+				if(isRandomizeQuestions(result)) {
+					randomizeQuestions(result, sectionSets);
 				}
 				response.setTest(result);
 			}
@@ -208,16 +208,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			for(String section: result.getSections()) {
 				List<EdoQuestion> set = sectionSets.get(section);
 				Collections.shuffle(set);
-				shuffled.addAll(set);
+				Integer qNo = 1;
+				for(EdoQuestion question: set) {
+					question.setQuestionNumber(qNo);
+					qNo++;
+					shuffled.add(question);
+				}
 			}
 			result.setTest(shuffled);
 			LoggingUtil.logMessage("Shuffled the questions for test .." + result.getId());
 		}
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(new Random().nextInt(10));
-	}
 
 	private boolean isRandomizeQuestions(EdoTest result) {
 		return StringUtils.equals("Y", result.getRandomQuestions());
