@@ -4,10 +4,14 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -157,6 +161,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(map)) {
 				EdoTest result = map.get(0).getTest();
 				Integer count = 1;
+				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
 				for(EdoTestQuestionMap mapper: map) {
 					EdoQuestion question = mapper.getQuestion();
 					if(question != null) {
@@ -166,8 +171,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						if(!result.getSubjects().contains(question.getSubject())) {
 							result.getSubjects().add(question.getSubject());
 						}
-						if(StringUtils.isNotBlank(question.getSection()) && !result.getSections().contains(question.getSection())) {
-							result.getSections().add(question.getSection());
+						if(StringUtils.isNotBlank(question.getSection())) {
+							if(!result.getSections().contains(question.getSection())) {
+								result.getSections().add(question.getSection());
+							}
+							if(isRandomizeQuestions(result)) {
+								List<EdoQuestion> currentCount = sectionSets.get(question.getSection());
+								if(currentCount == null) {
+									currentCount = new ArrayList<EdoQuestion>();
+								}
+								currentCount.add(question);
+								sectionSets.put(question.getSection(), currentCount);
+							}
+						}
+						if(isRandomizeQuestions(result)) {
+							randomizeQuestions(result, sectionSets);
 						}
 						result.getTest().add(question);
 						count++;
@@ -182,6 +200,27 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		return response;
+	}
+
+	private void randomizeQuestions(EdoTest result, Map<String, List<EdoQuestion>> sectionSets) {
+		if(CollectionUtils.isNotEmpty(sectionSets.keySet()) && result != null) {
+			List<EdoQuestion> shuffled = new ArrayList<EdoQuestion>();
+			for(String section: result.getSections()) {
+				List<EdoQuestion> set = sectionSets.get(section);
+				Collections.shuffle(set);
+				shuffled.addAll(set);
+			}
+			result.setTest(shuffled);
+			LoggingUtil.logMessage("Shuffled the questions for test .." + result.getId());
+		}
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(new Random().nextInt(10));
+	}
+
+	private boolean isRandomizeQuestions(EdoTest result) {
+		return StringUtils.equals("Y", result.getRandomQuestions());
 	}
 
 	private void prepareMatchTypeQuestion(EdoQuestion question) {

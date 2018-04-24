@@ -30,6 +30,7 @@ public class EdoTest {
 	private Date endDate;
 	private List<String> sections;
 	private String testUi;
+	private String randomQuestions;
 	
 	public EdoTest() {
 		
@@ -190,6 +191,14 @@ public class EdoTest {
 
 	public void setTestUi(String testUi) {
 		this.testUi = testUi;
+	}
+
+	public String getRandomQuestions() {
+		return randomQuestions;
+	}
+
+	public void setRandomQuestions(String randomQuestions) {
+		this.randomQuestions = randomQuestions;
 	}
 	
 }
