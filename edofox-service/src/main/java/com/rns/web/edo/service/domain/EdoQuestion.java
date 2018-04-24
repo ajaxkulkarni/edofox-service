@@ -1,5 +1,6 @@
 package com.rns.web.edo.service.domain;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -42,6 +43,7 @@ public class EdoQuestion {
 	private EDOQuestionAnalysis analysis;
 	private List<EdoComplexOption> complexOptions;
 	private String section;
+	private BigDecimal marks;
 	
 	public String getOption1() {
 		return option1;
@@ -244,6 +246,12 @@ public class EdoQuestion {
 	}
 	public void setSection(String section) {
 		this.section = section;
+	}
+	public BigDecimal getMarks() {
+		return marks;
+	}
+	public void setMarks(BigDecimal marks) {
+		this.marks = marks;
 	}
 
 }

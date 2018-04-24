@@ -222,11 +222,15 @@ public class CommonUtils {
 						if (checkAnswer(answered, question)) {
 							correctCount++;
 							if (question.getWeightage() != null) {
-								score = score.add(new BigDecimal(question.getWeightage()));
+								BigDecimal marks = new BigDecimal(question.getWeightage());
+								question.setMarks(marks);
+								score = score.add(marks);
 							}
 						} else {
 							if (question.getNegativeMarks() != null) {
-								score = score.subtract(new BigDecimal(question.getNegativeMarks()));
+								BigDecimal marks = new BigDecimal(question.getNegativeMarks());
+								question.setMarks(marks);
+								score = score.subtract(marks);
 							}
 						}
 						break;
