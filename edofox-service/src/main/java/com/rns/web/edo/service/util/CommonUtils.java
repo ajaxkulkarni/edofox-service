@@ -230,6 +230,7 @@ public class CommonUtils {
 						} else {
 							if (question.getNegativeMarks() != null) {
 								answered.setMarks(new BigDecimal(question.getNegativeMarks()).negate());
+								LoggingUtil.logMessage("Setting negative marks - " + answered.getMarks() + " for question " + answered.getId());
 								score = score.subtract(new BigDecimal(question.getNegativeMarks()));
 							}
 						}
@@ -284,13 +285,15 @@ public class CommonUtils {
 		return StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()));
 	}
 
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		EdoQuestion question = new EdoQuestion();
 		//question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
 		question.setCorrectAnswer("asd");
 		EdoQuestion answer = new EdoQuestion();
 		answer.setAnswer("asd");
-		System.out.println(checkAnswer(answer, question));
-	}*/
+		answer.setMarks(new BigDecimal("1").negate());
+		//System.out.println(checkAnswer(answer, question));
+		System.out.println(answer.getMarks());
+	}
 	
 }
