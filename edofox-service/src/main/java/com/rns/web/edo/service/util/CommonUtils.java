@@ -229,9 +229,8 @@ public class CommonUtils {
 							}
 						} else {
 							if (question.getNegativeMarks() != null) {
-								BigDecimal marks = new BigDecimal(question.getNegativeMarks());
-								answered.setMarks(marks);
-								score = score.subtract(marks);
+								answered.setMarks(new BigDecimal(question.getNegativeMarks()).negate());
+								score = score.subtract(new BigDecimal(question.getNegativeMarks()));
 							}
 						}
 						break;
