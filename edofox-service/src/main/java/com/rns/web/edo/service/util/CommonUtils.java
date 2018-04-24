@@ -216,6 +216,7 @@ public class CommonUtils {
 			if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
 				setComplexAnswer(answered);
 			}
+			answered.setMarks(BigDecimal.ZERO);
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
 				for (EdoQuestion question : questions) {
 					if (question.getQn_id() != null &&  answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
@@ -223,13 +224,13 @@ public class CommonUtils {
 							correctCount++;
 							if (question.getWeightage() != null) {
 								BigDecimal marks = new BigDecimal(question.getWeightage());
-								question.setMarks(marks);
+								answered.setMarks(marks);
 								score = score.add(marks);
 							}
 						} else {
 							if (question.getNegativeMarks() != null) {
 								BigDecimal marks = new BigDecimal(question.getNegativeMarks());
-								question.setMarks(marks);
+								answered.setMarks(marks);
 								score = score.subtract(marks);
 							}
 						}
