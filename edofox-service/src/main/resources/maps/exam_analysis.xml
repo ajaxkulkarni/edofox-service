@@ -57,10 +57,11 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	
 	<resultMap id="students" type="com.rns.web.edo.service.domain.EdoStudent">
 
-		<result column="id" property="id" />
+		<result column="studentId" property="id" />
 		<result column="name" property="name" />
 		<result column="email" property="email" />
 		<result column="roll_no" property="rollNo" />
+		<result column="caste_category" property="casteCategory" />
 		<result column="score" property="analysis.score" />
 		<result column="correct" property="analysis.correctCount" />
 		<result column="solved" property="analysis.solvedCount" />
@@ -68,8 +69,25 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		
 	</resultMap>
 	
+	
+	
 	<select id="getStudentResults" resultMap="students" parameterType="Integer">
-		select * from test_status join student on test_status.student_id = student.id where test_status.test_id = ${value} order by test_status.score desc
+		select *,student.id as studentId from test_status join student on test_status.student_id = student.id where test_status.test_id = ${value} order by test_status.score desc
+	</select>
+	
+	<resultMap id="subjectScore" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
+
+		<result column="student_id" property="student.id" />
+		<result column="score" property="subjectScore.score" />
+		<result column="subject" property="subjectScore.subject" />
+		
+	</resultMap>
+	
+	<select id="getSubjectwiseScore" resultMap="subjectScore" parameterType="Integer">
+		SELECT sum(marks) as score, test_subjects.subject, student_id FROM `test_result` 
+		join test_questions on test_result.question_id = test_questions.id 
+		join test_subjects on test_questions.subject_id = test_subjects.subject_id 
+		where test_id = ${value} GROUP BY test_result.student_id,test_questions.subject_id
 	</select>
 	
 

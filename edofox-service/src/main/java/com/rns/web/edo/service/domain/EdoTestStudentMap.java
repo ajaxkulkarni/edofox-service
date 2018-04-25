@@ -10,6 +10,7 @@ public class EdoTestStudentMap {
 	private Integer mapId;
 	private Date registerDate;
 	private String studentAccess;
+	private EdoStudentSubjectAnalysis subjectScore;
 	
 	public EdoTest getTest() {
 		return test;
@@ -46,6 +47,12 @@ public class EdoTestStudentMap {
 	}
 	public void setStudentAccess(String studentAccess) {
 		this.studentAccess = studentAccess;
+	}
+	public EdoStudentSubjectAnalysis getSubjectScore() {
+		return subjectScore;
+	}
+	public void setSubjectScore(EdoStudentSubjectAnalysis subjectScore) {
+		this.subjectScore = subjectScore;
 	}
 	
 }

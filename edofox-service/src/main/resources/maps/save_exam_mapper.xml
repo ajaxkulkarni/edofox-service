@@ -29,5 +29,16 @@
 		update test_status set solved = ${test.solvedCount}, correct = ${test.correctCount}, score = ${test.score} 
 		where test_id = ${test.id} AND student_id = ${student.id}
 	</update>
+	
+	<!-- <update id="updateTestResult" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		<foreach item="question" index="index" collection="test.test" separator=";" >
+		update test_result set marks = ${question.marks} where test_id = ${test.id} AND student_id = ${student.id} AND question_id = ${question.qn_id}
+		</foreach>
+		;
+	</update> -->
+	
+	<update id="updateTestResult" parameterType="map">
+		update test_result set marks = ${marks} where test_id = ${test} AND student_id = ${student} AND question_id = ${question}
+	</update>
 
 </mapper>

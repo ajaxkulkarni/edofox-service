@@ -21,8 +21,10 @@ import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
+import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoSMSUtil;
@@ -146,9 +148,36 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_RESULT_NOT_FOUND));
 				return response;
 			}
-			List<EdoStudent> students = testsDao.getStudentResults(test.getId());
-			//TODO To be removed later
 			
+			EdoTest existing = testsDao.getTest(test.getId());
+			if(existing == null) {
+				return response;
+			}
+			
+			List<EdoStudent> students = testsDao.getStudentResults(test.getId());
+			
+			if(CollectionUtils.isNotEmpty(students)) {
+				List<EdoTestStudentMap> subjectScores = testsDao.getSubjectwiseScore(test.getId());
+				if(CollectionUtils.isNotEmpty(subjectScores)) {
+					for(EdoStudent student: students) {
+						if(student.getAnalysis() == null) {
+							continue;
+						}
+						List<EdoStudentSubjectAnalysis> subjectAnalysis = new ArrayList<EdoStudentSubjectAnalysis>();
+						for(EdoTestStudentMap map: subjectScores) {
+							if(map.getStudent() != null && map.getStudent().getId().intValue() == student.getId().intValue() && map.getSubjectScore() != null ) {
+								subjectAnalysis.add(map.getSubjectScore());
+								if( !existing.getSubjects().contains(map.getSubjectScore().getSubject())) {
+									existing.getSubjects().add(map.getSubjectScore().getSubject());
+								}
+							}
+						}
+						student.getAnalysis().setSubjectScores(subjectAnalysis);
+					}
+				}
+			}
+			
+			response.setTest(existing);
 			response.setStudents(students);
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
@@ -261,11 +290,23 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				request.getTest().setTest(solved);
 				CommonUtils.calculateTestScore(request.getTest(), questions);
 				testsDao.updateTestStatus(request);
-				EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+				if(CollectionUtils.isNotEmpty(request.getTest().getTest())) {
+					for(EdoQuestion question: request.getTest().getTest()) {
+						Map<String, Object> requestMap = new HashMap<String, Object>();
+						requestMap.put("marks", question.getMarks());
+						requestMap.put("test", request.getTest().getId());
+						requestMap.put("student", request.getStudent().getId());
+						requestMap.put("question", question.getQn_id());
+						testsDao.updateTestResult(requestMap);
+					}
+				}
+				//testsDao.updateTestResult(request);
+				//TODO: Temporary disabled
+				/*EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
 				smsUtil.setTest(request.getTest());
 				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
 				smsUtil.setStudent(student);
-				executor.execute(smsUtil);
+				executor.execute(smsUtil);*/
 			}
 			
 		} catch (Exception e) {

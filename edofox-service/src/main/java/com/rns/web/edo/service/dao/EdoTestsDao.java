@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
@@ -21,17 +22,20 @@ public interface EdoTestsDao {
 	List<EdoTestQuestionMap> getExamResult(EdoServiceRequest request);
 	EdoTestStudentMap getTestStatus(EdoTestStudentMap map); 
 	EdoTestStudentMap getStudentActivePackage(EdoTestStudentMap map);
+	EdoTest getTest(Integer id);
 	
 	//Save queries
 	Integer saveTestResult(EdoServiceRequest request);
 	Integer saveTestStatus(EdoServiceRequest request);
 	Integer updateTestStatus(EdoServiceRequest request);
+	Integer updateTestResult(Map<String, Object> requestMap);
 	//public List<EdoQuestion> getTestUnsolved(EdoStudent student);
 	
 	//Analysis
 	List<EdoTest> getExamAnalysis(Integer value);
 	List<EdoQuestion> getQuestionAnalysis(Integer value);
 	List<EdoStudent> getStudentResults(Integer value);
+	List<EdoTestStudentMap> getSubjectwiseScore(Integer value);
 	
 	//Student queries
 	List<EDOPackage> getInstituePackages(Integer instituteId);
@@ -49,5 +53,6 @@ public interface EdoTestsDao {
 	Integer saveTestQuestion(EdoTest test);
 	Integer updateSolution(EdoQuestion question);
 	List<EdoStudent> getStudentByPayment(String paymentId);
+	
 	
 }

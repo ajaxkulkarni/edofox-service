@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.domain;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class EDOStudentAnalysis {
 	
@@ -8,6 +9,7 @@ public class EDOStudentAnalysis {
 	private Integer correctCount;
 	private Integer flaggedCount;
 	private BigDecimal score;
+	private List<EdoStudentSubjectAnalysis> subjectScores;
 	
 	public Integer getSolvedCount() {
 		return solvedCount;
@@ -32,6 +34,12 @@ public class EDOStudentAnalysis {
 	}
 	public void setScore(BigDecimal score) {
 		this.score = score;
+	}
+	public List<EdoStudentSubjectAnalysis> getSubjectScores() {
+		return subjectScores;
+	}
+	public void setSubjectScores(List<EdoStudentSubjectAnalysis> subjectScores) {
+		this.subjectScores = subjectScores;
 	}
 	
 }
