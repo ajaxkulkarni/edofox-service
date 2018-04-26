@@ -46,6 +46,7 @@ public interface EdoConstants {
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
 	String QUESTION_TYPE_MATCH = "MATCH";
+	String QUESTION_TYPE_PASSAGE = "PASSAGE";
 	
 	
 	//DEV
