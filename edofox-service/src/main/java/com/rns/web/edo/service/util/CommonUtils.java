@@ -273,9 +273,23 @@ public class CommonUtils {
 	public static boolean checkAnswer(EdoQuestion answered, EdoQuestion question) {
 		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
-			if(ArrayUtils.isNotEmpty(correctAnswers)) {
+			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
+			if(ArrayUtils.isNotEmpty(correctAnswers) && ArrayUtils.isNotEmpty(selectedAnswers)) {
 				for(String correctAnswer: correctAnswers) {
-					if(!StringUtils.contains(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(correctAnswer))) {
+					boolean found = false;
+					for(String selectedAnswer: selectedAnswers) {
+						/*if(!StringUtils.contains(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(correctAnswer))) {
+							return false;
+						}*/
+						if(StringUtils.isBlank(StringUtils.trimToEmpty(selectedAnswer))) {
+							continue;
+						}
+						if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(selectedAnswer), StringUtils.trimToEmpty(correctAnswer))) {
+							found = true;
+							break;
+						}
+					}
+					if(!found) {
 						return false;
 					}
 				}
