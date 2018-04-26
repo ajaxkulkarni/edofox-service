@@ -274,29 +274,36 @@ public class CommonUtils {
 		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
-			if(ArrayUtils.isNotEmpty(correctAnswers) && ArrayUtils.isNotEmpty(selectedAnswers)) {
-				for(String correctAnswer: correctAnswers) {
-					boolean found = false;
-					for(String selectedAnswer: selectedAnswers) {
-						/*if(!StringUtils.contains(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(correctAnswer))) {
-							return false;
-						}*/
-						if(StringUtils.isBlank(StringUtils.trimToEmpty(selectedAnswer))) {
-							continue;
-						}
-						if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(selectedAnswer), StringUtils.trimToEmpty(correctAnswer))) {
-							found = true;
-							break;
-						}
-					}
-					if(!found) {
-						return false;
-					}
-				}
+			if(compareResults(correctAnswers, selectedAnswers) && compareResults(selectedAnswers, correctAnswers)) {
 				return true;
 			}
 		}
 		return StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()));
+	}
+
+	private static boolean compareResults(String[] correctAnswers, String[] selectedAnswers) {
+		if(ArrayUtils.isNotEmpty(correctAnswers) && ArrayUtils.isNotEmpty(selectedAnswers)) {
+			for(String correctAnswer: correctAnswers) {
+				boolean found = false;
+				for(String selectedAnswer: selectedAnswers) {
+					/*if(!StringUtils.contains(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(correctAnswer))) {
+						return false;
+					}*/
+					if(StringUtils.isBlank(StringUtils.trimToEmpty(selectedAnswer))) {
+						continue;
+					}
+					if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(selectedAnswer), StringUtils.trimToEmpty(correctAnswer))) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	public static void main(String[] args) {
