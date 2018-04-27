@@ -213,27 +213,21 @@ public class CommonUtils {
 		Integer flaggedCount = 0;
 		BigDecimal score = BigDecimal.ZERO;
 		for (EdoQuestion answered : test.getTest()) {
-			if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
-				setComplexAnswer(answered);
-			}
+			
 			answered.setMarks(BigDecimal.ZERO);
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
 				for (EdoQuestion question : questions) {
 					if (question.getQn_id() != null &&  answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
-						if (checkAnswer(answered, question)) {
-							correctCount++;
-							if (question.getWeightage() != null) {
-								BigDecimal marks = new BigDecimal(question.getWeightage());
-								answered.setMarks(marks);
-								score = score.add(marks);
+						Integer questionScore = calculateAnswer(answered, question);
+						if (questionScore != null) {
+							if(questionScore > 0) {
+								correctCount++;
 							}
-						} else {
-							if (question.getNegativeMarks() != null) {
-								answered.setMarks(new BigDecimal(question.getNegativeMarks()).negate());
-								LoggingUtil.logMessage("Setting negative marks - " + answered.getMarks() + " for question " + answered.getId());
-								score = score.subtract(new BigDecimal(question.getNegativeMarks()));
-							}
-						}
+							BigDecimal marks = new BigDecimal(questionScore);
+							answered.setMarks(marks);
+							score = score.add(marks);
+							LoggingUtil.logMessage(answered.getQuestionNumber() + "--" + answered.getQn_id() + " -- " + answered.getAnswer() + " -- " + answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + marks);
+						} 
 						break;
 					}
 				}
@@ -241,7 +235,6 @@ public class CommonUtils {
 				if (answered.getFlagged() != null && answered.getFlagged() == 1) {
 					flaggedCount++;
 				}
-				System.out.println(answered.getQn_id() + " -- " + answered.getAnswer() + " -- " + answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + score);
 			}
 
 		}
@@ -270,15 +263,50 @@ public class CommonUtils {
 		
 	}
 
-	public static boolean checkAnswer(EdoQuestion answered, EdoQuestion question) {
+	public static Integer calculateAnswer(EdoQuestion answered, EdoQuestion question) {
+		if(question.getWeightage() == null || question.getNegativeMarks() == null) {
+			return null;
+		}
 		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
 			if(compareResults(correctAnswers, selectedAnswers) && compareResults(selectedAnswers, correctAnswers)) {
-				return true;
-			}
+				return question.getWeightage();
+			} 
+		} else if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType())) {
+			return calculateMatchScore(question, answered);
+		} else if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()))){
+			return question.getWeightage();
 		}
-		return StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()));
+		return -question.getNegativeMarks();
+	}
+
+	private static Integer calculateMatchScore(EdoQuestion question, EdoQuestion answered) {
+		if(question.getCorrectAnswer() != null && answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
+			Integer count = 0;
+			for(EdoComplexOption option: answered.getComplexOptions()) {
+				if(CollectionUtils.isNotEmpty(option.getMatchOptions())) {
+					boolean correct = true;
+					for(EdoComplexOption match: option.getMatchOptions()) {
+						if(match.isSelected()) {
+							if(!StringUtils.contains(question.getCorrectAnswer(), option.getOptionName() + "-" + match.getOptionName())) {
+								correct = false;
+								break;
+							}
+						}
+					}
+					if(correct) {
+						count++;
+					} else {
+						count--;
+					}
+				}
+			}
+			setComplexAnswer(answered);
+			return count;
+		}
+		
+		return null;
 	}
 
 	private static boolean compareResults(String[] correctAnswers, String[] selectedAnswers) {
@@ -306,7 +334,7 @@ public class CommonUtils {
 		return false;
 	}
 
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EdoQuestion question = new EdoQuestion();
 		//question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
 		question.setCorrectAnswer("asd");
@@ -314,7 +342,9 @@ public class CommonUtils {
 		answer.setAnswer("asd");
 		answer.setMarks(new BigDecimal("1").negate());
 		//System.out.println(checkAnswer(answer, question));
-		System.out.println(answer.getMarks());
-	}
+		//System.out.println(answer.getMarks());
+		BigDecimal negative = new BigDecimal(-1);
+		System.out.println(new BigDecimal(0).add(negative));
+	}*/
 	
 }
