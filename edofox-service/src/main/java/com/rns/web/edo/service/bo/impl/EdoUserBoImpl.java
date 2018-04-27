@@ -176,12 +176,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 								result.getSections().add(question.getSection());
 							}
 							if(isRandomizeQuestions(result)) {
-								List<EdoQuestion> currentCount = sectionSets.get(question.getSection());
-								if(currentCount == null) {
-									currentCount = new ArrayList<EdoQuestion>();
+								List<EdoQuestion> questionList = sectionSets.get(question.getSection());
+								if(questionList == null) {
+									questionList = new ArrayList<EdoQuestion>();
 								}
-								currentCount.add(question);
-								sectionSets.put(question.getSection(), currentCount);
+								questionList.add(question);
+								sectionSets.put(question.getSection(), questionList);
 							}
 						}
 						result.getTest().add(question);
@@ -209,6 +209,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				List<EdoQuestion> set = sectionSets.get(section);
 				if(!StringUtils.contains(QUESTION_TYPE_PASSAGE, set.get(0).getType())) {
 					//No shuffle for comprehension type questions
+					LoggingUtil.logMessage("Shuffling for section .." + section + " - list - " + set.size());
 					Collections.shuffle(set);
 				}
 				Integer qNo = 1;
