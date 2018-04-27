@@ -302,6 +302,7 @@ public class CommonUtils {
 					}
 					if(matchedCount == 0) {
 						//Nothing checked
+						LoggingUtil.logMessage("Nothing checked for - " + option.getOptionName());
 						continue;
 					}
 					int actualCount = StringUtils.countMatches(question.getCorrectAnswer(), option.getOptionName());
@@ -310,6 +311,7 @@ public class CommonUtils {
 					} else {
 						count--;
 					}
+					LoggingUtil.logMessage("Checked for - " + option.getOptionName() + " - " + correct + " - " + actualCount + " - " + matchedCount);
 				}
 			}
 			return count;
