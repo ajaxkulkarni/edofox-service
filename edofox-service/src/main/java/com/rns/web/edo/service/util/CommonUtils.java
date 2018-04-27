@@ -9,13 +9,15 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.util.ArrayUtil;
 
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -284,42 +286,40 @@ public class CommonUtils {
 	}
 
 	private static Integer calculateMatchScore(EdoQuestion question, EdoQuestion answered) {
-		LoggingUtil.logMessage("Calculating match score .." + question.getQn_id() + ":" + question.getCorrectAnswer() + ":" + answered.getComplexOptions());
-		if(question.getCorrectAnswer() != null && answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
-			Integer count = 0;
-			LoggingUtil.logMessage("Calculating match score in 1 .." + question.getQn_id());
-			for(EdoComplexOption option: answered.getComplexOptions()) {
-				if(CollectionUtils.isNotEmpty(option.getMatchOptions())) {
-					LoggingUtil.logMessage("Calculating match score in 2 .." + option.getOptionName());
-					boolean correct = true;
-					Integer matchedCount = 0;
-					for(EdoComplexOption match: option.getMatchOptions()) {
-						if(match.isSelected()) {
-							LoggingUtil.logMessage("Checked option .." + match.getOptionName());
-							matchedCount++;
-							if(!StringUtils.contains(question.getCorrectAnswer(), option.getOptionName() + "-" + match.getOptionName())) {
-								correct = false;
-								break;
-							}
-						}
-					}
-					if(matchedCount == 0) {
-						//Nothing checked
-						LoggingUtil.logMessage("Nothing checked for - " + option.getOptionName());
+		
+		if(question.getCorrectAnswer() != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
+			String[] selectedPairs = StringUtils.split(answered.getAnswer(), ",");
+			if(ArrayUtils.isNotEmpty(selectedPairs)) {
+				Map<String, Integer> pairCount = new HashMap<String, Integer>();
+				for(String selectedPair: selectedPairs) {
+					if(!StringUtils.contains(question.getCorrectAnswer(), selectedPair)) {
 						continue;
 					}
-					int actualCount = StringUtils.countMatches(question.getCorrectAnswer(), option.getOptionName());
-					if(correct && actualCount == matchedCount) {
-						count++;
-					} else {
-						count--;
-					}
-					LoggingUtil.logMessage("Checked for - " + option.getOptionName() + " - " + correct + " - " + actualCount + " - " + matchedCount);
+				 	String[] pair = StringUtils.split(selectedPair, "-");
+				 	if(ArrayUtils.isNotEmpty(pair)) {
+				 		Integer existingCount = pairCount.get(pair[0]);
+				 		if(existingCount == null) {
+				 			existingCount = 0;
+				 		}
+						pairCount.put(pair[0], existingCount + 1);
+				 	}
 				}
+				Integer count = 0;
+				if(CollectionUtils.isNotEmpty(pairCount.keySet())) {
+					for(Entry<String, Integer> pair: pairCount.entrySet()) {
+						int actualCount = StringUtils.countMatches(pair.getKey(), question.getCorrectAnswer());
+						if(pair.getValue() != null) {
+							if(actualCount == pair.getValue().intValue()) {
+								count++;
+							} else {
+								count --;
+							}
+						}
+					} 
+				}
+				return count;
 			}
-			return count;
 		}
-		
 		return null;
 	}
 
