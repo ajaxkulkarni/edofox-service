@@ -207,7 +207,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			List<EdoQuestion> shuffled = new ArrayList<EdoQuestion>();
 			for(String section: result.getSections()) {
 				List<EdoQuestion> set = sectionSets.get(section);
-				if(!StringUtils.equals(QUESTION_TYPE_PASSAGE, set.get(0).getType())) {
+				if(!StringUtils.contains(QUESTION_TYPE_PASSAGE, set.get(0).getType())) {
 					//No shuffle for comprehension type questions
 					Collections.shuffle(set);
 				}
