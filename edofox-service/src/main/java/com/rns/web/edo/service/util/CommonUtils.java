@@ -287,15 +287,18 @@ public class CommonUtils {
 			for(EdoComplexOption option: answered.getComplexOptions()) {
 				if(CollectionUtils.isNotEmpty(option.getMatchOptions())) {
 					boolean correct = true;
+					Integer matchedCount = 0;
 					for(EdoComplexOption match: option.getMatchOptions()) {
 						if(match.isSelected()) {
 							if(!StringUtils.contains(question.getCorrectAnswer(), option.getOptionName() + "-" + match.getOptionName())) {
 								correct = false;
 								break;
 							}
+							matchedCount++;
 						}
 					}
-					if(correct) {
+					int actualCount = StringUtils.countMatches(question.getCorrectAnswer(), option.getOptionName());
+					if(correct && actualCount == matchedCount) {
 						count++;
 					} else {
 						count--;
