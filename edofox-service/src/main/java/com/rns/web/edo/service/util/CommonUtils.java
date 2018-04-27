@@ -269,7 +269,6 @@ public class CommonUtils {
 		if(question.getWeightage() == null || question.getNegativeMarks() == null) {
 			return null;
 		}
-		if(!StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType()))
 		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
