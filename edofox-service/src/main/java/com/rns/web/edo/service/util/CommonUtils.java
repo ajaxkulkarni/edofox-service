@@ -213,7 +213,9 @@ public class CommonUtils {
 		Integer flaggedCount = 0;
 		BigDecimal score = BigDecimal.ZERO;
 		for (EdoQuestion answered : test.getTest()) {
-			
+			if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
+				setComplexAnswer(answered);
+			}
 			answered.setMarks(BigDecimal.ZERO);
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
 				for (EdoQuestion question : questions) {
@@ -247,7 +249,7 @@ public class CommonUtils {
 	}
 
 	private static void setComplexAnswer(EdoQuestion answered) {
-		if(answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
+		if(answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions()) ) {
 			StringBuilder answerBuilder = new StringBuilder();
 			for(EdoComplexOption option: answered.getComplexOptions()) {
 				if(CollectionUtils.isNotEmpty(option.getMatchOptions())) {
@@ -267,6 +269,7 @@ public class CommonUtils {
 		if(question.getWeightage() == null || question.getNegativeMarks() == null) {
 			return null;
 		}
+		if(!StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType()))
 		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
@@ -305,7 +308,6 @@ public class CommonUtils {
 					}
 				}
 			}
-			setComplexAnswer(answered);
 			return count;
 		}
 		
