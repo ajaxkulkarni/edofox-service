@@ -268,7 +268,7 @@ public class CommonUtils {
 	}
 
 	public static Integer calculateAnswer(EdoQuestion answered, EdoQuestion question) {
-		if(question.getWeightage() == null || question.getNegativeMarks() == null) {
+		if(question.getWeightage() == null || question.getNegativeMarks() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
 			return null;
 		}
 		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
