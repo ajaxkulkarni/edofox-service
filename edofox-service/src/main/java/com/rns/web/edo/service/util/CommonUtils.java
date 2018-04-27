@@ -293,12 +293,16 @@ public class CommonUtils {
 					Integer matchedCount = 0;
 					for(EdoComplexOption match: option.getMatchOptions()) {
 						if(match.isSelected()) {
+							matchedCount++;
 							if(!StringUtils.contains(question.getCorrectAnswer(), option.getOptionName() + "-" + match.getOptionName())) {
 								correct = false;
 								break;
 							}
-							matchedCount++;
 						}
+					}
+					if(matchedCount == 0) {
+						//Nothing checked
+						continue;
 					}
 					int actualCount = StringUtils.countMatches(question.getCorrectAnswer(), option.getOptionName());
 					if(correct && actualCount == matchedCount) {
