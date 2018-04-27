@@ -284,14 +284,18 @@ public class CommonUtils {
 	}
 
 	private static Integer calculateMatchScore(EdoQuestion question, EdoQuestion answered) {
+		LoggingUtil.logMessage("Calculating match score .." + question.getQn_id());
 		if(question.getCorrectAnswer() != null && answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
 			Integer count = 0;
+			LoggingUtil.logMessage("Calculating match score in 1 .." + question.getQn_id());
 			for(EdoComplexOption option: answered.getComplexOptions()) {
 				if(CollectionUtils.isNotEmpty(option.getMatchOptions())) {
+					LoggingUtil.logMessage("Calculating match score in 2 .." + option.getOptionName());
 					boolean correct = true;
 					Integer matchedCount = 0;
 					for(EdoComplexOption match: option.getMatchOptions()) {
 						if(match.isSelected()) {
+							LoggingUtil.logMessage("Checked option .." + match.getOptionName());
 							matchedCount++;
 							if(!StringUtils.contains(question.getCorrectAnswer(), option.getOptionName() + "-" + match.getOptionName())) {
 								correct = false;
