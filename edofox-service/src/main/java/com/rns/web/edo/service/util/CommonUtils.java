@@ -284,7 +284,7 @@ public class CommonUtils {
 	}
 
 	private static Integer calculateMatchScore(EdoQuestion question, EdoQuestion answered) {
-		LoggingUtil.logMessage("Calculating match score .." + question.getQn_id());
+		LoggingUtil.logMessage("Calculating match score .." + question.getQn_id() + ":" + question.getCorrectAnswer() + ":" + answered.getComplexOptions());
 		if(question.getCorrectAnswer() != null && answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
 			Integer count = 0;
 			LoggingUtil.logMessage("Calculating match score in 1 .." + question.getQn_id());
