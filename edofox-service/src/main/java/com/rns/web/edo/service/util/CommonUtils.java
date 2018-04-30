@@ -364,6 +364,7 @@ public class CommonUtils {
 					}
 				}
 				if(!found) {
+					LoggingUtil.logMessage("Not found for .." + correctAnswer);
 					return false;
 				}
 			}
@@ -377,9 +378,9 @@ public class CommonUtils {
 		//question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
 		question.setCorrectAnswer("option2,option3");
 		EdoQuestion answer = new EdoQuestion();
-		answer.setAnswer(" option3,option2, ");
+		answer.setAnswer("option3,option2,");
 		question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
-		question.setWeightage(4);
+		question.setWeightage(3);
 		question.setNegativeMarks(1);
 		System.out.println(calculateAnswer(answer, question));
 		//answer.setMarks(new BigDecimal("1").negate());
