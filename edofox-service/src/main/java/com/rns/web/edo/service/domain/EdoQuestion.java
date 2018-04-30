@@ -44,6 +44,7 @@ public class EdoQuestion {
 	private List<EdoComplexOption> complexOptions;
 	private String section;
 	private BigDecimal marks;
+	private String alternateAnswer;
 	
 	public String getOption1() {
 		return option1;
@@ -252,6 +253,12 @@ public class EdoQuestion {
 	}
 	public void setMarks(BigDecimal marks) {
 		this.marks = marks;
+	}
+	public String getAlternateAnswer() {
+		return alternateAnswer;
+	}
+	public void setAlternateAnswer(String alternateAnswer) {
+		this.alternateAnswer = alternateAnswer;
 	}
 
 }

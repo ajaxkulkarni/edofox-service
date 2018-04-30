@@ -271,28 +271,50 @@ public class CommonUtils {
 		if(question.getWeightage() == null || question.getNegativeMarks() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
 			return null;
 		}
+		if(StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer()) || StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
+			return 0;
+		}
 		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
 			if(compareResults(correctAnswers, selectedAnswers) && compareResults(selectedAnswers, correctAnswers)) {
 				return question.getWeightage();
-			} 
+			} else if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
+				correctAnswers = StringUtils.split(question.getAlternateAnswer(), ",");
+				selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
+				if(compareResults(correctAnswers, selectedAnswers) && compareResults(selectedAnswers, correctAnswers)) {
+					return question.getWeightage();
+				}
+			}
 		} else if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType())) {
-			return calculateMatchScore(question, answered);
+			Integer matchScore = calculateMatchScore(question.getCorrectAnswer(), answered);
+			Integer altScore = null;
+			if(StringUtils.isNotBlank(question.getAlternateAnswer())) {
+				altScore = calculateMatchScore(question.getAlternateAnswer(), answered);
+			}
+			if(altScore != null && altScore > matchScore) {
+				return altScore;
+			}
+			return matchScore;
 		} else if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()))){
+			return question.getWeightage();
+		} else if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getAlternateAnswer()))) {
 			return question.getWeightage();
 		}
 		return -question.getNegativeMarks();
 	}
 
-	private static Integer calculateMatchScore(EdoQuestion question, EdoQuestion answered) {
+	private static Integer calculateMatchScore(String correctAnswer, EdoQuestion answered) {
 		
-		if(question.getCorrectAnswer() != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
+		if(correctAnswer != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
+			
 			String[] selectedPairs = StringUtils.split(answered.getAnswer(), ",");
+			Integer count = 0;
 			if(ArrayUtils.isNotEmpty(selectedPairs)) {
 				Map<String, Integer> pairCount = new HashMap<String, Integer>();
 				for(String selectedPair: selectedPairs) {
-					if(!StringUtils.contains(question.getCorrectAnswer(), selectedPair)) {
+					if(!StringUtils.contains(correctAnswer, selectedPair)) {
+						count --;
 						continue;
 					}
 				 	String[] pair = StringUtils.split(selectedPair, "-");
@@ -304,10 +326,9 @@ public class CommonUtils {
 						pairCount.put(pair[0], existingCount + 1);
 				 	}
 				}
-				Integer count = 0;
 				if(CollectionUtils.isNotEmpty(pairCount.keySet())) {
-					for(Entry<String, Integer> pair: pairCount.entrySet()) {
-						int actualCount = StringUtils.countMatches(pair.getKey(), question.getCorrectAnswer());
+					for(Entry<String, Integer> pair: pairCount.entrySet()) {						
+						int actualCount = StringUtils.countMatches(correctAnswer, pair.getKey());
 						if(pair.getValue() != null) {
 							if(actualCount == pair.getValue().intValue()) {
 								count++;
@@ -348,17 +369,14 @@ public class CommonUtils {
 		return false;
 	}
 
-	/*public static void main(String[] args) {
+	public static void main(String[] args) {
 		EdoQuestion question = new EdoQuestion();
 		//question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
-		question.setCorrectAnswer("asd");
+		question.setCorrectAnswer("a-r,b-q,c-s,d-p");
 		EdoQuestion answer = new EdoQuestion();
-		answer.setAnswer("asd");
+		answer.setAnswer("a-r,d-p");
 		answer.setMarks(new BigDecimal("1").negate());
-		//System.out.println(checkAnswer(answer, question));
-		//System.out.println(answer.getMarks());
-		BigDecimal negative = new BigDecimal(-1);
-		System.out.println(new BigDecimal(0).add(negative));
-	}*/
+		//System.out.println(calculateMatchScore(question, answer));
+	}
 	
 }

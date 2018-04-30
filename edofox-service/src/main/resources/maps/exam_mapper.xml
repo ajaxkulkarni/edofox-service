@@ -83,6 +83,7 @@
 		<result column="question_type" property="type" />
 		<result column="meta_data" property="metaData" />
 		<result column="meta_data_img_url" property="metaDataImageUrl" />
+		<result column="alt_answer" property="alternateAnswer"/>
 	</resultMap>
 	
 	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">

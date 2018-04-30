@@ -1,5 +1,6 @@
 package com.rns.web.edo.service.bo.impl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -279,6 +280,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		try {
 			
 			List<EdoQuestion> questions = testsDao.getExamQuestions(request.getTest().getId());
+			Integer bonus = 0;
+			Integer bonusCount = 0;
+			for(EdoQuestion question : questions) {
+				if(StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
+					bonus = bonus + question.getWeightage();
+				}
+			}
 			List<EdoTestQuestionMap> map = testsDao.getExamResult(request);
 			List<EdoQuestion> solved = new ArrayList<EdoQuestion>();
 			if(CollectionUtils.isNotEmpty(map)) {
@@ -289,6 +297,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				request.getTest().setTotalMarks(map.get(0).getTest().getTotalMarks());
 				request.getTest().setTest(solved);
 				CommonUtils.calculateTestScore(request.getTest(), questions);
+				if(bonus != null) {
+					request.getTest().setScore(request.getTest().getScore().add(new BigDecimal(bonus)));
+					request.getTest().setSolvedCount(request.getTest().getSolvedCount() + bonusCount);
+				}
 				testsDao.updateTestStatus(request);
 				if(CollectionUtils.isNotEmpty(request.getTest().getTest())) {
 					for(EdoQuestion question: request.getTest().getTest()) {
@@ -300,6 +312,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						testsDao.updateTestResult(requestMap);
 					}
 				}
+				
 				//testsDao.updateTestResult(request);
 				//TODO: Temporary disabled
 				/*EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
