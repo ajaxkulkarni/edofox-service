@@ -347,6 +347,9 @@ public class CommonUtils {
 	private static boolean compareResults(String[] correctAnswers, String[] selectedAnswers) {
 		if(ArrayUtils.isNotEmpty(correctAnswers) && ArrayUtils.isNotEmpty(selectedAnswers)) {
 			for(String correctAnswer: correctAnswers) {
+				if(StringUtils.isBlank(StringUtils.trimToEmpty(correctAnswer))) {
+					continue;
+				}
 				boolean found = false;
 				for(String selectedAnswer: selectedAnswers) {
 					/*if(!StringUtils.contains(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(correctAnswer))) {
@@ -372,10 +375,14 @@ public class CommonUtils {
 	public static void main(String[] args) {
 		EdoQuestion question = new EdoQuestion();
 		//question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
-		question.setCorrectAnswer("a-r,b-q,c-s,d-p");
+		question.setCorrectAnswer("option2,option3");
 		EdoQuestion answer = new EdoQuestion();
-		answer.setAnswer("a-r,d-p");
-		answer.setMarks(new BigDecimal("1").negate());
+		answer.setAnswer(" option3,option2, ");
+		question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
+		question.setWeightage(4);
+		question.setNegativeMarks(1);
+		System.out.println(calculateAnswer(answer, question));
+		//answer.setMarks(new BigDecimal("1").negate());
 		//System.out.println(calculateMatchScore(question, answer));
 	}
 	
