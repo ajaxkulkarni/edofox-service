@@ -268,7 +268,7 @@ public class CommonUtils {
 	}
 
 	public static Integer calculateAnswer(EdoQuestion answered, EdoQuestion question) {
-		if(question.getWeightage() == null || question.getNegativeMarks() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
+		if(question.getWeightage() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
 			return null;
 		}
 		if(StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer()) || StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
@@ -300,6 +300,9 @@ public class CommonUtils {
 			return question.getWeightage();
 		} else if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getAlternateAnswer()))) {
 			return question.getWeightage();
+		}
+		if(question.getNegativeMarks() == null || question.getNegativeMarks() == 0) {
+			return 0;
 		}
 		return -question.getNegativeMarks();
 	}
