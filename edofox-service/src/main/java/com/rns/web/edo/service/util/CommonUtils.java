@@ -274,7 +274,7 @@ public class CommonUtils {
 		if(StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer()) || StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
 			return 0;
 		}
-		if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MULTIPLE, question.getType())) {
+		if(StringUtils.contains(question.getType(), EdoConstants.QUESTION_TYPE_MULTIPLE)) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
 			if(compareResults(correctAnswers, selectedAnswers) && compareResults(selectedAnswers, correctAnswers)) {
