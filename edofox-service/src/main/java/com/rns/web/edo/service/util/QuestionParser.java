@@ -19,11 +19,11 @@ public class QuestionParser {
 	private static final String ANS_PARSE_KEY = ".Ans";
 
 	public static void main(String[] args) {
-		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Math 04.tex";
+		String fileName = "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\05 Math QP.tex";
 		Integer previousQuestion = 100;
 		Integer testId = null;
 		
-		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\Math 04.tex").size());
+		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\05 Math Sol.tex").size());
 	}
 
 	public static List<EdoQuestion> parseQuestionPaper(String fileName, Integer previousQuestion, String solutionPath) {

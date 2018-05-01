@@ -84,6 +84,7 @@
 		<result column="meta_data" property="metaData" />
 		<result column="meta_data_img_url" property="metaDataImageUrl" />
 		<result column="alt_answer" property="alternateAnswer"/>
+		<result column="partial" property="partialCorrection"/>
 	</resultMap>
 	
 	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">

@@ -192,12 +192,11 @@ public class CommonUtils {
 				result = StringUtils.replace(result, "{paymentId}", "");
 				result = StringUtils.replace(result, "{transactionId}", "");
 			}
-			
 
 		}
 		return result;
 	}
-	
+
 	public static String prepareTestNotification(String result, EdoTest test) {
 		if (test != null) {
 			result = StringUtils.replace(result, "{testName}", CommonUtils.getStringValue(test.getName()));
@@ -215,23 +214,24 @@ public class CommonUtils {
 		Integer flaggedCount = 0;
 		BigDecimal score = BigDecimal.ZERO;
 		for (EdoQuestion answered : test.getTest()) {
-			if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
+			if (StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
 				setComplexAnswer(answered);
 			}
 			answered.setMarks(BigDecimal.ZERO);
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
 				for (EdoQuestion question : questions) {
-					if (question.getQn_id() != null &&  answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
+					if (question.getQn_id() != null && answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
 						Integer questionScore = calculateAnswer(answered, question);
 						if (questionScore != null) {
-							if(questionScore > 0) {
+							if (questionScore > 0) {
 								correctCount++;
 							}
 							BigDecimal marks = new BigDecimal(questionScore);
 							answered.setMarks(marks);
 							score = score.add(marks);
-							LoggingUtil.logMessage(answered.getQuestionNumber() + "--" + answered.getQn_id() + " -- " + answered.getAnswer() + " -- " + answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + marks);
-						} 
+							LoggingUtil.logMessage(answered.getQuestionNumber() + "--" + answered.getQn_id() + " -- " + answered.getAnswer() + " -- "
+									+ answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + marks);
+						}
 						break;
 					}
 				}
@@ -246,17 +246,17 @@ public class CommonUtils {
 		test.setFlaggedCount(flaggedCount);
 		test.setSolvedCount(solvedCount);
 		test.setScore(score);
-		
+
 		LoggingUtil.logMessage("Evaluated the test - " + test.getCorrectCount() + " .. " + test.getScore());
 	}
 
 	private static void setComplexAnswer(EdoQuestion answered) {
-		if(answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions()) ) {
+		if (answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
 			StringBuilder answerBuilder = new StringBuilder();
-			for(EdoComplexOption option: answered.getComplexOptions()) {
-				if(CollectionUtils.isNotEmpty(option.getMatchOptions())) {
-					for(EdoComplexOption match: option.getMatchOptions()) {
-						if(match.isSelected()) {
+			for (EdoComplexOption option : answered.getComplexOptions()) {
+				if (CollectionUtils.isNotEmpty(option.getMatchOptions())) {
+					for (EdoComplexOption match : option.getMatchOptions()) {
+						if (match.isSelected()) {
 							answerBuilder.append(option.getOptionName()).append("-").append(match.getOptionName()).append(",");
 						}
 					}
@@ -264,82 +264,82 @@ public class CommonUtils {
 			}
 			answered.setAnswer(StringUtils.removeEnd(answerBuilder.toString(), ","));
 		}
-		
+
 	}
 
 	public static Integer calculateAnswer(EdoQuestion answered, EdoQuestion question) {
-		if(question.getWeightage() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
+		if (question.getWeightage() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
 			return null;
 		}
-		if(StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer()) || StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
+		if (StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer()) || StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
 			return 0;
 		}
-		if(StringUtils.contains(question.getType(), EdoConstants.QUESTION_TYPE_MULTIPLE)) {
+		if (StringUtils.contains(question.getType(), EdoConstants.QUESTION_TYPE_MULTIPLE)) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
-			if(compareResults(correctAnswers, selectedAnswers) && compareResults(selectedAnswers, correctAnswers)) {
-				return question.getWeightage();
-			} else if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
-				correctAnswers = StringUtils.split(question.getAlternateAnswer(), ",");
-				selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
-				if(compareResults(correctAnswers, selectedAnswers) && compareResults(selectedAnswers, correctAnswers)) {
-					return question.getWeightage();
-				}
+			Integer compareResult = calculateMultipleTypeScore(correctAnswers, selectedAnswers, question);
+			Integer alternateResult = null;
+			if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
+				String[] alternateAnswers = StringUtils.split(question.getAlternateAnswer(), ","); 
+				alternateResult = calculateMultipleTypeScore(alternateAnswers, selectedAnswers, question);
 			}
-		} else if(StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType())) {
+			if(alternateResult != null && alternateResult > compareResult) {
+				return alternateResult;
+			} else {
+				return compareResult;
+			}
+			
+		} else if (StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType())) {
 			Integer matchScore = calculateMatchScore(question.getCorrectAnswer(), answered);
 			Integer altScore = null;
-			if(StringUtils.isNotBlank(question.getAlternateAnswer())) {
+			if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
 				altScore = calculateMatchScore(question.getAlternateAnswer(), answered);
 			}
-			if(altScore != null && altScore > matchScore) {
+			if (altScore != null && altScore > matchScore) {
 				return altScore;
 			}
 			return matchScore;
-		} else if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()))){
+		} else if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()))) {
 			return question.getWeightage();
 		} else if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getAlternateAnswer()))) {
 			return question.getWeightage();
 		}
-		if(question.getNegativeMarks() == null || question.getNegativeMarks() == 0) {
-			return 0;
-		}
-		return -question.getNegativeMarks();
+		return getWrongScore(question);
 	}
 
 	private static Integer calculateMatchScore(String correctAnswer, EdoQuestion answered) {
-		
-		if(correctAnswer != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
-			
+
+		if (correctAnswer != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
+
 			String[] selectedPairs = StringUtils.split(answered.getAnswer(), ",");
 			Integer count = 0;
-			if(ArrayUtils.isNotEmpty(selectedPairs)) {
+			if (ArrayUtils.isNotEmpty(selectedPairs)) {
 				Map<String, Integer> pairCount = new HashMap<String, Integer>();
-				for(String selectedPair: selectedPairs) {
-					if(!StringUtils.contains(correctAnswer, selectedPair)) {
-						count --;
+				for (String selectedPair : selectedPairs) {
+					if (!StringUtils.contains(correctAnswer, selectedPair)) {
+						count--;
 						continue;
 					}
-				 	String[] pair = StringUtils.split(selectedPair, "-");
-				 	if(ArrayUtils.isNotEmpty(pair)) {
-				 		Integer existingCount = pairCount.get(pair[0]);
-				 		if(existingCount == null) {
-				 			existingCount = 0;
-				 		}
+					String[] pair = StringUtils.split(selectedPair, "-");
+					if (ArrayUtils.isNotEmpty(pair)) {
+						Integer existingCount = pairCount.get(pair[0]);
+						if (existingCount == null) {
+							existingCount = 0;
+						}
 						pairCount.put(pair[0], existingCount + 1);
-				 	}
+					}
 				}
-				if(CollectionUtils.isNotEmpty(pairCount.keySet())) {
-					for(Entry<String, Integer> pair: pairCount.entrySet()) {						
+				if (CollectionUtils.isNotEmpty(pairCount.keySet())) {
+					for (Entry<String, Integer> pair : pairCount.entrySet()) {
 						int actualCount = StringUtils.countMatches(correctAnswer, pair.getKey());
-						if(pair.getValue() != null) {
-							if(actualCount == pair.getValue().intValue()) {
+						if (pair.getValue() != null) {
+							if (actualCount == pair.getValue().intValue()) {
 								count++;
 							} else {
-								count --;
+								count--;
 							}
 						}
-					} 
+					}
 				}
 				return count;
 			}
@@ -347,47 +347,72 @@ public class CommonUtils {
 		return null;
 	}
 
-	private static boolean compareResults(String[] correctAnswers, String[] selectedAnswers) {
-		if(ArrayUtils.isNotEmpty(correctAnswers) && ArrayUtils.isNotEmpty(selectedAnswers)) {
-			for(String correctAnswer: correctAnswers) {
-				if(StringUtils.isBlank(StringUtils.trimToEmpty(correctAnswer))) {
+	private static Integer calculateMultipleTypeScore(String[] correctAnswers, String[] selectedAnswers, EdoQuestion question) {
+		if (ArrayUtils.isEmpty(correctAnswers)) {
+			return null;
+		}
+		if (ArrayUtils.isEmpty(selectedAnswers)) {
+			return null;
+		}
+		
+		Integer foundCount = 0;
+		Integer answerCount = 0;
+		Integer solvedCount = 0;
+		for (String correctAnswer : correctAnswers) {
+			if (StringUtils.isBlank(StringUtils.trimToEmpty(correctAnswer))) {
+				continue;
+			}
+			boolean found = false;
+			answerCount++;
+			solvedCount = 0;
+			for (String selectedAnswer : selectedAnswers) {
+				
+				if (StringUtils.isBlank(StringUtils.trimToEmpty(selectedAnswer))) {
 					continue;
 				}
-				boolean found = false;
-				for(String selectedAnswer: selectedAnswers) {
-					/*if(!StringUtils.contains(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(correctAnswer))) {
-						return false;
-					}*/
-					if(StringUtils.isBlank(StringUtils.trimToEmpty(selectedAnswer))) {
-						continue;
-					}
-					if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(selectedAnswer), StringUtils.trimToEmpty(correctAnswer))) {
-						found = true;
-						break;
-					}
-				}
-				if(!found) {
-					LoggingUtil.logMessage("Not found for .." + correctAnswer);
-					return false;
+				solvedCount++;
+				if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(selectedAnswer), StringUtils.trimToEmpty(correctAnswer))) {
+					found = true;
+					foundCount++;
 				}
 			}
-			return true;
+			/*if (!found) {
+				LoggingUtil.logMessage("Not found for .." + correctAnswer);
+				// return false;
+			}*/
 		}
-		return false;
+		if (foundCount == 0) {
+			return getWrongScore(question);
+		}
+		if(answerCount == solvedCount && foundCount == solvedCount) {
+			return question.getWeightage();
+		}
+		if(StringUtils.equalsIgnoreCase("Y", question.getPartialCorrection())) {
+			return 1;
+		}
+		return getWrongScore(question);
+	}
+
+	private static Integer getWrongScore(EdoQuestion question) {
+		if(question.getNegativeMarks() == null) {
+			return 0;
+		}
+		return -question.getNegativeMarks();
 	}
 
 	public static void main(String[] args) {
 		EdoQuestion question = new EdoQuestion();
-		//question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
+		// question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
 		question.setCorrectAnswer("option2,option3");
 		EdoQuestion answer = new EdoQuestion();
-		answer.setAnswer("option3,option2,");
+		answer.setAnswer("option4");
+		question.setPartialCorrection("Y");
 		question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
 		question.setWeightage(3);
 		question.setNegativeMarks(1);
 		System.out.println(calculateAnswer(answer, question));
-		//answer.setMarks(new BigDecimal("1").negate());
-		//System.out.println(calculateMatchScore(question, answer));
+		// answer.setMarks(new BigDecimal("1").negate());
+		// System.out.println(calculateMatchScore(question, answer));
 	}
-	
+
 }
