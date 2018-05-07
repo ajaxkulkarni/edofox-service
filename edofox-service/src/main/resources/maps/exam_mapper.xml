@@ -121,7 +121,7 @@
 		<result column="solved" property="test.solvedCount"/>
 		<result column="correct" property="test.correctCount"/>
 		<result column="flagged" property="test.flaggedCount"/>
-
+		<result column="show_result" property="test.showResult" />
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">

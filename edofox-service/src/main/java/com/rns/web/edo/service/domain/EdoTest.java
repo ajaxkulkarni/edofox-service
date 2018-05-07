@@ -31,6 +31,7 @@ public class EdoTest {
 	private List<String> sections;
 	private String testUi;
 	private String randomQuestions;
+	private String showResult;
 	
 	public EdoTest() {
 		
@@ -199,6 +200,14 @@ public class EdoTest {
 
 	public void setRandomQuestions(String randomQuestions) {
 		this.randomQuestions = randomQuestions;
+	}
+
+	public String getShowResult() {
+		return showResult;
+	}
+
+	public void setShowResult(String showResult) {
+		this.showResult = showResult;
 	}
 	
 }
