@@ -16,7 +16,6 @@ import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
-import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -28,7 +27,6 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
-import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.QuestionParser;
 
@@ -213,8 +211,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			EdoQuestion currentQuestion = test.getCurrentQuestion();
 			if(currentQuestion == null || currentQuestion.getWeightage() == null) {
 				currentQuestion = new EdoQuestion();
-				currentQuestion.setWeightage(4);
-				currentQuestion.setNegativeMarks(1);
+				currentQuestion.setWeightage(new Float(4));
+				currentQuestion.setNegativeMarks(new Float(1));
 			}
 			
 			List<EdoQuestion> questions = QuestionParser.parseQuestionPaper(filePath, firstQuestion, solutionPath);
@@ -280,7 +278,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		try {
 		
 			List<EdoQuestion> questions = testsDao.getExamQuestions(request.getTest().getId());
-			Integer bonus = 0;
+			Float bonus = new Float(0);
 			Integer bonusCount = 0;
 			for(EdoQuestion question : questions) {
 				if(StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
@@ -311,7 +309,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return status;
 	}
 
-	private void evalulateStudent(EdoServiceRequest request, List<EdoQuestion> questions, Integer bonus, Integer bonusCount) {
+	private void evalulateStudent(EdoServiceRequest request, List<EdoQuestion> questions, Float bonus, Integer bonusCount) {
 		LoggingUtil.logMessage("---- Evaluating => " + request.getStudent().getId());
 		List<EdoTestQuestionMap> map = testsDao.getExamResult(request);
 		List<EdoQuestion> solved = new ArrayList<EdoQuestion>();

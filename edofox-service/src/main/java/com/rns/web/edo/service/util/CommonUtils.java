@@ -221,7 +221,7 @@ public class CommonUtils {
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
 				for (EdoQuestion question : questions) {
 					if (question.getQn_id() != null && answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
-						Integer questionScore = calculateAnswer(answered, question);
+						Float questionScore = calculateAnswer(answered, question);
 						if (questionScore != null) {
 							if (questionScore > 0) {
 								correctCount++;
@@ -267,18 +267,18 @@ public class CommonUtils {
 
 	}
 
-	public static Integer calculateAnswer(EdoQuestion answered, EdoQuestion question) {
+	public static Float calculateAnswer(EdoQuestion answered, EdoQuestion question) {
 		if (question.getWeightage() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
 			return null;
 		}
 		if (StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer()) || StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
-			return 0;
+			return 0f;
 		}
 		if (StringUtils.contains(question.getType(), EdoConstants.QUESTION_TYPE_MULTIPLE)) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
 			String[] selectedAnswers = StringUtils.split(answered.getAnswer(), ",");
-			Integer compareResult = calculateMultipleTypeScore(correctAnswers, selectedAnswers, question);
-			Integer alternateResult = null;
+			Float compareResult = calculateMultipleTypeScore(correctAnswers, selectedAnswers, question);
+			Float alternateResult = null;
 			if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
 				String[] alternateAnswers = StringUtils.split(question.getAlternateAnswer(), ","); 
 				alternateResult = calculateMultipleTypeScore(alternateAnswers, selectedAnswers, question);
@@ -290,8 +290,8 @@ public class CommonUtils {
 			}
 			
 		} else if (StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType())) {
-			Integer matchScore = calculateMatchScore(question.getCorrectAnswer(), answered);
-			Integer altScore = null;
+			Float matchScore = calculateMatchScore(question.getCorrectAnswer(), answered);
+			Float altScore = null;
 			if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
 				altScore = calculateMatchScore(question.getAlternateAnswer(), answered);
 			}
@@ -307,12 +307,12 @@ public class CommonUtils {
 		return getWrongScore(question);
 	}
 
-	private static Integer calculateMatchScore(String correctAnswer, EdoQuestion answered) {
+	private static Float calculateMatchScore(String correctAnswer, EdoQuestion answered) {
 
 		if (correctAnswer != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
 
 			String[] selectedPairs = StringUtils.split(answered.getAnswer(), ",");
-			Integer count = 0;
+			Float count = 0f;
 			if (ArrayUtils.isNotEmpty(selectedPairs)) {
 				Map<String, Integer> pairCount = new HashMap<String, Integer>();
 				for (String selectedPair : selectedPairs) {
@@ -347,7 +347,7 @@ public class CommonUtils {
 		return null;
 	}
 
-	private static Integer calculateMultipleTypeScore(String[] correctAnswers, String[] selectedAnswers, EdoQuestion question) {
+	private static Float calculateMultipleTypeScore(String[] correctAnswers, String[] selectedAnswers, EdoQuestion question) {
 		if (ArrayUtils.isEmpty(correctAnswers)) {
 			return null;
 		}
@@ -388,14 +388,14 @@ public class CommonUtils {
 			return question.getWeightage();
 		}
 		if(StringUtils.equalsIgnoreCase("Y", question.getPartialCorrection())) {
-			return 1;
+			return new Float(1);
 		}
 		return getWrongScore(question);
 	}
 
-	private static Integer getWrongScore(EdoQuestion question) {
+	private static Float getWrongScore(EdoQuestion question) {
 		if(question.getNegativeMarks() == null) {
-			return 0;
+			return new Float(0);
 		}
 		return -question.getNegativeMarks();
 	}
@@ -408,8 +408,8 @@ public class CommonUtils {
 		answer.setAnswer("option4");
 		question.setPartialCorrection("Y");
 		question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
-		question.setWeightage(3);
-		question.setNegativeMarks(1);
+		question.setWeightage(3f);
+		question.setNegativeMarks(1f);
 		System.out.println(calculateAnswer(answer, question));
 		// answer.setMarks(new BigDecimal("1").negate());
 		// System.out.println(calculateMatchScore(question, answer));

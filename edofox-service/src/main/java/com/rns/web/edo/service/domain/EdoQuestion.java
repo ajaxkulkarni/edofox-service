@@ -26,8 +26,8 @@ public class EdoQuestion {
 	private boolean isCorrect;
 	private Integer flagged;
 	private String correctAnswer;
-	private Integer weightage;
-	private Integer negativeMarks;
+	private Float weightage;
+	private Float negativeMarks;
 	private Integer subjectId;
 	private String questionImageUrl;
 	private String option1ImageUrl;
@@ -140,16 +140,16 @@ public class EdoQuestion {
 	public void setCorrectAnswer(String correctAnswer) {
 		this.correctAnswer = correctAnswer;
 	}
-	public Integer getWeightage() {
+	public Float getWeightage() {
 		return weightage;
 	}
-	public void setWeightage(Integer weightage) {
+	public void setWeightage(Float weightage) {
 		this.weightage = weightage;
 	}
-	public Integer getNegativeMarks() {
+	public Float getNegativeMarks() {
 		return negativeMarks;
 	}
-	public void setNegativeMarks(Integer negativeMarks) {
+	public void setNegativeMarks(Float negativeMarks) {
 		this.negativeMarks = negativeMarks;
 	}
 	public String getQuestionImageUrl() {
