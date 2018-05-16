@@ -36,19 +36,23 @@
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<!-- <property name="url" value="jdbc:mysql://localhost:3306/shahu_test_exam" />
+		<property name="url" value="jdbc:mysql://localhost:3306/test_exam" />
 		<property name="username" value="root" />
-		<property name="password" value="WickedSmile2018!" /> -->
-		<property name="url" value="jdbc:mysql://localhost:3306/edo" />
+		<property name="password" value="WickedSmile2018!" />
+		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edofox" />
 		<property name="username" value="root" />
-		<property name="password" value="" />
+		<property name="password" value="" /> -->
 		<property name="testOnReturn" value="true" />
 		<property name="testOnBorrow" value="true" />
 		<property name="testWhileIdle" value="true" />
 		<property name="validationQuery" value="SELECT 1" />
-		<property name="initialSize" value="8" />
+		<!-- <property name="initialSize" value="8" />
 		<property name="maxActive" value="20" />
 		<property name="maxIdle" value="20" />
+		<property name="minIdle" value="0" /> -->
+		<property name="initialSize" value="50" />
+		<property name="maxActive" value="200" />
+		<property name="maxIdle" value="50" />
 		<property name="minIdle" value="0" />
 	</bean>
 
