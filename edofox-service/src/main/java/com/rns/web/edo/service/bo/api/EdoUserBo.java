@@ -18,6 +18,7 @@ public interface EdoUserBo {
 	EdoServiceResponse registerStudent(EdoStudent student);
 	EdoApiStatus processPayment(String id, String transactionId, String paymentId);
 	EdoPaymentStatus completePayment(EdoTest test, EdoStudent student);
+	EdoFile getStudentImage(Integer studentId);
 	
 	
 }

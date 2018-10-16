@@ -230,7 +230,7 @@ public class CommonUtils {
 							answered.setMarks(marks);
 							score = score.add(marks);
 							LoggingUtil.logMessage(answered.getQuestionNumber() + "--" + answered.getQn_id() + " -- " + answered.getAnswer() + " -- "
-									+ answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + marks);
+									+ answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + answered.getMarks() + " -- " + score);
 						}
 						break;
 					}

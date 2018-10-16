@@ -68,7 +68,8 @@
 		<result column="name" property="name" />
 		<result column="email" property="email" />
 		<result column="mobile_no" property="phone" />
-		<result column="package_name" property="currentPackage.name"/>				
+		<result column="package_name" property="currentPackage.name"/>		
+		<result column="profile_pic" property="profilePic"/>		
 	</resultMap>
 	
 	

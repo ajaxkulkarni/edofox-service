@@ -114,6 +114,26 @@ public class EdoUserController {
 		return null;
 	}
 	
+	@GET
+	@Path("/getImage/{studentId}")
+	//@Produces(MediaType.MULTIPART_FORM_DATA)
+	@Produces("image/png")
+	public Response getImage(@PathParam("studentId") Integer studentId) {
+		//LoggingUtil.logObject("Image request:", userId);
+		try {
+			EdoFile file = userBo.getStudentImage(studentId);
+			if(file != null) {
+				ResponseBuilder response = Response.ok(file.getContent());
+				//response.header("Content-Disposition", "filename=" + file.getFileName());
+				return response.build();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	@POST
 	@Path("/getPackages")
 	@Produces(MediaType.APPLICATION_JSON)

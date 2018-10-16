@@ -4,14 +4,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -82,6 +79,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoTest test = map.get(0).getTest();
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
+				setQuestionURLs(question);
 				test.getTest().add(question);
 				if(StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
@@ -98,7 +96,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					score = score.subtract(new BigDecimal(question.getNegativeMarks()));
 				}
 				subjectWiseScore.put(question.getSubject(), score);
-				
 			}
 			if(!subjectWiseScore.isEmpty()) {
 				EDOTestAnalysis analysis = new EDOTestAnalysis();
@@ -531,6 +528,25 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return null;
+	}
+
+	public EdoFile getStudentImage(Integer studentId) {
+		try {
+			EdoFile file = new EdoFile();
+			EdoStudent student = testsDao.getStudentById(studentId);
+			if(student == null) {
+				return null;
+			}
+			if(StringUtils.isNotBlank(student.getProfilePic())) {
+				InputStream is = new FileInputStream(student.getProfilePic());
+				file.setContent(is);
+				file.setFileName("profilePic" + "." + CommonUtils.getFileExtension(student.getProfilePic()));
+			}
+			return file;
+		} catch (Exception e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
 		return null;
 	}

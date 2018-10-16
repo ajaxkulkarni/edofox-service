@@ -25,6 +25,7 @@ public class EdoStudent {
 	private String casteCategory;
 	private String examMode;
 	private EDOPackage currentPackage;
+	private String profilePic;
 
 	public EdoStudent() {
 
@@ -160,6 +161,14 @@ public class EdoStudent {
 
 	public void setCurrentPackage(EDOPackage currentPackage) {
 		this.currentPackage = currentPackage;
+	}
+
+	public String getProfilePic() {
+		return profilePic;
+	}
+
+	public void setProfilePic(String profilePic) {
+		this.profilePic = profilePic;
 	}
 	
 }
