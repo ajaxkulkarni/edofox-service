@@ -194,6 +194,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							smsUtil.setTest(existing);
 							smsUtil.setInstitute(institute);
 							smsUtil.setAdditionalMessage(request.getSmsMessage());
+							smsUtil.setCopyParent(true);
 							executor.execute(smsUtil);
 						}
 					}

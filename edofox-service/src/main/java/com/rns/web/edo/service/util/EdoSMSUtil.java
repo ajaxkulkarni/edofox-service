@@ -79,7 +79,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 
 			if (copyParent && StringUtils.isNotBlank(student.getParentMobileNo())) {
 				// Send same SMS to parents
-				url = StringUtils.replace(SMS_URL, "{phoneNo}", student.getPhone());
+				url = StringUtils.replace(SMS_URL, "{phoneNo}", student.getParentMobileNo());
 				url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 				sendSMS(url);
 			}
