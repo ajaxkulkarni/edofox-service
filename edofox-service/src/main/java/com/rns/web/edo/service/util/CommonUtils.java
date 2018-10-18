@@ -193,7 +193,11 @@ public class CommonUtils {
 				result = StringUtils.replace(result, "{paymentId}", "");
 				result = StringUtils.replace(result, "{transactionId}", "");
 			}
-
+			if(student.getAnalysis() != null) {
+				result = StringUtils.replace(result, "{rank}", CommonUtils.getStringValue(student.getAnalysis().getRank()));
+				result = StringUtils.replace(result, "{totalStudents}", CommonUtils.getStringValue(student.getAnalysis().getTotalStudents()));
+				result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(student.getAnalysis().getScore()));
+			}
 		}
 		return result;
 	}
@@ -209,7 +213,7 @@ public class CommonUtils {
 				result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 			}
 		}
-		result = StringUtils.replace(result, "{additionalMessage}", additionalMessage);
+		result = StringUtils.replace(result, "{additionalMessage}", CommonUtils.getStringValue(additionalMessage));
 		return result;
 	}
 

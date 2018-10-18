@@ -10,6 +10,8 @@ public class EDOStudentAnalysis {
 	private Integer flaggedCount;
 	private BigDecimal score;
 	private List<EdoStudentSubjectAnalysis> subjectScores;
+	private Integer rank;
+	private Integer totalStudents;
 	
 	public Integer getSolvedCount() {
 		return solvedCount;
@@ -40,6 +42,18 @@ public class EDOStudentAnalysis {
 	}
 	public void setSubjectScores(List<EdoStudentSubjectAnalysis> subjectScores) {
 		this.subjectScores = subjectScores;
+	}
+	public Integer getRank() {
+		return rank;
+	}
+	public void setRank(Integer rank) {
+		this.rank = rank;
+	}
+	public Integer getTotalStudents() {
+		return totalStudents;
+	}
+	public void setTotalStudents(Integer totalStudents) {
+		this.totalStudents = totalStudents;
 	}
 	
 }

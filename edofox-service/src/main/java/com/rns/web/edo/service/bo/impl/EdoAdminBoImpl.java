@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.bo.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,8 +129,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
-	public EdoServiceResponse getTestResults(EdoTest test, String dataFilePath) {
+	public EdoServiceResponse getTestResults(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
+		EdoTest test = request.getTest();
 		if(test == null || test.getId() == null) {
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 			return response;
@@ -154,13 +156,25 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return response;
 			}
 			
+			EDOInstitute institute = null;
+			if(request.getInstitute() != null) {
+				institute = testsDao.getInstituteById(request.getInstitute().getId());
+			}
+			
 			List<EdoStudent> students = testsDao.getStudentResults(test.getId());
 			
 			if(CollectionUtils.isNotEmpty(students)) {
 				List<EdoTestStudentMap> subjectScores = testsDao.getSubjectwiseScore(test.getId());
 				if(CollectionUtils.isNotEmpty(subjectScores)) {
+					Integer rank = 0;
 					for(EdoStudent student: students) {
 						if(student.getAnalysis() == null) {
+							continue;
+						}
+						rank++;
+						student.getAnalysis().setRank(rank);
+						student.getAnalysis().setTotalStudents(students.size());
+						if(request.getStudent() != null && request.getStudent().getId() != student.getId()) {
 							continue;
 						}
 						List<EdoStudentSubjectAnalysis> subjectAnalysis = new ArrayList<EdoStudentSubjectAnalysis>();
@@ -173,12 +187,23 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							}
 						}
 						student.getAnalysis().setSubjectScores(subjectAnalysis);
+						if(StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {
+							//Send rank SMS to student and parents
+							EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT_RANK);
+							smsUtil.setStudent(student);
+							smsUtil.setTest(existing);
+							smsUtil.setInstitute(institute);
+							smsUtil.setAdditionalMessage(request.getSmsMessage());
+							executor.execute(smsUtil);
+						}
 					}
 				}
 			}
 			
-			response.setTest(existing);
-			response.setStudents(students);
+			if(!StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {
+				response.setTest(existing);
+				response.setStudents(students);
+			}
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
@@ -328,7 +353,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			request.getTest().setTest(solved);
 			CommonUtils.calculateTestScore(request.getTest(), questions);
 			if(bonus != null) {
-				request.getTest().setScore(request.getTest().getScore().add(new BigDecimal(bonus)));
+				BigDecimal finalScore = request.getTest().getScore().add(new BigDecimal(bonus));
+				finalScore.setScale(2, RoundingMode.HALF_UP);
+				request.getTest().setScore(finalScore);
 				request.getTest().setSolvedCount(request.getTest().getSolvedCount() + bonusCount);
 				LoggingUtil.logMessage("Added bonus .." + bonus + " so total is - " + request.getTest().getScore());
 			}

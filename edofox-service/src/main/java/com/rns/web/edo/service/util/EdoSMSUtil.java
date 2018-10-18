@@ -19,26 +19,31 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 public class EdoSMSUtil implements Runnable, EdoConstants {
-	
+
 	public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
 	private EdoStudent student;
 	private String type;
 	private EdoTest test;
 	private EDOInstitute institute;
 	private String additionalMessage;
-	
+	private boolean copyParent;
+
 	public EdoSMSUtil() {
-	
+
 	}
-	
+
 	public EdoSMSUtil(String type) {
 		this.type = type;
 	}
-	
+
 	public void setStudent(EdoStudent student) {
 		this.student = student;
 	}
-	
+
+	public void setCopyParent(boolean copyParent) {
+		this.copyParent = copyParent;
+	}
+
 	public void setInstitute(EDOInstitute institute) {
 		this.institute = institute;
 	}
@@ -48,41 +53,53 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	}
 
 	private void sendSMS() {
-		
-		if(student == null) {
+
+		if (student == null) {
 			return;
 		}
-		
+
 		try {
-			
+
 			String url = StringUtils.replace(SMS_URL, "{phoneNo}", student.getPhone());
-			
+
 			String message = SMS_TEMPLATES.get(type);
-			/*message = StringUtils.replace(message, "{name}", student.getName());
-			message = StringUtils.replace(message, "{transactionId}", CommonUtils.getStringValue(student.getTransactionId()));*/
+			/*
+			 * message = StringUtils.replace(message, "{name}",
+			 * student.getName()); message = StringUtils.replace(message,
+			 * "{transactionId}",
+			 * CommonUtils.getStringValue(student.getTransactionId()));
+			 */
 			message = CommonUtils.prepareStudentNotification(message, student);
-			
-			if(test != null) {
+
+			if (test != null) {
 				message = CommonUtils.prepareTestNotification(message, test, institute, additionalMessage);
 			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
-			ClientConfig config = new DefaultClientConfig();
-			Client client = Client.create(config);
-			WebResource webResource = client.resource(url);
-			
-			LoggingUtil.logMessage("Calling SMS URL:" + url);
+			sendSMS(url);
 
-			ClientResponse response = webResource.get(ClientResponse.class);
-
-			if (response.getStatus() != 200) {
-				LoggingUtil.logError("SMS sending Failed : HTTP error code : " + response.getStatus());
+			if (copyParent && StringUtils.isNotBlank(student.getParentMobileNo())) {
+				// Send same SMS to parents
+				url = StringUtils.replace(SMS_URL, "{phoneNo}", student.getPhone());
+				url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
+				sendSMS(url);
 			}
-			LoggingUtil.logMessage("Output from SMS .... " + response.getStatus() + " \n");
-			
+
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
-		
+
+	}
+
+	private void sendSMS(String url) {
+		ClientConfig config = new DefaultClientConfig();
+		Client client = Client.create(config);
+		WebResource webResource = client.resource(url);
+		LoggingUtil.logMessage("Calling SMS URL:" + url);
+		ClientResponse response = webResource.get(ClientResponse.class);
+		if (response.getStatus() != 200) {
+			LoggingUtil.logError("SMS sending Failed : HTTP error code : " + response.getStatus());
+		}
+		LoggingUtil.logMessage("Output from SMS .... " + response.getStatus() + " \n");
 	}
 
 	public static void main(String[] args) {
@@ -100,7 +117,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		mail.setStudent(s);
 		mail.sendSMS();
 	}
-	
+
 	public EdoTest getTest() {
 		return test;
 	}
@@ -119,12 +136,14 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
-			put(MAIL_TYPE_SUBSCRIPTION, "Hi {name}, Welcome to Vision Latur. Please complete the payment in order to have full access to Vision Latur features.");
+			put(MAIL_TYPE_SUBSCRIPTION,
+					"Hi {name}, Welcome to Vision Latur. Please complete the payment in order to have full access to Vision Latur features.");
 			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your Vision Latur package {packages} is activated. Transaction ID - {transactionId}.");
 			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your {instituteName} {testName} final result is - "
-					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}"
-					+ "\n{additionalMessage}");
+					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}" + "\n{additionalMessage}");
+			put(MAIL_TYPE_TEST_RESULT_RANK,
+					"Hi {name}, your {instituteName} {testName} score is {score} " + "\nYour final rank is {rank} out of {totalStudents}\n{additionalMessage}");
 		}
 	});
-	
+
 }

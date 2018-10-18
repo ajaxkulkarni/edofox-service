@@ -26,6 +26,7 @@ public class EdoStudent {
 	private String examMode;
 	private EDOPackage currentPackage;
 	private String profilePic;
+	private String parentMobileNo;
 
 	public EdoStudent() {
 
@@ -169,6 +170,14 @@ public class EdoStudent {
 
 	public void setProfilePic(String profilePic) {
 		this.profilePic = profilePic;
+	}
+
+	public String getParentMobileNo() {
+		return parentMobileNo;
+	}
+
+	public void setParentMobileNo(String parentMobileNo) {
+		this.parentMobileNo = parentMobileNo;
 	}
 	
 }

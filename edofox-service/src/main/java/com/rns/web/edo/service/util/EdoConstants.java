@@ -43,6 +43,7 @@ public interface EdoConstants {
 	String MAIL_TYPE_SUBSCRIPTION = "SubscriptionMail";
 	String MAIL_TYPE_ACTIVATED = "PackageActivated";
 	String MAIL_TYPE_TEST_RESULT = "TestResult";
+	String MAIL_TYPE_TEST_RESULT_RANK = "TestResultRank";
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
 	String QUESTION_TYPE_MATCH = "MATCH";
