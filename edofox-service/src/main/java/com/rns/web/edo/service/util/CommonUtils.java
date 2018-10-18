@@ -198,7 +198,7 @@ public class CommonUtils {
 		return result;
 	}
 
-	public static String prepareTestNotification(String result, EdoTest test, EDOInstitute institute) {
+	public static String prepareTestNotification(String result, EdoTest test, EDOInstitute institute, String additionalMessage) {
 		if (test != null) {
 			result = StringUtils.replace(result, "{testName}", CommonUtils.getStringValue(test.getName()));
 			result = StringUtils.replace(result, "{solved}", CommonUtils.getStringValue(test.getSolvedCount()));
@@ -209,6 +209,7 @@ public class CommonUtils {
 				result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 			}
 		}
+		result = StringUtils.replace(result, "{additionalMessage}", additionalMessage);
 		return result;
 	}
 

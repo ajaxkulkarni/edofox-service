@@ -25,6 +25,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	private String type;
 	private EdoTest test;
 	private EDOInstitute institute;
+	private String additionalMessage;
 	
 	public EdoSMSUtil() {
 	
@@ -62,7 +63,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 			message = CommonUtils.prepareStudentNotification(message, student);
 			
 			if(test != null) {
-				message = CommonUtils.prepareTestNotification(message, test, institute);
+				message = CommonUtils.prepareTestNotification(message, test, institute, additionalMessage);
 			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 			ClientConfig config = new DefaultClientConfig();
@@ -108,14 +109,21 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		this.test = test;
 	}
 
+	public String getAdditionalMessage() {
+		return additionalMessage;
+	}
+
+	public void setAdditionalMessage(String additionalMessage) {
+		this.additionalMessage = additionalMessage;
+	}
+
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "Hi {name}, Welcome to Vision Latur. Please complete the payment in order to have full access to Vision Latur features.");
 			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your Vision Latur package {packages} is activated. Transaction ID - {transactionId}.");
 			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your {instituteName} {testName} final result is - "
 					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}"
-					+ "\nYou can also review the detailed results by logging in to test.edofox.com."
-					+ "\nAll the best for the next exam!");
+					+ "\n{additionalMessage}");
 		}
 	});
 	

@@ -23,6 +23,7 @@ public class EdoServiceRequest {
 	private String solutionPath;
 	private List<EdoStudent> students;
 	private String requestType;
+	private String smsMessage;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -109,6 +110,14 @@ public class EdoServiceRequest {
 
 	public void setRequestType(String requestType) {
 		this.requestType = requestType;
+	}
+
+	public String getSmsMessage() {
+		return smsMessage;
+	}
+
+	public void setSmsMessage(String smsMessage) {
+		this.smsMessage = smsMessage;
 	}
 	
 }
