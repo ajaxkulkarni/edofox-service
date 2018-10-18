@@ -114,8 +114,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your Vision Latur package {packages} is activated. Transaction ID - {transactionId}.");
 			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your {instituteName} {testName} final result is - "
 					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}"
-					+ "\nYou can also review the results by logging in to vision latur dashboard at visionlatur.com."
-					+ "\nYou will get the state wide rank report soon. All the best for the next exam!");
+					+ "\nYou can also review the detailed results by logging in to test.edofox.com."
+					+ "\nAll the best for the next exam!");
 		}
 	});
 	
