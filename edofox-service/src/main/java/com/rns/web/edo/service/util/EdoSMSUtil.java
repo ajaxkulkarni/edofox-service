@@ -2,8 +2,6 @@ package com.rns.web.edo.service.util;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.rmi.server.SkeletonMismatchException;
-import java.util.Base64.Encoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.sun.jersey.api.client.Client;
@@ -25,7 +24,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	private EdoStudent student;
 	private String type;
 	private EdoTest test;
-	
+	private EDOInstitute institute;
 	
 	public EdoSMSUtil() {
 	
@@ -37,6 +36,10 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	
 	public void setStudent(EdoStudent student) {
 		this.student = student;
+	}
+	
+	public void setInstitute(EDOInstitute institute) {
+		this.institute = institute;
 	}
 
 	public void run() {
@@ -59,7 +62,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 			message = CommonUtils.prepareStudentNotification(message, student);
 			
 			if(test != null) {
-				message = CommonUtils.prepareTestNotification(message, test);
+				message = CommonUtils.prepareTestNotification(message, test, institute);
 			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 			ClientConfig config = new DefaultClientConfig();
@@ -109,7 +112,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "Hi {name}, Welcome to Vision Latur. Please complete the payment in order to have full access to Vision Latur features.");
 			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your Vision Latur package {packages} is activated. Transaction ID - {transactionId}.");
-			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your Vision Latur {testName} final result is - "
+			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your {instituteName} {testName} final result is - "
 					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}"
 					+ "\nYou can also review the results by logging in to vision latur dashboard at visionlatur.com."
 					+ "\nYou will get the state wide rank report soon. All the best for the next exam!");

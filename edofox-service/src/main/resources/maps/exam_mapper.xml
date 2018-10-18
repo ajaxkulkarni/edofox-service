@@ -158,5 +158,13 @@
 		SELECT * FROM test where test_id = ${value};
 	</select>
 	
+	<resultMap id="institute" type="com.rns.web.edo.service.domain.EDOInstitute">
+		<result column="id" property="id" />
+		<result column="institute_name" property="name" />
+	</resultMap>
+	
+	<select id="getInstituteById" resultMap="institute" parameterType="Integer">
+		SELECT * FROM institute where id = ${value};
+	</select>
 
 </mapper>

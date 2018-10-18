@@ -19,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoComplexOption;
@@ -197,13 +198,16 @@ public class CommonUtils {
 		return result;
 	}
 
-	public static String prepareTestNotification(String result, EdoTest test) {
+	public static String prepareTestNotification(String result, EdoTest test, EDOInstitute institute) {
 		if (test != null) {
 			result = StringUtils.replace(result, "{testName}", CommonUtils.getStringValue(test.getName()));
 			result = StringUtils.replace(result, "{solved}", CommonUtils.getStringValue(test.getSolvedCount()));
 			result = StringUtils.replace(result, "{correctCount}", CommonUtils.getStringValue(test.getCorrectCount()));
 			result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(test.getScore()));
 			result = StringUtils.replace(result, "{totalMarks}", CommonUtils.getStringValue(test.getTotalMarks()));
+			if(institute != null) {
+				result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
+			}
 		}
 		return result;
 	}

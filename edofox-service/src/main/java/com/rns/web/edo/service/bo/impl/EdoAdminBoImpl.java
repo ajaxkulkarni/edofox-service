@@ -27,6 +27,7 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.QuestionParser;
 
@@ -286,6 +287,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				}
 			}
 			
+			EDOInstitute institute = null;
+			if(request.getInstitute() != null) {
+				institute = testsDao.getInstituteById(request.getInstitute().getId());
+			}
+			
 			if(request.getStudent() == null) {
 				List<EdoStudent> students = testsDao.getStudentResults(request.getTest().getId());
 				if(CollectionUtils.isNotEmpty(students)) {
@@ -293,11 +299,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						EdoServiceRequest req = new EdoServiceRequest();
 						req.setTest(request.getTest());
 						req.setStudent(student);
-						evalulateStudent(req, questions, bonus, bonusCount);
+						evalulateStudent(req, questions, bonus, bonusCount, request.getRequestType(), institute);
 					}
 				}
 			} else {
-				evalulateStudent(request, questions, bonus, bonusCount);
+				evalulateStudent(request, questions, bonus, bonusCount, request.getRequestType(), institute);
 			}
 			
 			
@@ -309,7 +315,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return status;
 	}
 
-	private void evalulateStudent(EdoServiceRequest request, List<EdoQuestion> questions, Float bonus, Integer bonusCount) {
+	private void evalulateStudent(EdoServiceRequest request, List<EdoQuestion> questions, Float bonus, Integer bonusCount, String type, EDOInstitute institute) {
 		LoggingUtil.logMessage("---- Evaluating => " + request.getStudent().getId());
 		List<EdoTestQuestionMap> map = testsDao.getExamResult(request);
 		List<EdoQuestion> solved = new ArrayList<EdoQuestion>();
@@ -339,12 +345,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 			
 			//testsDao.updateTestResult(request);
-			//TODO: Temporary disabled
-			/*EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
-			smsUtil.setTest(request.getTest());
-			EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
-			smsUtil.setStudent(student);
-			executor.execute(smsUtil);*/
+			if(StringUtils.equalsIgnoreCase("SMS", type)) {
+				EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+				smsUtil.setTest(request.getTest());
+				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
+				smsUtil.setStudent(student);
+				smsUtil.setInstitute(institute);
+				executor.execute(smsUtil);
+			}
 		}
 	}
 

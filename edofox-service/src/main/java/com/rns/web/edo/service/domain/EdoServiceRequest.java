@@ -1,12 +1,17 @@
 package com.rns.web.edo.service.domain;
 
 import java.io.IOException;
+
 import java.util.List;
 
 import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EdoServiceRequest {
 	
 	private EdoStudent student;
@@ -17,6 +22,7 @@ public class EdoServiceRequest {
 	private Integer subjectId;
 	private String solutionPath;
 	private List<EdoStudent> students;
+	private String requestType;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -95,6 +101,14 @@ public class EdoServiceRequest {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	public String getRequestType() {
+		return requestType;
+	}
+
+	public void setRequestType(String requestType) {
+		this.requestType = requestType;
 	}
 	
 }
