@@ -4,6 +4,7 @@ public class EDOInstitute {
 	
 	private Integer id;
 	private String name;
+	private String firebaseId;
 	
 	public Integer getId() {
 		return id;
@@ -16,6 +17,12 @@ public class EDOInstitute {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public String getFirebaseId() {
+		return firebaseId;
+	}
+	public void setFirebaseId(String firebaseId) {
+		this.firebaseId = firebaseId;
 	}
 
 }

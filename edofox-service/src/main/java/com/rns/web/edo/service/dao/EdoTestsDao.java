@@ -55,6 +55,8 @@ public interface EdoTestsDao {
 	Integer saveTestQuestion(EdoTest test);
 	Integer updateSolution(EdoQuestion question);
 	List<EdoStudent> getStudentByPayment(String paymentId);
+	List<EdoStudent> getAllStudents(Integer id);
+	
 	
 	
 	

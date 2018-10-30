@@ -32,6 +32,7 @@ public class EdoTest {
 	private String testUi;
 	private String randomQuestions;
 	private String showResult;
+	private String firebaseId;
 	
 	public EdoTest() {
 		
@@ -208,6 +209,14 @@ public class EdoTest {
 
 	public void setShowResult(String showResult) {
 		this.showResult = showResult;
+	}
+
+	public String getFirebaseId() {
+		return firebaseId;
+	}
+
+	public void setFirebaseId(String firebaseId) {
+		this.firebaseId = firebaseId;
 	}
 	
 }

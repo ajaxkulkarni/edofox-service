@@ -63,16 +63,6 @@
 		UPDATE student_institute set status = '${responseText}' WHERE payment_id = '${paymentId}';
 	</update>
 	
-	<resultMap id="studentInfo" type="com.rns.web.edo.service.domain.EdoStudent">
-		<result column="id" property="id" />
-		<result column="name" property="name" />
-		<result column="email" property="email" />
-		<result column="mobile_no" property="phone" />
-		<result column="package_name" property="currentPackage.name"/>		
-		<result column="profile_pic" property="profilePic"/>		
-	</resultMap>
-	
-	
 	<select id="getStudentByPhoneNumber" parameterType="com.rns.web.edo.service.domain.EdoPaymentStatus" resultMap="studentInfo" >
 		select * from student where mobile_no = '${phone}'
 	</select>

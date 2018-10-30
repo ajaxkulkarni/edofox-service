@@ -28,6 +28,7 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoFirebaseUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.QuestionParser;
@@ -197,6 +198,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							smsUtil.setCopyParent(true);
 							executor.execute(smsUtil);
 						}
+						if(StringUtils.equalsIgnoreCase(REQUEST_FIREBASE_UPDATE, request.getRequestType())) {
+							EdoFirebaseUtil.updateStudentResult(student, existing, institute.getFirebaseId());
+						}
 					}
 				}
 			}
@@ -211,18 +215,29 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
-	public EdoServiceResponse getAllStudents(EDOInstitute institute) {
+	public EdoServiceResponse getAllStudents(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
+		EDOInstitute institute = request.getInstitute();
 		if(institute == null || institute.getId() == null) {
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 			return response;
 		}
 		try {
-			
+			List<EdoStudent> students = testsDao.getAllStudents(institute.getId());
+			if(CollectionUtils.isNotEmpty(students)) {
+				for(EdoStudent student: students) {
+					if(StringUtils.equals(REQUEST_FIREBASE_UPDATE, request.getRequestType())) {
+						EdoFirebaseUtil.updateStudent(student, institute.getFirebaseId());
+					}
+				}
+			}
+			if(!StringUtils.equals(REQUEST_FIREBASE_UPDATE, request.getRequestType())) {
+				response.setStudents(students);
+			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
-		return null;
+		return response;
 	}
 
 	@Transactional

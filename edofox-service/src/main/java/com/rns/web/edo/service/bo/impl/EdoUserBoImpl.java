@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,6 +46,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	private EdoTestsDao testsDao;
 	private String filePath;
 
+	private Map<Integer, Integer> testSubmissions = new ConcurrentHashMap<Integer, Integer>();
+	
+	
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
 	}
@@ -287,6 +291,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 		EdoApiStatus status = new EdoApiStatus();
 		try {
+			Integer currentTest = testSubmissions.get(request.getStudent().getId());
+			if(currentTest != null && request.getTest().getId() == currentTest) {
+				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
+				status.setStatusCode(STATUS_ERROR);
+				LoggingUtil.logMessage("Test " + currentTest + " being submitted for student=>" + request.getStudent().getId());
+				return status;
+			}
+			LoggingUtil.logMessage("Submitting test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions);
+			testSubmissions.put(request.getStudent().getId(), request.getTest().getId());
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(test);
 			inputMap.setStudent(request.getStudent());
@@ -323,6 +336,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			if(request.getStudent() != null && request.getStudent().getId() != null) {
+				testSubmissions.remove(request.getStudent().getId());
+				LoggingUtil.logMessage("Submitted test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions);
+			}
 		}
 		return status;
 	}

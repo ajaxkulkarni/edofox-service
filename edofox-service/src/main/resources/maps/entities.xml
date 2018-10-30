@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+	<!-- result maps -->
+	<!-- <resultMap id="packages" type="com.rns.web.edo.service.domain.EDOPackage">
+		<result column="packageId" property="id" />
+		<result column="package_name" property="name" />
+		<result column="price" property="price" />
+		<result column="institute_id" property="institute.id" />
+		<result column="institute_name" property="institute.name" />
+		<result column="offline_price" property="offlinePrice" />
+
+	</resultMap> -->
+
+	<resultMap id="studentInfo" type="com.rns.web.edo.service.domain.EdoStudent">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="email" property="email" />
+		<result column="mobile_no" property="phone" />
+		<result column="package_name" property="currentPackage.name"/>		
+		<result column="profile_pic" property="profilePic"/>		
+	</resultMap>
+	
+	<resultMap id="institute" type="com.rns.web.edo.service.domain.EDOInstitute">
+		<result column="id" property="id" />
+		<result column="institute_name" property="name" />
+		<result column="firebase_id" property="firebaseId" />
+	</resultMap>
+	
+	<resultMap id="test" type="com.rns.web.edo.service.domain.EdoTest">
+		<result column="test_id" property="id" />
+		<result column="test_name" property="name" />
+		<result column="no_of_questions" property="noOfQuestions" />
+		<result column="total_marks" property="totalMarks" />
+		<result column="duration" property="duration" />
+		<result column="firebase_id" property="firebaseId" />
+		<result column="start_date" property="startDate" />
+	</resultMap>
+	
+</mapper>

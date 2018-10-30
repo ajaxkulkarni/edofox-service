@@ -49,6 +49,7 @@ public interface EdoConstants {
 	String QUESTION_TYPE_MATCH = "MATCH";
 	String QUESTION_TYPE_PASSAGE = "PASSAGE";
 	
+	String REQUEST_FIREBASE_UPDATE = "firebaseUpdate";
 	
 	//DEV
 	String TESTS_JSON_PATH = "F:\\Resoneuronance\\Edofox\\Document\\tests";

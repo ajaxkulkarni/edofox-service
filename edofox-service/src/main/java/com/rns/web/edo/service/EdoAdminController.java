@@ -127,5 +127,17 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getAllStudents")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getAllStudents(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get All Students Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response = adminBo.getAllStudents(request);
+		LoggingUtil.logMessage("Get All Students Response");
+		return response;
+	}
+	
 
 }

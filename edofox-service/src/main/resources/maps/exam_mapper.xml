@@ -146,22 +146,9 @@
 		where test_id = ${test.id} AND student_id = ${student.id} AND (student_institute.status = 'Completed' OR student_institute.student_access = 'Admin') ;
 	</select>
 	
-	<resultMap id="test" type="com.rns.web.edo.service.domain.EdoTest">
-		<result column="test_id" property="id" />
-		<result column="test_name" property="name" />
-		<result column="no_of_questions" property="noOfQuestions" />
-		<result column="total_marks" property="totalMarks" />
-		<result column="duration" property="duration" />
-	</resultMap>
-	
 	<select id="getTest" resultMap="test" parameterType="Integer">
 		SELECT * FROM test where test_id = ${value};
 	</select>
-	
-	<resultMap id="institute" type="com.rns.web.edo.service.domain.EDOInstitute">
-		<result column="id" property="id" />
-		<result column="institute_name" property="name" />
-	</resultMap>
 	
 	<select id="getInstituteById" resultMap="institute" parameterType="Integer">
 		SELECT * FROM institute where id = ${value};
