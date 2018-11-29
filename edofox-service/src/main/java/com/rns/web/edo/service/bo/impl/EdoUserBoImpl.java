@@ -85,14 +85,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				EdoQuestion question = mapper.getQuestion();
 				setQuestionURLs(question);
 				test.getTest().add(question);
-				if(StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
+				if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
 				}
 				BigDecimal score = subjectWiseScore.get(question.getSubject());
 				if(score == null) {
 					score = new BigDecimal(0);
 				}
-				if(StringUtils.equalsIgnoreCase(question.getAnswer(), question.getCorrectAnswer())) {
+				if(CommonUtils.isBonus(question) || StringUtils.equalsIgnoreCase(question.getAnswer(), question.getCorrectAnswer())) {
 					if (question.getWeightage() != null) {
 						score = score.add(new BigDecimal(question.getWeightage()));
 					}

@@ -322,11 +322,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			List<EdoQuestion> questions = testsDao.getExamQuestions(request.getTest().getId());
 			Float bonus = new Float(0);
 			Integer bonusCount = 0;
-			for(EdoQuestion question : questions) {
+			/*for(EdoQuestion question : questions) {
 				if(StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
 					bonus = bonus + question.getWeightage();
 				}
-			}
+			}*/
 			
 			EDOInstitute institute = null;
 			if(request.getInstitute() != null) {

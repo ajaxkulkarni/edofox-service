@@ -3,6 +3,7 @@ package com.rns.web.edo.service.util;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +80,7 @@ public class EdoFirebaseUtil {
 					  FirestoreOptions.newBuilder()
 					  .setTimestampsInSnapshotsEnabled(true)
 					  //.setCredentials(credentials)
-					  .setProjectId("pvivekanand-android-app-devenv")
+					  .setProjectId("edofox-management-module")
 					  .setDatabaseId("(default)")
 					  .build();
 			
@@ -102,23 +103,26 @@ public class EdoFirebaseUtil {
 	
 	public static void updateStudent(EdoStudent student, String instituteId) {
 		try {
-			EdoStudentFirebase studentFirebase = new EdoStudentFirebase();
-			new NullAwareBeanUtils().copyProperties(studentFirebase, student);
+			student.setInstituteId(instituteId);
+			//EdoStudentFirebase studentFirebase = new EdoStudentFirebase();
+			//new NullAwareBeanUtils().copyProperties(studentFirebase, student);
 			CollectionReference studentsCollection = db.collection("students");
-			ApiFuture<QuerySnapshot> docRef = studentsCollection.whereEqualTo("phone", student.getPhone()).whereEqualTo("instituteId", instituteId).get();
+			ApiFuture<QuerySnapshot> docRef = studentsCollection.whereEqualTo("StudentContact", StringUtils.prependIfMissing(student.getPhone(), "+91")).whereEqualTo("instituteID", instituteId).get();
 			List<QueryDocumentSnapshot> documents = docRef.get().getDocuments();
 			
 			if(CollectionUtils.isNotEmpty(documents)) {
 				for (QueryDocumentSnapshot document : documents) {
-					Map<String, Object> request = prepareStudentRequest(student);
+					Map<String, Object> request = prepareStudentRequest(student, false);
+					request.put("uniqueId", document.getReference().getId());
 					ApiFuture<WriteResult> result = document.getReference().set(request, SetOptions.merge());
-					LoggingUtil.logMessage("Updated student : " + result.get().getUpdateTime() + " name=> " + student.getName());
+					LoggingUtil.logMessage("Updated student : " + result.get().getUpdateTime() + " name=> " + student.getName() + " request=> " + request);
 				}
 			} else {
-				student.setInstituteId(instituteId);
-				Map<String, Object> request = prepareStudentRequest(student);
+				Map<String, Object> request = prepareStudentRequest(student, true);
 				ApiFuture<DocumentReference> result = studentsCollection.add(request);
-				LoggingUtil.logMessage("Update student : " + result.get() + " name=> " + student.getName());
+				request.put("uniqueId", result.get().getId());
+				result.get().set(request, SetOptions.merge());
+				LoggingUtil.logMessage("Added student : " + result.get() + " name=> " + student.getName() + " request =>" + request);
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
@@ -126,16 +130,30 @@ public class EdoFirebaseUtil {
 		
 	}
 
-	private static Map<String, Object> prepareStudentRequest(EdoStudent student) {
+	private static Map<String, Object> prepareStudentRequest(EdoStudent student, boolean newRequest) {
 		Map<String, Object> request = new HashMap<String, Object>();
+		if(newRequest) {
+			request.put("Name", "");
+			request.put("email", "");
+			request.put("StudentContact", "");
+			request.put("RollNo", "");
+			request.put("ParentContact", "");
+			request.put("profilePicURL", "");
+			request.put("instituteId", "");
+			request.put("Category", "");
+			request.put("Class", "");
+			request.put("Div", "");
+			request.put("PrePercent", "");
+			request.put("uniqueId", "");
+		}
 		if(StringUtils.isNotBlank(student.getName())) {
 			request.put("Name", student.getName());
-		}
+		} 
 		if(StringUtils.isNotBlank(student.getEmail())) {
 			request.put("email", student.getEmail());
 		}
 		if(StringUtils.isNotBlank(student.getPhone())) {
-			request.put("StudentContact", student.getPhone());
+			request.put("StudentContact", StringUtils.prependIfMissing(student.getPhone(), "+91"));
 		}
 		if(StringUtils.isNotBlank(student.getRollNo())) {
 			request.put("RollNo", student.getRollNo());
@@ -144,30 +162,27 @@ public class EdoFirebaseUtil {
 			request.put("ParentContact", student.getParentMobileNo());
 		}
 		if(StringUtils.isNotBlank(student.getProfilePic())) {
-			request.put("profilePicURL", student.getProfilePic());
+			request.put("profilePicURL", EdoConstants.HOST_NAME + "getImage/" + student.getId());
 		}
 		if(StringUtils.isNotBlank(student.getInstituteId())) {
-			request.put("instituteId", student.getInstituteId());
+			request.put("instituteID", student.getInstituteId());
 		}
 		return request;
 	}
 	
-	/*public static void main(String[] args) throws InterruptedException, ExecutionException {
+	public static void main(String[] args) throws InterruptedException, ExecutionException {
 		
 		EdoStudent student = new EdoStudent();
-		student.setName("Ajinkya Kulkarni");
-		student.setEmail("ajinkyashiva2@gmail.com");
-		student.setPhone("+919923283604");
-		student.setRollNo("123456");
-		updateStudent(student, "7V0l67417NlGshXzCtY6");
+		student.setPhone("9923283604");
+		updateStudent(student, "zyUxwMyGMnC5xA2mPQhx");
 		System.out.println("Done!");
 		
-	}*/
+	}
 	
 	public static void updateStudentResult(EdoStudent student, EdoTest test, String instituteId) {
 		try {
 			CollectionReference studentsCollection = db.collection("students");
-			ApiFuture<QuerySnapshot> docRef = studentsCollection.whereEqualTo("phone", student.getPhone()).whereEqualTo("instituteId", instituteId).get();
+			ApiFuture<QuerySnapshot> docRef = studentsCollection.whereEqualTo("StudentContact", StringUtils.prependIfMissing(student.getPhone(), "+91")).whereEqualTo("instituteID", instituteId).get();
 			List<QueryDocumentSnapshot> documents = docRef.get().getDocuments();
 			
 			if(CollectionUtils.isNotEmpty(documents)) {
@@ -176,11 +191,12 @@ public class EdoFirebaseUtil {
 					ApiFuture<QuerySnapshot> apiFuture = examsCollection.whereEqualTo("testId", test.getId()).get();
 					if(CollectionUtils.isNotEmpty(apiFuture.get().getDocuments())) {
 						for(QueryDocumentSnapshot examDocument : apiFuture.get().getDocuments()) {
-							Map<String, Object> request = getExamResult(student, test);
+							Map<String, Object> request = getExamResult(student, test, instituteId);
 							examDocument.getReference().set(request, SetOptions.merge());
+							LoggingUtil.logMessage("Updated exam result " + examDocument.getReference() + " for student " + student.getName());
 						}
 					} else {
-						ApiFuture<DocumentReference> ref = examsCollection.add(getExamResult(student, test));
+						ApiFuture<DocumentReference> ref = examsCollection.add(getExamResult(student, test, instituteId));
 						LoggingUtil.logMessage("Added exam result " + ref.get() + " for student " + student.getName());
 					}
 					//ApiFuture<WriteResult> result = apiFuture;
@@ -195,20 +211,28 @@ public class EdoFirebaseUtil {
 		
 	}
 
-	private static Map<String, Object> getExamResult(EdoStudent student, EdoTest test) {
+	private static Map<String, Object> getExamResult(EdoStudent student, EdoTest test, String instituteId) {
 		Map<String, Object> request = new HashMap<String, Object>();
-		request.put("TestName", test.getName());
+		request.put("TestName", CommonUtils.getStringValue(test.getName()));
 		request.put("dateAdded", new Date());
 		request.put("examDate", test.getStartDate());
+		request.put("examDay", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.DAY_OF_MONTH)));
+		request.put("examMonth", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.MONTH) + 1));
+		request.put("examYear", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.YEAR)));
+		request.put("examName", CommonUtils.getStringValue(test.getName()));
+		request.put("correctedAnswerFileUrl", ""); //TODO
+		request.put("paperSolutionExamFileUrl", ""); //TODO
 		request.put("examID", test.getFirebaseId());
 		request.put("testId", test.getId());
 		request.put("studentId", student.getId());
-		request.put("score", test.getScore());
 		request.put("total", test.getTotalMarks());
 		if(student.getAnalysis() != null) {
 			request.put("rank", student.getAnalysis().getRank());
 			request.put("appearedStudents", student.getAnalysis().getTotalStudents());
+			request.put("score", CommonUtils.getStringValue(student.getAnalysis().getScore()));
+			
 		}
+		request.put("instituteId", CommonUtils.getStringValue(instituteId));
 		return request;
 	}
 

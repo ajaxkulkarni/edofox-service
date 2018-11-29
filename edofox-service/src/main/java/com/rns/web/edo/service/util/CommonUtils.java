@@ -218,6 +218,28 @@ public class CommonUtils {
 	}
 
 	public static void calculateTestScore(EdoTest test, List<EdoQuestion> questions) {
+		if(test == null || CollectionUtils.isEmpty(test.getTest())) {
+			return;
+		}
+		//Add bonus questions if not solved
+		for(EdoQuestion question : questions) {
+			if(isBonus(question)) {
+				//Find if this is solved
+				boolean found = false;
+				for (EdoQuestion answered : test.getTest()) {
+					if (question.getQn_id() != null && answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					EdoQuestion bonus = new EdoQuestion();
+					bonus.setQn_id(question.getQn_id());
+					test.getTest().add(bonus);
+				}
+			}
+		}
+		
 		Integer solvedCount = 0;
 		Integer correctCount = 0;
 		Integer flaggedCount = 0;
@@ -251,6 +273,7 @@ public class CommonUtils {
 			}
 
 		}
+		
 		test.setCorrectCount(correctCount);
 		test.setFlaggedCount(flaggedCount);
 		test.setSolvedCount(solvedCount);
@@ -280,8 +303,12 @@ public class CommonUtils {
 		if (question.getWeightage() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
 			return null;
 		}
-		if (StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer()) || StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer())) {
+		if (StringUtils.equalsIgnoreCase("cancel", question.getCorrectAnswer())) {
 			return 0f;
+		}
+		if(isBonus(question)) {
+			LoggingUtil.logMessage("Found a bonus question =>" + answered.getQn_id());
+			return question.getWeightage();
 		}
 		if (StringUtils.contains(question.getType(), EdoConstants.QUESTION_TYPE_MULTIPLE)) {
 			String[] correctAnswers = StringUtils.split(question.getCorrectAnswer(), ",");
@@ -314,6 +341,10 @@ public class CommonUtils {
 			return question.getWeightage();
 		}
 		return getWrongScore(question);
+	}
+
+	public static boolean isBonus(EdoQuestion question) {
+		return StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer());
 	}
 
 	private static Float calculateMatchScore(String correctAnswer, EdoQuestion answered) {
