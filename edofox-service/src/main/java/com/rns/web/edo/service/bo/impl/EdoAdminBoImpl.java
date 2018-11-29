@@ -368,13 +368,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			request.getTest().setTotalMarks(map.get(0).getTest().getTotalMarks());
 			request.getTest().setTest(solved);
 			CommonUtils.calculateTestScore(request.getTest(), questions);
-			if(bonus != null) {
+			/*if(bonus != null) {
 				BigDecimal finalScore = request.getTest().getScore().add(new BigDecimal(bonus));
 				finalScore.setScale(2, RoundingMode.HALF_UP);
 				request.getTest().setScore(finalScore);
 				request.getTest().setSolvedCount(request.getTest().getSolvedCount() + bonusCount);
 				LoggingUtil.logMessage("Added bonus .." + bonus + " so total is - " + request.getTest().getScore());
-			}
+			}*/
 			testsDao.updateTestStatus(request);
 			if(CollectionUtils.isNotEmpty(request.getTest().getTest())) {
 				for(EdoQuestion question: request.getTest().getTest()) {
@@ -383,7 +383,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					requestMap.put("test", request.getTest().getId());
 					requestMap.put("student", request.getStudent().getId());
 					requestMap.put("question", question.getQn_id());
-					testsDao.updateTestResult(requestMap);
+					if(StringUtils.equals("bonus", question.getResponse())) {
+						LoggingUtil.logMessage("Adding result for question => " + question.getQn_id() + " for " + request.getStudent().getId());
+						testsDao.addTestResult(requestMap);
+					} else {
+						testsDao.updateTestResult(requestMap);
+					}
+						
 				}
 			}
 			

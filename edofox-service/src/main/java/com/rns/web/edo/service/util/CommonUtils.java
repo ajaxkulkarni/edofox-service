@@ -234,8 +234,10 @@ public class CommonUtils {
 				}
 				if(!found) {
 					EdoQuestion bonus = new EdoQuestion();
+					bonus.setResponse("bonus");
 					bonus.setQn_id(question.getQn_id());
 					test.getTest().add(bonus);
+					LoggingUtil.logMessage("Found unsolved bonus question => " + question.getQn_id());
 				}
 			}
 		}
