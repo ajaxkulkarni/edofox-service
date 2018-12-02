@@ -25,6 +25,7 @@ public interface EdoTestsDao {
 	EdoTestStudentMap getStudentActivePackage(EdoTestStudentMap map);
 	EdoTest getTest(Integer id);
 	EDOInstitute getInstituteById(Integer id);
+	List<EdoTestStudentMap> getSubjectwiseScoreStudent(Map<String,Object> value);
 	
 	//Save queries
 	Integer saveTestResult(EdoServiceRequest request);

@@ -178,15 +178,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						if(request.getStudent() != null && request.getStudent().getId() != student.getId()) {
 							continue;
 						}
-						List<EdoStudentSubjectAnalysis> subjectAnalysis = new ArrayList<EdoStudentSubjectAnalysis>();
-						for(EdoTestStudentMap map: subjectScores) {
-							if(map.getStudent() != null && map.getStudent().getId().intValue() == student.getId().intValue() && map.getSubjectScore() != null ) {
-								subjectAnalysis.add(map.getSubjectScore());
-								if( !existing.getSubjects().contains(map.getSubjectScore().getSubject())) {
-									existing.getSubjects().add(map.getSubjectScore().getSubject());
-								}
-							}
-						}
+						List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(existing, subjectScores, student);
 						student.getAnalysis().setSubjectScores(subjectAnalysis);
 						if(StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {
 							//Send rank SMS to student and parents
@@ -214,6 +206,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		return response;
 	}
+
 
 	public EdoServiceResponse getAllStudents(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();

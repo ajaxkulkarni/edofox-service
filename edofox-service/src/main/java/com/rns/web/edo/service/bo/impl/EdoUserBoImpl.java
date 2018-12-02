@@ -30,6 +30,7 @@ import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
@@ -81,11 +82,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 		if(CollectionUtils.isNotEmpty(map)) {
 			EdoTest test = map.get(0).getTest();
+			
+			Map<String, Object> input = new HashMap<String, Object>();
+			input.put("test", test.getId());
+			input.put("student", request.getStudent().getId());
+			List<EdoTestStudentMap> resultMap = testsDao.getSubjectwiseScoreStudent(input);
+			List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(test, resultMap, request.getStudent());
+			EDOTestAnalysis analysis = new EDOTestAnalysis();
+			analysis.setSubjectAnalysis(subjectAnalysis);
+			test.setAnalysis(analysis);
+			
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
 				setQuestionURLs(question);
 				test.getTest().add(question);
-				if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
+				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
 				}
 				BigDecimal score = subjectWiseScore.get(question.getSubject());
@@ -99,13 +110,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				} else if (question.getNegativeMarks() != null) {
 					score = score.subtract(new BigDecimal(question.getNegativeMarks()));
 				}
-				subjectWiseScore.put(question.getSubject(), score);
+				subjectWiseScore.put(question.getSubject(), score);*/
 			}
-			if(!subjectWiseScore.isEmpty()) {
-				EDOTestAnalysis analysis = new EDOTestAnalysis();
-				analysis.setSubjectWiseScore(subjectWiseScore);
-				test.setAnalysis(analysis);
-			}
+			
 			response.setTest(test);
 		}
 		

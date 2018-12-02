@@ -111,7 +111,7 @@
 		<result column="option2_img_url" property="question.option2ImageUrl" />
 		<result column="option3_img_url" property="question.option3ImageUrl" />
 		<result column="option4_img_url" property="question.option4ImageUrl" />
-
+		<result column="marks" property="question.marks"/>
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
 		<result column="no_of_questions" property="test.noOfQuestions" />

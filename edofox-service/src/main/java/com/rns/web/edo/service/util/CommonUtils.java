@@ -7,6 +7,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,7 +27,9 @@ import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.EdoTestStudentMap;
 
 public class CommonUtils {
 
@@ -440,6 +443,19 @@ public class CommonUtils {
 			return new Float(0);
 		}
 		return -question.getNegativeMarks();
+	}
+	
+	public static List<EdoStudentSubjectAnalysis> getSubjectAnalysis(EdoTest existing, List<EdoTestStudentMap> subjectScores, EdoStudent student) {
+		List<EdoStudentSubjectAnalysis> subjectAnalysis = new ArrayList<EdoStudentSubjectAnalysis>();
+		for(EdoTestStudentMap map: subjectScores) {
+			if(map.getStudent() != null && map.getStudent().getId().intValue() == student.getId().intValue() && map.getSubjectScore() != null ) {
+				subjectAnalysis.add(map.getSubjectScore());
+				if( !existing.getSubjects().contains(map.getSubjectScore().getSubject())) {
+					existing.getSubjects().add(map.getSubjectScore().getSubject());
+				}
+			}
+		}
+		return subjectAnalysis;
 	}
 
 	public static void main(String[] args) {
