@@ -376,6 +376,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					requestMap.put("test", request.getTest().getId());
 					requestMap.put("student", request.getStudent().getId());
 					requestMap.put("question", question.getQn_id());
+					requestMap.put("answered", "");
+					requestMap.put("flagged", 0);
 					if(StringUtils.equals("bonus", question.getResponse())) {
 						LoggingUtil.logMessage("Adding result for question => " + question.getQn_id() + " for " + request.getStudent().getId());
 						testsDao.addTestResult(requestMap);

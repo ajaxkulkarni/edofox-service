@@ -111,6 +111,7 @@
 		<result column="option2_img_url" property="question.option2ImageUrl" />
 		<result column="option3_img_url" property="question.option3ImageUrl" />
 		<result column="option4_img_url" property="question.option4ImageUrl" />
+		<result column="mapId" property="question.mapId"/>
 		<result column="marks" property="question.marks"/>
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
@@ -125,7 +126,7 @@
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		SELECT * FROM test 
+		SELECT *,test_result.id as mapId FROM test 
 		join test_questions_map on test.test_id = test_questions_map.test_id
 		join test_questions on test_questions_map.question_id = test_questions.id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id

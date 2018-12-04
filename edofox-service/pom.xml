@@ -136,17 +136,15 @@
 			<artifactId>firebase-admin</artifactId>
 			<version>6.5.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.3</version>
 		</dependency>
-
+		
 		<!-- <dependency> <groupId>com.fasterxml.jackson.core</groupId> <artifactId>jackson-databind</artifactId> 
 			<version>2.2.3</version> </dependency> -->
-
-
 
 		<!-- Jersey + Spring -->
 		<dependency>

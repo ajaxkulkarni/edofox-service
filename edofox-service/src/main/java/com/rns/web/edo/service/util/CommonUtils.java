@@ -232,6 +232,13 @@ public class CommonUtils {
 				for (EdoQuestion answered : test.getTest()) {
 					if (question.getQn_id() != null && answered.getQn_id() != null && question.getQn_id().intValue() == answered.getQn_id().intValue()) {
 						found = true;
+						if(answered.getMapId() == null) {
+							//Not already added
+							answered.setResponse("bonus");
+							answered.setAnswer("bonus");
+						} else if (StringUtils.isBlank(answered.getAnswer())) {
+							answered.setAnswer("bonus");
+						}
 						break;
 					}
 				}
@@ -239,6 +246,7 @@ public class CommonUtils {
 					EdoQuestion bonus = new EdoQuestion();
 					bonus.setResponse("bonus");
 					bonus.setQn_id(question.getQn_id());
+					bonus.setAnswer("bonus");
 					test.getTest().add(bonus);
 					LoggingUtil.logMessage("Found unsolved bonus question => " + question.getQn_id());
 				}

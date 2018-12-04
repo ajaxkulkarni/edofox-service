@@ -46,6 +46,7 @@ public class EdoQuestion {
 	private BigDecimal marks;
 	private String alternateAnswer;
 	private String partialCorrection;
+	private Integer mapId;
 	
 	public String getOption1() {
 		return option1;
@@ -266,6 +267,12 @@ public class EdoQuestion {
 	}
 	public void setPartialCorrection(String partialCorrection) {
 		this.partialCorrection = partialCorrection;
+	}
+	public Integer getMapId() {
+		return mapId;
+	}
+	public void setMapId(Integer mapId) {
+		this.mapId = mapId;
 	}
 
 }

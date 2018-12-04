@@ -42,7 +42,7 @@
 	</update>
 	
 	<insert id="addTestResult" parameterType="map">
-		insert into test_result (marks, test_id, student_id, question_id) values(${marks}, ${test}, ${student}, ${question})
+		insert into test_result (marks, test_id, student_id, question_id, option_selected, flagged) values(${marks}, ${test}, ${student}, ${question}, '${answered}', ${flagged})
 	</insert>
 
 </mapper>
