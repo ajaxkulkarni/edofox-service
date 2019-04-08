@@ -270,24 +270,48 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	private void setQuestionURLs(EdoQuestion question) {
-		if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-			question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_QUESTION);
+		
+		if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
+			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
+				question.setQuestionImageUrl("http://" + question.getQuestionImageUrl());
+			}
+			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
+				question.setOption1ImageUrl("http://" + question.getOption1ImageUrl());
+			}
+			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
+				question.setOption2ImageUrl("http://" + question.getOption2ImageUrl());
+			}
+			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
+				question.setOption3ImageUrl("http://" + question.getOption3ImageUrl());
+			}
+			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
+				question.setOption4ImageUrl("http://" + question.getOption4ImageUrl());
+			}
+			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
+				question.setMetaDataImageUrl("http://" + question.getMetaDataImageUrl());
+			}
+		} else {
+			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
+				question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_QUESTION);
+			}
+			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
+				question.setOption1ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
+			}
+			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
+				question.setOption2ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
+			}
+			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
+				question.setOption3ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
+			}
+			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
+				question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
+			}
+			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
+				question.setMetaDataImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
+			}
 		}
-		if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-			question.setOption1ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
-		}
-		if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-			question.setOption2ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
-		}
-		if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-			question.setOption3ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
-		}
-		if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-			question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
-		}
-		if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-			question.setMetaDataImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
-		}
+		
+		
 	}
 
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
