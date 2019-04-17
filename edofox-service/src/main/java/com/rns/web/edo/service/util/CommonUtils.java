@@ -437,11 +437,20 @@ public class CommonUtils {
 		if (foundCount == 0) {
 			return getWrongScore(question);
 		}
+		//answerCount - Total answers
+		//solvedCount - Total solved
+		//foundCount - Correct and solved
 		if(answerCount == solvedCount && foundCount == solvedCount) {
+			//all solved and all correct
 			return question.getWeightage();
 		}
+		
 		if(StringUtils.equalsIgnoreCase("Y", question.getPartialCorrection())) {
-			return new Float(1);
+			//return new Float(1);
+			if(solvedCount == foundCount) {
+				//Whatever is solved is correct. i.e. 3 options chosen and 3 are correct => score will be 3
+				return new Float(solvedCount);
+			}
 		}
 		return getWrongScore(question);
 	}
