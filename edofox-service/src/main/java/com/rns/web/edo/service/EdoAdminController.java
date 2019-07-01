@@ -1,5 +1,7 @@
 package com.rns.web.edo.service;
 
+import java.io.InputStream;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -11,10 +13,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.util.CommonUtils;
+import com.rns.web.edo.service.util.EdoExcelUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
 
 @Component
 @Path("/admin")
@@ -124,6 +130,28 @@ public class EdoAdminController {
 			e.printStackTrace();
 		}
 		LoggingUtil.logMessage("Upload Students Response");
+		return response;
+	}
+	
+	@POST
+	@Path("/uploadStudentsExcel")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse uploadStudentsExcel(@FormDataParam("data") InputStream studentData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
+			@FormDataParam("instituteId") Integer instituteId) {
+		LoggingUtil.logMessage("Upload Students Excel :" + instituteId);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EdoServiceRequest request = new EdoServiceRequest();
+			EDOInstitute institute = new EDOInstitute();
+			institute.setId(instituteId);
+			request.setInstitute(institute);
+			request.setStudents(EdoExcelUtil.extractStudents(studentData, instituteId));
+			response.setStatus(adminBo.bulkUploadStudents(request));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Upload Students Excel Response");
 		return response;
 	}
 	

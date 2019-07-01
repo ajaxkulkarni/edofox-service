@@ -418,6 +418,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					testsDao.saveStudent(student);
 				} else {
 					student.setId(existingStudent.get(0).getId());
+					testsDao.updateStudent(student);
 				}
 				
 				LoggingUtil.logMessage("Student ID is =>" + student.getId());
@@ -425,6 +426,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					testsDao.deleteExistingPackages(student);
 					testsDao.createStudentPackage(student);
 				}
+				EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
+				EdoFirebaseUtil.updateStudent(student, currentInstitute.getFirebaseId());
 				LoggingUtil.logMessage("Added student == " + student.getRollNo() + " successfully!");
 			}
 			

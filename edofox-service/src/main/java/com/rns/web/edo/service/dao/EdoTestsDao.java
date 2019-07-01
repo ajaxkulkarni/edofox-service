@@ -51,6 +51,7 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentByPhoneNumber(EdoStudent student);
 	EDOPackage getTestPackage(Integer testId);
 	EdoStudent getStudentById(Integer id);
+	int updateStudent(EdoStudent student);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);

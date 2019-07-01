@@ -28,6 +28,22 @@
 		(name, email, mobile_no, password, roll_no, gender, school_district, date_of_birth, caste_category )
 		values('${name}', '${email}', '${phone}', '${password}', '${rollNo}', '${gender}', '${schoolDistrict}', '${dob}', '${casteCategory}');
 	</insert>
+	
+	<update id="updateStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent">
+		update student SET 
+		<if test="name != null">
+		name = '${name}' , 
+		</if>
+		<if test="email != null">
+		email = '${email}', 
+		</if>
+		<if test="rollNo != null">
+		roll_no = '${rollNo}',
+		</if>
+		gender = '${gender}' , 
+		school_district = '${schoolDistrict}', date_of_birth = '${dob}', caste_category =  '${casteCategory}' 
+		where id = ${id}
+	</update>
 
 	<insert id="createStudentPackage" parameterType="com.rns.web.edo.service.domain.EdoStudent"
 		useGeneratedKeys="true" keyProperty="transactionId" keyColumn="id">

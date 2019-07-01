@@ -73,15 +73,15 @@ public class EdoFirebaseUtil {
 			System.out.println(credentials.getRequestMetadata());*/
 			
 			
-			serviceAccount = new FileInputStream("/home/service/properties/edofox-key.json");
+			serviceAccount = new FileInputStream(EdoPropertyUtil.getProperty(EdoPropertyUtil.FIREBASE_CREDENTIALS));//"/home/service/properties/edofox-key.json"
 			GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
 			
 			FirestoreOptions options = 
 					  FirestoreOptions.newBuilder()
 					  .setTimestampsInSnapshotsEnabled(true)
-					  //.setCredentials(credentials)
-					  .setProjectId("edofox-management-module")
-					  .setDatabaseId("(default)")
+					  .setCredentials(credentials)
+					  .setProjectId(EdoPropertyUtil.getProperty(EdoPropertyUtil.FIREBASE_PROJECT))//"edofox-management-module"
+					  .setDatabaseId("(default)")//"(default)"
 					  .build();
 			
 			db = options.getService();
