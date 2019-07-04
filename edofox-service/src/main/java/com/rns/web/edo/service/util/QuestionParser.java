@@ -474,17 +474,29 @@ public class QuestionParser {
 	}
 
 	private static String getSolution(Elements solution) {
-		Element parent = solution.get(0).child(1);
-		int i = 0;
-		if(!parent.child(i).isBlock()) {
-			i = 1;
+		try {
+			if(solution == null || solution.isEmpty() || solution.get(0).children() == null || solution.get(0).children().isEmpty()) {
+				return "";
+			}
+			Element parent = solution.get(0).child(1);
+			if(parent.children() == null || parent.children().isEmpty()) {
+				return "";
+			}
+			int i = 0;
+			if(!parent.child(i).isBlock()) {
+				i = 1;
+			}
+			String solutionHtml = parent.child(i).html();
+			solutionHtml = StringUtils.replace(solutionHtml, "<script type=\"math/tex\">", "$");
+			solutionHtml = StringUtils.replace(solutionHtml, "</script>", "$");
+			String solu = Jsoup.parse(solutionHtml).text();
+			System.out.println("Solution:" + solu);
+			return solu;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		String solutionHtml = parent.child(i).html();
-		solutionHtml = StringUtils.replace(solutionHtml, "<script type=\"math/tex\">", "$");
-		solutionHtml = StringUtils.replace(solutionHtml, "</script>", "$");
-		String solu = Jsoup.parse(solutionHtml).text();
-		System.out.println("Solution:" + solu);
-		return solu;
+		
+		return "";
 	}
 
 	private static String addMathJax(Elements element) {
