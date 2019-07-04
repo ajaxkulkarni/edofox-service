@@ -11,6 +11,7 @@ public class EdoServiceResponse {
 	private EDOInstitute institute;
 	private List<EDOPackage> packages;
 	private EdoPaymentStatus paymentStatus;
+	private EdoQuestion question;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -69,6 +70,14 @@ public class EdoServiceResponse {
 
 	public void setPaymentStatus(EdoPaymentStatus paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	public EdoQuestion getQuestion() {
+		return question;
+	}
+
+	public void setQuestion(EdoQuestion question) {
+		this.question = question;
 	}
 
 }

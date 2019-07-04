@@ -1,7 +1,5 @@
 package com.rns.web.edo.service.bo.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -437,6 +435,26 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			status.setStatusCode(STATUS_OK);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setQuestion(QuestionParser.parseHtml(request.getQuestion()));
+			if(response.getQuestion() == null) {
+				EdoApiStatus status = new EdoApiStatus();
+				status.setResponseText("Problem in parsing question! Check the question HTML again ..");
+				status.setStatusCode(STATUS_ERROR);
+				response.setStatus(status);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			EdoApiStatus status = new EdoApiStatus();
+			status.setResponseText(ERROR_IN_PROCESSING);
+			status.setStatusCode(STATUS_ERROR);
+			response.setStatus(status);
+		}
+		return response;
 	}
 
 

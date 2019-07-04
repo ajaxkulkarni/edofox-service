@@ -167,5 +167,16 @@ public class EdoAdminController {
 		return response;
 	}
 	
-
+	@POST
+	@Path("/parseQuestion")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Parse question Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response = adminBo.parseQuestion(request);
+		LoggingUtil.logMessage("Parse question Response");
+		return response;
+	}
+	
 }

@@ -1,6 +1,5 @@
 package com.rns.web.edo.service.bo.api;
 
-import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -15,4 +14,5 @@ public interface EdoAdminBo {
 	EdoApiStatus fileUploadTestSolutions(String filePath, EdoTest test, Integer subjectId);
 	EdoApiStatus revaluateResult(EdoServiceRequest request);
 	EdoApiStatus bulkUploadStudents(EdoServiceRequest request);
+	EdoServiceResponse parseQuestion(EdoServiceRequest request);
 }

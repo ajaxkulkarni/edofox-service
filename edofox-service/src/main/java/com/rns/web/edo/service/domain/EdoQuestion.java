@@ -47,6 +47,7 @@ public class EdoQuestion {
 	private String alternateAnswer;
 	private String partialCorrection;
 	private Integer mapId;
+	private String examType;
 	
 	public String getOption1() {
 		return option1;
@@ -273,6 +274,12 @@ public class EdoQuestion {
 	}
 	public void setMapId(Integer mapId) {
 		this.mapId = mapId;
+	}
+	public String getExamType() {
+		return examType;
+	}
+	public void setExamType(String examType) {
+		this.examType = examType;
 	}
 
 }
