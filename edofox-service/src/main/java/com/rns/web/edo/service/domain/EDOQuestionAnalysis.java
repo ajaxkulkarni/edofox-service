@@ -17,6 +17,29 @@ public class EDOQuestionAnalysis {
 	private BigDecimal option3percent;
 	private BigDecimal option4percent;
 	private BigDecimal correctPercent;
+	
+	private Integer questionsAddedBySubject;
+	private Integer questionsAddedByChapter;
+	private Integer questionsAddedByDate;
+	
+	public Integer getQuestionsAddedBySubject() {
+		return questionsAddedBySubject;
+	}
+	public void setQuestionsAddedBySubject(Integer questionsAddedBySubject) {
+		this.questionsAddedBySubject = questionsAddedBySubject;
+	}
+	public Integer getQuestionsAddedByChapter() {
+		return questionsAddedByChapter;
+	}
+	public void setQuestionsAddedByChapter(Integer questionsAddedByChapter) {
+		this.questionsAddedByChapter = questionsAddedByChapter;
+	}
+	public Integer getQuestionsAddedByDate() {
+		return questionsAddedByDate;
+	}
+	public void setQuestionsAddedByDate(Integer questionsAddedByDate) {
+		this.questionsAddedByDate = questionsAddedByDate;
+	}
 	public Integer getOptionCount() {
 		return optionCount;
 	}

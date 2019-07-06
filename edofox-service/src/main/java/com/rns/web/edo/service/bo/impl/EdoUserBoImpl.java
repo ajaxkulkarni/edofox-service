@@ -600,4 +600,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return null;
 	}
 
+	public EdoServiceResponse getAllSubjects() {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			 response.setSubjects(testsDao.getAllSubjects());
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
 }

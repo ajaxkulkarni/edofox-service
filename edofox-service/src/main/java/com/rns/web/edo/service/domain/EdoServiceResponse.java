@@ -12,6 +12,8 @@ public class EdoServiceResponse {
 	private List<EDOPackage> packages;
 	private EdoPaymentStatus paymentStatus;
 	private EdoQuestion question;
+	private List<EdoSubject> subjects;
+	private EDOQuestionAnalysis questionAnalysis;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -78,6 +80,22 @@ public class EdoServiceResponse {
 
 	public void setQuestion(EdoQuestion question) {
 		this.question = question;
+	}
+
+	public List<EdoSubject> getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(List<EdoSubject> subjects) {
+		this.subjects = subjects;
+	}
+
+	public EDOQuestionAnalysis getQuestionAnalysis() {
+		return questionAnalysis;
+	}
+
+	public void setQuestionAnalysis(EDOQuestionAnalysis questionAnalysis) {
+		this.questionAnalysis = questionAnalysis;
 	}
 
 }

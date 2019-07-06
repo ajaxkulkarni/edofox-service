@@ -1,6 +1,8 @@
 package com.rns.web.edo.service.bo.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -440,19 +442,45 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			response.setQuestion(QuestionParser.parseHtml(request.getQuestion()));
-			if(response.getQuestion() == null) {
+			EdoQuestion question = QuestionParser.parseHtml(request.getQuestion());
+			response.setQuestion(question);
+			if(question == null) {
 				EdoApiStatus status = new EdoApiStatus();
 				status.setResponseText("Problem in parsing question! Check the question HTML again ..");
 				status.setStatusCode(STATUS_ERROR);
 				response.setStatus(status);
+				return response;
 			}
+			if(StringUtils.equals("JEE", question.getExamType()) || StringUtils.equals("JEEA", question.getExamType())) {
+				question.setWeightage(4f);
+				question.setNegativeMarks(1f);
+			}
+			testsDao.addQuestion(question);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			EdoApiStatus status = new EdoApiStatus();
 			status.setResponseText(ERROR_IN_PROCESSING);
 			status.setStatusCode(STATUS_ERROR);
 			response.setStatus(status);
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getDataEntrySummary(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EDOQuestionAnalysis questionAnalysis = new EDOQuestionAnalysis();
+			questionAnalysis.setQuestionsAddedByChapter(testsDao.getNoOfQuestionsByChapter(request.getQuestion().getChapter().getChapterId()));
+			/*Calendar cal = Calendar.getInstance();
+			cal.setTime(new Date());
+			cal.set(Calendar.HOUR, 0);
+			cal.set(Calendar.MINUTE, 0);
+			cal.set(Calendar.SECOND, 0);*/
+			String date = CommonUtils.convertDate(new Date());
+			questionAnalysis.setQuestionsAddedByDate(testsDao.getNoOfQuestionsByDate(date));
+			response.setQuestionAnalysis(questionAnalysis);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
 	}

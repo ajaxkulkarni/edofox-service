@@ -179,4 +179,16 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getDataEntrySummary")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getDataEntrySummary(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Data entry summary Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response = adminBo.getDataEntrySummary(request);
+		LoggingUtil.logMessage("Data entry summary Response");
+		return response;
+	}
+	
 }

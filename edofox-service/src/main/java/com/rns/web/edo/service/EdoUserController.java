@@ -188,4 +188,15 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getAllSubjects")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getAllSubjects(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get subjects Request :" + request);
+		EdoServiceResponse response = userBo.getAllSubjects();
+		LoggingUtil.logMessage("Get subjects Response");
+		return response;
+	}
+	
 }

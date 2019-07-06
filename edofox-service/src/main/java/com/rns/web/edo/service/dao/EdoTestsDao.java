@@ -1,5 +1,6 @@
 package com.rns.web.edo.service.dao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.EdoSubject;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
@@ -60,7 +62,11 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentByPayment(String paymentId);
 	List<EdoStudent> getAllStudents(Integer id);
 	
-	
+	//Question queries
+	List<EdoSubject> getAllSubjects();
+	void addQuestion(EdoQuestion question);
+	int getNoOfQuestionsByChapter(Integer chapterId);
+	int getNoOfQuestionsByDate(String date);
 	
 	
 }

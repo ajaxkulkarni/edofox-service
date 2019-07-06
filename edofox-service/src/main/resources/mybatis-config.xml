@@ -18,6 +18,7 @@
 		<mapper resource="maps/student_mapper.xml" />
 		<mapper resource="maps/admin_mapper.xml" />
 		<mapper resource="maps/entities.xml" />
+		<mapper resource="maps/question_mapper.xml" />
 	</mappers>
 	<!-- <settings> <setting name="logImpl" value="LOG4J"/> </settings> -->
 

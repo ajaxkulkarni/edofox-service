@@ -4,6 +4,7 @@ public class EdoChapter {
 
 	private Integer chapterId;
 	private String chapterName;
+	private String std;
 
 	public Integer getChapterId() {
 		return chapterId;
@@ -19,5 +20,13 @@ public class EdoChapter {
 
 	public void setChapterName(String chapterName) {
 		this.chapterName = chapterName;
+	}
+
+	public String getStd() {
+		return std;
+	}
+
+	public void setStd(String std) {
+		this.std = std;
 	}
 }
