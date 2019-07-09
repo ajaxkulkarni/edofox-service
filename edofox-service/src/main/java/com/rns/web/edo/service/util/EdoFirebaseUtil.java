@@ -162,7 +162,7 @@ public class EdoFirebaseUtil {
 			request.put("ParentContact", student.getParentMobileNo());
 		}
 		if(StringUtils.isNotBlank(student.getProfilePic())) {
-			request.put("profilePicURL", EdoConstants.HOST_NAME + "getImage/" + student.getId());
+			request.put("profilePicURL", EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "getImage/" + student.getId());
 		}
 		if(StringUtils.isNotBlank(student.getInstituteId())) {
 			request.put("instituteID", student.getInstituteId());

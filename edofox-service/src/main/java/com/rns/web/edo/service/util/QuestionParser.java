@@ -1,24 +1,29 @@
 package com.rns.web.edo.service.util;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
+import com.gargoylesoftware.htmlunit.CookieManager;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.rns.web.edo.service.domain.EdoQuestion;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 public class QuestionParser {
 	
@@ -515,15 +520,157 @@ public class QuestionParser {
 		
 		System.out.println(parseQuestionPaper(fileName, previousQuestion, "F:\\Resoneuronance\\Edofox\\Document\\Latex\\VL CET 2018\\Solutions\\06 Math Sol.tex").size());
 	*/	
+		WebClient webClient = null;
 		try {
-			String html = IOUtils.toString(new FileInputStream("F:\\Resoneuronance\\Edofox\\Document\\sample_toppr_true_false.html"));
-			EdoQuestion q = new EdoQuestion();
-			q.setMetaData(html);
-			parseHtml(q);
-		} catch (IOException e) {
+			/*String url = "https://www.toppr.com/class-12/physics/measurement-and-errors/question-sets/all/?page=3";
+			
+			String loginUrl = "https://www.toppr.com/login/";
+			
+			webClient = new WebClient(BrowserVersion.FIREFOX_60);
+			webClient.setAjaxController(new NicelyResynchronizingAjaxController());
+			webClient.getOptions().setThrowExceptionOnScriptError(false);
+			//webClient.getOptions().setJavaScriptEnabled(false);
+			
+			CookieManager manager = new CookieManager();
+			
+			addCookie(manager, ".toppr.com", "ajs_user_id");
+			addCookie(manager, ".toppr.com", "intercom-session-sh7i09tg");
+			addCookie(manager, ".toppr.com", "__cfduid");
+			addCookie(manager, ".toppr.com", "_fbp");
+			addCookie(manager, ".toppr.com", "_gid");
+			addCookie(manager, ".toppr.com", "ajs_anonymous_id");
+			addCookie(manager, ".toppr.com", "_ga");
+			addCookie(manager, ".toppr.com", "session_id");
+			addCookie(manager, "www.toppr.com", "NPS_45e50a70_throttle");
+			addCookie(manager, "www.toppr.com", "NPS_45e50a70_last_seen");
+			addCookie(manager, "www.toppr.com", "AWSALB");
+			addCookie(manager, "www.toppr.com", "admin_sessionid");
+			
+			webClient.setCookieManager(manager);
+			
+			
+			HtmlPage page = webClient.getPage(loginUrl);
+			System.out.println("Adding local storage ..");
+			addLocalStorage(page, "ajs_group_properties");
+			addLocalStorage(page, "ajs_user_traits");
+			addLocalStorage(page, "_WE_82618208");
+			addLocalStorage(page, "local_ajs_anonymous_id");
+			addLocalStorage(page, "ajs_user_id");
+			addLocalStorage(page, "intercom-state");
+			
+			//page = webClient.getPage(url);
+			
+			System.out.println("Waiting for JS ....");
+			webClient.waitForBackgroundJavaScript(10000);
+			System.out.println(page.asText());
+			
+			
+
+			<input placeholder="" name="countryPhone" id="countryPhone" maxlength="10" class="_1_zeR _3yQ8t input-hasError input input-hasError" type="tel" autocomplete="on" value=""/>
+			<button class="_3UUnG button-smallHeight button button-shadow">
+
+			 
+			
+			HtmlAnchor anchor = page.getAnchorByHref("/login/");
+			HtmlPage postLogin = anchor.click();
+			final String pageAsXml = postLogin.asXml();
+			System.out.println(postLogin);
+			
+			
+			HtmlTelInput phone = page.getHtmlElementById("countryPhone");
+			phone.setText("9923283604");
+			phone.setValueAttribute("9923283604");
+			DomNodeList<DomElement> buttons = page.getElementsByTagName("button");
+			if(!buttons.isEmpty()) {
+				for(DomElement btn: buttons) {
+					if(StringUtils.contains(btn.getAttribute("class"), "_3UUnG")) {
+						System.out.println("Found login button " + btn.getAttribute("class"));
+						WebWindow window = page.getEnclosingWindow();
+						HtmlPage newPage = btn.click();
+						System.out.println("Waiting for OTP .." + window.getEnclosedPage());
+						webClient.waitForBackgroundJavaScript(10000);
+						//System.out.println(newPage.asText());
+						//page = (HtmlPage) window.getEnclosedPage();
+						System.out.println(page.asText());
+						break;
+					}
+				}
+			}*/
+			
+			getQuestions();
+			
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			if(webClient != null) {
+				webClient.close();
+			}
 		}
+	}
+
+	private static void addLocalStorage(final HtmlPage page, String key) {
+		page.executeJavaScript("window.localStorage.setItem('" + key + "','" + EdoPropertyUtil.getProperty(key) + "');");
+		System.out.println("Added local storage for " + key + " = " + EdoPropertyUtil.getProperty(key));
+	}
+
+	private static void addCookie(CookieManager manager, String domain, String key) {
+		Cookie cookie = new Cookie(domain, key, EdoPropertyUtil.getProperty("ajs_user_id"));
+		manager.addCookie(cookie);
+	}
+	
+	public static void getQuestions() {
+		String url = "https://www.toppr.com/api/v5.0/class-12/practice/physics/physical-world/question-bank/?page=1&type=single%20correct";
+		
+		ClientConfig config = new DefaultClientConfig();
+		config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+		Client client = Client.create(config);
+
+
+		WebResource webResource = client.resource(url);
+
+		/*
+		 authority: www.toppr.com
+:method: GET
+:path: /api/v5.0/class-12/practice/physics/physical-world/question-bank/?page=4&type=single%20correct
+:scheme: https
+accept: application/json, text/plain, 
+accept-encoding: gzip, deflate, br
+accept-language: en-US,en;q=0.9
+agent-platform: web
+agent-platform-version: 4
+cookie: __cfduid=d8425c513fca7e167df7fd8c36733c8211562568579; _ga=GA1.2.1805524713.1562568578; _gid=GA1.2.1447940675.1562568578; ajs_group_id=null; ajs_anonymous_id=%22febdab1d-0ed5-4b29-b50c-3189928394ee%22; _fbp=fb.1.1562568579520.1595014898; intercom-id-sh7i09tg=8533d373-7127-4429-8be5-55c34541221f; admin_sessionid=09bdab68bd918319fa7a3a5c7787558c; nextUrl=; sign_up_lead=; tracking_id=; NPS_45e50a70_last_seen=1562576744047; ajs_user_id=10254079; intercom-session-sh7i09tg=S1F1Y3ppRzIwNm52UTJJek1vNFJJSnNsenl6cExva0NNWXNScnJsMlBiUllhUDdtb3AzdElwQ3ljRjBjaWhhcS0tcDVkYUpNQyt4VWU0aHpkVWxwRjhrUT09--74452af66afeec402d3122af23e6e3cea8744af4; AWSALB=U3Apr0g3/gKwS9/MMfI9qSrSaOw/MaCtLndxGqYNF2Wa87qIcXNl1Xexu4qBaKmtunHKQkLjHiuVyEsddl3jRgKOod5tOpF1qNT9N8EFNpuc2YNpuhnKUBjJW03lvL9nLuQzPgJrMHjJ4O529l706cSeyzT+YtH7ofALoYkcfJ/MjKU7j0CxGGS5ioBPeA==; _gat_gtag_UA_42239720_1=1
+referer: https://www.toppr.com/class-12/physics/physical-world/question-sets/all/?page=4&type=single%20correct
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36
+accept: application/json, text/plain, 
+accept-encoding: gzip, deflate, br
+accept-language: en-US,en;q=0.9
+agent-platform: web
+agent-platform-version: 4
+		 */
+		
+		webResource.header(":authority", "www.toppr.com");
+		webResource.header(":method", "GET");
+		webResource.header(":path", "/api/v5.0/class-12/practice/physics/physical-world/question-bank/?page=4&type=single%20correct");
+		webResource.header(":scheme", "https");
+		webResource.header("cookie", "__cfduid=d8425c513fca7e167df7fd8c36733c8211562568579; _ga=GA1.2.1805524713.1562568578; _gid=GA1.2.1447940675.1562568578; ajs_group_id=null; ajs_anonymous_id=%22febdab1d-0ed5-4b29-b50c-3189928394ee%22; _fbp=fb.1.1562568579520.1595014898; intercom-id-sh7i09tg=8533d373-7127-4429-8be5-55c34541221f; admin_sessionid=09bdab68bd918319fa7a3a5c7787558c; nextUrl=; sign_up_lead=; tracking_id=; NPS_45e50a70_last_seen=1562576744047; ajs_user_id=10254079; intercom-session-sh7i09tg=S1F1Y3ppRzIwNm52UTJJek1vNFJJSnNsenl6cExva0NNWXNScnJsMlBiUllhUDdtb3AzdElwQ3ljRjBjaWhhcS0tcDVkYUpNQyt4VWU0aHpkVWxwRjhrUT09--74452af66afeec402d3122af23e6e3cea8744af4; AWSALB=U3Apr0g3/gKwS9/MMfI9qSrSaOw/MaCtLndxGqYNF2Wa87qIcXNl1Xexu4qBaKmtunHKQkLjHiuVyEsddl3jRgKOod5tOpF1qNT9N8EFNpuc2YNpuhnKUBjJW03lvL9nLuQzPgJrMHjJ4O529l706cSeyzT+YtH7ofALoYkcfJ/MjKU7j0CxGGS5ioBPeA==; _gat_gtag_UA_42239720_1=1");
+		webResource.header("referer", "https://www.toppr.com/class-12/physics/physical-world/question-sets/all/?page=4&type=single%20correct");
+		webResource.header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");
+		webResource.header("agent-platform", "web");
+		webResource.header("agent-platform-version", "4");
+		
+		ClientResponse response = webResource.type("application/json").get(ClientResponse.class);
+
+		if (response.getStatus() != 200) {
+			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus() + " message " + response);
+		}
+		String output = response.getEntity(String.class);
+		LoggingUtil.logMessage("Output from Server for get questions : " + response.getStatus() + ".... \n " + output);
+	
+		
+		//"question_style""single correct" true-false multiple%20correct blank assertion matrix passage true-false
+
+		//
 	}
 
 	

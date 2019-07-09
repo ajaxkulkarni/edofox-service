@@ -26,7 +26,7 @@ public class PaymentUtil implements EdoConstants {
 		order.setCurrency("INR");
 		order.setAmount(amount);
 		order.setDescription("Vision Latur Payment");
-		order.setRedirectUrl(HOST_NAME + "processPayment");
+		order.setRedirectUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "processPayment");
 		order.setWebhookUrl("http://www.someurl.com/");
 		order.setTransactionId("T" + transactionId);
 

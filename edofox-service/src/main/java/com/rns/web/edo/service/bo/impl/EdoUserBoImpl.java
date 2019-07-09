@@ -37,6 +37,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
+import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
@@ -291,23 +292,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				question.setMetaDataImageUrl("http://" + question.getMetaDataImageUrl());
 			}
 		} else {
+			String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-				question.setQuestionImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_QUESTION);
+				question.setQuestionImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_QUESTION);
 			}
 			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-				question.setOption1ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
+				question.setOption1ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
 			}
 			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-				question.setOption2ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
+				question.setOption2ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
 			}
 			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-				question.setOption3ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
+				question.setOption3ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
 			}
 			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-				question.setOption4ImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
+				question.setOption4ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
 			}
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-				question.setMetaDataImageUrl(HOST_NAME + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
+				question.setMetaDataImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
 			}
 		}
 		
