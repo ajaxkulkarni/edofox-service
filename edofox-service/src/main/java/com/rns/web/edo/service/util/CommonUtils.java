@@ -295,7 +295,7 @@ public class CommonUtils {
 		LoggingUtil.logMessage("Evaluated the test - " + test.getCorrectCount() + " .. " + test.getScore());
 	}
 
-	private static void setComplexAnswer(EdoQuestion answered) {
+	public static void setComplexAnswer(EdoQuestion answered) {
 		if (answered != null && CollectionUtils.isNotEmpty(answered.getComplexOptions())) {
 			StringBuilder answerBuilder = new StringBuilder();
 			for (EdoComplexOption option : answered.getComplexOptions()) {

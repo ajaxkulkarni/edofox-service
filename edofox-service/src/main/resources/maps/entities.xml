@@ -38,4 +38,30 @@
 		<result column="start_date" property="startDate" />
 	</resultMap>
 	
+	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">
+		<result column="question_id" property="qn_id" />
+		<result column="question" property="question" />
+		<result column="option1" property="option1" />
+		<result column="option2" property="option2" />
+		<result column="option3" property="option3" />
+		<result column="option4" property="option4" />
+		<result column="option5" property="option5" />
+		<result column="correct_answer" property="correctAnswer"/>
+		<result column="weightage" property="weightage"/>
+		<result column="negative_marks" property="negativeMarks"/>
+		<result column="question_img_url" property="questionImageUrl" />
+		<result column="option1_img_url" property="option1ImageUrl" />
+		<result column="option2_img_url" property="option2ImageUrl" />
+		<result column="option3_img_url" property="option3ImageUrl" />
+		<result column="option4_img_url" property="option4ImageUrl" />
+		<result column="subject_id" property="subjectId"/>
+		<result column="question_number" property="questionNumber"/>
+		<result column="question_type" property="type" />
+		<result column="meta_data" property="metaData" />
+		<result column="meta_data_img_url" property="metaDataImageUrl" />
+		<result column="alt_answer" property="alternateAnswer"/>
+		<result column="partial" property="partialCorrection"/>
+		<result column="ref_id" property="referenceId"/>
+	</resultMap>
+	
 </mapper>

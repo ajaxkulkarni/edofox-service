@@ -20,6 +20,7 @@ public interface EdoUserBo {
 	EdoPaymentStatus completePayment(EdoTest test, EdoStudent student);
 	EdoFile getStudentImage(Integer studentId);
 	EdoServiceResponse getAllSubjects();
-	
+	EdoServiceResponse getNextQuestion(EdoServiceRequest request);
+	EdoServiceResponse submitAnswer(EdoServiceRequest request);
 	
 }

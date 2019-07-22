@@ -48,6 +48,8 @@ public class EdoQuestion {
 	private String partialCorrection;
 	private Integer mapId;
 	private String examType;
+	private Integer level;
+	private String referenceId;
 	
 	public String getOption1() {
 		return option1;
@@ -280,6 +282,18 @@ public class EdoQuestion {
 	}
 	public void setExamType(String examType) {
 		this.examType = examType;
+	}
+	public Integer getLevel() {
+		return level;
+	}
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+	public String getReferenceId() {
+		return referenceId;
+	}
+	public void setReferenceId(String referenceId) {
+		this.referenceId = referenceId;
 	}
 
 }

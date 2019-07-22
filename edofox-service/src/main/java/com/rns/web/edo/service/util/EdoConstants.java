@@ -1,5 +1,10 @@
 package com.rns.web.edo.service.util;
 
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public interface EdoConstants {
 
 	//String HOST_NAME = "http://localhost:8080/edofox/service/";
@@ -53,6 +58,7 @@ public interface EdoConstants {
 	
 	//DEV
 	String TESTS_JSON_PATH = "F:\\Resoneuronance\\Edofox\\Document\\tests";
+	String Q_BANK_PATH = "/home/service/questionData/";
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";
@@ -68,6 +74,5 @@ public interface EdoConstants {
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";
 	//String CLIENT_ID = "VnK8OksaNBzM1qq6uBh1FP34bT6KbJtcp2tOGoT9";
-
 
 }

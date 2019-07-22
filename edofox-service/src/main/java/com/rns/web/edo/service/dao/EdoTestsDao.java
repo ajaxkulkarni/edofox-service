@@ -1,8 +1,11 @@
 package com.rns.web.edo.service.dao;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.InsertProvider;
+import org.mybatis.dynamic.sql.insert.render.InsertStatementProvider;
+import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
@@ -64,9 +67,11 @@ public interface EdoTestsDao {
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects();
-	void addQuestion(EdoQuestion question);
+	int addQuestion(EdoQuestion question);
 	int getNoOfQuestionsByChapter(Integer chapterId);
 	int getNoOfQuestionsByDate(String date);
-	
-	
+	List<EdoQuestion> getQuestionsByRefId(String refId);
+	int updateQuestion(EdoQuestion question);
+	void addQuestionsBatch(List<EdoQuestion> questions);
+	EdoQuestion getNextQuestion(EdoQuestion request);
 }

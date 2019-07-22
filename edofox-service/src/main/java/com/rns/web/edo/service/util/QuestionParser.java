@@ -1,13 +1,29 @@
 package com.rns.web.edo.service.util;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,7 +33,11 @@ import com.gargoylesoftware.htmlunit.CookieManager;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.Cookie;
+import com.rns.web.edo.service.domain.EdoChapter;
 import com.rns.web.edo.service.domain.EdoQuestion;
+import com.rns.web.edo.service.domain.ext.ExtDataQuestion;
+import com.rns.web.edo.service.domain.ext.ExtDataQuestionChoice;
+import com.rns.web.edo.service.domain.ext.ExtDataRoot;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -597,7 +617,9 @@ public class QuestionParser {
 				}
 			}*/
 			
-			getQuestions();
+			//getQuestions();
+			
+			bulkParse(1, 1, "F:\\Resoneuronance\\Edofox\\Document\\QuestionBank\\Physics\\measurement-and-error", "JEE");
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -653,16 +675,18 @@ agent-platform-version: 4
 		webResource.header(":method", "GET");
 		webResource.header(":path", "/api/v5.0/class-12/practice/physics/physical-world/question-bank/?page=4&type=single%20correct");
 		webResource.header(":scheme", "https");
-		webResource.header("cookie", "__cfduid=d8425c513fca7e167df7fd8c36733c8211562568579; _ga=GA1.2.1805524713.1562568578; _gid=GA1.2.1447940675.1562568578; ajs_group_id=null; ajs_anonymous_id=%22febdab1d-0ed5-4b29-b50c-3189928394ee%22; _fbp=fb.1.1562568579520.1595014898; intercom-id-sh7i09tg=8533d373-7127-4429-8be5-55c34541221f; admin_sessionid=09bdab68bd918319fa7a3a5c7787558c; nextUrl=; sign_up_lead=; tracking_id=; NPS_45e50a70_last_seen=1562576744047; ajs_user_id=10254079; intercom-session-sh7i09tg=S1F1Y3ppRzIwNm52UTJJek1vNFJJSnNsenl6cExva0NNWXNScnJsMlBiUllhUDdtb3AzdElwQ3ljRjBjaWhhcS0tcDVkYUpNQyt4VWU0aHpkVWxwRjhrUT09--74452af66afeec402d3122af23e6e3cea8744af4; AWSALB=U3Apr0g3/gKwS9/MMfI9qSrSaOw/MaCtLndxGqYNF2Wa87qIcXNl1Xexu4qBaKmtunHKQkLjHiuVyEsddl3jRgKOod5tOpF1qNT9N8EFNpuc2YNpuhnKUBjJW03lvL9nLuQzPgJrMHjJ4O529l706cSeyzT+YtH7ofALoYkcfJ/MjKU7j0CxGGS5ioBPeA==; _gat_gtag_UA_42239720_1=1");
+		webResource.header("cookie", "__cfduid=d8425c513fca7e167df7fd8c36733c8211562568579; _ga=GA1.2.1805524713.1562568578; _gid=GA1.2.1447940675.1562568578; ajs_group_id=null; ajs_anonymous_id=%22febdab1d-0ed5-4b29-b50c-3189928394ee%22; _fbp=fb.1.1562568579520.1595014898; intercom-id-sh7i09tg=8533d373-7127-4429-8be5-55c34541221f; admin_sessionid=09bdab68bd918319fa7a3a5c7787558c; nextUrl=; sign_up_lead=; tracking_id=; NPS_45e50a70_last_seen=1562576744047; ajs_user_id=10254079; intercom-session-sh7i09tg=S1F1Y3ppRzIwNm52UTJJek1vNFJJSnNsenl6cExva0NNWXNScnJsMlBiUllhUDdtb3AzdElwQ3ljRjBjaWhhcS0tcDVkYUpNQyt4VWU0aHpkVWxwRjhrUT09--74452af66afeec402d3122af23e6e3cea8744af4; AWSALB=U3Apr0g3/gKwS9/MMfI9qSrSaOw/MaCtLndxGqYNF2Wa87qIcXNl1Xexu4qBaKmtunHKQkLjHiuVyEsddl3jRgKOod5tOpF1qNT9N8EFNpuc2YNpuhnKUBjJW03lvL9nLuQzPgJrMHjJ4O529l706cSeyzT+YtH7ofALoYkcfJ/MjKU7j0CxGGS5ioBPeA=="); //_gat_gtag_UA_42239720_1=1
 		webResource.header("referer", "https://www.toppr.com/class-12/physics/physical-world/question-sets/all/?page=4&type=single%20correct");
 		webResource.header("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");
 		webResource.header("agent-platform", "web");
 		webResource.header("agent-platform-version", "4");
+		javax.ws.rs.core.Cookie cookie = new javax.ws.rs.core.Cookie("AWSALB", "OsjNLNEeTJXQj");
+		webResource.cookie(cookie);
 		
 		ClientResponse response = webResource.type("application/json").get(ClientResponse.class);
 
 		if (response.getStatus() != 200) {
-			throw new RuntimeException("Failed : HTTP error code : " + response.getStatus() + " message " + response);
+			System.out.println("Failed : HTTP error code : " + response.getStatus() + " message " + response);
 		}
 		String output = response.getEntity(String.class);
 		LoggingUtil.logMessage("Output from Server for get questions : " + response.getStatus() + ".... \n " + output);
@@ -672,6 +696,239 @@ agent-platform-version: 4
 
 		//
 	}
-
 	
+	public static List<EdoQuestion> bulkParse(Integer chapterId, Integer subjectId, String path, String exam) throws JsonParseException, JsonMappingException, IOException {
+		
+		File folder = new File(path);
+		List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
+		FileInputStream in = null;
+		
+		try {
+			for(File file: folder.listFiles()) {
+				System.out.println("Reading file at .. " + file.getAbsolutePath());
+				in = new FileInputStream(file);
+				String json = IOUtils.toString(in);
+				//System.out.println(json);
+				ExtDataRoot data = new ObjectMapper().readValue(json, ExtDataRoot.class);
+				if(data.getData() != null) {
+					if(CollectionUtils.isEmpty(data.getData().getQuestions())) {
+						System.out.println("No questions found!!!");
+					} else {
+						for(ExtDataQuestion q: data.getData().getQuestions()) {
+							System.out.println(q);
+							if(StringUtils.isBlank(q.getQuestion_style()) || questionStyles.get(q.getQuestion_style()) == null) {
+								System.out.println("Skipping ... " + q.getQuestion_style());
+								continue;
+							}
+							
+							if(CollectionUtils.isNotEmpty(q.getPassage_child_questions())) {
+								//Add multiple questions
+								for(ExtDataQuestion subQ: q.getPassage_child_questions()) {
+									EdoQuestion edoQuestion = prepareQuestion(chapterId, subjectId, subQ, exam);
+									if(edoQuestion != null) {
+										edoQuestion.setQuestion(Jsoup.parse(q.getQuestion()).text() + "\n" +  edoQuestion.getQuestion());
+										edoQuestion.setType("PASSAGE");
+										questions.add(edoQuestion);
+									}
+								}
+							} else if (CollectionUtils.isNotEmpty(q.getChoices()) || StringUtils.equals("blank", q.getQuestion_style())) {
+								EdoQuestion edoQuestion = prepareQuestion(chapterId, subjectId, q, exam);
+								if(edoQuestion != null) {
+									questions.add(edoQuestion);
+								}
+							}
+							
+						}
+					}
+				} else {
+					System.out.println("............. Not found ..........");
+				}
+			}
+			System.out.println("................... Total questions added " + questions.size());
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(in != null) {
+				in.close();
+			}
+		}
+		return questions;
+	}
+
+	private static EdoQuestion prepareQuestion(Integer chapterId, Integer subjectId, ExtDataQuestion q, String exam) {
+		EdoQuestion edoQuestion = new EdoQuestion();
+		edoQuestion.setType(questionStyles.get(q.getQuestion_style()));
+		if(edoQuestion.getType() == null) {
+			return null;
+		}
+		edoQuestion.setQuestion(escapeQuotes(Jsoup.parse(q.getQuestion()).text()));
+		setOptionAndCorrectAnswer(q, edoQuestion);
+		edoQuestion.setSolution(escapeQuotes(Jsoup.parse(q.getSolution()).text()));
+		edoQuestion.setSolutionImageUrl(q.getSolution_image());
+		edoQuestion.setQuestionImageUrl(q.getQuestion_image());
+		//downloadFile(edoQuestion.getQuestionImgeUrl(),  "question.png");
+		//downloadFile(edoQuestion.getSolutionImageUrl(), "solution.png");
+		EdoChapter chapter = new EdoChapter();
+		chapter.setChapterId(chapterId);
+		edoQuestion.setChapter(chapter);
+		edoQuestion.setSubjectId(subjectId);
+		edoQuestion.setLevel(q.getQuestion_level());
+		edoQuestion.setReferenceId(q.getQuestion_id());
+		edoQuestion.setExamType(exam);
+		if(StringUtils.equals("JEE", exam) || StringUtils.equals("JEEA", exam) || StringUtils.equals("NEET", exam)) {
+			edoQuestion.setWeightage(4f);
+			edoQuestion.setNegativeMarks(1f);
+		}
+		if(StringUtils.equals("assertion", q.getQuestion_style()) && StringUtils.isBlank(edoQuestion.getQuestion())) {
+			edoQuestion.setQuestion(escapeQuotes(Jsoup.parse((q.getAssertion() + "\n" + q.getReason())).text()));
+		}
+		return edoQuestion;
+	}
+
+
+	private static String escapeQuotes(String text) {
+		if(StringUtils.isBlank(text)) {
+			return text;
+		}
+		return StringUtils.replace(text, "'", "''");
+	}
+
+	private static void setOptionAndCorrectAnswer(ExtDataQuestion q, EdoQuestion question) {
+		if(StringUtils.equals("matrix", q.getQuestion_style())) {
+			StringBuilder questionBuilder = new StringBuilder();
+			questionBuilder.append("\n").append("List 1 :").append("\n");
+			StringBuilder builder = new StringBuilder();
+			if(CollectionUtils.isNotEmpty(q.getMx_l1())) {
+				int x = 'a';
+				for(String op : q.getMx_l1()) {
+					char[] ch = Character.toChars(x);
+					builder.append(ch).append(",");
+					questionBuilder.append(ch[0] + ". " + op).append("\n");
+					x++;
+				}
+				question.setOption1(StringUtils.removeEnd(builder.toString(), ","));
+			}
+			questionBuilder.append("List 2 :").append("\n");
+			builder = new StringBuilder();
+			if(CollectionUtils.isNotEmpty(q.getMx_l2())) {
+				for(int i = 1; i <= q.getMx_l2().size(); i++) {
+					builder.append(i).append(",");
+					questionBuilder.append(i + ". " + q.getMx_l2().get(i - 1)).append("\n");
+				}
+				question.setOption2(StringUtils.removeEnd(builder.toString(), ","));
+			}
+			question.setQuestion(question.getQuestion() + escapeQuotes(Jsoup.parse(questionBuilder.toString()).text()));
+			if(CollectionUtils.isNotEmpty(q.getChoices())) {
+				String correctAnswers = q.getChoices().get(0).getChoice();
+				if(StringUtils.isNotBlank(correctAnswers)) {
+					String[] corrects = StringUtils.split(correctAnswers, ",");
+					if(ArrayUtils.isNotEmpty(corrects)) {
+						Arrays.sort(corrects, new Comparator<String>() {
+					        public int compare(String o1, String o2) {
+					            return Integer.valueOf(o1).compareTo(Integer.valueOf(o2));
+					        }
+					    });
+						StringBuilder correctAnswer = new StringBuilder();
+						int x = 'a';
+						for(String correct: corrects) {
+							int correctVal = Integer.valueOf(correct) + 1;
+							correctVal = correctVal % q.getMx_l2().size();
+							if(correctVal == 0) {
+								correctVal = q.getMx_l2().size();
+							}
+							correctAnswer.append(Character.toChars(x)).append("-").append(correctVal).append(",");
+							x++;
+						}
+						question.setCorrectAnswer(StringUtils.removeEnd(correctAnswer.toString(), ","));
+					}
+				}
+				
+			}
+		} else {
+			if(CollectionUtils.isNotEmpty(q.getChoices())) {
+				int i = 1;
+				StringBuilder correctAnswer = new StringBuilder();
+				for(ExtDataQuestionChoice choice: q.getChoices()) {
+					String choiceValue = escapeQuotes(choice.getChoice());
+					if(i == 1) {
+						question.setOption1(choiceValue);
+						question.setOption1ImageUrl(choice.getImage());
+						if(choice.isIs_right() && !StringUtils.equals("blank", q.getQuestion_style())) {
+							correctAnswer.append("option1").append(",");
+						}
+					} else if(i == 2) {
+						question.setOption2(choiceValue);
+						question.setOption2ImageUrl(choice.getImage());
+						if(choice.isIs_right() && !StringUtils.equals("blank", q.getQuestion_style())) {
+							correctAnswer.append("option2").append(",");
+						} 
+					} else if(i == 3) {
+						question.setOption3(choiceValue);
+						question.setOption3ImageUrl(choice.getImage());
+						if(choice.isIs_right() && !StringUtils.equals("blank", q.getQuestion_style())) {
+							correctAnswer.append("option3").append(",");
+						}
+					} else if(i == 4) {
+						question.setOption4(choiceValue);
+						question.setOption4ImageUrl(choice.getImage());
+						if(choice.isIs_right() && !StringUtils.equals("blank", q.getQuestion_style())) {
+							correctAnswer.append("option4").append(",");
+						}
+					}
+					if(choice.isIs_right() && StringUtils.equals("blank", q.getQuestion_style())) {
+						correctAnswer.append(choiceValue);
+					}
+					i++;
+				}
+				question.setCorrectAnswer(StringUtils.removeEnd(correctAnswer.toString(), ","));
+			}
+		}
+		
+	}
+	
+	public static String downloadFile(String url, String fileName, Integer questionId) throws FileNotFoundException, IOException {
+		InputStream in = null;
+		FileOutputStream os = null;
+		try {
+			ClientConfig config = new DefaultClientConfig();
+			config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+			Client client = Client.create(config);
+
+			WebResource webResource = client.resource(url);
+			ClientResponse resp = webResource.get(ClientResponse.class);
+			in = resp.getEntityInputStream();
+			String filePath = "";
+			if (in != null) {
+				filePath = EdoConstants.Q_BANK_PATH + questionId + "_" + fileName;
+				os = new FileOutputStream(filePath);
+				IOUtils.copy(in, os);
+			}
+			return filePath;
+		
+		} catch (Exception e) {
+			System.out.println("Error downloading file ..");
+		} finally {
+			if(in != null) {
+				in.close();
+			}
+			if(os != null) {
+				os.close();
+			}
+		}
+		return null;
+	}
+
+
+	static Map<String, String> questionStyles = Collections.unmodifiableMap(new HashMap<String, String>() {
+		{
+			put("single correct", "SINGLE");
+			put("true-false", "SINGLE");
+			put("multiple correct", "MULTIPLE");
+			put("blank", "NUMBER");
+			put("assertion", "SINGLE");
+			put("matrix", "MATCH");
+			put("passage", "SINGLE");
+		}
+	});
 }

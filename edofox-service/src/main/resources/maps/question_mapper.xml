@@ -21,14 +21,14 @@
 		SELECT * FROM test_subjects left join chapters on test_subjects.subject_id = chapters.subject;
 	</select>
 	
-	<insert id="addQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
+	<insert id="addQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		<!-- <foreach collection="test.test" item="question" index="index">
 		insert into test_result (test_id,student_id,question_id,option_selected,flagged) values(${test.id}, ${student.id},${question.qn_id}, '${question.answer}',0);
 		</foreach> -->
 		insert into test_questions (subject_id,question,option1,option2,option3,option4,correct_answer,question_img_url,
-							solution,weightage,negative_marks,created_date,question_type,exam_type,chapter) 
+							solution,weightage,negative_marks,created_date,question_type,exam_type,chapter, level, ref_id) 
                             values (${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
-                            '${solution}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',${chapter.chapterId})
+                            '${solution}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',${chapter.chapterId}, ${level}, '${referenceId}')
 	</insert>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer" parameterType="Integer" >
@@ -37,6 +37,36 @@
 	
 	<select id="getNoOfQuestionsByDate" resultType="Integer" parameterType="String" >
 		select count(*) from test_questions where created_date >= '${value}';
+	</select>
+	
+	<select id="getQuestionsByRefId" resultMap="questions" parameterType="String" >
+		select * from test_questions where ref_id = '${value}';
+	</select>
+	
+	<update id="updateQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
+		update test_questions set question_img_url = '${questionImageUrl}', solution_img_url = '${solutionImageUrl}' where id = ${id}	
+	</update>
+	
+	<insert id="addQuestionsBatch" parameterType="java.util.List">
+		insert into test_questions (subject_id,question,option1,option2,option3,option4,correct_answer,question_img_url,
+							solution,weightage,negative_marks,created_date,question_type,exam_type,chapter, level, ref_id) 
+                            values
+		<foreach item="question" index="index" collection="list" open="(" separator="),(" close=")">
+           (${question.subjectId},'${question.question}','${question.option1}','${question.option2}','${question.option3}','${question.option4}','${question.correctAnswer}','${question.questionImageUrl}',
+           '${question.solution}',${question.weightage},${question.negativeMarks},CURRENT_TIMESTAMP,'${question.type}','${question.examType}',${question.chapter.chapterId}, ${question.level}, '${question.referenceId}')
+        </foreach>
+	</insert>
+	
+	
+	<select id="getNextQuestion" resultMap="questions" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
+		SELECT * FROM test_questions WHERE subject_id = ${subjectId} AND chapter = ${chapter.chapterId}
+		<if test="level != null">
+			AND level between ${level - 1} AND ${level}
+		</if>
+		<if test="type != null">
+			AND question_type = '${type}'
+		</if>
+		ORDER BY RAND() LIMIT 1;
 	</select>
 
 </mapper>

@@ -199,4 +199,26 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getNextQuestion")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getNextQuestion(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get next question Request :" + request);
+		EdoServiceResponse response = userBo.getNextQuestion(request);
+		LoggingUtil.logMessage("Get next question Response");
+		return response;
+	}
+	
+	@POST
+	@Path("/submitAnswer")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse submitAnswer(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Submit question answer Request :" + request);
+		EdoServiceResponse response = userBo.submitAnswer(request);
+		LoggingUtil.logMessage("Submit question answer Response");
+		return response;
+	}
+	
 }
