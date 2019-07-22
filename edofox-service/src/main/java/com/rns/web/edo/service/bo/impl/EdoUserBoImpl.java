@@ -293,23 +293,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 		} else {
 			String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
+			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-				question.setQuestionImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_QUESTION);
+				question.setQuestionImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_QUESTION);
 			}
 			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-				question.setOption1ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION1);
+				question.setOption1ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION1);
 			}
 			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-				question.setOption2ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION2);
+				question.setOption2ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION2);
 			}
 			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-				question.setOption3ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION3);
+				question.setOption3ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION3);
 			}
 			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-				question.setOption4ImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_OPTION4);
+				question.setOption4ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION4);
 			}
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-				question.setMetaDataImageUrl(hostUrl + "getImage/" + question.getQn_id() + "/" + ATTR_META_DATA);
+				question.setMetaDataImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_META_DATA);
 			}
 		}
 		
