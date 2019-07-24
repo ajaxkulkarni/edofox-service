@@ -787,7 +787,7 @@ agent-platform-version: 4
 	}
 
 
-	private static String escapeQuotes(String text) {
+	public static String escapeQuotes(String text) {
 		if(StringUtils.isBlank(text)) {
 			return text;
 		}
@@ -918,7 +918,94 @@ agent-platform-version: 4
 		}
 		return null;
 	}
+	
+	public static void fixQuestion(EdoQuestion question) {
+		if(StringUtils.isBlank(question.getQuestion())) {
+			return;
+		}
+		boolean isLatex = false;
+		if(StringUtils.contains(question.getQuestion(), "$$")) {
+			isLatex = true;
+		}
+		if(StringUtils.contains(question.getOption1(), "$$")) {
+			isLatex = true;
+		}
+		if(StringUtils.contains(question.getOption2(), "$$")) {
+			isLatex = true;
+		}
+		if(StringUtils.contains(question.getOption3(), "$$")) {
+			isLatex = true;
+		}
+		if(StringUtils.contains(question.getOption4(), "$$")) {
+			isLatex = true;
+		}
+		if(StringUtils.contains(question.getSolution(), "$$")) {
+			isLatex = true;
+		}
+		if(!isLatex) {
+			return;
+		}
+		for(String key: KEYWORDS) {
+			String fixedValue = fixValue(question.getQuestion(), key);
+			question.setQuestion(fixedValue != null ? fixedValue: question.getQuestion());
+			
+			fixedValue = fixValue(question.getOption1(), key);
+			question.setOption1(fixedValue != null ? fixedValue: question.getOption1());
+			
+			fixedValue = fixValue(question.getOption2(), key);
+			question.setOption2(fixedValue != null ? fixedValue: question.getOption2());
+			
+			fixedValue = fixValue(question.getOption3(), key);
+			question.setOption3(fixedValue != null ? fixedValue: question.getOption3());
+			
+			fixedValue = fixValue(question.getOption4(), key);
+			question.setOption4(fixedValue != null ? fixedValue: question.getOption4());
+			
+			fixedValue = fixValue(question.getSolution(), key);
+			question.setSolution(fixedValue != null ? fixedValue: question.getSolution());
+		}
+	}
 
+	private static String fixValue(String string, String key) {
+		if(!StringUtils.contains(string, "$$")) {
+			return StringUtils.remove(string, "'");
+		}
+		if(!StringUtils.contains(string, key)) {
+			return StringUtils.remove(string, "'");
+		}
+		int startIndex = 0;
+		int startOfLatex = 0;
+		StringBuilder builder = new StringBuilder();
+		while (startOfLatex >= 0) {
+			startOfLatex = StringUtils.indexOf(string, "$$", startIndex);
+			if(startOfLatex < 0) {
+				break;
+			}
+			builder.append(StringUtils.substring(string, startIndex, startOfLatex));
+			int endOfLatex = StringUtils.indexOf(string, "$$", startOfLatex + 2);
+			if(endOfLatex > 0) {
+				String s = StringUtils.substring(string, startOfLatex, endOfLatex);
+				if(StringUtils.isNotBlank(s)) {
+					String temp = "";
+					if(StringUtils.equals("imes", key)) {
+						temp = "t";
+					}
+					String newString = StringUtils.replace(s, key, "\\" + temp + key);
+					builder.append(newString);
+				}
+				builder.append("$$");
+				startIndex = endOfLatex + 2;
+			} else {
+				break;
+			}
+			
+		}
+		builder.append(StringUtils.substring(string, startIndex));
+		if(!StringUtils.equals(string, builder)) {
+			System.out.println("New: " + builder + " Old: " + string);
+		}
+		return StringUtils.remove(builder.toString(), "'");
+	}
 
 	static Map<String, String> questionStyles = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
@@ -931,4 +1018,8 @@ agent-platform-version: 4
 			put("passage", "SINGLE");
 		}
 	});
+	
+	public static String[] KEYWORDS = new String [] {"hat", "displaystyle", "frac","dfrac","vec","sqrt","circ","imes","mathrm","overrightarrow","pi","left",
+			"overline", "widehat", "alpha", "beta", "gamma", "theta", "delta", "eta", "epsilon" , "leq", "geq"};
+	
 }

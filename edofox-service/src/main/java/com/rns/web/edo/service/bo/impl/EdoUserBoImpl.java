@@ -41,6 +41,7 @@ import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
+import com.rns.web.edo.service.util.QuestionParser;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -620,6 +621,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(question != null) {
 				setQuestionURLs(question);
 				prepareMatchTypeQuestion(question);
+				QuestionParser.fixQuestion(question);
+				question.setChapter(request.getQuestion().getChapter());
+				question.setSubjectId(request.getQuestion().getSubjectId());
 			}
 			response.setQuestion(question);
 		} catch (Exception e) {

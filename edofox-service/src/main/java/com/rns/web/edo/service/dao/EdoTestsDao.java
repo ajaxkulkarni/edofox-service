@@ -74,4 +74,7 @@ public interface EdoTestsDao {
 	int updateQuestion(EdoQuestion question);
 	void addQuestionsBatch(List<EdoQuestion> questions);
 	EdoQuestion getNextQuestion(EdoQuestion request);
+	List<EdoQuestion> getFixableQuestions(Map<String,Object> map);
+	int fixQuestions(List<EdoQuestion> questions);
+	int fixQuestion(EdoQuestion question);
 }
