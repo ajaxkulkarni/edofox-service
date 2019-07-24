@@ -146,6 +146,17 @@ public class EdoUserController {
 	}
 	
 	@POST
+	@Path("/getStudentPackages")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getStudentPackages(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get studentpackages Request :" + request);
+		EdoServiceResponse response = userBo.getPackages(request.getStudent());
+		LoggingUtil.logMessage("Get student packages Response");
+		return response;
+	}
+	
+	@POST
 	@Path("/registerStudentPackages")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)

@@ -48,6 +48,7 @@ public interface EdoTestsDao {
 	
 	//Student queries
 	List<EDOPackage> getInstituePackages(Integer instituteId);
+	List<EDOPackage> getStudentPackages(Integer studentId);
 	Integer saveStudent(EdoStudent student);
 	Integer createStudentPackage(EdoStudent student);
 	Integer deleteExistingPackages(EdoStudent student);

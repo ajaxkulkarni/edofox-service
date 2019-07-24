@@ -428,6 +428,20 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return response;
 	}
+	
+	public EdoServiceResponse getPackages(EdoStudent student) {
+		if(student == null || student.getId() == null) {
+			return new EdoServiceResponse(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+		}
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			response.setPackages(testsDao.getStudentPackages(student.getId()));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
 
 	public EdoServiceResponse registerStudent(EdoStudent student) {
 		if(student == null || StringUtils.isBlank(student.getPhone()) || CollectionUtils.isEmpty(student.getPackages()) || StringUtils.isBlank(student.getExamMode())) {

@@ -21,6 +21,14 @@
 		institute.id =${value};
 
 	</select>
+	
+	<select id="getStudentPackages" resultMap="packages"
+		parameterType="Integer">
+		select *, packages.id as packageId from packages join student_institute on student_institute.package_id =
+		packages.id
+		where student_institute.student_id = ${value};
+
+	</select>
 
 	<insert id="saveStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
