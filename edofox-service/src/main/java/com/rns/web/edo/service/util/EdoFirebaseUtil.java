@@ -10,13 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.codehaus.jackson.map.ObjectMapper;
 
-import com.google.api.client.util.Data;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
@@ -30,7 +27,6 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
 import com.rns.web.edo.service.domain.EdoStudent;
-import com.rns.web.edo.service.domain.EdoStudentFirebase;
 import com.rns.web.edo.service.domain.EdoTest;
 
 public class EdoFirebaseUtil {
@@ -91,12 +87,12 @@ public class EdoFirebaseUtil {
 			//FirebaseApp.initializeApp(options);
 
 			//db = FirestoreClient.getFirestore();
-			System.out.println("Firebase initialized!");
+			LoggingUtil.logMessage("############# Firebase initialized! #############");
 			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			LoggingUtil.logError("Error in fireabse init == " + ExceptionUtils.getStackTrace(e));
 		} catch (IOException e) {
-			e.printStackTrace();
+			LoggingUtil.logError("Error in fireabse init == " + ExceptionUtils.getStackTrace(e));
 		}
 		
 	}
