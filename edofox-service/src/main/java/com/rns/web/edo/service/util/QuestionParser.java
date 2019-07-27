@@ -989,6 +989,8 @@ agent-platform-version: 4
 					String temp = "";
 					if(StringUtils.equals("imes", key)) {
 						temp = "t";
+					} else if (StringUtils.equals("ightarrow", key) || StringUtils.equals("ight", key)) {
+						temp = "r";
 					}
 					String newString = StringUtils.replace(s, key, "\\" + temp + key);
 					builder.append(newString);
@@ -1020,6 +1022,6 @@ agent-platform-version: 4
 	});
 	
 	public static String[] KEYWORDS = new String [] {"hat", "displaystyle", "frac","dfrac","vec","sqrt","circ","imes","mathrm","overrightarrow","pi","left",
-			"overline", "widehat", "alpha", "beta", "gamma", "theta", "delta", "eta", "epsilon" , "leq", "geq"};
+			"overline", "widehat", "alpha", "beta", "gamma", "theta", "delta", "eta", "epsilon" , "leq", "geq", "ightarrow", "right", "ight", "harpoons"};
 	
 }

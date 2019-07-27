@@ -135,6 +135,7 @@ public class EdoExcelUtil {
 					payment.setMode("Offline");
 					student.setExamMode("Online");
 					student.setPayment(payment);
+					student.setPassword("12345");
 					students.add(student);
 				}
 			}
