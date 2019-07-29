@@ -33,11 +33,17 @@
 			</foreach> -->
 		insert into test_questions
 		(subject_id,question,option1,option2,option3,option4,correct_answer,question_img_url,
-		solution,weightage,negative_marks,created_date,question_type,exam_type,chapter,
+		solution,weightage,negative_marks,created_date,question_type,exam_type,
+		<if test="chapter.chapterId != null">
+			chapter,
+		</if>
 		level, ref_id)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
-		'${solution}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',${chapter.chapterId},
+		'${solution}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
+		<if test="chapter.chapterId != null">
+		${chapter.chapterId},
+		</if>
 		${level}, '${referenceId}')
 	</insert>
 
@@ -57,6 +63,10 @@
 		parameterType="String">
 		select * from test_questions where ref_id =
 		'${value}';
+	</select>
+	
+	<select id="getQuestionsByExam" resultMap="questions" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
+		select * from test_questions where exam_type like '%${examType}%' AND subject_id = ${subjectId};
 	</select>
 
 	<update id="updateQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
@@ -170,5 +180,15 @@
 			</set>
 			where id = ${id}
 	</update>
+	
+	<insert id="createExam" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		<!-- <foreach collection="test.test" item="question" index="index">
+		insert into test_result (test_id,student_id,question_id,option_selected,flagged) values(${test.id}, ${student.id},${question.qn_id}, '${question.answer}',0);
+		</foreach> -->
+		insert into test_questions_map (test_id,question_id,created_date,question_number,section, weightage, negative_marks) values
+		<foreach item="question" index="index" collection="test.test" open="(" separator="),(" close=")">
+            ${test.id}, ${question.id}, CURRENT_TIMESTAMP, ${question.qn_id}, '${question.subject}', ${question.weightage}, ${question.negativeMarks}
+        </foreach>
+	</insert>
 
 </mapper>

@@ -78,4 +78,6 @@ public interface EdoTestsDao {
 	List<EdoQuestion> getFixableQuestions(Map<String,Object> map);
 	int fixQuestions(List<EdoQuestion> questions);
 	int fixQuestion(EdoQuestion question);
+	void createExam(EdoServiceRequest request);
+	List<EdoQuestion> getQuestionsByExam(EdoQuestion question);
 }

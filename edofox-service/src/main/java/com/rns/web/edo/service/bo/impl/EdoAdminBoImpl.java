@@ -485,5 +485,59 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
+	public EdoServiceResponse automateTest(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			if(request.getTest() != null) {
+				EdoQuestion question = new EdoQuestion();
+				question.setExamType(request.getTest().getName());
+				//Physics
+				question.setSubjectId(1);
+				List<EdoQuestion> questions = testsDao.getQuestionsByExam(question);
+				Integer startId = 1;
+				addQuestionsToExam(request, questions, startId, "Physics");
+				//Chemistry
+				startId = questions.size() + 1;
+				question.setSubjectId(3);
+				question.setSubject("Chemistry");
+				questions = testsDao.getQuestionsByExam(question);
+				addQuestionsToExam(request, questions, startId, "Chemistry");
+				//Maths
+				startId = questions.size() + 1;
+				question.setSubjectId(2);
+				question.setSubject("Maths");
+				questions = testsDao.getQuestionsByExam(question);
+				addQuestionsToExam(request, questions, startId, "Maths");
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	private void addQuestionsToExam(EdoServiceRequest request, List<EdoQuestion> questions, Integer startId, String subject) {
+		if(CollectionUtils.isNotEmpty(questions)) {
+			for(EdoQuestion q: questions) {
+				if(StringUtils.contains(request.getTest().getName(), "CET")) {
+					if(q.getSubjectId() == 2) {
+						q.setWeightage(2f);
+					} else {
+						q.setWeightage(1f);
+					}
+					q.setNegativeMarks(0f);
+				} else {
+					q.setWeightage(4f);
+					q.setNegativeMarks(1f);
+				}
+				q.setQn_id(startId);
+				q.setSubject(subject);
+				startId++;
+			}
+			request.getTest().setTest(questions);
+			testsDao.createExam(request);
+		}
+	}
+
 
 }

@@ -178,6 +178,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						question.setId(count);
 						setQuestionURLs(question);
 						prepareMatchTypeQuestion(question);
+						QuestionParser.fixQuestion(question);
 						if(!result.getSubjects().contains(question.getSubject())) {
 							result.getSubjects().add(question.getSubject());
 						}

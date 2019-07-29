@@ -191,4 +191,20 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/autoCreateExam")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse createExam(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Create exam Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response = adminBo.automateTest(request);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Create exam Response");
+		return response;
+	}
+	
 }

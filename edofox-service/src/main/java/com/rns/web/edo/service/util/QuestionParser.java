@@ -776,9 +776,16 @@ agent-platform-version: 4
 		edoQuestion.setLevel(q.getQuestion_level());
 		edoQuestion.setReferenceId(q.getQuestion_id());
 		edoQuestion.setExamType(exam);
-		if(StringUtils.equals("JEE", exam) || StringUtils.equals("JEEA", exam) || StringUtils.equals("NEET", exam)) {
+		if(StringUtils.contains(exam, "JEE") || StringUtils.equals("NEET", exam)) {
 			edoQuestion.setWeightage(4f);
 			edoQuestion.setNegativeMarks(1f);
+		}
+		if(StringUtils.contains(exam, "CET")) {
+			if(subjectId == 2) {
+				edoQuestion.setWeightage(2f);
+			}
+			edoQuestion.setWeightage(1f);
+			edoQuestion.setNegativeMarks(0f);
 		}
 		if(StringUtils.equals("assertion", q.getQuestion_style()) && StringUtils.isBlank(edoQuestion.getQuestion())) {
 			edoQuestion.setQuestion(escapeQuotes(Jsoup.parse((q.getAssertion() + "\n" + q.getReason())).text()));

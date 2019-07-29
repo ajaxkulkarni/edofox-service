@@ -16,4 +16,5 @@ public interface EdoAdminBo {
 	EdoApiStatus bulkUploadStudents(EdoServiceRequest request);
 	EdoServiceResponse parseQuestion(EdoServiceRequest request);
 	EdoServiceResponse getDataEntrySummary(EdoServiceRequest request);
+	EdoServiceResponse automateTest(EdoServiceRequest request);
 }
