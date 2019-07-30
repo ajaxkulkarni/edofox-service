@@ -1032,7 +1032,7 @@ agent-platform-version: 4
 		}
 	});
 	
-	public static String[] KEYWORDS = new String [] {"hat", "displaystyle", "dfrac", "frac", "vec","sqrt","circ","imes","mathrm","overrightarrow","pi","left",
+	public static String[] KEYWORDS = new String [] {"hat", "displaystyle", "frac", "vec","sqrt","circ","imes","mathrm","overrightarrow","pi","left",
 			"overline", "widehat", "alpha", "beta", "gamma", "theta", "delta", "eta", "epsilon" , "leq", "geq", "ightarrow", "right", "ight", "harpoons",
 			"overset", "underset", "dot", "Delta", "Alpha", "Beta", "Gamma", "Eta", "lambda", "int", "ge", "le", "quad", "ne"};
 	
