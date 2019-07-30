@@ -998,6 +998,10 @@ agent-platform-version: 4
 						temp = "t";
 					} else if (StringUtils.equals("ightarrow", key) || StringUtils.equals("ight", key)) {
 						temp = "r";
+					}  else if (StringUtils.equals("frac", key)) {
+						if(StringUtils.contains(s, "dfrac")) {
+							s = StringUtils.replace(s, "dfrac", "frac");
+						}
 					}
 					String newString = StringUtils.replace(s, key, "\\" + temp + key);
 					builder.append(newString);
