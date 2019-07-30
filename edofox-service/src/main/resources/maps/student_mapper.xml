@@ -59,7 +59,7 @@
 		(student_id,institute_id,package_id,status,exam_mode,payment_mode) values
 		<foreach item="package" index="index" collection="packages"
 			open="(" separator="),(" close=")">
-			${id},${package.institute.id}, ${package.id}, 'Created', '${examMode}', '${payment.mode}'
+			${id},${package.institute.id}, ${package.id}, 'Completed', '${examMode}', '${payment.mode}'
 		</foreach>
 		<!-- (${id},${currentPackage.institute.id}, ${currentPackage.id}, 'Created', '${examMode}', '${payment.mode}')
 		ON DUPLICATE KEY UPDATE exam_mode = '${examMode}', payment_mode = '${payment.mode}' -->
