@@ -1003,7 +1003,16 @@ agent-platform-version: 4
 							s = StringUtils.replace(s, "dfrac", "frac");
 						}
 					}
-					String newString = StringUtils.replace(s, key, "\\" + temp + key);
+					String escaper = "\\";
+					int keyIndex = StringUtils.indexOf(s, key);
+					if(keyIndex > 0 && (keyIndex - 1) > 0) {
+						if(s.charAt(keyIndex - 1) == '\\') {
+							escaper = "";
+						}
+					}
+					//displaystyle 'le' should not be replaced with '\'
+					// \\left \\right could be because left and le
+					String newString = StringUtils.replace(s, key, escaper + temp + key);
 					builder.append(newString);
 				}
 				builder.append("$$");
@@ -1034,6 +1043,6 @@ agent-platform-version: 4
 	
 	public static String[] KEYWORDS = new String [] {"hat", "displaystyle", "frac", "vec","sqrt","circ","imes","mathrm","overrightarrow","pi","left",
 			"overline", "widehat", "alpha", "beta", "gamma", "theta", "delta", "eta", "epsilon" , "leq", "geq", "ightarrow", "right", "ight", "harpoons",
-			"overset", "underset", "dot", "Delta", "Alpha", "Beta", "Gamma", "Eta", "lambda", "int", "ge", "le", "quad", "ne"};
+			"overset", "underset", "dot", "Delta", "Alpha", "Beta", "Gamma", "Eta", "lambda", "int", "ge", "le", "quad", "ne", "begin", "end"};
 	
 }

@@ -400,7 +400,7 @@ public class CommonUtils {
 		return null;
 	}
 
-	private static Float calculateMultipleTypeScore(String[] correctAnswers, String[] selectedAnswers, EdoQuestion question) {
+	public static Float calculateMultipleTypeScore(String[] correctAnswers, String[] selectedAnswers, EdoQuestion question) {
 		if (ArrayUtils.isEmpty(correctAnswers)) {
 			return null;
 		}
@@ -435,6 +435,7 @@ public class CommonUtils {
 			}*/
 		}
 		if (foundCount == 0) {
+			LoggingUtil.logMessage("Not found any correct answered .. " + question.getId() + " : " + question.getQn_id() + " count " + foundCount);
 			return getWrongScore(question);
 		}
 		//answerCount - Total answers
@@ -442,6 +443,7 @@ public class CommonUtils {
 		//foundCount - Correct and solved
 		if(answerCount == solvedCount && foundCount == solvedCount) {
 			//all solved and all correct
+			LoggingUtil.logMessage("All solved and all are correct .. " + question.getId() + " : " + question.getQn_id() + " counts => " + foundCount + ":" + solvedCount + ":" + answerCount);
 			return question.getWeightage();
 		}
 		
@@ -449,6 +451,7 @@ public class CommonUtils {
 			//return new Float(1);
 			if(solvedCount == foundCount) {
 				//Whatever is solved is correct. i.e. 3 options chosen and 3 are correct => score will be 3
+				LoggingUtil.logMessage("All solved are correct .. " + question.getId() + " : " + question.getQn_id() + " counts " + solvedCount + ":" + foundCount);
 				return new Float(solvedCount);
 			}
 		}
