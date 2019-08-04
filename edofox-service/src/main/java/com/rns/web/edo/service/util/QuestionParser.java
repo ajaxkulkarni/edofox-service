@@ -1002,6 +1002,9 @@ agent-platform-version: 4
 						if(StringUtils.contains(s, "dfrac")) {
 							s = StringUtils.replace(s, "dfrac", "frac");
 						}
+					} else if (StringUtils.equals("egin", key)) {
+						//Find all indices of egin and replace with 'b' wherever needed
+						temp = "b";
 					}
 					String escaper = "\\";
 					/*int keyIndex = StringUtils.indexOf(s, key);
@@ -1013,9 +1016,19 @@ agent-platform-version: 4
 					//displaystyle 'le' should not be replaced with '\'
 					// \\left \\right could be because left and le
 					String newString = StringUtils.replace(s, key, escaper + temp + key);
-					if(StringUtils.equals("le", key) && StringUtils.contains(newString, "display")) {
-						//Don't replace for displaystyle
+					if(StringUtils.equals("le", key) && (StringUtils.contains(newString, "display") || StringUtils.contains(newString, "examp"))) {
+						//Don't replace for displaystyle or example
 						newString = StringUtils.replace(newString, "displaysty\\le", "displaystyle");
+						newString = StringUtils.replace(newString, "examp\\le", "example");
+					}
+					if(StringUtils.equals("egin", key) && StringUtils.contains(newString, "bbegin")) {
+						//Don't replace for displaystyle
+						newString = StringUtils.replace(newString, "bbegin", "begin");
+					}
+					//fix for ightarrow
+					if( (StringUtils.equals("ightarrow", key) || StringUtils.equals("ight", key))) {
+						newString = StringUtils.replace(newString, "\\r\\ight", "\\right");
+						newString = StringUtils.replace(newString, "\\r\\right", "\\right");
 					}
 					//replace double \\ with \
 					newString = StringUtils.replace(newString, "\\\\", "\\");
@@ -1049,6 +1062,6 @@ agent-platform-version: 4
 	
 	public static String[] KEYWORDS = new String [] {"hat", "displaystyle", "frac", "vec","sqrt","circ","imes","mathrm","overrightarrow","pi","left",
 			"overline", "widehat", "alpha", "beta", "gamma", "theta", "delta", "eta", "epsilon" , "leq", "geq", "ightarrow", "right", "ight", "harpoons",
-			"overset", "underset", "dot", "Delta", "Alpha", "Beta", "Gamma", "Eta", "lambda", "int", "ge", "le", "quad", "ne", "begin", "end"};
+			"overset", "underset", "dot", "Delta", "Alpha", "Beta", "Gamma", "Eta", "lambda", "int", "ge", "le", "quad", "ne", "begin", "end", "egin"};
 	
 }
