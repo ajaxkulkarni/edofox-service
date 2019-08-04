@@ -1004,15 +1004,21 @@ agent-platform-version: 4
 						}
 					}
 					String escaper = "\\";
-					int keyIndex = StringUtils.indexOf(s, key);
+					/*int keyIndex = StringUtils.indexOf(s, key);
 					if(keyIndex > 0 && (keyIndex - 1) > 0) {
 						if(s.charAt(keyIndex - 1) == '\\') {
 							escaper = "";
 						}
-					}
+					}*/
 					//displaystyle 'le' should not be replaced with '\'
 					// \\left \\right could be because left and le
 					String newString = StringUtils.replace(s, key, escaper + temp + key);
+					if(StringUtils.equals("le", key) && StringUtils.contains(newString, "display")) {
+						//Don't replace for displaystyle
+						newString = StringUtils.replace(newString, "displaysty\\le", "displaystyle");
+					}
+					//replace double \\ with \
+					newString = StringUtils.replace(newString, "\\\\", "\\");
 					builder.append(newString);
 				}
 				builder.append("$$");
