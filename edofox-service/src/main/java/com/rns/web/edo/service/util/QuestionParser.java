@@ -1025,10 +1025,21 @@ agent-platform-version: 4
 						//Don't replace for displaystyle
 						newString = StringUtils.replace(newString, "bbegin", "begin");
 					}
-					//fix for ightarrow
+					//fix for ightarrow or right
 					if( (StringUtils.equals("ightarrow", key) || StringUtils.equals("ight", key))) {
 						newString = StringUtils.replace(newString, "\\r\\ight", "\\right");
+						newString = StringUtils.replace(newString, "\r\\ight", "\\right");
+						newString = StringUtils.replace(newString, "r\\ight", "\\right");
+						
 						newString = StringUtils.replace(newString, "\\r\\right", "\\right");
+						newString = StringUtils.replace(newString, "\r\\right", "\\right");
+						newString = StringUtils.replace(newString, "r\\right", "\\right");
+						
+					}
+					//replace for overline
+					if(StringUtils.equals("ne", key) && (StringUtils.contains(newString, "overline"))) {
+						//Don't replace for displaystyle or example
+						newString = StringUtils.replace(newString, "overli\\ne", "overline");
 					}
 					//replace double \\ with \
 					newString = StringUtils.replace(newString, "\\\\", "\\");
@@ -1062,6 +1073,6 @@ agent-platform-version: 4
 	
 	public static String[] KEYWORDS = new String [] {"hat", "displaystyle", "frac", "vec","sqrt","circ","imes","mathrm","overrightarrow","pi","left",
 			"overline", "widehat", "alpha", "beta", "gamma", "theta", "delta", "eta", "epsilon" , "leq", "geq", "ightarrow", "right", "ight", "harpoons",
-			"overset", "underset", "dot", "Delta", "Alpha", "Beta", "Gamma", "Eta", "lambda", "int", "ge", "le", "quad", "ne", "begin", "end", "egin"};
+			"overset", "underset", "dot", "Delta", "Alpha", "Beta", "Gamma", "Eta", "lambda", "int", "ge", "le", "quad", "ne", "begin", "end", "egin", "omega"};
 	
 }

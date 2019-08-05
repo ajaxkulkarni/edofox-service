@@ -497,13 +497,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				Integer startId = 1;
 				addQuestionsToExam(request, questions, startId, "Physics");
 				//Chemistry
-				startId = questions.size() + 1;
+				startId = startId + questions.size();
 				question.setSubjectId(3);
 				question.setSubject("Chemistry");
 				questions = testsDao.getQuestionsByExam(question);
 				addQuestionsToExam(request, questions, startId, "Chemistry");
 				//Maths
-				startId = questions.size() + 1;
+				startId = startId + questions.size();
 				question.setSubjectId(2);
 				question.setSubject("Maths");
 				questions = testsDao.getQuestionsByExam(question);
