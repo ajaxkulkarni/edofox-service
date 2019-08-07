@@ -1035,6 +1035,8 @@ agent-platform-version: 4
 						newString = StringUtils.replace(newString, "\r\\right", "\\right");
 						newString = StringUtils.replace(newString, "r\\right", "\\right");
 						
+						newString = StringUtils.replace(newString, "\\ove\\rightarrow", "\\overightarrow");
+						
 					}
 					//replace for overline
 					if(StringUtils.equals("ne", key) && (StringUtils.contains(newString, "overline"))) {

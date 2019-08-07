@@ -22,6 +22,28 @@ public class EDOQuestionAnalysis {
 	private Integer questionsAddedByChapter;
 	private Integer questionsAddedByDate;
 	
+	private Integer hardQuestionsCount;
+	private Integer mediumQuestionsCount;
+	private Integer easyQuestionsCount;
+	
+	public Integer getHardQuestionsCount() {
+		return hardQuestionsCount;
+	}
+	public void setHardQuestionsCount(Integer hardQuestionsCount) {
+		this.hardQuestionsCount = hardQuestionsCount;
+	}
+	public Integer getMediumQuestionsCount() {
+		return mediumQuestionsCount;
+	}
+	public void setMediumQuestionsCount(Integer mediumQuestionsCount) {
+		this.mediumQuestionsCount = mediumQuestionsCount;
+	}
+	public Integer getEasyQuestionsCount() {
+		return easyQuestionsCount;
+	}
+	public void setEasyQuestionsCount(Integer easyQuestionsCount) {
+		this.easyQuestionsCount = easyQuestionsCount;
+	}
 	public Integer getQuestionsAddedBySubject() {
 		return questionsAddedBySubject;
 	}

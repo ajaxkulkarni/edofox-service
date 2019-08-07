@@ -2,6 +2,7 @@ package com.rns.web.edo.service.bo.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -489,25 +490,72 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			if(request.getTest() != null) {
-				EdoQuestion question = new EdoQuestion();
-				question.setExamType(request.getTest().getName());
-				//Physics
-				question.setSubjectId(1);
-				List<EdoQuestion> questions = testsDao.getQuestionsByExam(question);
-				Integer startId = 1;
-				addQuestionsToExam(request, questions, startId, "Physics");
-				//Chemistry
-				startId = startId + questions.size();
-				question.setSubjectId(3);
-				question.setSubject("Chemistry");
-				questions = testsDao.getQuestionsByExam(question);
-				addQuestionsToExam(request, questions, startId, "Chemistry");
-				//Maths
-				startId = startId + questions.size();
-				question.setSubjectId(2);
-				question.setSubject("Maths");
-				questions = testsDao.getQuestionsByExam(question);
-				addQuestionsToExam(request, questions, startId, "Maths");
+				EdoQuestion question = request.getQuestion();
+				if(question != null && question.getAnalysis() != null) {
+					List<EdoQuestion> examQuestions = new ArrayList<EdoQuestion>();
+					int startId = 1;
+					if(StringUtils.equals("CET", question.getExamType())) {
+						question.setType("SINGLE");
+					}
+
+					//Fetch hard level questions
+					question.setLevel(5);
+					question.setQuestionNumber(question.getAnalysis().getHardQuestionsCount());
+					List<EdoQuestion> questions = testsDao.getNextQuestion(question);
+					if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getHardQuestionsCount().intValue()) {
+						//addQuestionsToExam(request, questions, startId, request.getTest().getName());
+						examQuestions.addAll(questions);
+					} else {
+						response.setStatus(new EdoApiStatus(-111, "Insufficient hard type questions! Please change the count.."));
+						return response;
+					}
+					
+					//Fetch medium level questions
+					question.setLevel(3);
+					question.setQuestionNumber(question.getAnalysis().getMediumQuestionsCount());
+					questions = testsDao.getNextQuestion(question);
+					if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getMediumQuestionsCount().intValue()) {
+						examQuestions.addAll(questions);
+					} else {
+						response.setStatus(new EdoApiStatus(-111, "Insufficient medium type questions! Please change the count.."));
+						return response;
+					}
+					
+					//Fetch easy level questions
+					question.setLevel(1);
+					question.setQuestionNumber(question.getAnalysis().getEasyQuestionsCount());
+					questions = testsDao.getNextQuestion(question);
+					if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getEasyQuestionsCount().intValue()) {
+						examQuestions.addAll(questions);
+					} else {
+						response.setStatus(new EdoApiStatus(-111, "Insufficient easy type questions! Please change the count.."));
+						return response;
+					}
+					//shuffle questions before adding
+					Collections.shuffle(examQuestions);
+					addQuestionsToExam(request, examQuestions, startId, request.getTest().getName());
+					
+				} else {
+					question = new EdoQuestion();
+					question.setExamType(request.getTest().getName());
+					//Physics
+					question.setSubjectId(1);
+					List<EdoQuestion> questions = testsDao.getQuestionsByExam(question);
+					Integer startId = 1;
+					addQuestionsToExam(request, questions, startId, "Physics");
+					//Chemistry
+					startId = startId + questions.size();
+					question.setSubjectId(3);
+					question.setSubject("Chemistry");
+					questions = testsDao.getQuestionsByExam(question);
+					addQuestionsToExam(request, questions, startId, "Chemistry");
+					//Maths
+					startId = startId + questions.size();
+					question.setSubjectId(2);
+					question.setSubject("Maths");
+					questions = testsDao.getQuestionsByExam(question);
+					addQuestionsToExam(request, questions, startId, "Maths");
+				}
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
@@ -519,16 +567,18 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	private void addQuestionsToExam(EdoServiceRequest request, List<EdoQuestion> questions, Integer startId, String subject) {
 		if(CollectionUtils.isNotEmpty(questions)) {
 			for(EdoQuestion q: questions) {
-				if(StringUtils.contains(request.getTest().getName(), "CET")) {
-					if(q.getSubjectId() == 2) {
-						q.setWeightage(2f);
+				if(q.getWeightage() == null) {
+					if(StringUtils.contains(request.getTest().getName(), "CET")) {
+						if(q.getSubjectId() == 2) {
+							q.setWeightage(2f);
+						} else {
+							q.setWeightage(1f);
+						}
+						q.setNegativeMarks(0f);
 					} else {
-						q.setWeightage(1f);
+						q.setWeightage(4f);
+						q.setNegativeMarks(1f);
 					}
-					q.setNegativeMarks(0f);
-				} else {
-					q.setWeightage(4f);
-					q.setNegativeMarks(1f);
 				}
 				q.setQn_id(startId);
 				q.setSubject(subject);

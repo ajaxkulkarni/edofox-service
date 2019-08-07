@@ -632,15 +632,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoServiceResponse getNextQuestion(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			EdoQuestion question = testsDao.getNextQuestion(request.getQuestion());
-			if(question != null) {
-				setQuestionURLs(question);
-				prepareMatchTypeQuestion(question);
-				QuestionParser.fixQuestion(question);
-				question.setChapter(request.getQuestion().getChapter());
-				question.setSubjectId(request.getQuestion().getSubjectId());
+			List<EdoQuestion> questions = testsDao.getNextQuestion(request.getQuestion());
+			if(CollectionUtils.isNotEmpty(questions)) {
+				EdoQuestion question = questions.get(0);
+				if(question != null) {
+					setQuestionURLs(question);
+					prepareMatchTypeQuestion(question);
+					QuestionParser.fixQuestion(question);
+					question.setChapter(request.getQuestion().getChapter());
+					question.setSubjectId(request.getQuestion().getSubjectId());
+					question.setQuestionNumber(1);
+				}
+				response.setQuestion(question);
 			}
-			response.setQuestion(question);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
