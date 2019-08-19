@@ -131,39 +131,42 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
-			inputMap.setStudent(new EdoStudent(studenId));
-			EdoTestStudentMap studentMap = testsDao.getTestStatus(inputMap);
-			if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
-				response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
-				return response;
-			}
-			
-			studentMap = testsDao.getStudentActivePackage(inputMap);
-			if(studentMap == null) {
-				//Test or package not active
-				response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_PAID, ERROR_TEST_NOT_PAID));
-				return response;
-			}
-			
-			if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
-				if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
-					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
+			if(studenId != null) {
+				inputMap.setStudent(new EdoStudent(studenId));
+				EdoTestStudentMap studentMap = testsDao.getTestStatus(inputMap);
+				if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
+					response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
 					return response;
 				}
 				
-				EdoTest mapTest = studentMap.getTest();
-				if(mapTest != null) {
-					if(mapTest.getStartDate() != null && mapTest.getStartDate().getTime() > new Date().getTime()) {
-						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be availble on " + CommonUtils.convertDate(mapTest.getStartDate())));
+				studentMap = testsDao.getStudentActivePackage(inputMap);
+				if(studentMap == null) {
+					//Test or package not active
+					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_PAID, ERROR_TEST_NOT_PAID));
+					return response;
+				}
+				
+				if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
+					if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
+						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
 						return response;
 					}
-					if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime()) {
-						if(studentMap.getRegisterDate() != null && studentMap.getRegisterDate().getTime() < mapTest.getEndDate().getTime()) {
-							response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
+					
+					EdoTest mapTest = studentMap.getTest();
+					if(mapTest != null) {
+						if(mapTest.getStartDate() != null && mapTest.getStartDate().getTime() > new Date().getTime()) {
+							response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be availble on " + CommonUtils.convertDate(mapTest.getStartDate())));
 							return response;
+						}
+						if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime()) {
+							if(studentMap.getRegisterDate() != null && studentMap.getRegisterDate().getTime() < mapTest.getEndDate().getTime()) {
+								response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
+								return response;
+							}
 						}
 					}
 				}
+				
 			}
 			
 			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
