@@ -70,7 +70,11 @@ public class EdoUserController {
 		LoggingUtil.logMessage("Get Test Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			response =  userBo.getTest(request.getTest().getId(), request.getStudent().getId());
+			Integer studentId = null;
+			if(request.getStudent() != null) {
+				studentId = request.getStudent().getId();
+			}
+			response =  userBo.getTest(request.getTest().getId(), studentId);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
