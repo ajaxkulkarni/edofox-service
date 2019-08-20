@@ -50,6 +50,7 @@ public class EdoQuestion {
 	private String examType;
 	private Integer level;
 	private String referenceId;
+	private Integer timeSpent;
 	
 	public String getOption1() {
 		return option1;
@@ -294,6 +295,12 @@ public class EdoQuestion {
 	}
 	public void setReferenceId(String referenceId) {
 		this.referenceId = referenceId;
+	}
+	public Integer getTimeSpent() {
+		return timeSpent;
+	}
+	public void setTimeSpent(Integer timeSpent) {
+		this.timeSpent = timeSpent;
 	}
 
 }

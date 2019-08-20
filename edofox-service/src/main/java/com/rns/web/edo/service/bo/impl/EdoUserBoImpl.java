@@ -97,6 +97,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
 				setQuestionURLs(question);
+				QuestionParser.fixQuestion(question);
 				test.getTest().add(question);
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;

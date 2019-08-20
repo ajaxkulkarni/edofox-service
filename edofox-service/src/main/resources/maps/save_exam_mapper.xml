@@ -14,9 +14,9 @@
 		<!-- <foreach collection="test.test" item="question" index="index">
 		insert into test_result (test_id,student_id,question_id,option_selected,flagged) values(${test.id}, ${student.id},${question.qn_id}, '${question.answer}',0);
 		</foreach> -->
-		insert into test_result (test_id,student_id,question_id,option_selected,flagged,marks) values
+		insert into test_result (test_id,student_id,question_id,option_selected,flagged,marks, time_taken) values
 		<foreach item="question" index="index" collection="test.test" open="(" separator="),(" close=")">
-            ${test.id}, ${student.id},${question.qn_id}, '${question.answer}',${question.flagged},${question.marks}
+            ${test.id}, ${student.id},${question.qn_id}, '${question.answer}',${question.flagged},${question.marks}, ${question.timeSpent}
         </foreach>
 	</insert>
 	
