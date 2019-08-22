@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -149,7 +150,7 @@ public class EdoAdminController {
 			request.setStudents(EdoExcelUtil.extractStudents(studentData, instituteId));
 			response.setStatus(adminBo.bulkUploadStudents(request));
 		} catch (Exception e) {
-			e.printStackTrace();
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		LoggingUtil.logMessage("Upload Students Excel Response");
 		return response;

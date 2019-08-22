@@ -647,6 +647,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoServiceResponse getNextQuestion(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
+			request.getQuestion().setQuestionNumber(1);
 			List<EdoQuestion> questions = testsDao.getNextQuestion(request.getQuestion());
 			if(CollectionUtils.isNotEmpty(questions)) {
 				EdoQuestion question = questions.get(0);
