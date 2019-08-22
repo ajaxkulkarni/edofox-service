@@ -330,7 +330,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return url;
 		}
 		String folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
-		folderPath = "test.edofox.com" + folderPath;
+		folderPath = "test.edofox.com/" + folderPath;
 		return folderPath;
 	}
 
