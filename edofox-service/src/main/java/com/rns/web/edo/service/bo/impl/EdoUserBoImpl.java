@@ -133,7 +133,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
 			if(studenId != null) {
-				inputMap.setStudent(new EdoStudent(studenId));
+				/*inputMap.setStudent(new EdoStudent(studenId));
 				EdoTestStudentMap studentMap = testsDao.getTestStatus(inputMap);
 				if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
 					response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
@@ -166,7 +166,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							}
 						}
 					}
-				}
+				}*/
 				
 			}
 			
@@ -203,7 +203,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						count++;
 					}
 				}
-				if(isRandomizeQuestions(result)) {
+				if(isRandomizeQuestions(result) && studenId != null) {
+					//Randomize only for student NOT for Admin
 					randomizeQuestions(result, sectionSets);
 				}
 				response.setTest(result);
@@ -278,27 +279,28 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	private void setQuestionURLs(EdoQuestion question) {
 		
-		if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
+		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
+		
+		if(EdoConstants.ABSOLUTE_IMAGE_URLS || StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-				question.setQuestionImageUrl("http://" + question.getQuestionImageUrl());
+				question.setQuestionImageUrl("http://" + prepareUrl(question.getQuestionImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-				question.setOption1ImageUrl("http://" + question.getOption1ImageUrl());
+				question.setOption1ImageUrl("http://" + prepareUrl(question.getOption1ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-				question.setOption2ImageUrl("http://" + question.getOption2ImageUrl());
+				question.setOption2ImageUrl("http://" + prepareUrl(question.getOption2ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-				question.setOption3ImageUrl("http://" + question.getOption3ImageUrl());
+				question.setOption3ImageUrl("http://" + prepareUrl(question.getOption3ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-				question.setOption4ImageUrl("http://" + question.getOption4ImageUrl());
+				question.setOption4ImageUrl("http://" + prepareUrl(question.getOption4ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-				question.setMetaDataImageUrl("http://" + question.getMetaDataImageUrl());
+				question.setMetaDataImageUrl("http://" + prepareUrl(question.getMetaDataImageUrl()));
 			}
 		} else {
-			String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
 			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
 				question.setQuestionImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_QUESTION);
@@ -321,6 +323,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		
+	}
+
+	private String prepareUrl(String url) {
+		if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
+			return url;
+		}
+		String folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
+		folderPath = "test.edofox.com" + folderPath;
+		return folderPath;
 	}
 
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
