@@ -118,6 +118,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						} 
 					}
 					existing.setAnalysis(qAnalysis);
+					CommonUtils.setQuestionURLs(existing);
+					QuestionParser.fixQuestion(existing);
 					questionMap.put(question.getQn_id(), existing);
 				}
 				if(CollectionUtils.isNotEmpty(questionMap.values())) {
