@@ -16,7 +16,14 @@
 		</foreach> -->
 		insert into test_result (test_id,student_id,question_id,option_selected,flagged,marks, time_taken) values
 		<foreach item="question" index="index" collection="test.test" open="(" separator="),(" close=")">
-            ${test.id}, ${student.id},${question.qn_id}, '${question.answer}',${question.flagged},${question.marks}, ${question.timeSpent}
+            ${test.id}, ${student.id},${question.qn_id}, '${question.answer}',${question.flagged},${question.marks}, 
+            <if test="question.timeSpent == null">
+            	0
+            </if>
+            <if test="question.timeSpent != null">
+            ${question.timeSpent}
+            </if>
+            
         </foreach>
 	</insert>
 	
