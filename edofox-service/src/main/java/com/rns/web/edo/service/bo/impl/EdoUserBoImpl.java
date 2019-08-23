@@ -96,7 +96,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
-				setQuestionURLs(question);
+				CommonUtils.setQuestionURLs(question);
 				QuestionParser.fixQuestion(question);
 				test.getTest().add(question);
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
@@ -180,7 +180,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					EdoQuestion question = mapper.getQuestion();
 					if(question != null) {
 						question.setId(count);
-						setQuestionURLs(question);
+						CommonUtils.setQuestionURLs(question);
 						prepareMatchTypeQuestion(question);
 						QuestionParser.fixQuestion(question);
 						if(!result.getSubjects().contains(question.getSubject())) {
@@ -277,62 +277,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 	}
 
-	private void setQuestionURLs(EdoQuestion question) {
-		
-		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
-		
-		if(EdoConstants.ABSOLUTE_IMAGE_URLS || StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
-			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-				question.setQuestionImageUrl("http://" + prepareUrl(question.getQuestionImageUrl()));
-			}
-			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-				question.setOption1ImageUrl("http://" + prepareUrl(question.getOption1ImageUrl()));
-			}
-			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-				question.setOption2ImageUrl("http://" + prepareUrl(question.getOption2ImageUrl()));
-			}
-			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-				question.setOption3ImageUrl("http://" + prepareUrl(question.getOption3ImageUrl()));
-			}
-			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-				question.setOption4ImageUrl("http://" + prepareUrl(question.getOption4ImageUrl()));
-			}
-			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-				question.setMetaDataImageUrl("http://" + prepareUrl(question.getMetaDataImageUrl()));
-			}
-		} else {
-			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
-			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-				question.setQuestionImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_QUESTION);
-			}
-			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-				question.setOption1ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION1);
-			}
-			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-				question.setOption2ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION2);
-			}
-			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-				question.setOption3ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION3);
-			}
-			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-				question.setOption4ImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_OPTION4);
-			}
-			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-				question.setMetaDataImageUrl(hostUrl + "getImage/" + qn_id + "/" + ATTR_META_DATA);
-			}
-		}
-		
-		
-	}
-
-	private String prepareUrl(String url) {
-		if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
-			return url;
-		}
-		String folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
-		folderPath = "test.edofox.com/" + folderPath;
-		return folderPath;
-	}
 
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
 		EdoTest test = request.getTest();
@@ -652,7 +596,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(questions)) {
 				EdoQuestion question = questions.get(0);
 				if(question != null) {
-					setQuestionURLs(question);
+					CommonUtils.setQuestionURLs(question);
 					prepareMatchTypeQuestion(question);
 					QuestionParser.fixQuestion(question);
 					question.setChapter(request.getQuestion().getChapter());

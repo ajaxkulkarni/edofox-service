@@ -492,5 +492,63 @@ public class CommonUtils {
 		// answer.setMarks(new BigDecimal("1").negate());
 		// System.out.println(calculateMatchScore(question, answer));
 	}
+	
+	public static void setQuestionURLs(EdoQuestion question) {
+		
+		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
+		
+		if(EdoConstants.ABSOLUTE_IMAGE_URLS || StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
+			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
+				question.setQuestionImageUrl("http://" + prepareUrl(question.getQuestionImageUrl()));
+			}
+			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
+				question.setOption1ImageUrl("http://" + prepareUrl(question.getOption1ImageUrl()));
+			}
+			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
+				question.setOption2ImageUrl("http://" + prepareUrl(question.getOption2ImageUrl()));
+			}
+			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
+				question.setOption3ImageUrl("http://" + prepareUrl(question.getOption3ImageUrl()));
+			}
+			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
+				question.setOption4ImageUrl("http://" + prepareUrl(question.getOption4ImageUrl()));
+			}
+			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
+				question.setMetaDataImageUrl("http://" + prepareUrl(question.getMetaDataImageUrl()));
+			}
+		} else {
+			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
+			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
+				question.setQuestionImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_QUESTION);
+			}
+			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
+				question.setOption1ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION1);
+			}
+			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
+				question.setOption2ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION2);
+			}
+			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
+				question.setOption3ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION3);
+			}
+			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
+				question.setOption4ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION4);
+			}
+			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
+				question.setMetaDataImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_META_DATA);
+			}
+		}
+		
+		
+	}
+	
+
+	public static String prepareUrl(String url) {
+		if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
+			return url;
+		}
+		String folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
+		folderPath = "test.edofox.com/" + folderPath;
+		return folderPath;
+	}
 
 }

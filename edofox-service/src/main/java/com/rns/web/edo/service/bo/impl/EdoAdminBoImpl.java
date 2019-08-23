@@ -199,6 +199,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 			
 			if(!StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {
+				formatQuestions(existing);
 				response.setTest(existing);
 				response.setStudents(students);
 			}
@@ -208,6 +209,15 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
+
+	private void formatQuestions(EdoTest existing) {
+		if(existing != null && CollectionUtils.isNotEmpty(existing.getTest())) {
+			for(EdoQuestion question: existing.getTest()) {
+				QuestionParser.fixQuestion(question);
+				CommonUtils.setQuestionURLs(question);
+			}
+		}
+	}
 
 	public EdoServiceResponse getAllStudents(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
@@ -533,7 +543,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					}
 					//shuffle questions before adding
 					Collections.shuffle(examQuestions);
-					addQuestionsToExam(request, examQuestions, startId, request.getTest().getName());
+					addQuestionsToExam(request, examQuestions, startId, request.getTest().getName(), question);
 					
 				} else {
 					question = new EdoQuestion();
@@ -542,19 +552,19 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					question.setSubjectId(1);
 					List<EdoQuestion> questions = testsDao.getQuestionsByExam(question);
 					Integer startId = 1;
-					addQuestionsToExam(request, questions, startId, "Physics");
+					addQuestionsToExam(request, questions, startId, "Physics", null);
 					//Chemistry
 					startId = startId + questions.size();
 					question.setSubjectId(3);
 					question.setSubject("Chemistry");
 					questions = testsDao.getQuestionsByExam(question);
-					addQuestionsToExam(request, questions, startId, "Chemistry");
+					addQuestionsToExam(request, questions, startId, "Chemistry", null);
 					//Maths
 					startId = startId + questions.size();
 					question.setSubjectId(2);
 					question.setSubject("Maths");
 					questions = testsDao.getQuestionsByExam(question);
-					addQuestionsToExam(request, questions, startId, "Maths");
+					addQuestionsToExam(request, questions, startId, "Maths", null);
 				}
 			}
 		} catch (Exception e) {
@@ -564,21 +574,26 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
-	private void addQuestionsToExam(EdoServiceRequest request, List<EdoQuestion> questions, Integer startId, String subject) {
+	private void addQuestionsToExam(EdoServiceRequest request, List<EdoQuestion> questions, Integer startId, String subject, EdoQuestion question) {
 		if(CollectionUtils.isNotEmpty(questions)) {
 			for(EdoQuestion q: questions) {
-				if(q.getWeightage() == null) {
-					if(StringUtils.contains(request.getTest().getName(), "CET")) {
-						if(q.getSubjectId() == 2) {
-							q.setWeightage(2f);
+				if(question == null || question.getWeightage() == null) {
+					if(q.getWeightage() == null) {
+						if(StringUtils.contains(request.getTest().getName(), "CET")) {
+							if(q.getSubjectId() == 2) {
+								q.setWeightage(2f);
+							} else {
+								q.setWeightage(1f);
+							}
+							q.setNegativeMarks(0f);
 						} else {
-							q.setWeightage(1f);
+							q.setWeightage(4f);
+							q.setNegativeMarks(1f);
 						}
-						q.setNegativeMarks(0f);
-					} else {
-						q.setWeightage(4f);
-						q.setNegativeMarks(1f);
 					}
+				} else {
+					q.setWeightage(question.getWeightage());
+					q.setNegativeMarks(question.getNegativeMarks());
 				}
 				q.setQn_id(startId);
 				q.setSubject(subject);
