@@ -133,7 +133,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
 			if(studenId != null) {
-				/*inputMap.setStudent(new EdoStudent(studenId));
+				inputMap.setStudent(new EdoStudent(studenId));
 				EdoTestStudentMap studentMap = testsDao.getTestStatus(inputMap);
 				if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
 					response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
@@ -166,7 +166,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							}
 						}
 					}
-				}*/
+				}
 				
 			}
 			
