@@ -626,4 +626,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
+	public EdoServiceResponse raiseDoubt(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EdoTestStudentMap map = new EdoTestStudentMap();
+			map.setTest(request.getTest());
+			map.setStudent(request.getStudent());
+			testsDao.addQuestionQuery(map);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
 }

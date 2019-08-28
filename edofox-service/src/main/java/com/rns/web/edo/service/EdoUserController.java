@@ -236,4 +236,15 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/raiseDoubt")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse raiseDoubt(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Doubt Request :" + request);
+		EdoServiceResponse response = userBo.raiseDoubt(request);
+		LoggingUtil.logMessage("Doubt Response");
+		return response;
+	}
+	
 }

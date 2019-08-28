@@ -25,6 +25,7 @@ public class EdoServiceRequest {
 	private String requestType;
 	private String smsMessage;
 	private EdoQuestion question;
+	private EdoFeedback feedback;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -127,6 +128,14 @@ public class EdoServiceRequest {
 
 	public void setQuestion(EdoQuestion question) {
 		this.question = question;
+	}
+
+	public EdoFeedback getFeedback() {
+		return feedback;
+	}
+
+	public void setFeedback(EdoFeedback feedback) {
+		this.feedback = feedback;
 	}
 	
 }

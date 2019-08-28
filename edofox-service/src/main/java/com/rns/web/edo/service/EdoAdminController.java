@@ -208,4 +208,15 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/resolveDoubt")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse resolveDoubt(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Doubt resolve Request :" + request);
+		EdoServiceResponse response = adminBo.addFeedbackResolution(request);
+		LoggingUtil.logMessage("Doubt resolve Response");
+		return response;
+	}
+	
 }

@@ -51,6 +51,7 @@ public class EdoQuestion {
 	private Integer level;
 	private String referenceId;
 	private Integer timeSpent;
+	private EdoFeedback feedback;
 	
 	public String getOption1() {
 		return option1;
@@ -301,6 +302,12 @@ public class EdoQuestion {
 	}
 	public void setTimeSpent(Integer timeSpent) {
 		this.timeSpent = timeSpent;
+	}
+	public EdoFeedback getFeedback() {
+		return feedback;
+	}
+	public void setFeedback(EdoFeedback feedback) {
+		this.feedback = feedback;
 	}
 
 }

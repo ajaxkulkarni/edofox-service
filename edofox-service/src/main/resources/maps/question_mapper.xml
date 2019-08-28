@@ -192,4 +192,34 @@
         </foreach>
 	</insert>
 	
+	<insert id="addQuestionQuery" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
+		insert into exam_feedback (feedback, created_date, question_id, 
+		<if test="test.id != null">
+			test_id,
+		</if>
+		<if test="test.currentQuestion.chapter != null">
+		chapter_id, 
+		</if>
+		<if test="test.currentQuestion.subjectId != null">
+		subject_id,
+		</if>
+		 type, student_id)
+		values ('${test.currentQuestion.feedback.feedback}', CURRENT_TIMESTAMP, ${test.currentQuestion.id}, 
+		<if test="test.id != null">
+			${test.id},
+		</if>
+		
+		<if test="test.currentQuestion.chapter != null">
+			${test.currentQuestion.chapter.chapterId}, 
+		</if>
+		<if test="test.currentQuestion.subjectId != null">
+		${test.currentQuestion.subjectId},
+		</if>
+		'${test.currentQuestion.feedback.type}', ${student.id});
+	</insert>
+	
+	<update id="addResolution" parameterType="com.rns.web.edo.service.domain.EdoFeedback">
+		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId} where question_id = ${questionId}
+	</update>
+	
 </mapper>

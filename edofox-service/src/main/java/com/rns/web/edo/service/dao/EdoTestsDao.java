@@ -9,6 +9,7 @@ import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -80,4 +81,6 @@ public interface EdoTestsDao {
 	int fixQuestion(EdoQuestion question);
 	void createExam(EdoServiceRequest request);
 	List<EdoQuestion> getQuestionsByExam(EdoQuestion question);
+	void addQuestionQuery(EdoTestStudentMap map);
+	void addResolution(EdoFeedback feedback);
 }

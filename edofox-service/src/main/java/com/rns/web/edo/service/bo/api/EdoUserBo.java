@@ -23,5 +23,6 @@ public interface EdoUserBo {
 	EdoServiceResponse getAllSubjects();
 	EdoServiceResponse getNextQuestion(EdoServiceRequest request);
 	EdoServiceResponse submitAnswer(EdoServiceRequest request);
+	EdoServiceResponse raiseDoubt(EdoServiceRequest request);
 	
 }
