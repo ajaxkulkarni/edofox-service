@@ -509,39 +509,48 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						question.setType("SINGLE");
 					}
 
+					List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
 					//Fetch hard level questions
-					question.setLevel(5);
-					question.setQuestionNumber(question.getAnalysis().getHardQuestionsCount());
-					List<EdoQuestion> questions = testsDao.getNextQuestion(question);
-					if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getHardQuestionsCount().intValue()) {
-						//addQuestionsToExam(request, questions, startId, request.getTest().getName());
-						examQuestions.addAll(questions);
-					} else {
-						response.setStatus(new EdoApiStatus(-111, "Insufficient hard type questions! Please change the count.."));
-						return response;
+					if(question.getAnalysis().getHardQuestionsCount() != null && question.getAnalysis().getHardQuestionsCount().intValue() != 0) {
+						question.setLevel(5);
+						question.setQuestionNumber(question.getAnalysis().getHardQuestionsCount());
+						questions = testsDao.getNextQuestion(question);
+						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getHardQuestionsCount().intValue()) {
+							//addQuestionsToExam(request, questions, startId, request.getTest().getName());
+							examQuestions.addAll(questions);
+						} else {
+							response.setStatus(new EdoApiStatus(-111, "Insufficient hard type questions! Please change the count.."));
+							return response;
+						}
 					}
 					
-					//Fetch medium level questions
-					question.setLevel(3);
-					question.setQuestionNumber(question.getAnalysis().getMediumQuestionsCount());
-					questions = testsDao.getNextQuestion(question);
-					if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getMediumQuestionsCount().intValue()) {
-						examQuestions.addAll(questions);
-					} else {
-						response.setStatus(new EdoApiStatus(-111, "Insufficient medium type questions! Please change the count.."));
-						return response;
+					if(question.getAnalysis().getMediumQuestionsCount() != null && question.getAnalysis().getMediumQuestionsCount().intValue() != 0) {
+						//Fetch medium level questions
+						question.setLevel(3);
+						question.setQuestionNumber(question.getAnalysis().getMediumQuestionsCount());
+						questions = testsDao.getNextQuestion(question);
+						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getMediumQuestionsCount().intValue()) {
+							examQuestions.addAll(questions);
+						} else {
+							response.setStatus(new EdoApiStatus(-111, "Insufficient medium type questions! Please change the count.."));
+							return response;
+						}
+						
 					}
 					
-					//Fetch easy level questions
-					question.setLevel(1);
-					question.setQuestionNumber(question.getAnalysis().getEasyQuestionsCount());
-					questions = testsDao.getNextQuestion(question);
-					if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getEasyQuestionsCount().intValue()) {
-						examQuestions.addAll(questions);
-					} else {
-						response.setStatus(new EdoApiStatus(-111, "Insufficient easy type questions! Please change the count.."));
-						return response;
+					if(question.getAnalysis().getEasyQuestionsCount() != null && question.getAnalysis().getEasyQuestionsCount().intValue() != 0) {
+						//Fetch easy level questions
+						question.setLevel(1);
+						question.setQuestionNumber(question.getAnalysis().getEasyQuestionsCount());
+						questions = testsDao.getNextQuestion(question);
+						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getEasyQuestionsCount().intValue()) {
+							examQuestions.addAll(questions);
+						} else {
+							response.setStatus(new EdoApiStatus(-111, "Insufficient easy type questions! Please change the count.."));
+							return response;
+						}
 					}
+					
 					//shuffle questions before adding
 					Collections.shuffle(examQuestions);
 					addQuestionsToExam(request, examQuestions, startId, request.getTest().getName(), question);
