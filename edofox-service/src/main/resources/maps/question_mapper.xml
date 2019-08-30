@@ -224,13 +224,14 @@
 	
 	<resultMap id="feedbackData" type="com.rns.web.edo.service.domain.EdoQuestion">
 		<result column="question" property="question" />
+		<result column="question" property="id" />
 		<result column="question_img_url" property="questionImageUrl" />
 		<result column="frequency" property="feedback.frequency"/>
 		<result column="resolution" property="feedback.resolution"/>
 	</resultMap>
 	
 	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
-		SELECT count(*) as frequency, question, question_img_url,resolution FROM exam_feedback 
+		SELECT count(*) as frequency, question, question_img_url,resolution,test_questions.id FROM exam_feedback 
 		join test_questions on exam_feedback.question_id = test_questions.id 
 		where 1 
 		<if test="requestType == 'Unresolved'">
@@ -241,6 +242,9 @@
 		</if>
 		<if test="fromDate != null &amp;&amp; toDate != null">
 			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		</if>
+		<if test="student != null  &amp;&amp; student.id != null">
+			AND student_id = ${student.id}
 		</if>
 		group by question_id order by exam_feedback.created_date desc;
 	</select>
