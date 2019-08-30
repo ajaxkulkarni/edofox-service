@@ -550,5 +550,27 @@ public class CommonUtils {
 		folderPath = "test.edofox.com/" + folderPath;
 		return folderPath;
 	}
+	
+	public static Date getStartDate(Date date) {
+		if(date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.HOUR, 0);
+		return cal.getTime();
+	}
+	
+	public static Date getEndDate(Date date) {
+		if(date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.add(Calendar.DATE, 1);
+		return CommonUtils.getStartDate(cal.getTime());
+	}
 
 }

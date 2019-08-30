@@ -83,4 +83,5 @@ public interface EdoTestsDao {
 	List<EdoQuestion> getQuestionsByExam(EdoQuestion question);
 	void addQuestionQuery(EdoTestStudentMap map);
 	void addResolution(EdoFeedback feedback);
+	List<EdoQuestion> getFeedbackData(EdoServiceRequest request);
 }

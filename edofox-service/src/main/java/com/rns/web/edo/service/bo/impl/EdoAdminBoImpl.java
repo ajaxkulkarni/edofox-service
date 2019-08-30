@@ -1,7 +1,6 @@
 package com.rns.web.edo.service.bo.impl;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -610,6 +609,21 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			testsDao.addResolution(request.getFeedback());
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getFeedbackData(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EdoTest test = new EdoTest();
+			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
+			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
+			test.setTest(testsDao.getFeedbackData(request));
+			response.setTest(test); 
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

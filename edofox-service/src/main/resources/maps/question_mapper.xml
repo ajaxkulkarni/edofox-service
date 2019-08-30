@@ -222,8 +222,15 @@
 		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId} where question_id = ${questionId} AND resolution is NULL
 	</update>
 	
-	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		SELECT count(*) as frequency, question, question_img_url FROM exam_feedback 
+	<resultMap id="feedbackData" type="com.rns.web.edo.service.domain.EdoQuestion">
+		<result column="question" property="question" />
+		<result column="question_img_url" property="questionImageUrl" />
+		<result column="frequency" property="feedback.frequency"/>
+		<result column="resolution" property="feedback.resolution"/>
+	</resultMap>
+	
+	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
+		SELECT count(*) as frequency, question, question_img_url,resolution FROM exam_feedback 
 		join test_questions on exam_feedback.question_id = test_questions.id 
 		where 1 
 		<if test="requestType == 'Unresolved'">

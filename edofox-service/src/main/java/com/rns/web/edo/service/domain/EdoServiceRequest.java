@@ -1,7 +1,7 @@
 package com.rns.web.edo.service.domain;
 
 import java.io.IOException;
-
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.JsonGenerationException;
@@ -26,6 +26,8 @@ public class EdoServiceRequest {
 	private String smsMessage;
 	private EdoQuestion question;
 	private EdoFeedback feedback;
+	private Date fromDate;
+	private Date toDate;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -136,6 +138,22 @@ public class EdoServiceRequest {
 
 	public void setFeedback(EdoFeedback feedback) {
 		this.feedback = feedback;
+	}
+
+	public Date getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Date getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
 	}
 	
 }

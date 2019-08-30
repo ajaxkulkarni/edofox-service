@@ -2,6 +2,11 @@ package com.rns.web.edo.service.domain;
 
 import java.util.Date;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class EdoFeedback {
 	
 	private Integer id;
@@ -11,7 +16,7 @@ public class EdoFeedback {
 	private Integer resolution;
 	private Integer questionId;
 	private Integer studentId;
-	
+	private Integer frequency;
 	
 	
 	public String getFeedback() {
@@ -55,6 +60,12 @@ public class EdoFeedback {
 	}
 	public void setStudentId(Integer studentId) {
 		this.studentId = studentId;
+	}
+	public Integer getFrequency() {
+		return frequency;
+	}
+	public void setFrequency(Integer frequency) {
+		this.frequency = frequency;
 	}
 	
 

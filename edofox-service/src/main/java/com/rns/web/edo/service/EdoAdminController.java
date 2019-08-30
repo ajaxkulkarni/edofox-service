@@ -219,4 +219,15 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getFeedbackData")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getFeedbackData(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Feedback data Request :" + request);
+		EdoServiceResponse response = adminBo.getFeedbackData(request);
+		LoggingUtil.logMessage("Feedback data Response");
+		return response;
+	}
+	
 }
