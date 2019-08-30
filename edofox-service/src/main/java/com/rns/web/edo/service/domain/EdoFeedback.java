@@ -13,7 +13,7 @@ public class EdoFeedback {
 	private String feedback;
 	private String type;
 	private Date createdDate;
-	private Integer resolution;
+	private String resolution;
 	private Integer questionId;
 	private Integer studentId;
 	private Integer frequency;
@@ -43,10 +43,10 @@ public class EdoFeedback {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public Integer getResolution() {
+	public String getResolution() {
 		return resolution;
 	}
-	public void setResolution(Integer resolution) {
+	public void setResolution(String resolution) {
 		this.resolution = resolution;
 	}
 	public Integer getQuestionId() {
