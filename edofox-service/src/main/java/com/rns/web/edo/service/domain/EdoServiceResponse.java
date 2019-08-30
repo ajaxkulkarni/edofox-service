@@ -14,6 +14,7 @@ public class EdoServiceResponse {
 	private EdoQuestion question;
 	private List<EdoSubject> subjects;
 	private EDOQuestionAnalysis questionAnalysis;
+	private List<EdoFeedback> feedbacks;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -96,6 +97,14 @@ public class EdoServiceResponse {
 
 	public void setQuestionAnalysis(EDOQuestionAnalysis questionAnalysis) {
 		this.questionAnalysis = questionAnalysis;
+	}
+
+	public List<EdoFeedback> getFeedbacks() {
+		return feedbacks;
+	}
+
+	public void setFeedbacks(List<EdoFeedback> feedbacks) {
+		this.feedbacks = feedbacks;
 	}
 
 }

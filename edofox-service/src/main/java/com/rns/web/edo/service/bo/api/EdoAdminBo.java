@@ -19,4 +19,5 @@ public interface EdoAdminBo {
 	EdoServiceResponse automateTest(EdoServiceRequest request);
 	EdoServiceResponse addFeedbackResolution(EdoServiceRequest request);
 	EdoServiceResponse getFeedbackData(EdoServiceRequest request);
+	EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request);
 }

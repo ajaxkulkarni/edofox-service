@@ -230,4 +230,15 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getQuestionFeedbacks")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request) {
+		LoggingUtil.logMessage("QuestionFeedback data Request :" + request);
+		EdoServiceResponse response = adminBo.getQuestionFeedbacks(request);
+		LoggingUtil.logMessage("QuestionFeedback data Response");
+		return response;
+	}
+	
 }

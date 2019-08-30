@@ -631,5 +631,18 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
+	public EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			if(request.getQuestion() != null) {
+				response.setFeedbacks(testsDao.getQuestionFeedbacks(request.getQuestion().getId()));
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
 
 }

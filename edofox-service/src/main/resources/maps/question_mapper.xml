@@ -245,4 +245,15 @@
 		group by question_id order by exam_feedback.created_date desc;
 	</select>
 	
+	<resultMap id="feedbacks" type="com.rns.web.edo.service.domain.EdoFeedback">
+		<result column="feedback" property="feedback" />
+		<result column="created_date" property="createdDate" />
+		<result column="type" property="type"/>
+		<result column="resolution" property="resolution"/>
+	</resultMap>
+	
+	<select id="getQuestionFeedbacks" parameterType="Integer" resultMap="feedbacks">
+		select * from exam_feedback where question_id = ${value} order by created_date desc;
+	</select>
+	
 </mapper>
