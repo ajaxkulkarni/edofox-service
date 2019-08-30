@@ -629,10 +629,20 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoServiceResponse raiseDoubt(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			EdoTestStudentMap map = new EdoTestStudentMap();
-			map.setTest(request.getTest());
-			map.setStudent(request.getStudent());
-			testsDao.addQuestionQuery(map);
+			EdoQuestion currentQuestion = request.getTest().getCurrentQuestion();
+			if(currentQuestion != null) {
+				if(currentQuestion.getChapter() == null || currentQuestion.getChapter().getChapterId() == null || currentQuestion.getSubjectId() == null) {
+					List<EdoQuestion> question = testsDao.getNextQuestion(currentQuestion);
+					if(CollectionUtils.isNotEmpty(question)) {
+						currentQuestion.setSubjectId(question.get(0).getSubjectId());
+						currentQuestion.setChapter(question.get(0).getChapter());
+					}
+					EdoTestStudentMap map = new EdoTestStudentMap();
+					map.setTest(request.getTest());
+					map.setStudent(request.getStudent());
+					testsDao.addQuestionQuery(map);
+				}
+			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

@@ -55,6 +55,7 @@
 		<result column="option3_img_url" property="option3ImageUrl" />
 		<result column="option4_img_url" property="option4ImageUrl" />
 		<result column="subject_id" property="subjectId"/>
+		<result column="chapter" property="chapter.chapterId"/>
 		<result column="question_number" property="questionNumber"/>
 		<result column="question_type" property="type" />
 		<result column="meta_data" property="metaData" />

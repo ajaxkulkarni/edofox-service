@@ -197,7 +197,7 @@
 		<if test="test.id != null">
 			test_id,
 		</if>
-		<if test="test.currentQuestion.chapter != null">
+		<if test="test.currentQuestion.chapter != null AND test.currentQuestion.chapter.chapterId != null">
 		chapter_id, 
 		</if>
 		<if test="test.currentQuestion.subjectId != null">
@@ -219,7 +219,7 @@
 	</insert>
 	
 	<update id="addResolution" parameterType="com.rns.web.edo.service.domain.EdoFeedback">
-		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId} where question_id = ${questionId}
+		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId} where question_id = ${questionId} AND resolution is NULL
 	</update>
 	
 </mapper>
