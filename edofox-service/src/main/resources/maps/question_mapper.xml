@@ -197,7 +197,7 @@
 		<if test="test.id != null">
 			test_id,
 		</if>
-		<if test="test.currentQuestion.chapter != null AND test.currentQuestion.chapter.chapterId != null">
+		<if test="test.currentQuestion.chapter != null &amp;&amp; test.currentQuestion.chapter.chapterId != null">
 		chapter_id, 
 		</if>
 		<if test="test.currentQuestion.subjectId != null">
@@ -221,5 +221,21 @@
 	<update id="addResolution" parameterType="com.rns.web.edo.service.domain.EdoFeedback">
 		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId} where question_id = ${questionId} AND resolution is NULL
 	</update>
+	
+	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		SELECT count(*) as frequency, question, question_img_url FROM exam_feedback 
+		join test_questions on exam_feedback.question_id = test_questions.id 
+		where 1 
+		<if test="requestType == 'Unresolved'">
+			AND resolution is NULL
+		</if>
+		<if test="requestType == 'Resolved'">
+			AND resolution is NOT NULL
+		</if>
+		<if test="fromDate != null &amp;&amp; toDate != null">
+			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		</if>
+		group by question_id order by exam_feedback.created_date desc;
+	</select>
 	
 </mapper>
