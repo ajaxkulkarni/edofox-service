@@ -693,6 +693,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return status;
 			}
 			
+			if(StringUtils.isBlank(student.getPassword())) {
+				student.setPassword("12345");
+			}
+			
 			addStudent(request, student);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
