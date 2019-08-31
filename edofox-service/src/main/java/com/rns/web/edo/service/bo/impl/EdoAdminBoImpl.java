@@ -678,17 +678,17 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return status;
 			}
 			
-			if(StringUtils.isNotBlank(student.getName())) {
+			if(StringUtils.isBlank(student.getName())) {
 				status.setStatus(-111, "Please provide valid student name ..");
 				return status;
 			}
 			
-			if(StringUtils.isNotBlank(student.getPhone())) {
+			if(StringUtils.isBlank(student.getPhone())) {
 				status.setStatus(-111, "Please provide valid student phone number ..");
 				return status;
 			}
 			
-			if(CollectionUtils.isNotEmpty(student.getPackages())) {
+			if(CollectionUtils.isEmpty(student.getPackages())) {
 				status.setStatus(-111, "Please provide atleast one valid package ..");
 				return status;
 			}
