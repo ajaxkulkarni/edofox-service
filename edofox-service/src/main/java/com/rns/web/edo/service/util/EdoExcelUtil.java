@@ -148,7 +148,7 @@ public class EdoExcelUtil {
 
 	private static String getCellValue(Integer colNumber, Row row) {
 		if(colNumber == null || row.getCell(colNumber) == null) {
-			return null;
+			return "";
 		}
 		return row.getCell(colNumber).getStringCellValue();
 	}

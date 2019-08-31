@@ -33,8 +33,8 @@
 	<insert id="saveStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		insert into student
-		(name, email, mobile_no, password, roll_no, gender, school_district, date_of_birth, caste_category )
-		values('${name}', '${email}', '${phone}', '${password}', '${rollNo}', '${gender}', '${schoolDistrict}', '${dob}', '${casteCategory}');
+		(name, email, mobile_no, password, roll_no, gender, school_district, date_of_birth, caste_category, parent_mobile_no )
+		values('${name}', '${email}', '${phone}', '${password}', '${rollNo}', '${gender}', '${schoolDistrict}', '${dob}', '${casteCategory}', '${parentMobileNo}');
 	</insert>
 	
 	<update id="updateStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent">
