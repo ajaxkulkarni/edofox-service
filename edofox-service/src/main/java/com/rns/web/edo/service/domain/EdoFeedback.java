@@ -17,6 +17,8 @@ public class EdoFeedback {
 	private Integer questionId;
 	private Integer studentId;
 	private Integer frequency;
+	private String feedbackResolutionText;
+	private String feedbackVideoUrl;
 	
 	
 	public String getFeedback() {
@@ -66,6 +68,18 @@ public class EdoFeedback {
 	}
 	public void setFrequency(Integer frequency) {
 		this.frequency = frequency;
+	}
+	public String getFeedbackResolutionText() {
+		return feedbackResolutionText;
+	}
+	public void setFeedbackResolutionText(String feedbackResolutionText) {
+		this.feedbackResolutionText = feedbackResolutionText;
+	}
+	public String getFeedbackVideoUrl() {
+		return feedbackVideoUrl;
+	}
+	public void setFeedbackVideoUrl(String feedbackVideoUrl) {
+		this.feedbackVideoUrl = feedbackVideoUrl;
 	}
 	
 

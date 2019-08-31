@@ -18,6 +18,7 @@ import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -631,7 +632,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			EdoTest test = new EdoTest();
 			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
 			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
-			test.setTest(testsDao.getFeedbackData(request));
+			List<EdoQuestion> feedbackData = testsDao.getFeedbackData(request);
+			if(CollectionUtils.isNotEmpty(feedbackData)) {
+				for(EdoQuestion edoFeedback: feedbackData) {
+					QuestionParser.fixQuestion(edoFeedback);
+				}
+			}
+			test.setTest(feedbackData);
 			response.setTest(test); 
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));

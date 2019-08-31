@@ -228,6 +228,8 @@
 		<result column="question_img_url" property="questionImageUrl" />
 		<result column="frequency" property="feedback.frequency"/>
 		<result column="resolution" property="feedback.resolution"/>
+		<result column="feedback_resolution_text" property="feedback.feedbackResolutionText"/>
+		<result column="feedback_resolution_video_url" property="feedback.feedbackVideoUrl"/>
 	</resultMap>
 	
 	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
@@ -254,6 +256,8 @@
 		<result column="created_date" property="createdDate" />
 		<result column="type" property="type"/>
 		<result column="resolution" property="resolution"/>
+		<result column="feedback_resolution_text" property="feedbackResolutionText"/>
+		<result column="feedback_resolution_video_url" property="feedbackVideoUrl"/>
 	</resultMap>
 	
 	<select id="getQuestionFeedbacks" parameterType="Integer" resultMap="feedbacks">
