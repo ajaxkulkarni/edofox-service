@@ -241,4 +241,17 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/registerStudent")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse registerStudent(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Student info Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.registerStudent(request));
+		LoggingUtil.logMessage("Student info Response " + response.getStatus().getResponseText());
+		return response;
+	}
+	
+	
 }

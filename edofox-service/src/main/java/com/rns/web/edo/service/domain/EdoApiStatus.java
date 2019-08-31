@@ -30,6 +30,9 @@ public class EdoApiStatus {
 		this.statusCode = statusCode;
 	}
 	
-	
+	public void setStatus(int code, String message) {
+		setStatusCode(code);
+		setResponseText(message);
+	}
 
 }

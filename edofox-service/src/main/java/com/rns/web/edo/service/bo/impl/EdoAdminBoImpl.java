@@ -425,23 +425,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		try {
 			
 			for(EdoStudent student: request.getStudents()) {
-				List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
-				
-				if(CollectionUtils.isEmpty(existingStudent)) {
-					testsDao.saveStudent(student);
-				} else {
-					student.setId(existingStudent.get(0).getId());
-					testsDao.updateStudent(student);
-				}
-				
-				LoggingUtil.logMessage("Student ID is =>" + student.getId());
-				if(student.getId() != null) {
-					testsDao.deleteExistingPackages(student);
-					testsDao.createStudentPackage(student);
-				}
-				EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
-				EdoFirebaseUtil.updateStudent(student, currentInstitute.getFirebaseId());
-				LoggingUtil.logMessage("Added student == " + student.getRollNo() + " successfully!");
+				addStudent(request, student);
 			}
 			
 		} catch (Exception e) {
@@ -450,6 +434,26 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			status.setStatusCode(STATUS_OK);
 		}
 		return status;
+	}
+
+	private void addStudent(EdoServiceRequest request, EdoStudent student) {
+		List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
+		
+		if(CollectionUtils.isEmpty(existingStudent)) {
+			testsDao.saveStudent(student);
+		} else {
+			student.setId(existingStudent.get(0).getId());
+			testsDao.updateStudent(student);
+		}
+		
+		LoggingUtil.logMessage("Student ID is =>" + student.getId());
+		if(student.getId() != null) {
+			testsDao.deleteExistingPackages(student);
+			testsDao.createStudentPackage(student);
+		}
+		EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
+		EdoFirebaseUtil.updateStudent(student, currentInstitute.getFirebaseId());
+		LoggingUtil.logMessage("Added student == " + student.getRollNo() + " successfully!");
 	}
 
 	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
@@ -658,6 +662,43 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	public EdoApiStatus registerStudent(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			if(request.getInstitute() == null || request.getInstitute().getId() == null || StringUtils.isBlank(request.getInstitute().getFirebaseId())) {
+				status.setStatus(-111, "Please provide valid institute information ..");
+				return status;
+			}
+			
+			EdoStudent student = request.getStudent();
+			if(student == null) {
+				status.setStatus(-111, "Please provide valid student information ..");
+				return status;
+			}
+			
+			if(StringUtils.isNotBlank(student.getName())) {
+				status.setStatus(-111, "Please provide valid student name ..");
+				return status;
+			}
+			
+			if(StringUtils.isNotBlank(student.getPhone())) {
+				status.setStatus(-111, "Please provide valid student phone number ..");
+				return status;
+			}
+			
+			if(CollectionUtils.isNotEmpty(student.getPackages())) {
+				status.setStatus(-111, "Please provide atleast one valid package ..");
+				return status;
+			}
+			
+			addStudent(request, student);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status = new EdoApiStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
 	}
 
 

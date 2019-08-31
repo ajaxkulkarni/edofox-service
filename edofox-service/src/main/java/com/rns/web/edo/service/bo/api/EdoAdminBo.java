@@ -14,6 +14,7 @@ public interface EdoAdminBo {
 	EdoApiStatus fileUploadTestSolutions(String filePath, EdoTest test, Integer subjectId);
 	EdoApiStatus revaluateResult(EdoServiceRequest request);
 	EdoApiStatus bulkUploadStudents(EdoServiceRequest request);
+	EdoApiStatus registerStudent(EdoServiceRequest request);
 	EdoServiceResponse parseQuestion(EdoServiceRequest request);
 	EdoServiceResponse getDataEntrySummary(EdoServiceRequest request);
 	EdoServiceResponse automateTest(EdoServiceRequest request);
