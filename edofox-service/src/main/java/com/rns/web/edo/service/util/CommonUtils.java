@@ -546,8 +546,17 @@ public class CommonUtils {
 		if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
 			return url;
 		}
-		String folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
-		folderPath = "test.edofox.com/" + folderPath;
+		String folderPath = null;
+		//reliancedlp.edofox.com/public_html/testImages/371344/QuestionImg.jpg"
+		String hostName = "test.edofox.com/";
+		if(!StringUtils.contains(url, "reliancedlp")) {
+			folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
+		} else {
+			hostName = "reliancedlp.edofox.com/";
+			folderPath = StringUtils.replace(url, "/var/www/reliancedlp.edofox.com/public_html/", "");
+			LoggingUtil.logMessage("Setting image URL as " + hostName + folderPath);
+		}
+		folderPath = hostName + folderPath;
 		return folderPath;
 	}
 	
