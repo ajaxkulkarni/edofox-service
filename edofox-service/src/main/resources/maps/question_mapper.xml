@@ -234,7 +234,7 @@
 	</resultMap>
 	
 	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
-		SELECT count(*) as frequency, question, question_img_url,resolution,test_questions.id,feedback_resolution_text,feedback_resolution_video_url, test_questions.subject_Id FROM exam_feedback 
+		SELECT count(*) as frequency, question, question_img_url,resolution,test_questions.id,feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id FROM exam_feedback 
 		join test_questions on exam_feedback.question_id = test_questions.id 
 		where 1 
 		<if test="requestType == 'Unresolved'">
