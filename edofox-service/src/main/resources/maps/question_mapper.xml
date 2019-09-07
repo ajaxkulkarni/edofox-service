@@ -102,7 +102,7 @@
 		<if test="type != null">
 			AND question_type = '${type}'
 		</if>
-		AND length(trim(option1)) > 0
+		AND length(trim(option1)) > 0 AND (status IS NULL or status = 'A')
 		ORDER BY RAND() LIMIT ${questionNumber};
 		</if>
 		<if test="id != null">

@@ -52,6 +52,7 @@ public class EdoQuestion {
 	private String referenceId;
 	private Integer timeSpent;
 	private EdoFeedback feedback;
+	private String status;
 	
 	public String getOption1() {
 		return option1;
@@ -308,6 +309,12 @@ public class EdoQuestion {
 	}
 	public void setFeedback(EdoFeedback feedback) {
 		this.feedback = feedback;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

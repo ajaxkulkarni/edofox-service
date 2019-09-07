@@ -33,6 +33,7 @@ import com.gargoylesoftware.htmlunit.CookieManager;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.util.Cookie;
+import com.google.common.base.CharMatcher;
 import com.rns.web.edo.service.domain.EdoChapter;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.ext.ExtDataQuestion;
@@ -798,34 +799,42 @@ agent-platform-version: 4
 		if(StringUtils.isBlank(text)) {
 			return text;
 		}
-		return StringUtils.replace(text, "'", "''");
+		String replace = StringUtils.replace(text, "'", "''");
+		//replace = StringUtils.replace(text, "\\", "\\\\");
+		//replace = StringUtils.replace(text, "\\P{Print}", "");
+		System.out.println("Length before : " + text.length());
+		replace = CharMatcher.ASCII.retainFrom(text);
+		System.out.println("Length after : " + text.length());
+		return replace;
 	}
 
 	private static void setOptionAndCorrectAnswer(ExtDataQuestion q, EdoQuestion question) {
 		if(StringUtils.equals("matrix", q.getQuestion_style())) {
 			StringBuilder questionBuilder = new StringBuilder();
-			questionBuilder.append("\n").append("List 1 :").append("\n");
+			//String newline = "\n";
+			String newline = "<br>";
+			questionBuilder.append(newline).append("<h3>List 1 </h3>").append(newline);
 			StringBuilder builder = new StringBuilder();
 			if(CollectionUtils.isNotEmpty(q.getMx_l1())) {
 				int x = 'a';
 				for(String op : q.getMx_l1()) {
 					char[] ch = Character.toChars(x);
 					builder.append(ch).append(",");
-					questionBuilder.append(ch[0] + ". " + op).append("\n");
+					questionBuilder.append("<b>").append(ch[0]).append("</b>").append(". ").append(op).append(newline);
 					x++;
 				}
 				question.setOption1(StringUtils.removeEnd(builder.toString(), ","));
 			}
-			questionBuilder.append("List 2 :").append("\n");
+			questionBuilder.append("<h3>List 2 </h3>").append(newline);
 			builder = new StringBuilder();
 			if(CollectionUtils.isNotEmpty(q.getMx_l2())) {
 				for(int i = 1; i <= q.getMx_l2().size(); i++) {
 					builder.append(i).append(",");
-					questionBuilder.append(i + ". " + q.getMx_l2().get(i - 1)).append("\n");
+					questionBuilder.append("<b>").append(i).append("</b>").append(". ").append(q.getMx_l2().get(i - 1)).append(newline);
 				}
 				question.setOption2(StringUtils.removeEnd(builder.toString(), ","));
 			}
-			question.setQuestion(question.getQuestion() + escapeQuotes(Jsoup.parse(questionBuilder.toString()).text()));
+			question.setQuestion(escapeQuotes(Jsoup.parse(question.getQuestion()).text()) + escapeQuotes(questionBuilder.toString()));
 			if(CollectionUtils.isNotEmpty(q.getChoices())) {
 				String correctAnswers = q.getChoices().get(0).getChoice();
 				if(StringUtils.isNotBlank(correctAnswers)) {
@@ -928,6 +937,10 @@ agent-platform-version: 4
 	
 	public static void fixQuestion(EdoQuestion question) {
 		if(StringUtils.isBlank(question.getQuestion())) {
+			return;
+		}
+		if(StringUtils.equals("A", question.getStatus())) {
+			LoggingUtil.logMessage("Skipping the parse check for " + question.getId());
 			return;
 		}
 		boolean isLatex = false;

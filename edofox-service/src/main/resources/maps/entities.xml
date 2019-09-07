@@ -63,6 +63,7 @@
 		<result column="alt_answer" property="alternateAnswer"/>
 		<result column="partial" property="partialCorrection"/>
 		<result column="ref_id" property="referenceId"/>
+		<result column="status" property="status"/>
 	</resultMap>
 	
 </mapper>

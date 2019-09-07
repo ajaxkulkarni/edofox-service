@@ -66,6 +66,7 @@ public interface EdoTestsDao {
 	Integer updateSolution(EdoQuestion question);
 	List<EdoStudent> getStudentByPayment(String paymentId);
 	List<EdoStudent> getAllStudents(Integer id);
+	Integer getLastQuestionNumber(Integer testId);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects();

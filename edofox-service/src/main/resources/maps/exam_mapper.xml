@@ -43,7 +43,9 @@
 		join test_subjects
 		on test_questions.subject_id = test_subjects.subject_id
 		where
-		test.test_id = ${value} order by test_questions_map.question_number,test_questions_map.id asc
+		test.test_id = ${value} 
+		AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)
+		order by test_questions_map.question_number,test_questions_map.id asc
 
 	</select>
 
@@ -130,6 +132,10 @@
 	
 	<select id="getInstituteById" resultMap="institute" parameterType="Integer">
 		SELECT * FROM institute where id = ${value};
+	</select>
+	
+	<select id="getLastQuestionNumber" resultType="Integer" parameterType="Integer">
+		SELECT question_number FROM edo_prod.test_questions_map where test_id = ${value} order by question_number desc limit 1;
 	</select>
 
 </mapper>

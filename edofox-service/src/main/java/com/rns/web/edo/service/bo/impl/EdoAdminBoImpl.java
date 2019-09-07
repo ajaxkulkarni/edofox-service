@@ -510,6 +510,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				if(question != null && question.getAnalysis() != null) {
 					List<EdoQuestion> examQuestions = new ArrayList<EdoQuestion>();
 					int startId = 1;
+					Integer lastQuestion = testsDao.getLastQuestionNumber(request.getTest().getId());
+					if(lastQuestion != null && lastQuestion > 0) {
+						startId = lastQuestion;
+					}
 					if(StringUtils.equals("CET", question.getExamType())) {
 						question.setType("SINGLE");
 					}
