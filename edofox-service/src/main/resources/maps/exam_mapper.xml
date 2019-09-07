@@ -31,6 +31,7 @@
 		<result column="duration" property="test.duration" />
 		<result column="test_ui" property="test.testUi"/>
 		<result column="random_questions" property="test.randomQuestions"/>
+		<result column="status" property="question.status"/>
 	</resultMap>
 
 
@@ -102,6 +103,7 @@
 		<result column="flagged" property="test.flaggedCount"/>
 		<result column="show_result" property="test.showResult" />
 		<result column="time_taken" property="question.timeSpent" />
+		<result column="status" property="question.status"/>
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
