@@ -91,6 +91,7 @@
 		<result column="option2_img_url" property="question.option2ImageUrl" />
 		<result column="option3_img_url" property="question.option3ImageUrl" />
 		<result column="option4_img_url" property="question.option4ImageUrl" />
+		<result column="solution" property="question.solution" />
 		<result column="mapId" property="question.mapId"/>
 		<result column="marks" property="question.marks"/>
 		<result column="test_id" property="test.id" />

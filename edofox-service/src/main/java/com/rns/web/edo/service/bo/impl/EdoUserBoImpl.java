@@ -96,6 +96,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
+				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
 				CommonUtils.setQuestionURLs(question);
 				QuestionParser.fixQuestion(question);
 				test.getTest().add(question);
