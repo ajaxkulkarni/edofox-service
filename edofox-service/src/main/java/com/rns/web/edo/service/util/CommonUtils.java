@@ -516,6 +516,9 @@ public class CommonUtils {
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
 				question.setMetaDataImageUrl("http://" + prepareUrl(question.getMetaDataImageUrl()));
 			}
+			if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
+				question.setSolutionImageUrl("http://" + prepareUrl(question.getSolutionImageUrl()));
+			}
 		} else {
 			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
@@ -535,6 +538,9 @@ public class CommonUtils {
 			}
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
 				question.setMetaDataImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_META_DATA);
+			}
+			if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
+				question.setSolutionImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_SOLUTION);
 			}
 		}
 		

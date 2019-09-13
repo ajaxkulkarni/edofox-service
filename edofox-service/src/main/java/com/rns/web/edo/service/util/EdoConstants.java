@@ -44,6 +44,7 @@ public interface EdoConstants {
 	String ATTR_OPTION2 = "option2";
 	String ATTR_OPTION1 = "option1";
 	String ATTR_META_DATA = "meta";
+	String ATTR_SOLUTION = "solution";
 	
 	String MAIL_TYPE_SUBSCRIPTION = "SubscriptionMail";
 	String MAIL_TYPE_ACTIVATED = "PackageActivated";
