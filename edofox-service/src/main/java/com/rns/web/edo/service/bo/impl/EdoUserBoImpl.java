@@ -616,11 +616,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
 			EdoQuestion question = request.getQuestion();
-			if(StringUtils.equals(QUESTION_TYPE_MATCH, question.getType())) {
-				CommonUtils.setComplexAnswer(question);
+			if(question != null) {
+				if(StringUtils.equals(QUESTION_TYPE_MATCH, question.getType())) {
+					CommonUtils.setComplexAnswer(question);
+				}
+				Float ans = CommonUtils.calculateAnswer(question, question);
+				if(ans != null) {
+					question.setMarks(new BigDecimal(ans));
+				}
+				response.setQuestion(question);
 			}
-			question.setMarks(new BigDecimal(CommonUtils.calculateAnswer(question, question)));
-			response.setQuestion(question);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
