@@ -139,7 +139,7 @@
 	</select>
 	
 	<select id="getLastQuestionNumber" resultType="Integer" parameterType="Integer">
-		SELECT question_number FROM edo_prod.test_questions_map where test_id = ${value} order by question_number desc limit 1;
+		SELECT question_number FROM test_questions_map where test_id = ${value} order by question_number desc limit 1;
 	</select>
 
 </mapper>
