@@ -716,9 +716,8 @@ agent-platform-version: 4
 						System.out.println("No questions found!!!");
 					} else {
 						for(ExtDataQuestion q: data.getData().getQuestions()) {
-							System.out.println(q);
+							//System.out.println(q);
 							if(StringUtils.isBlank(q.getQuestion_style()) || questionStyles.get(q.getQuestion_style()) == null) {
-								System.out.println("Skipping ... " + q.getQuestion_style());
 								continue;
 							}
 							
@@ -802,9 +801,7 @@ agent-platform-version: 4
 		String replace = StringUtils.replace(text, "'", "''");
 		//replace = StringUtils.replace(text, "\\", "\\\\");
 		//replace = StringUtils.replace(text, "\\P{Print}", "");
-		System.out.println("Length before : " + text.length());
 		replace = CharMatcher.ASCII.retainFrom(text);
-		System.out.println("Length after : " + text.length());
 		return replace;
 	}
 

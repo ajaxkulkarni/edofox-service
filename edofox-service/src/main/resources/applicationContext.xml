@@ -23,6 +23,7 @@
 	<bean id="adminBo" class="com.rns.web.edo.service.bo.impl.EdoAdminBoImpl">
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"></property>
 	</bean>
 
 
@@ -39,7 +40,7 @@
 		<property name="url" value="jdbc:mysql://localhost:3306/test_exam" />
 		<property name="username" value="root" />
 		<property name="password" value="WickedSmile2018!" />
-		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edofox" />
+		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edo_prod" />
 		<property name="username" value="root" />
 		<property name="password" value="" /> -->
 		<property name="testOnReturn" value="true" />
@@ -64,6 +65,30 @@
 	<bean id="testsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 		<property name="mapperInterface" value="com.rns.web.edo.service.dao.EdoTestsDao" />
+	</bean>
+	
+	
+	<!-- Hibernate 4 SessionFactory Bean definition -->
+	<bean id="hibernate4AnnotatedSessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>com.rns.web.edo.service.domain.jpa.EdoQuestionEntity</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+				<!-- <prop key="hibernate.hbm2ddl.auto">update</prop> -->
+				<!-- <prop key="hibernate.connection.release_mode">after_statement</prop> -->
+				<!-- <prop key="connection.provider_class"> org.hibernate.connection.C3P0ConnectionProvider 
+					</prop> -->
+			</props>
+		</property>
 	</bean>
 
 </beans>

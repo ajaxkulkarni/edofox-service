@@ -10,6 +10,10 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +31,7 @@ import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
@@ -38,6 +43,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
 	private ThreadPoolTaskExecutor executor;
 	private EdoTestsDao testsDao;
+	private SessionFactory sessionFactory;
 
 	public void setExecutor(ThreadPoolTaskExecutor executor) {
 		this.executor = executor;
@@ -50,6 +56,16 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	public void setTestsDao(EdoTestsDao testsDao) {
 		this.testsDao = testsDao;
 	}
+	
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+
 
 
 	public EdoServiceResponse getTestAnalysis(EdoTest test) {
@@ -708,6 +724,43 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		return status;
 	}
-
+	
+	public void fixQuestions() {
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			int i = 3;
+			for(i = 3; i <= 100; i++) {
+				LoggingUtil.logMessage("................ Started for chapter .. " + i);
+				List<EdoQuestionEntity> noAnswerList = session.createCriteria(EdoQuestionEntity.class)
+						.add(Restrictions.isNull("correctAnswer")).add(Restrictions.eq("chapter", i)).add(Restrictions.eq("status", "A")).list();
+				List<EdoQuestionEntity> hasAnswerList = session.createCriteria(EdoQuestionEntity.class)
+						.add(Restrictions.isNotNull("correctAnswer")).add(Restrictions.eq("chapter", i)).add(Restrictions.eqOrIsNull("status", "D")).list();
+				
+				if(CollectionUtils.isNotEmpty(noAnswerList)) {
+					Transaction tx = session.beginTransaction();
+					for(EdoQuestionEntity noAnswer: noAnswerList) {
+						if(CollectionUtils.isNotEmpty(hasAnswerList)) {
+							for(EdoQuestionEntity hasAnswer: hasAnswerList) {
+								if (StringUtils.equals(hasAnswer.getReferenceId(), noAnswer.getReferenceId())) {
+									noAnswer.setCorrectAnswer(hasAnswer.getCorrectAnswer());
+									LoggingUtil.logMessage("Setting answer for " + noAnswer.getId() + " as " + hasAnswer.getCorrectAnswer());
+									break;
+								}
+							}
+						}
+					}
+					tx.commit();
+					LoggingUtil.logMessage("................ Committed for chapter .. " + i);
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			if(session != null) {
+				session.close();
+			}
+		}
+	}
 
 }
