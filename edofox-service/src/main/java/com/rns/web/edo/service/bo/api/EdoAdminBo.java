@@ -21,4 +21,5 @@ public interface EdoAdminBo {
 	EdoServiceResponse addFeedbackResolution(EdoServiceRequest request);
 	EdoServiceResponse getFeedbackData(EdoServiceRequest request);
 	EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request);
+	void fixQuestions();
 }

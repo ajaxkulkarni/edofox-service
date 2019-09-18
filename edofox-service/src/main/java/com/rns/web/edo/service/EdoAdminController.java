@@ -253,5 +253,17 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/fixQuestions")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse fixQuestions(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Fix questions Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		adminBo.fixQuestions();
+		LoggingUtil.logMessage("Fix questions Response " + response.getStatus().getResponseText());
+		return response;
+	}
+	
 	
 }
