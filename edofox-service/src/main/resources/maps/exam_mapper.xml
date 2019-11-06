@@ -32,6 +32,8 @@
 		<result column="test_ui" property="test.testUi"/>
 		<result column="random_questions" property="test.randomQuestions"/>
 		<result column="status" property="question.status"/>
+		<result column="weightage" property="question.weightage"/>
+		<result column="negative_marks" property="question.negativeMarks"/>
 	</resultMap>
 
 
