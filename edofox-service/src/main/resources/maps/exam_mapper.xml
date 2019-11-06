@@ -31,14 +31,17 @@
 		<result column="duration" property="test.duration" />
 		<result column="test_ui" property="test.testUi"/>
 		<result column="random_questions" property="test.randomQuestions"/>
-		<result column="status" property="question.status"/>
+		<result column="qStatus" property="question.status"/>
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>
+		<result column="correct_answer" property="question.correctAnswer"/>
+		<result column="alt_answer" property="question.alternateAnswer"/>
+		<result column="partial" property="question.partialCorrection"/>
 	</resultMap>
 
 
 	<select id="getExam" resultMap="testQuestionsMap" parameterType="Integer">
-		SELECT * FROM test
+		SELECT *,test_questions.status as qStatus FROM test
 		join test_questions_map on test.test_id =
 		test_questions_map.test_id
 		join test_questions on
