@@ -370,6 +370,20 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			if(path != null) {
+				if(StringUtils.contains(path, "http")) {
+					path = QuestionParser.downloadFile(path, imageType, questionId);
+					if(StringUtils.equals(imageType, ATTR_OPTION1)) {
+						question.setOption1ImageUrl(path);
+					} else if (StringUtils.equals(imageType, ATTR_OPTION2)) {
+						question.setOption2ImageUrl(path);
+					} else if (StringUtils.equals(imageType, ATTR_OPTION3)) {
+						question.setOption3ImageUrl(path);
+					} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
+						question.setOption4ImageUrl(path);
+					}
+					testsDao.updateQuestion(question);
+				}
+				
 				InputStream is = new FileInputStream(path);
 				file.setContent(is);
 				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));

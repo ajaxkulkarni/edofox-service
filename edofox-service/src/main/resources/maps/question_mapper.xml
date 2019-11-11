@@ -66,13 +66,26 @@
 	</select>
 	
 	<select id="getQuestionsByExam" resultMap="questions" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
-		select * from test_questions where exam_type like '%${examType}%' AND subject_id = ${subjectId};
+		select * from test_questions where exam_type like '%${examType}%' AND subject_id = ${subjectId} AND status = 'A';
 	</select>
 
 	<update id="updateQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
 		update test_questions
 		set question_img_url = '${questionImageUrl}', solution_img_url =
-		'${solutionImageUrl}' where id = ${id}
+		'${solutionImageUrl}' 
+		<if test="option1ImageUrl != null">
+			, option1_img_url = '${option1ImageUrl}'
+		</if>
+		<if test="option2ImageUrl != null">
+			, option2_img_url = '${option2ImageUrl}'
+		</if>
+		<if test="option3ImageUrl != null">
+			, option3_img_url = '${option3ImageUrl}'
+		</if>
+		<if test="option4ImageUrl != null">
+			, option4_img_url = '${option4ImageUrl}'
+		</if>
+		where id = ${id}
 	</update>
 
 	<insert id="addQuestionsBatch" parameterType="java.util.List">
