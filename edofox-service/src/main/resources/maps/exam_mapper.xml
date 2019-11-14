@@ -37,6 +37,9 @@
 		<result column="correct_answer" property="question.correctAnswer"/>
 		<result column="alt_answer" property="question.alternateAnswer"/>
 		<result column="partial" property="question.partialCorrection"/>
+		<result column="solution" property="question.solution"/>
+		<result column="solution_img_url" property="question.solutionImageUrl"/>
+		
 	</resultMap>
 
 

@@ -188,6 +188,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						if(studenId != null) {
 							question.setCorrectAnswer(null);
 							question.setAlternateAnswer(null);
+							question.setSolution(null);
+							question.setSolutionImageUrl(null);
 						}
 						if(!result.getSubjects().contains(question.getSubject())) {
 							result.getSubjects().add(question.getSubject());
