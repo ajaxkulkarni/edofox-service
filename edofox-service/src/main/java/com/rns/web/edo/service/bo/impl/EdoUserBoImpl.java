@@ -372,7 +372,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			if(path != null) {
-				if(StringUtils.contains(path, "http")) {
+				/*if(StringUtils.contains(path, "http")) {
 					path = QuestionParser.downloadFile(path, imageType, questionId);
 					if(StringUtils.equals(imageType, ATTR_OPTION1)) {
 						question.setOption1ImageUrl(path);
@@ -388,7 +388,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				
 				InputStream is = new FileInputStream(path);
 				file.setContent(is);
-				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));
+				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));*/
 			}
 			return file;
 		} catch (Exception e) {
