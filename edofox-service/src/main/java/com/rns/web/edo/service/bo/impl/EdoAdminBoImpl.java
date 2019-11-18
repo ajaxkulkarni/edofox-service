@@ -626,7 +626,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 								finalQuestions.add(q);
 								count++;
 							}
-							if(count > buffer) {
+							if(count >= buffer) {
 								break;
 							}
 						}
