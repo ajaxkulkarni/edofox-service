@@ -15,7 +15,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
@@ -37,7 +40,6 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
-import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
@@ -48,9 +50,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	private ThreadPoolTaskExecutor executor;
 	private EdoTestsDao testsDao;
 	private String filePath;
+	private DataSourceTransactionManager txManager;
 
 	private Map<Integer, Integer> testSubmissions = new ConcurrentHashMap<Integer, Integer>();
 	
+	public void setTxManager(DataSourceTransactionManager txManager) {
+		this.txManager = txManager;
+	}
+	
+	public DataSourceTransactionManager getTxManager() {
+		return txManager;
+	}
 	
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
@@ -291,7 +301,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		if(request.getStudent() == null || test == null) {
 			return new EdoApiStatus(-111, ERROR_IN_PROCESSING);
 		}
-		
+		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		EdoApiStatus status = new EdoApiStatus();
 		try {
 			Integer currentTest = testSubmissions.get(request.getStudent().getId());
@@ -334,11 +344,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				smsUtil.setStudent(student);
 				executor.execute(smsUtil);*/
 			}
-			
+			//Commit the transaction
+			txManager.commit(txStatus);
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			//rollback
+			try {
+				txManager.rollback(txStatus);
+			} catch (Exception e2) {
+				LoggingUtil.logError(ExceptionUtils.getStackTrace(e2));
+			}
+			
 		} finally {
 			if(request.getStudent() != null && request.getStudent().getId() != null) {
 				testSubmissions.remove(request.getStudent().getId());
@@ -384,11 +402,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						question.setOption4ImageUrl(path);
 					}
 					testsDao.updateQuestion(question);
-				}
+				}*/
 				
 				InputStream is = new FileInputStream(path);
 				file.setContent(is);
-				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));*/
+				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));
 			}
 			return file;
 		} catch (Exception e) {
