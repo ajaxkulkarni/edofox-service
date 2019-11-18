@@ -532,48 +532,105 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					}
 					if(StringUtils.equals("CET", question.getExamType())) {
 						question.setType("SINGLE");
+					 	question.setCorrect(true);
+					} else if (StringUtils.isNotBlank(question.getAnalysis().getQuestionType())) {
+						//Not select questions of provided type in normal case
+						question.setType(question.getAnalysis().getQuestionType());
+						question.setCorrect(false);
 					}
-
+					//List<EdoQuestion> typeBased = new ArrayList<EdoQuestion>();
 					List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
+					int totalQuestions = 0;
 					//Fetch hard level questions
 					if(question.getAnalysis().getHardQuestionsCount() != null && question.getAnalysis().getHardQuestionsCount().intValue() != 0) {
+						totalQuestions = totalQuestions + question.getAnalysis().getHardQuestionsCount();
+						//question.setType(originalType);
 						question.setLevel(5);
 						question.setQuestionNumber(question.getAnalysis().getHardQuestionsCount());
 						questions = testsDao.getNextQuestion(question);
 						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getHardQuestionsCount().intValue()) {
 							//addQuestionsToExam(request, questions, startId, request.getTest().getName());
 							examQuestions.addAll(questions);
-						} else {
+							//Fetch type based questions
+							addTypeBasedQuestions(question, examQuestions);
+							
+						} /*else {
 							response.setStatus(new EdoApiStatus(-111, "Insufficient hard type questions! Please change the count.."));
 							return response;
-						}
+						}*/
 					}
 					
 					if(question.getAnalysis().getMediumQuestionsCount() != null && question.getAnalysis().getMediumQuestionsCount().intValue() != 0) {
 						//Fetch medium level questions
+						totalQuestions = totalQuestions + question.getAnalysis().getMediumQuestionsCount();
+						//question.setType(originalType);
 						question.setLevel(3);
 						question.setQuestionNumber(question.getAnalysis().getMediumQuestionsCount());
 						questions = testsDao.getNextQuestion(question);
 						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getMediumQuestionsCount().intValue()) {
 							examQuestions.addAll(questions);
-						} else {
+							//Fetch type based questions
+							addTypeBasedQuestions(question, examQuestions);
+						} /*else {
 							response.setStatus(new EdoApiStatus(-111, "Insufficient medium type questions! Please change the count.."));
 							return response;
-						}
+						}*/
 						
 					}
 					
 					if(question.getAnalysis().getEasyQuestionsCount() != null && question.getAnalysis().getEasyQuestionsCount().intValue() != 0) {
 						//Fetch easy level questions
+						totalQuestions = totalQuestions + question.getAnalysis().getEasyQuestionsCount();
+						//question.setType(originalType);
 						question.setLevel(1);
 						question.setQuestionNumber(question.getAnalysis().getEasyQuestionsCount());
 						questions = testsDao.getNextQuestion(question);
 						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getEasyQuestionsCount().intValue()) {
 							examQuestions.addAll(questions);
-						} else {
+							//Fetch type based questions
+							addTypeBasedQuestions(question, examQuestions);
+						} /*else {
 							response.setStatus(new EdoApiStatus(-111, "Insufficient easy type questions! Please change the count.."));
 							return response;
+						}*/
+					}
+					
+					//Fill with random questions if insufficient
+					
+					if(examQuestions.size() < totalQuestions) {
+						int buffer = (totalQuestions - examQuestions.size());
+						EdoQuestion remaining = new EdoQuestion();
+						remaining.setSubjectId(question.getSubjectId());
+						remaining.setChapter(question.getChapter());
+						remaining.setType(question.getType());
+						remaining.setCorrect(question.isCorrect());
+						remaining.setQuestionNumber(buffer);
+						List<EdoQuestion> remainingQuestions = testsDao.getNextQuestion(remaining);
+						if (CollectionUtils.isNotEmpty(remainingQuestions)) {
+							examQuestions.addAll(remainingQuestions);
 						}
+					} else if (examQuestions.size() > totalQuestions) {
+						//Remove some unwanted questions from the bottom
+						List<EdoQuestion> finalQuestions = new ArrayList<EdoQuestion>();
+						if(StringUtils.isNotBlank(question.getAnalysis().getQuestionType())) {
+							for(EdoQuestion q: examQuestions) {
+								if(StringUtils.equals(question.getAnalysis().getQuestionType(), q.getType())) {
+									finalQuestions.add(q);
+								}
+							}
+						}
+						int buffer = totalQuestions - finalQuestions.size();
+						int count = 0;
+						for(EdoQuestion q: examQuestions) {
+							if(!StringUtils.equals(question.getAnalysis().getQuestionType(), q.getType())) {
+								finalQuestions.add(q);
+								count++;
+							}
+							if(count > buffer) {
+								break;
+							}
+						}
+						examQuestions = finalQuestions;
 					}
 					
 					//shuffle questions before adding
@@ -607,6 +664,35 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	private void addTypeBasedQuestions(EdoQuestion question, List<EdoQuestion> questions) {
+		Integer limit = question.getAnalysis().getTypeCount();
+		if(StringUtils.isNotBlank(question.getAnalysis().getQuestionType()) && limit != null) {
+			EdoQuestion typeQ = new EdoQuestion();
+			typeQ.setLevel(question.getLevel());
+			typeQ.setType(question.getAnalysis().getQuestionType());
+			typeQ.setCorrect(true);
+			typeQ.setSubjectId(question.getSubjectId());
+			typeQ.setChapter(question.getChapter());
+			//Calculate existing type questions
+			int count = 0;
+			if(CollectionUtils.isNotEmpty(questions)) {
+				for(EdoQuestion q: questions) {
+					if(StringUtils.equals(typeQ.getType(), q.getType())) {
+						count++;
+					}
+				}
+			}
+			if(count >= limit) {
+				return;
+			}
+			typeQ.setQuestionNumber(limit - count);
+			List<EdoQuestion> typeQs = testsDao.getNextQuestion(typeQ);
+			if(CollectionUtils.isNotEmpty(typeQs)) {
+				questions.addAll(typeQs);
+			}
+		}
 	}
 
 	private void addQuestionsToExam(EdoServiceRequest request, List<EdoQuestion> questions, Integer startId, String subject, EdoQuestion question) {

@@ -26,6 +26,10 @@ public class EDOQuestionAnalysis {
 	private Integer mediumQuestionsCount;
 	private Integer easyQuestionsCount;
 	
+	private Integer typeCount;
+	private String questionType;
+	
+	
 	public Integer getHardQuestionsCount() {
 		return hardQuestionsCount;
 	}
@@ -133,6 +137,18 @@ public class EDOQuestionAnalysis {
 	}
 	public void setCorrectPercent(BigDecimal correctPercent) {
 		this.correctPercent = correctPercent;
+	}
+	public Integer getTypeCount() {
+		return typeCount;
+	}
+	public void setTypeCount(Integer typeCount) {
+		this.typeCount = typeCount;
+	}
+	public String getQuestionType() {
+		return questionType;
+	}
+	public void setQuestionType(String questionType) {
+		this.questionType = questionType;
 	}
 	
 	

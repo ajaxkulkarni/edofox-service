@@ -112,8 +112,11 @@
 		<if test="level != null">
 			AND level between ${level - 1} AND ${level}
 		</if>
-		<if test="type != null">
+		<if test="type != null &amp;&amp; isCorrect">
 			AND question_type = '${type}'
+		</if>
+		<if test="type != null &amp;&amp; !isCorrect">
+			AND (question_type != '${type}' OR question_type IS NULL)
 		</if>
 		AND length(trim(option1)) > 0 AND (status IS NULL or status = 'A')
 		ORDER BY RAND() LIMIT ${questionNumber};

@@ -17,7 +17,9 @@
 	<bean id="userBo" class="com.rns.web.edo.service.bo.impl.EdoUserBoImpl">
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
-		<property name="filePath" value="/home/wwwedofox/public_html/test/json_test_files/"/>
+		<property name="filePath"
+			value="/home/wwwedofox/public_html/test/json_test_files/" />
+		<property name="txManager" ref="transactionManager" />
 	</bean>
 
 	<bean id="adminBo" class="com.rns.web.edo.service.bo.impl.EdoAdminBoImpl">
@@ -34,23 +36,27 @@
 		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
 	</bean>
 
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<constructor-arg ref="dataSource" />
+	</bean>
+
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/test_exam" />
+		<property name="url" value="jdbc:mysql://localhost:3306/edo_prod" />
 		<property name="username" value="root" />
-		<property name="password" value="WickedSmile2018!" />
-		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edo_prod" />
-		<property name="username" value="root" />
-		<property name="password" value="" /> -->
+		<property name="password" value="" />
+		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edo_prod" 
+			/> <property name="username" value="root" /> <property name="password" value="" 
+			/> -->
 		<property name="testOnReturn" value="true" />
 		<property name="testOnBorrow" value="true" />
 		<property name="testWhileIdle" value="true" />
 		<property name="validationQuery" value="SELECT 1" />
-		<!-- <property name="initialSize" value="8" />
-		<property name="maxActive" value="20" />
-		<property name="maxIdle" value="20" />
-		<property name="minIdle" value="0" /> -->
+		<!-- <property name="initialSize" value="8" /> <property name="maxActive" 
+			value="20" /> <property name="maxIdle" value="20" /> <property name="minIdle" 
+			value="0" /> -->
 		<property name="initialSize" value="50" />
 		<property name="maxActive" value="200" />
 		<property name="maxIdle" value="50" />
@@ -60,14 +66,17 @@
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<property name="transactionFactory">
+			<bean class="org.mybatis.spring.transaction.SpringManagedTransactionFactory" />
+		</property>
 	</bean>
 
 	<bean id="testsDao" class="org.mybatis.spring.mapper.MapperFactoryBean">
 		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
 		<property name="mapperInterface" value="com.rns.web.edo.service.dao.EdoTestsDao" />
 	</bean>
-	
-	
+
+
 	<!-- Hibernate 4 SessionFactory Bean definition -->
 	<bean id="hibernate4AnnotatedSessionFactory"
 		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
