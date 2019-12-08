@@ -30,7 +30,9 @@
 		<result column="total_marks" property="test.totalMarks" />
 		<result column="duration" property="test.duration" />
 		<result column="test_ui" property="test.testUi"/>
+		<result column="start_date" property="test.startDate"/>
 		<result column="random_questions" property="test.randomQuestions"/>
+		<result column="time_constraint" property="test.timeConstraint"/>
 		<result column="qStatus" property="question.status"/>
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>

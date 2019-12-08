@@ -27,8 +27,8 @@ public interface EdoTestsDao {
 	EdoQuestion getQuestion(Integer value);
 	List<EdoTestQuestionMap> getExam(Integer value);
 	List<EdoTestQuestionMap> getExamResult(EdoServiceRequest request);
-	EdoTestStudentMap getTestStatus(EdoTestStudentMap map); 
-	EdoTestStudentMap getStudentActivePackage(EdoTestStudentMap map);
+	List<EdoTestStudentMap> getTestStatus(EdoTestStudentMap map); 
+	List<EdoTestStudentMap> getStudentActivePackage(EdoTestStudentMap map);
 	EdoTest getTest(Integer id);
 	EDOInstitute getInstituteById(Integer id);
 	List<EdoTestStudentMap> getSubjectwiseScoreStudent(Map<String,Object> value);

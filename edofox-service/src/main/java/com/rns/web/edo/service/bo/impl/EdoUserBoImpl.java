@@ -145,13 +145,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			inputMap.setTest(new EdoTest(testId));
 			if(studenId != null) {
 				inputMap.setStudent(new EdoStudent(studenId));
-				EdoTestStudentMap studentMap = testsDao.getTestStatus(inputMap);
+				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
+				EdoTestStudentMap studentMap = null;
+				if(CollectionUtils.isNotEmpty(studentMaps)) {
+					studentMap = studentMaps.get(0);
+				}
 				if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
 					response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
 					return response;
 				}
 				
-				studentMap = testsDao.getStudentActivePackage(inputMap);
+				studentMaps = testsDao.getStudentActivePackage(inputMap);
+				
+				if(CollectionUtils.isNotEmpty(studentMaps)) {
+					studentMap = studentMaps.get(0);
+				} else {
+					studentMap = null;
+				}
+				
 				if(studentMap == null) {
 					//Test or package not active
 					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_PAID, ERROR_TEST_NOT_PAID));
@@ -185,6 +196,27 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			if(CollectionUtils.isNotEmpty(map)) {
 				EdoTest result = map.get(0).getTest();
+				//Check if time constraint is present
+				if(result.isTimeConstraint()) {
+					Date startTime = result.getStartDate();
+					if(startTime != null) {
+						Long durationInMs = new Long(result.getDuration() * 1000);
+						long timeDifference = System.currentTimeMillis() - startTime.getTime();
+						if(timeDifference > 0) {
+							long timeLeft = durationInMs - timeDifference;
+							if(timeLeft < 0) {
+								result.setSecLeft(0L);
+								result.setMinLeft(0L);
+							} else {
+								long secondsDiff = timeLeft / 1000;
+								result.setSecLeft(secondsDiff % 60); //seconds left
+								result.setMinLeft(secondsDiff / 60);
+							}
+						}
+						
+					}
+				}
+				
 				Integer count = 1;
 				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
 				for(EdoTestQuestionMap mapper: map) {
@@ -316,7 +348,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(test);
 			inputMap.setStudent(request.getStudent());
-			EdoTestStudentMap map = testsDao.getTestStatus(inputMap);
+			List<EdoTestStudentMap> maps = testsDao.getTestStatus(inputMap);
+			EdoTestStudentMap map = null;
+			if(CollectionUtils.isNotEmpty(maps)) {
+				map = maps.get(0);
+			}
 			if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
 				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
 				status.setStatusCode(STATUS_ERROR);
