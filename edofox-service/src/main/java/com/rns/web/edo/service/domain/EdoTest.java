@@ -33,7 +33,7 @@ public class EdoTest {
 	private String randomQuestions;
 	private String showResult;
 	private String firebaseId;
-	private Boolean timeConstraint;
+	private String timeConstraint;
 	private Long minLeft;
 	private Long secLeft;
 	
@@ -222,14 +222,14 @@ public class EdoTest {
 		this.firebaseId = firebaseId;
 	}
 
-	public Boolean isTimeConstraint() {
+	public String getTimeConstraint() {
 		return timeConstraint;
 	}
-
-	public void setTimeConstraint(Boolean timeConstraint) {
+	
+	public void setTimeConstraint(String timeConstraint) {
 		this.timeConstraint = timeConstraint;
 	}
-
+	
 	public Long getMinLeft() {
 		return minLeft;
 	}

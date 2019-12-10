@@ -197,7 +197,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(map)) {
 				EdoTest result = map.get(0).getTest();
 				//Check if time constraint is present
-				if(result.isTimeConstraint()) {
+				if(StringUtils.equals("1", result.getTimeConstraint())) {
 					Date startTime = result.getStartDate();
 					if(startTime != null) {
 						Long durationInMs = new Long(result.getDuration() * 1000);
