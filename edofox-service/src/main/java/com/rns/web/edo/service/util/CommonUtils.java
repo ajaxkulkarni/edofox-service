@@ -19,6 +19,8 @@ import java.util.Scanner;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.Session;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
@@ -586,6 +588,17 @@ public class CommonUtils {
 		cal.setTime(date);
 		cal.add(Calendar.DATE, 1);
 		return CommonUtils.getStartDate(cal.getTime());
+	}
+
+	public static void closeSession(Session session) {
+		try {
+			if(session != null) {
+				session.close();
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		
 	}
 
 }

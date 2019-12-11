@@ -98,6 +98,22 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/saveAnswer")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse saveAnswer(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Save Answer Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setStatus(userBo.saveAnswer(request));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Save Answer Response");
+		return response;
+	}
+	
 	@GET
 	@Path("/getImage/{questionId}/{imageType}")
 	//@Produces(MediaType.MULTIPART_FORM_DATA)

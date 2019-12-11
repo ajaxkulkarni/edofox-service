@@ -36,6 +36,8 @@ public interface EdoConstants {
 	String COMMA_SEPARATOR = ", ";
 	
 	String TEST_STATUS_COMPLETED = "COMPLETED";
+	String TEST_STATUS_STARTED = "STARTED";
+	
 	String STATUS_ACTIVE = "Active";
 	String ACCESS_LEVEL_ADMIN = "Admin";
 	String ATTR_QUESTION = "question";

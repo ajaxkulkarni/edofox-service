@@ -11,10 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.TransactionStatus;
@@ -37,13 +42,16 @@ import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
+import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
-import com.rns.web.edo.service.util.QuestionParser;
+import com.rns.web.edo.service.util.QuestionParser;import ucar.units.RegularBaseQuantity;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -51,7 +59,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	private EdoTestsDao testsDao;
 	private String filePath;
 	private DataSourceTransactionManager txManager;
-
+	private SessionFactory sessionFactory;
 	private Map<Integer, Integer> testSubmissions = new ConcurrentHashMap<Integer, Integer>();
 	
 	public void setTxManager(DataSourceTransactionManager txManager) {
@@ -80,6 +88,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public void setTestsDao(EdoTestsDao testsDao) {
 		this.testsDao = testsDao;
+	}
+	
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+	
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
 	}
 
 	public EdoServiceResponse getTestResult(EdoServiceRequest request) {
@@ -154,6 +170,25 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
 					return response;
 				}
+				
+				//Added on 11/12/19
+				if(studentMap == null) {
+					//Add test status as 'STARTED' to track students who logged in
+					EdoServiceRequest request = new EdoServiceRequest();
+					EdoStudent student = new EdoStudent();
+					student.setId(studenId);
+					request.setStudent(student);
+					EdoTest test = new EdoTest();
+					test.setId(testId);
+					request.setTest(test);
+					request.setRequestType(TEST_STATUS_STARTED);
+					test.setSolvedCount(0);
+					test.setCorrectCount(0);
+					test.setFlaggedCount(0);
+					test.setScore(BigDecimal.ZERO);
+					testsDao.saveTestStatus(request);
+				}
+				//Added on 11/12/19
 				
 				studentMaps = testsDao.getStudentActivePackage(inputMap);
 				
@@ -327,14 +362,67 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 	}
 
+	//As of 11/12/19
+	public EdoApiStatus saveAnswer(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			saveAnswer(request, session);
+			
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+	//As of 11/12/19
 
+	private void saveAnswer(EdoServiceRequest request, Session session) {
+		EdoAnswerEntity answer = new EdoAnswerEntity();
+		List<EdoAnswerEntity> existing = session.createCriteria(EdoAnswerEntity.class)
+						.add(Restrictions.eq("testId", request.getTest().getId()))
+						.add(Restrictions.eq("studentId", request.getStudent().getId()))
+						.add(Restrictions.eq("questionId", request.getQuestion().getQn_id()))
+						.list();
+		if(CollectionUtils.isNotEmpty(existing)) {
+			answer = existing.get(0);
+		} else {
+			answer.setQuestionId(request.getQuestion().getQn_id());
+			answer.setStudentId(request.getStudent().getId());
+			answer.setTestId(request.getTest().getId());
+			answer.setCreatedDate(new Date());
+		}
+		
+		if (StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, request.getQuestion().getType())) {
+			CommonUtils.setComplexAnswer(request.getQuestion());
+		}
+		
+		answer.setFlagged(request.getQuestion().getFlagged());
+		answer.setOptionSelected(request.getQuestion().getAnswer());
+		answer.setTimeTaken(request.getQuestion().getTimeSpent());
+		//Will update only for save test
+		answer.setMarks(request.getQuestion().getMarks());
+		
+		
+		if(answer.getId() == null) {
+			session.persist(answer);
+		}
+	}
+	
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
 		EdoTest test = request.getTest();
 		if(request.getStudent() == null || test == null) {
 			return new EdoApiStatus(-111, ERROR_IN_PROCESSING);
 		}
-		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		//TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
+		
 		try {
 			Integer currentTest = testSubmissions.get(request.getStudent().getId());
 			if(currentTest != null && request.getTest().getId() == currentTest) {
@@ -345,11 +433,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			LoggingUtil.logMessage("Submitting test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions);
 			testSubmissions.put(request.getStudent().getId(), request.getTest().getId());
-			EdoTestStudentMap inputMap = new EdoTestStudentMap();
+			
+			/*EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(test);
-			inputMap.setStudent(request.getStudent());
-			List<EdoTestStudentMap> maps = testsDao.getTestStatus(inputMap);
-			EdoTestStudentMap map = null;
+			inputMap.setStudent(request.getStudent());*/
+			
+			//New flow
+			session = sessionFactory.openSession();
+			
+			List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+											.add(Restrictions.eq("testId", test.getId()))
+											.add(Restrictions.eq("studentId", request.getStudent().getId()))
+											.list();
+			EdoTestStatusEntity map = null;
 			if(CollectionUtils.isNotEmpty(maps)) {
 				map = maps.get(0);
 			}
@@ -358,6 +454,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				status.setStatusCode(STATUS_ERROR);
 				LoggingUtil.logMessage("Already submitted this test for student=>" + request.getStudent().getId());
 				return status;
+			}
+			
+			if(map == null) {
+				map = new EdoTestStatusEntity();
+				map.setCreatedDate(new Date());
+				map.setTestId(test.getId());
+				map.setStudentId(request.getStudent().getId());
 			}
 			
 			List<EdoQuestion> questions = testsDao.getExamQuestions(test.getId());
@@ -369,31 +472,53 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			CommonUtils.calculateTestScore(test, questions);
 			
-			if(request != null && request.getTest() != null && CollectionUtils.isNotEmpty(request.getTest().getTest())) {
+			/*if(request != null && request.getTest() != null && CollectionUtils.isNotEmpty(request.getTest().getTest())) {
 				testsDao.saveTestResult(request);
 				testsDao.saveTestStatus(request);
 				
 				//TODO: Temporary
-				/*EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+				EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
 				smsUtil.setTest(test);
 				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
 				smsUtil.setStudent(student);
-				executor.execute(smsUtil);*/
+				executor.execute(smsUtil);
+			}*/
+			Transaction tx = session.beginTransaction();
+			if(CollectionUtils.isNotEmpty(test.getTest())) {
+				for(EdoQuestion question: test.getTest()) {
+					EdoServiceRequest saveAnswerRequest = new EdoServiceRequest();
+					saveAnswerRequest.setTest(test);
+					saveAnswerRequest.setStudent(request.getStudent());
+					saveAnswerRequest.setQuestion(question);
+					saveAnswer(saveAnswerRequest, session);
+				}
+			}
+			
+			map.setSolved(test.getSolvedCount());
+			map.setCorrect(test.getCorrectCount());
+			map.setFlagged(test.getFlaggedCount());
+			map.setScore(test.getScore());
+			map.setStatus(TEST_STATUS_COMPLETED);
+			if(map.getId() == null) {
+				session.persist(map);
 			}
 			//Commit the transaction
-			txManager.commit(txStatus);
+			//txManager.commit(txStatus);
+			tx.commit();
+			LoggingUtil.logMessage("Submitted the test " + test.getId() +  " for .. " + request.getStudent().getId());
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			//rollback
-			try {
+			/*try {
 				txManager.rollback(txStatus);
 			} catch (Exception e2) {
 				LoggingUtil.logError(ExceptionUtils.getStackTrace(e2));
-			}
+			}*/
 			
 		} finally {
+			CommonUtils.closeSession(session);
 			if(request.getStudent() != null && request.getStudent().getId() != null) {
 				testSubmissions.remove(request.getStudent().getId());
 				LoggingUtil.logMessage("Submitted test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions);
