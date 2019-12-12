@@ -13,6 +13,15 @@ public class LoggingUtil {
 	
 	private static Logger errorLogger = Logger.getLogger(LoggingUtil.class);
 	
+	public static Logger saveTestLogger = Logger.getLogger("saveTestLog");
+	
+	public static Logger saveTestErrorLogger = Logger.getLogger("saveTestError");
+	
+	public static Logger saveAnswerLogger = Logger.getLogger("saveAnswerLog");
+	
+	public static Logger saveAnswerErrorLogger = Logger.getLogger("saveAnswerErrorLog");
+	
+	
 	//private static Logger emailLogger = Logger.getLogger("email");
 	
 	public static void logMessage(String message) {
@@ -31,6 +40,14 @@ public class LoggingUtil {
 		} catch (JsonMappingException e1) {
 		} catch (IOException e1) {
 		}
+	}
+	
+	public static void logMessage(String message, Logger logger) {
+		logger.info(message);
+	}
+	
+	public static void logError(String message, Logger logger) {
+		logger.error(message);
 	}
 
 }

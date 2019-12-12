@@ -369,7 +369,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			tx.commit();
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveAnswerErrorLogger);
 			status.setStatus(-111, ERROR_IN_PROCESSING);
 		} finally {
 			CommonUtils.closeSession(session);
@@ -413,6 +413,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
 		EdoTest test = request.getTest();
 		if(request.getStudent() == null || test == null) {
+			LoggingUtil.logMessage("Invalid test input", LoggingUtil.saveTestLogger);
 			return new EdoApiStatus(-111, ERROR_IN_PROCESSING);
 		}
 		EdoApiStatus status = new EdoApiStatus();
@@ -420,14 +421,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		//TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		
 		try {
+			
+			CommonUtils.saveJson(request);
+			
 			Integer currentTest = testSubmissions.get(request.getStudent().getId());
 			if(currentTest != null && request.getTest().getId() == currentTest) {
 				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
 				status.setStatusCode(STATUS_ERROR);
-				LoggingUtil.logMessage("Test " + currentTest + " being submitted for student=>" + request.getStudent().getId());
+				LoggingUtil.logMessage("Test " + currentTest + " being submitted for student=>" + request.getStudent().getId(), LoggingUtil.saveTestLogger);
 				return status;
 			}
-			LoggingUtil.logMessage("Submitting test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions);
+			LoggingUtil.logMessage("Submitting test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions, LoggingUtil.saveTestLogger);
 			testSubmissions.put(request.getStudent().getId(), request.getTest().getId());
 			
 			/*EdoTestStudentMap inputMap = new EdoTestStudentMap();
@@ -448,7 +452,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
 				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
 				status.setStatusCode(STATUS_ERROR);
-				LoggingUtil.logMessage("Already submitted this test for student=>" + request.getStudent().getId());
+				LoggingUtil.logMessage("Already submitted this test for student=>" + request.getStudent().getId(), LoggingUtil.saveTestLogger);
 				return status;
 			}
 			
@@ -501,11 +505,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//Commit the transaction
 			//txManager.commit(txStatus);
 			tx.commit();
-			LoggingUtil.logMessage("Submitted the test " + test.getId() +  " for .. " + request.getStudent().getId());
+			LoggingUtil.logMessage("Submitted the test " + test.getId() +  " for .. " + request.getStudent().getId(), LoggingUtil.saveTestLogger);
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveTestErrorLogger);
 			//rollback
 			/*try {
 				txManager.rollback(txStatus);
@@ -517,7 +521,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.closeSession(session);
 			if(request.getStudent() != null && request.getStudent().getId() != null) {
 				testSubmissions.remove(request.getStudent().getId());
-				LoggingUtil.logMessage("Submitted test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions);
+				LoggingUtil.logMessage("Submitted test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions, LoggingUtil.saveTestLogger);
 			}
 		}
 		return status;

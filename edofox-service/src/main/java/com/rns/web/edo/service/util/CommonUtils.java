@@ -2,6 +2,7 @@ package com.rns.web.edo.service.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -17,16 +18,21 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.ObjectWriter;
 import org.hibernate.Session;
 
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoQuestion;
+import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
@@ -556,7 +562,10 @@ public class CommonUtils {
 		}
 		String folderPath = null;
 		//reliancedlp.edofox.com/public_html/testImages/371344/QuestionImg.jpg"
-		String hostName = "test.edofox.com/";
+		String hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
+		if(StringUtils.isBlank(hostName)) {
+			hostName = "test.edofox.com/";
+		}
 		if(!StringUtils.contains(url, "reliancedlp")) {
 			folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
 		} else {
@@ -599,6 +608,22 @@ public class CommonUtils {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		
+	}
+	
+	public static void saveJson(EdoServiceRequest request) {
+		try {
+			String studentSubPath = "/" + request.getStudent().getId() + ".json";
+			File folder = new File(EdoConstants.JSON_PATH + request.getTest().getId());
+			if(!folder.exists()) {
+				folder.mkdirs();
+			}
+			ObjectMapper mapper = new ObjectMapper();
+			ObjectWriter writer = mapper.writer();
+			writer.writeValue(new File(folder + studentSubPath), request);
+			//IOUtils.write(new ObjectMapper().writeValueAsString(request), new FileWriter(folder + studentSubPath));
+		} catch (Exception e) {
+			LoggingUtil.logError("Error in save JSON .. " + ExceptionUtils.getStackTrace(e), LoggingUtil.saveTestErrorLogger);
+		}
 	}
 
 }

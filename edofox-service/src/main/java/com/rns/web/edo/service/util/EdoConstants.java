@@ -73,6 +73,8 @@ public interface EdoConstants {
 	String CLIENT_SECRET = "lK2O6nmZoT9JozLbhND9qCDKPNMwBOnhrLPkcoylrVBolH0CJEYsBQpyjv2OzeyPvv4rh51AzUiXEh41FwW5tlZM2C7Z3xegib4oJclzR9bTMxYqeOK9pZQ7ypxvSSLb";
 
 	boolean ABSOLUTE_IMAGE_URLS = false;
+
+	String JSON_PATH =  "/home/service/testData/";
 	
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";
