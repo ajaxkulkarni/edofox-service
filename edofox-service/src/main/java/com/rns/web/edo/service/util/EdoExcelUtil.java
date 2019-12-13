@@ -42,8 +42,7 @@ public class EdoExcelUtil {
 	private static final CharSequence TITLE_DISTRICT = "District";
 	private static final CharSequence TITLE_DOB = "DOB";
 	private static final CharSequence TITLE_CASTE = "Caste";
-	
-	
+	private static final CharSequence TITLE_PASSWORD = "Password";
 					
 
 
@@ -61,7 +60,7 @@ public class EdoExcelUtil {
 		DataFormatter dataFormatter = new DataFormatter();
 
 		Integer colName = null, colEmail = null, colPhone = null, colPackage1 = null, colPackage2 = null, colPackage3 = null, colRoll = null;
-		Integer colParentPhone = null, colDistrict = null, colGender = null, colDob = null, colCaste = null;
+		Integer colParentPhone = null, colDistrict = null, colGender = null, colDob = null, colCaste = null, colPassword = null;
 		for (Row row : sheet) {
 			if (row.getRowNum() == 0) { // Title row
 				for (Cell cell : row) {
@@ -91,6 +90,8 @@ public class EdoExcelUtil {
 						colDistrict = cell.getColumnIndex();
 					} else if (StringUtils.equalsIgnoreCase(cellValue, TITLE_PARENT_PHONE)) {
 						colParentPhone = cell.getColumnIndex();
+					}  else if (StringUtils.equalsIgnoreCase(cellValue, TITLE_PASSWORD)) {
+						colPassword = cell.getColumnIndex();
 					}
 				}
 			} else {
@@ -136,6 +137,9 @@ public class EdoExcelUtil {
 					student.setExamMode("Online");
 					student.setPayment(payment);
 					student.setPassword("12345");
+					if(colPassword != null) {
+						student.setPassword(row.getCell(colPassword).getStringCellValue());
+					}
 					students.add(student);
 				}
 			}
