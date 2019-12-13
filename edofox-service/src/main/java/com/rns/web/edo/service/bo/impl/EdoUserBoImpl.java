@@ -399,7 +399,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		answer.setFlagged(request.getQuestion().getFlagged());
+		if(answer.getFlagged() == null) {
+			answer.setFlagged(0);
+		}
 		answer.setOptionSelected(request.getQuestion().getAnswer());
+		if(answer.getOptionSelected() == null) {
+			answer.setOptionSelected("");
+		}
 		answer.setTimeTaken(request.getQuestion().getTimeSpent());
 		//Will update only for save test
 		answer.setMarks(request.getQuestion().getMarks());
