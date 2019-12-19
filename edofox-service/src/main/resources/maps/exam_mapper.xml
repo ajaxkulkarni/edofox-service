@@ -116,6 +116,7 @@
 		<result column="show_result" property="test.showResult" />
 		<result column="time_taken" property="question.timeSpent" />
 		<result column="status" property="question.status"/>
+		<result column="question_disabled" property="question.disabled"/>
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">

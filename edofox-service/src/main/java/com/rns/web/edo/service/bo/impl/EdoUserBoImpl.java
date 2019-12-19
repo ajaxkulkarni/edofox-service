@@ -121,6 +121,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
 				CommonUtils.setQuestionURLs(question);
 				QuestionParser.fixQuestion(question);
+				
+				//Add only if not disabled
+				if(question.getDisabled() != null && question.getDisabled() == 1) {
+					if(StringUtils.isBlank(question.getAnswer())) {
+						continue;
+					}
+				}
+				
 				test.getTest().add(question);
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
