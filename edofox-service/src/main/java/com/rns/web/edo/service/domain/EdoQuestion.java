@@ -53,6 +53,7 @@ public class EdoQuestion {
 	private Integer timeSpent;
 	private EdoFeedback feedback;
 	private String status;
+	private Integer disabled;
 	
 	public String getOption1() {
 		return option1;
@@ -315,6 +316,12 @@ public class EdoQuestion {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public Integer getDisabled() {
+		return disabled;
+	}
+	public void setDisabled(Integer disabled) {
+		this.disabled = disabled;
 	}
 
 }
