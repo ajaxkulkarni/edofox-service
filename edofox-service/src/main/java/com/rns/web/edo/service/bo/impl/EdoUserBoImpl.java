@@ -402,7 +402,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		if(answer.getFlagged() == null) {
 			answer.setFlagged(0);
 		}
-		answer.setOptionSelected(request.getQuestion().getAnswer());
+		if(request.getQuestion().getAnswer() != null) {
+			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), "[^a-zA-Z0-9\\s\\-\\,]", ""));
+		}
 		if(answer.getOptionSelected() == null) {
 			answer.setOptionSelected("");
 		}
@@ -410,6 +412,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		//Will update only for save test
 		answer.setMarks(request.getQuestion().getMarks());
 		
+		System.out.println("Saving answer .. " + answer.getOptionSelected());
 		
 		if(answer.getId() == null) {
 			session.persist(answer);

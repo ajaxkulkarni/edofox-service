@@ -68,6 +68,8 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="solved" property="analysis.solvedCount" />
 		<result column="flagged" property="analysis.flaggedCount" />
 		<result column="parent_mobile_no" property="parentMobileNo"/>
+		<result column="school_district" property="schoolDistrict"/>
+		
 	</resultMap>
 	
 	
@@ -81,14 +83,30 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="student_id" property="student.id" />
 		<result column="score" property="subjectScore.score" />
 		<result column="subject" property="subjectScore.subject" />
+		<result column="totalQuestions" property="subjectScore.totalQuestions" />
+		<result column="negativeScore" property="subjectScore.deductions" />
+		<result column="solved" property="subjectScore.solvedCount" />
+		<result column="totalDeductions" property="subjectScore.deductionsCount" />
+		<result column="incorrects" property="subjectScore.incorrectCount" />
 		
 	</resultMap>
 	
-	<select id="getSubjectwiseScore" resultMap="subjectScore" parameterType="Integer">
+	<!-- <select id="getSubjectwiseScore" resultMap="subjectScore" parameterType="Integer">
 		SELECT sum(marks) as score, test_subjects.subject, student_id FROM `test_result` 
 		join test_questions on test_result.question_id = test_questions.id 
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id 
 		where test_id = ${value} GROUP BY test_result.student_id,test_questions.subject_id
+	</select> -->
+	
+	<select id="getSubjectwiseScore" resultMap="subjectScore" parameterType="Integer">
+		SELECT sum(marks) as score, count(*) as solved, test_subjects.subject, test_result.student_id,totalQuestions.totalQuestions,totalWrong.totalDeductions,totalWrong.negativeScore,totalIncorrect.incorrects FROM `test_result` 
+		join test_questions on test_result.question_id = test_questions.id 
+		join test_subjects on test_questions.subject_id = test_subjects.subject_id 
+        join (select count(*) as totalQuestions,subject_id from test_questions_map join test_questions on test_questions_map.question_id = test_questions.id where test_id = ${value} group by subject_id) as totalQuestions on totalQuestions.subject_id = test_subjects.subject_id 
+        join (select count(*) as totalDeductions, sum(marks) as negativeScore,subject_id,student_id from test_result join test_questions on test_result.question_id = test_questions.id where test_id = ${value} AND marks &lt; 0 group by student_id, subject_id) as totalWrong on totalWrong.student_id = test_result.student_id AND  totalWrong.subject_id = test_subjects.subject_id
+		join (select count(*) as incorrects, subject_id,student_id from test_result join test_questions on test_result.question_id = test_questions.id where test_id = ${value} AND marks &lt;= 0 AND length(option_selected) &gt; 0 group by student_id, subject_id) as totalIncorrect on totalIncorrect.student_id = test_result.student_id AND  totalIncorrect.subject_id = test_subjects.subject_id
+        where test_id = ${value} AND length(option_selected) > 0 GROUP BY test_result.student_id,test_questions.subject_id
+	
 	</select>
 	
 	<select id="getSubjectwiseScoreStudent" resultMap="subjectScore" parameterType="map">
