@@ -281,8 +281,9 @@ public class EdoUserController {
 	
 	@GET
 	@Path("/ping")
-	public Response ping() {
-		return Response.ok("SUCCESS").build();
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse ping() {
+		return new EdoServiceResponse();
 	}
 	
 }
