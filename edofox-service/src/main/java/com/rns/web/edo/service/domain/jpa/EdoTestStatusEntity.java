@@ -38,6 +38,8 @@ public class EdoTestStatusEntity {
 	private BigDecimal score;
 	@Column(name = "created_date", unique = true)
 	private Date createdDate;
+	@Column(name = "time_left", unique = true)
+	private Long timeLeft;
 	
 	public Integer getId() {
 		return id;
@@ -92,6 +94,12 @@ public class EdoTestStatusEntity {
 	}
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
+	}
+	public void setTimeLeft(Long timeLeft) {
+		this.timeLeft = timeLeft;
+	}
+	public Long getTimeLeft() {
+		return timeLeft;
 	}
 	
 }

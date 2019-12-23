@@ -25,5 +25,6 @@ public interface EdoUserBo {
 	EdoServiceResponse submitAnswer(EdoServiceRequest request);
 	EdoServiceResponse raiseDoubt(EdoServiceRequest request);
 	EdoApiStatus saveAnswer(EdoServiceRequest request);
+	EdoServiceResponse getSolved(EdoServiceRequest request);
 	
 }

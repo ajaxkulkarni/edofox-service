@@ -369,12 +369,26 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	//As of 11/12/19
 	public EdoApiStatus saveAnswer(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();
+		if(request.getTest() == null || request.getTest().getId() == null || request.getStudent() == null || request.getStudent().getId() == null) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
 		Session session = null;
 		try {
 			session = this.sessionFactory.openSession();
 			Transaction tx = session.beginTransaction();
 			saveAnswer(request, session);
-			
+			Long minLeft = request.getTest().getMinLeft();
+			Long secLeft = request.getTest().getSecLeft();
+			if(minLeft != null && secLeft != null) {
+				List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+						.add(Restrictions.eq("testId", request.getTest().getId()))
+						.add(Restrictions.eq("studentId", request.getStudent().getId()))
+						.list();
+				if(CollectionUtils.isNotEmpty(maps)) {
+					maps.get(0).setTimeLeft((minLeft * 60) + secLeft);
+				}
+			}
 			tx.commit();
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveAnswerErrorLogger);
@@ -412,6 +426,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		if(request.getQuestion().getAnswer() != null) {
 			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), "[^a-zA-Z0-9\\s\\-\\,]", ""));
+		} else {
+			answer.setOptionSelected("");
 		}
 		if(answer.getOptionSelected() == null) {
 			answer.setOptionSelected("");
@@ -429,9 +445,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	
 	public EdoApiStatus saveTest(EdoServiceRequest request) {
 		EdoTest test = request.getTest();
-		if(request.getStudent() == null || test == null) {
+		if(request.getStudent() == null || request.getStudent().getId() == null || test == null || test.getId() == null) {
 			LoggingUtil.logMessage("Invalid test input", LoggingUtil.saveTestLogger);
-			return new EdoApiStatus(-111, ERROR_IN_PROCESSING);
+			return new EdoApiStatus(-111, ERROR_INVALID_PROFILE);
 		}
 		EdoApiStatus status = new EdoApiStatus();
 		Session session = null;
@@ -869,6 +885,64 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getSolved(EdoServiceRequest request) {
+		if(request.getTest() == null || request.getStudent() == null || request.getStudent().getId() == null) {
+			LoggingUtil.logMessage("Invalid test input", LoggingUtil.saveTestLogger);
+			EdoApiStatus edoApiStatus = new EdoApiStatus(-111, ERROR_INVALID_PROFILE);
+			return new EdoServiceResponse(edoApiStatus);
+		}
+		Session session = null;
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			session = this.sessionFactory.openSession();
+			List<EdoAnswerEntity> answers = session.createCriteria(EdoAnswerEntity.class)
+					.add(Restrictions.eq("studentId", request.getStudent().getId()))
+					.add(Restrictions.eq("testId", request.getTest().getId()))
+					.list();
+		
+			if(CollectionUtils.isNotEmpty(answers)) {
+				EdoTest test = new EdoTest();
+				List<EdoQuestion> solved = new ArrayList<EdoQuestion>();
+				Integer solvedCount = 0;
+				for(EdoAnswerEntity answer: answers) {
+					EdoQuestion q = new EdoQuestion();
+					q.setId(answer.getQuestionId());
+					q.setAnswer(answer.getOptionSelected());
+					if(StringUtils.isNotBlank(answer.getOptionSelected())) {
+						solvedCount ++;
+					}
+					if(StringUtils.contains(answer.getOptionSelected(), "-")) {
+						EdoQuestion original = testsDao.getQuestion(answer.getQuestionId());
+						if(original != null && StringUtils.equals(QUESTION_TYPE_MATCH, original.getType())) {
+							q = CommonUtils.getComplexAnswer(q);
+						}
+					}
+					q.setTimeSpent(answer.getTimeTaken());
+					q.setFlagged(answer.getFlagged());
+					solved.add(q);
+				}
+				test.setTest(solved);
+				test.setSolvedCount(solvedCount);
+				List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+						.add(Restrictions.eq("testId", request.getTest().getId()))
+						.add(Restrictions.eq("studentId", request.getStudent().getId()))
+						.list();
+				if(CollectionUtils.isNotEmpty(maps)) {
+					if(maps.get(0).getTimeLeft() != null && maps.get(0).getTimeLeft() > 0) {
+						test.setMinLeft(maps.get(0).getTimeLeft() / 60);
+						test.setSecLeft(maps.get(0).getTimeLeft() % 60);
+					}
+				}
+				response.setTest(test);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return response;
 	}

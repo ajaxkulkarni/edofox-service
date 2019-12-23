@@ -114,6 +114,22 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getSolved")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getSolved(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get solved Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response = userBo.getSolved(request);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Get solved Response");
+		return response;
+	}
+	
 	@GET
 	@Path("/getImage/{questionId}/{imageType}")
 	//@Produces(MediaType.MULTIPART_FORM_DATA)
@@ -261,6 +277,12 @@ public class EdoUserController {
 		EdoServiceResponse response = userBo.raiseDoubt(request);
 		LoggingUtil.logMessage("Doubt Response");
 		return response;
+	}
+	
+	@GET
+	@Path("/ping")
+	public Response ping() {
+		return Response.ok("SUCCESS").build();
 	}
 	
 }

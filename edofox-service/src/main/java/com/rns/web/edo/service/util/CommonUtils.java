@@ -319,6 +319,29 @@ public class CommonUtils {
 		}
 
 	}
+	
+	public static EdoQuestion getComplexAnswer(EdoQuestion answered) {
+		if (answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
+			String[] answers = StringUtils.split(answered.getAnswer(), ",");
+			if(ArrayUtils.isNotEmpty(answers)) {
+				List<EdoComplexOption> options = new ArrayList<EdoComplexOption>();
+				for (String answer: answers) {
+					String[] keys = StringUtils.split(answer, "-");
+					if(ArrayUtils.isNotEmpty(keys)) {
+						EdoComplexOption option = new EdoComplexOption();
+						option.setOptionName(keys[0]);
+						List<EdoComplexOption> selected = new ArrayList<EdoComplexOption>();
+						EdoComplexOption selectedOp = new EdoComplexOption();
+						selectedOp.setOptionName(keys[1]);
+						selected.add(selectedOp);
+						option.setMatchOptions(selected);
+					}
+				}
+				answered.setComplexOptions(options);
+			}
+		}
+		return answered;
+	}
 
 	public static Float calculateAnswer(EdoQuestion answered, EdoQuestion question) {
 		if (question.getWeightage() == null || StringUtils.isBlank(question.getCorrectAnswer())) {
