@@ -530,25 +530,25 @@ public class CommonUtils {
 		
 		if(EdoConstants.ABSOLUTE_IMAGE_URLS || StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-				question.setQuestionImageUrl("http://" + prepareUrl(question.getQuestionImageUrl()));
+				question.setQuestionImageUrl(/*"http://" +*/ prepareUrl(question.getQuestionImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-				question.setOption1ImageUrl("http://" + prepareUrl(question.getOption1ImageUrl()));
+				question.setOption1ImageUrl(/*"http://" +*/ prepareUrl(question.getOption1ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-				question.setOption2ImageUrl("http://" + prepareUrl(question.getOption2ImageUrl()));
+				question.setOption2ImageUrl(/*"http://" + */prepareUrl(question.getOption2ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-				question.setOption3ImageUrl("http://" + prepareUrl(question.getOption3ImageUrl()));
+				question.setOption3ImageUrl(/*"http://" +*/ prepareUrl(question.getOption3ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-				question.setOption4ImageUrl("http://" + prepareUrl(question.getOption4ImageUrl()));
+				question.setOption4ImageUrl(/*"http://" +*/ prepareUrl(question.getOption4ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-				question.setMetaDataImageUrl("http://" + prepareUrl(question.getMetaDataImageUrl()));
+				question.setMetaDataImageUrl(/*"http://" +*/ prepareUrl(question.getMetaDataImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
-				question.setSolutionImageUrl("http://" + prepareUrl(question.getSolutionImageUrl()));
+				question.setSolutionImageUrl(/*"http://" +*/ prepareUrl(question.getSolutionImageUrl()));
 			}
 		} else {
 			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
