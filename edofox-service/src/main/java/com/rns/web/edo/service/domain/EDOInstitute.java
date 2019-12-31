@@ -5,6 +5,7 @@ public class EDOInstitute {
 	private Integer id;
 	private String name;
 	private String firebaseId;
+	private String contact;
 	
 	public Integer getId() {
 		return id;
@@ -23,6 +24,12 @@ public class EDOInstitute {
 	}
 	public void setFirebaseId(String firebaseId) {
 		this.firebaseId = firebaseId;
+	}
+	public String getContact() {
+		return contact;
+	}
+	public void setContact(String contact) {
+		this.contact = contact;
 	}
 
 }

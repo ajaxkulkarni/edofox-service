@@ -220,11 +220,16 @@ public class CommonUtils {
 			result = StringUtils.replace(result, "{correctCount}", CommonUtils.getStringValue(test.getCorrectCount()));
 			result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(test.getScore()));
 			result = StringUtils.replace(result, "{totalMarks}", CommonUtils.getStringValue(test.getTotalMarks()));
-			if(institute != null) {
-				result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
-			}
 		}
+		result = prepareInstituteNotification(result, institute);
 		result = StringUtils.replace(result, "{additionalMessage}", CommonUtils.getStringValue(additionalMessage));
+		return result;
+	}
+
+	public static String prepareInstituteNotification(String result, EDOInstitute institute) {
+		if(institute != null) {
+			result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
+		}
 		return result;
 	}
 
@@ -649,4 +654,15 @@ public class CommonUtils {
 		}
 	}
 
+	public static Integer prepareTransactionId(Integer transactionId) {
+		try {
+			long time = System.currentTimeMillis();
+			String timeString = String.valueOf(time);
+			String substring = StringUtils.substring(timeString, timeString.length() - 3, timeString.length());
+			return new Integer(transactionId + substring);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
 }

@@ -19,6 +19,7 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoStudent;
 
@@ -26,20 +27,31 @@ import com.rns.web.edo.service.domain.EdoStudent;
 public class EdoMailUtil implements Runnable, EdoConstants {
 
 	
-	private static final String MAIL_HOST = "smtp.gmail.com";
-	private static final String MAIL_ID = "visionlaturpattern@gmail.com";
-	private static final String MAIL_PASSWORD = "Vision2018!";
+	//private static final String MAIL_HOST = "smtp.gmail.com";
+	//private static final String MAIL_ID = "visionlaturpattern@gmail.com";
+	//private static final String MAIL_PASSWORD = "Vision2018!";
 	
 	private static final String MAIL_AUTH = "true";
 	//private static final String MAIL_HOST = "smtp.zoho.com";
-	private static final String MAIL_PORT = "587";
+	
+	
+	private static final String MAIL_HOST = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_HOST);
+	private static final String MAIL_ID = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_ID);
+	private static final String MAIL_PASSWORD = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_PASSWORD);
+	private static final String MAIL_PORT = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_PORT);
+	
 	
 
 	private String type;
 	private String mailSubject;
 	private EdoStudent student;
-
+	private EDOInstitute institute;
 	
+	
+	public void setInstitute(EDOInstitute institute) {
+		this.institute = institute;
+	}
+
 	public void setStudent(EdoStudent student) {
 		this.student = student;
 	}
@@ -58,7 +70,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 		try {
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(MAIL_ID, "Vision Latur"));
+			message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
 			prepareMailContent(message);
 			Transport.send(message);
 			LoggingUtil.logMessage("Sent email to .." + student.getEmail());
@@ -95,10 +107,18 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			//boolean attachCv = false;
 			String result = readMailContent(message);
 			result = CommonUtils.prepareStudentNotification(result, student);
+			result = CommonUtils.prepareInstituteNotification(result, institute);
 			
 			//message.setContent(result, "text/html");
 			message.setContent(result, "text/html; charset=utf-8");
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(student.getEmail()));
+			
+			//Format subject
+			if(message.getSubject() != null) {
+				if(institute != null) {
+					message.setSubject(StringUtils.replace(message.getSubject(), "{instituteName}", institute.getName()));
+				}
+			}
 			return result;
 
 		} catch (FileNotFoundException e) {
@@ -141,8 +161,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 	private static Map<String, String> MAIL_SUBJECTS = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
-			put(MAIL_TYPE_SUBSCRIPTION, "Thank you for subscribing to Vision Latur!");
-			put(MAIL_TYPE_ACTIVATED, "Your test package is now active!");
+			put(MAIL_TYPE_SUBSCRIPTION, "Thank you for registering to {instituteName}");
+			put(MAIL_TYPE_ACTIVATED, "Your course for {instituteName} is now active");
 		}
 	});
 

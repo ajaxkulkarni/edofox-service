@@ -66,12 +66,10 @@ public interface EdoConstants {
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";
-	String AUTH_ENDPOINT = "https://www.instamojo.com/oauth2/token/";
-	String API_ENDPOINT = "https://api.instamojo.com/v2/";
 	
 	//VISION
-	String CLIENT_ID = "KfpmvuHq07V98YAaH3qROzmad6L6VLKtdHhPS430";
-	String CLIENT_SECRET = "lK2O6nmZoT9JozLbhND9qCDKPNMwBOnhrLPkcoylrVBolH0CJEYsBQpyjv2OzeyPvv4rh51AzUiXEh41FwW5tlZM2C7Z3xegib4oJclzR9bTMxYqeOK9pZQ7ypxvSSLb";
+	//String CLIENT_ID = "KfpmvuHq07V98YAaH3qROzmad6L6VLKtdHhPS430";
+	//String CLIENT_SECRET = "lK2O6nmZoT9JozLbhND9qCDKPNMwBOnhrLPkcoylrVBolH0CJEYsBQpyjv2OzeyPvv4rh51AzUiXEh41FwW5tlZM2C7Z3xegib4oJclzR9bTMxYqeOK9pZQ7ypxvSSLb";
 
 	boolean ABSOLUTE_IMAGE_URLS = false;
 
@@ -80,5 +78,5 @@ public interface EdoConstants {
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";
 	//String CLIENT_ID = "VnK8OksaNBzM1qq6uBh1FP34bT6KbJtcp2tOGoT9";
-
+	
 }

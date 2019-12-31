@@ -15,6 +15,16 @@ public class EdoPropertyUtil {
 	public static final String FIREBASE_CREDENTIALS = "firebase.credentials.path";
 	public static final String HOST_URL = "host.url";
 	public static final String HOST_NAME = "host.name";
+	public static final String CLIENT_ID = "insta.client.id";
+	public static final String CLIENT_SECRET = "insta.client.secret";
+	public static final String AUTH_ENDPOINT = "insta.auth.endpoint";//"https://www.instamojo.com/oauth2/token/";
+	public static final String API_ENDPOINT = "insta.api.endpoint";//"https://api.instamojo.com/v2/";
+	public static final String MAIL_HOST = "mail.server";
+	public static final String MAIL_ID = "mail.username";
+	public static final String MAIL_PASSWORD = "mail.password";
+	public static final String MAIL_PORT = "mail.port";
+	public static final String SETTLEMENT_URL = "settlement.url";
+	public static final String SETTLEMENT_TOKEN = "settlement.token";
 
 	public static String getProperty(String name) {
 		try {

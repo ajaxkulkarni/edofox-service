@@ -643,13 +643,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
+			String status = "Completed";
 			if(student.getPayment() != null && student.getPayment().isOffline()) {
 				student.getPayment().setMode("Offline");
 			} else {
 				EdoPaymentStatus payment = new EdoPaymentStatus();
 				payment.setMode("Online");
+				status = "Created";
 				student.setPayment(payment);
 			}
+			//Update package status
+			if(CollectionUtils.isNotEmpty(student.getPackages())) {
+				for(EDOPackage pkg: student.getPackages()) {
+					if(StringUtils.isBlank(pkg.getStatus())) {
+						pkg.setStatus(status);
+					}
+				}
+			}
+			//student.setCurrentPackage(studentPackage);
 			student.setRollNo(""); //For new student
 			if(student.getId() == null) {
 				//Check if the student with same phone exists
@@ -671,7 +682,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			completePayment(student, response);
 			
 			//SMS and email
-			notifyStudent(student, MAIL_TYPE_SUBSCRIPTION);
+			//Get institute details
+			EDOInstitute institute = null;
+			if(CollectionUtils.isNotEmpty(student.getPackages()) && student.getPackages().get(0).getInstitute() != null) {
+				institute = testsDao.getInstituteById(student.getPackages().get(0).getInstitute().getId());
+			}
+			notifyStudent(student, MAIL_TYPE_SUBSCRIPTION, institute);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
@@ -679,13 +695,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	private void notifyStudent(EdoStudent student, String mailType) {
+	private void notifyStudent(EdoStudent student, String mailType, EDOInstitute institute) {
 		EdoMailUtil edoMailUtil = new EdoMailUtil(mailType);
 		edoMailUtil.setStudent(student);
+		edoMailUtil.setInstitute(institute);
 		executor.execute(edoMailUtil);
 		
 		EdoSMSUtil edoSMSUtil = new EdoSMSUtil(mailType);
 		edoSMSUtil.setStudent(student);
+		edoSMSUtil.setInstitute(institute);
 		executor.execute(edoSMSUtil);
 	}
 
@@ -700,6 +718,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 		}
 		if(!student.getPayment().isOffline()) {
+			//Set transaction ID to be unique
+			
 			EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId());
 			if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
 				student.setPayment(paymentResponse);
@@ -719,18 +739,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			boolean validPayment = PaymentUtil.getPaymentStatus(id);
 			if(validPayment) {
-				EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
-				paymentStatus.setPaymentId(id);
-				paymentStatus.setResponseText("Completed");
-				paymentStatus.setOffline(false);
-				testsDao.updatePayment(paymentStatus);
 				List<EdoStudent> studentPackages = testsDao.getStudentByPayment(id);
+				EDOInstitute institute = null;
 				if(CollectionUtils.isNotEmpty(studentPackages)) {
 					EdoStudent edoStudent = new EdoStudent();
 					List<EDOPackage> packages = new ArrayList<EDOPackage>();
+					boolean incompletePackageFound = false;
 					for(EdoStudent student: studentPackages) {
 						if(student.getCurrentPackage() != null) {
 							packages.add(student.getCurrentPackage());
+							if(student.getCurrentPackage().getInstitute() != null) {
+								institute = new EDOInstitute();
+								institute.setName(student.getCurrentPackage().getInstitute().getName());
+							}
+							if(!StringUtils.equals(student.getCurrentPackage().getStatus(), "Completed")) {
+								incompletePackageFound = true;
+							}
 						}
 						edoStudent.setName(student.getName());
 						edoStudent.setPhone(student.getPhone());
@@ -739,9 +763,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(transactionId != null) {
 						edoStudent.setTransactionId(new Integer(StringUtils.removeStart(transactionId, "T")));
 					}
-					edoStudent.setPackages(packages);
-					edoStudent.setPayment(paymentStatus);
-					notifyStudent(edoStudent, MAIL_TYPE_ACTIVATED);
+					
+					if(incompletePackageFound) {
+						EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
+						paymentStatus.setPaymentId(id);
+						paymentStatus.setResponseText("Completed");
+						paymentStatus.setOffline(false);
+						testsDao.updatePayment(paymentStatus);
+						
+						edoStudent.setPackages(packages);
+						edoStudent.setPayment(paymentStatus);
+						notifyStudent(edoStudent, MAIL_TYPE_ACTIVATED, institute);
+					}
 				}
 			} else {
 				EdoPaymentStatus paymentStatus = new EdoPaymentStatus();

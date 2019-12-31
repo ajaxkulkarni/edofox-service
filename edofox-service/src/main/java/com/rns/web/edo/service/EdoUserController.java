@@ -11,6 +11,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
@@ -27,6 +28,7 @@ import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 
 @Component
@@ -210,9 +212,11 @@ public class EdoUserController {
 	public Response processPayment(@QueryParam("id") String id, @QueryParam("transaction_id") String transactionId, @QueryParam("payment_id") String paymentId) {
 		LoggingUtil.logMessage("Process payment Request :" + id + " : " + transactionId);
 		EdoApiStatus response = userBo.processPayment(id, transactionId, paymentId);
-		String urlString = EdoConstants.UI_HOST + "success.html";
+		String urlString = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "payment.php?payment_id=" + id + "&status=";
 		if(response == null || response.getStatusCode() != EdoConstants.STATUS_OK) {
-			urlString = EdoConstants.UI_HOST + "error.html";
+			urlString = urlString + "Failed";
+		} else {
+			urlString = urlString + "Success";
 		}
 		URI url = null;
 		try {
@@ -221,6 +225,16 @@ public class EdoUserController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return Response.temporaryRedirect(url).build();
+	}
+	//{amount=[200.00], fees=[3.80], purpose=[Edofox payment], shorturl=[], buyer_phone=[+919423040642], buyer_name=[ajinkyA chandrashekhaR kulkarnI], payment_request_id=[e919c33d3d0241a98f25b91e733406b4], mac=[c10296185b86a2180d4dc85e9b59ae78a01893c9], buyer=[ajinkyashiva@gmail.coM], payment_id=[MOJO549240353296233], currency=[INR], longurl=[https://test.instamojo.com/@contact_9994e/e919c33d3d0241a98f25b91e733406b4], status=[Credit]}
+	@POST
+	@Path("/paymentWebhook")
+	// @Produces(MediaType.APPLICATION_JSON)
+	public Response paymentWebhook(MultivaluedMap<String, String> formParams) {
+		System.out.println(formParams);
+		LoggingUtil.logMessage("Webhook payment Request :" + formParams);
+		/*EdoApiStatus response = */userBo.processPayment(formParams.getFirst("id"), formParams.getFirst("transaction_id"), null);
+		return Response.ok().build();
 	}
 	
 	@POST

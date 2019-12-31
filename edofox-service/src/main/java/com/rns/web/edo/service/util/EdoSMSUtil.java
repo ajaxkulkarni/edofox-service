@@ -73,6 +73,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 
 			if (test != null) {
 				message = CommonUtils.prepareTestNotification(message, test, institute, additionalMessage);
+			} else if (institute != null) {
+				message = CommonUtils.prepareInstituteNotification(message, institute);
 			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 			sendSMS(url);
@@ -137,8 +139,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION,
-					"Hi {name}, Welcome to Vision Latur. Please complete the payment in order to have full access to Vision Latur features.");
-			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your Vision Latur package {packages} is activated. Transaction ID - {transactionId}.");
+					"Hi {name}, Thank you for registering for {instituteName}. Please complete the payment in order to have full access to {instituteName} courses.");
+			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your {instituteName} package {packages} is activated. Transaction ID - {transactionId}.");
 			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your {instituteName} {testName} final result is - "
 					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}" + "\n{additionalMessage}");
 			put(MAIL_TYPE_TEST_RESULT_RANK,

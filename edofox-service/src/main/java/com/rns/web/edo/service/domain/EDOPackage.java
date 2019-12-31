@@ -15,6 +15,7 @@ public class EDOPackage {
 	private BigDecimal offlinePrice;
 	private EDOInstitute institute;
 	private boolean selected;
+	private String status;
 	
 	public Integer getId() {
 		return id;
@@ -51,6 +52,12 @@ public class EDOPackage {
 	}
 	public void setOfflinePrice(BigDecimal offlinePrice) {
 		this.offlinePrice = offlinePrice;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 	

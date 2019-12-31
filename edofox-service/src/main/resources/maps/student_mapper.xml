@@ -59,7 +59,7 @@
 		(student_id,institute_id,package_id,status,exam_mode,payment_mode) values
 		<foreach item="package" index="index" collection="packages"
 			open="(" separator="),(" close=")">
-			${id},${package.institute.id}, ${package.id}, 'Completed', '${examMode}', '${payment.mode}'
+			${id},${package.institute.id}, ${package.id}, '${package.status}', '${examMode}', '${payment.mode}'
 		</foreach>
 		<!-- (${id},${currentPackage.institute.id}, ${currentPackage.id}, 'Created', '${examMode}', '${payment.mode}')
 		ON DUPLICATE KEY UPDATE exam_mode = '${examMode}', payment_mode = '${payment.mode}' -->
@@ -105,9 +105,10 @@
 	</select>
 	
 	<select id="getStudentByPayment" parameterType="String" resultMap="studentInfo" >
-		SELECT * FROM student_institute 
+		SELECT *,student_institute.status as paymentStatus FROM student_institute 
 		join student on student.id = student_institute.student_id
 		join packages on student_institute.package_id = packages.id
+		join institute on institute.id = packages.institute_id
 		where student_institute.payment_id = '${value}';
 	</select>
 	

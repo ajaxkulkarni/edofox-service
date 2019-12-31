@@ -115,18 +115,21 @@ public class EdoExcelUtil {
 						EDOPackage p1 = new EDOPackage();
 						p1.setId((Double.valueOf(row.getCell(colPackage1).getNumericCellValue())).intValue());
 						p1.setInstitute(institute);
+						p1.setStatus("Completed");
 						packages.add(p1);
 					}
 					if(colPackage2 != null && row.getCell(colPackage2)  != null) {
 						EDOPackage p2 = new EDOPackage();
 						p2.setId((Double.valueOf(row.getCell(colPackage2).getNumericCellValue())).intValue());
 						p2.setInstitute(institute);
+						p2.setStatus("Completed");
 						packages.add(p2);
 					}
 					if(colPackage3 != null && row.getCell(colPackage3)  != null) {
 						EDOPackage p3 = new EDOPackage();
 						p3.setId((Double.valueOf(row.getCell(colPackage3).getNumericCellValue())).intValue());
 						p3.setInstitute(institute);
+						p3.setStatus("Completed");
 						packages.add(p3);
 					}
 					if(CollectionUtils.isNotEmpty(packages)) {
