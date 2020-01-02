@@ -535,25 +535,25 @@ public class CommonUtils {
 		
 		if(EdoConstants.ABSOLUTE_IMAGE_URLS || StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
-				question.setQuestionImageUrl("http://" + prepareUrl(question.getQuestionImageUrl()));
+				question.setQuestionImageUrl(prepareUrl(question.getQuestionImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
-				question.setOption1ImageUrl("http://" + prepareUrl(question.getOption1ImageUrl()));
+				question.setOption1ImageUrl(prepareUrl(question.getOption1ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
-				question.setOption2ImageUrl("http://" + prepareUrl(question.getOption2ImageUrl()));
+				question.setOption2ImageUrl(prepareUrl(question.getOption2ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
-				question.setOption3ImageUrl("http://" + prepareUrl(question.getOption3ImageUrl()));
+				question.setOption3ImageUrl(prepareUrl(question.getOption3ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
-				question.setOption4ImageUrl("http://" + prepareUrl(question.getOption4ImageUrl()));
+				question.setOption4ImageUrl(prepareUrl(question.getOption4ImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
-				question.setMetaDataImageUrl("http://" + prepareUrl(question.getMetaDataImageUrl()));
+				question.setMetaDataImageUrl(prepareUrl(question.getMetaDataImageUrl()));
 			}
 			if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
-				question.setSolutionImageUrl("http://" + prepareUrl(question.getSolutionImageUrl()));
+				question.setSolutionImageUrl(prepareUrl(question.getSolutionImageUrl()));
 			}
 		} else {
 			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
@@ -592,12 +592,15 @@ public class CommonUtils {
 		//reliancedlp.edofox.com/public_html/testImages/371344/QuestionImg.jpg"
 		String hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
 		if(StringUtils.isBlank(hostName)) {
-			hostName = "test.edofox.com/";
+			hostName = "http://test.edofox.com/";
 		}
 		if(!StringUtils.contains(url, "reliancedlp")) {
 			folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
 		} else {
-			hostName = "reliancedlp.edofox.com/";
+			hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME_RELIANCE);
+			if(StringUtils.isBlank(hostName)) {
+				hostName = "http://reliancedlp.edofox.com/";
+			}
 			folderPath = StringUtils.replace(url, "/var/www/reliancedlp.edofox.com/public_html/", "");
 			LoggingUtil.logMessage("Setting image URL as " + hostName + folderPath);
 		}

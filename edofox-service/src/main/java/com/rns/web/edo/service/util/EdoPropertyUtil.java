@@ -15,6 +15,7 @@ public class EdoPropertyUtil {
 	public static final String FIREBASE_CREDENTIALS = "firebase.credentials.path";
 	public static final String HOST_URL = "host.url";
 	public static final String HOST_NAME = "host.name";
+	public static final String HOST_NAME_RELIANCE = "host.name.reliance";
 	public static final String CLIENT_ID = "insta.client.id";
 	public static final String CLIENT_SECRET = "insta.client.secret";
 	public static final String AUTH_ENDPOINT = "insta.auth.endpoint";//"https://www.instamojo.com/oauth2/token/";
