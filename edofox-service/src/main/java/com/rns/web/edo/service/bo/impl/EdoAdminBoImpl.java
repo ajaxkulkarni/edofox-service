@@ -803,6 +803,12 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				student.setPassword("12345");
 			}
 			
+			List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
+			if(CollectionUtils.isNotEmpty(existingStudent)) {
+				status.setStatus(-222, "This mobile number is already registered ..");
+				return status;
+			}
+			
 			addStudent(request, student);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
