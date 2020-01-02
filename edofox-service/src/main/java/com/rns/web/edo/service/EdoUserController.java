@@ -210,7 +210,7 @@ public class EdoUserController {
 	@Path("/processPayment")
 	//@Produces(MediaType.APPLICATION_JSON)
 	public Response processPayment(@QueryParam("id") String id, @QueryParam("transaction_id") String transactionId, @QueryParam("payment_id") String paymentId) {
-		LoggingUtil.logMessage("Process payment Request :" + id + " : " + transactionId);
+		LoggingUtil.logMessage("Process payment Request :" + id + " : " + transactionId, LoggingUtil.paymentLogger);
 		EdoApiStatus response = userBo.processPayment(id, transactionId, paymentId);
 		String urlString = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "payment.php?payment_id=" + id + "&status=";
 		if(response == null || response.getStatusCode() != EdoConstants.STATUS_OK) {

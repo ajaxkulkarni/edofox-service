@@ -95,11 +95,11 @@ public class EdoExcelUtil {
 					}
 				}
 			} else {
-				if (colName != null && colPhone != null) {
+				if (colName != null || colPhone != null || colRoll != null) {
 					String phone = dataFormatter.formatCellValue(row.getCell(colPhone));
-					if (StringUtils.isBlank(phone)) {
+					/*if (StringUtils.isBlank(phone)) {
 						continue;
-					}
+					}*/
 					EdoStudent student = new EdoStudent();
 					student.setName(getCellValue(colName, row));
 					student.setPhone(phone);
@@ -153,7 +153,7 @@ public class EdoExcelUtil {
 
 	}
 
-	private static String getCellValue(Integer colNumber, Row row) {
+	public static String getCellValue(Integer colNumber, Row row) {
 		if(colNumber == null || row.getCell(colNumber) == null) {
 			return "";
 		}

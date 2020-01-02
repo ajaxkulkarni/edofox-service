@@ -11,7 +11,7 @@ public class LoggingUtil {
 	
 	private static Logger reportLogger = Logger.getLogger(LoggingUtil.class);
 	
-	private static Logger errorLogger = Logger.getLogger(LoggingUtil.class);
+	private static Logger errorLogger = Logger.getLogger("errorLogger");
 	
 	public static Logger saveTestLogger = Logger.getLogger("saveTestLog");
 	
@@ -20,6 +20,8 @@ public class LoggingUtil {
 	public static Logger saveAnswerLogger = Logger.getLogger("saveAnswerLog");
 	
 	public static Logger saveAnswerErrorLogger = Logger.getLogger("saveAnswerErrorLog");
+	
+	public static Logger paymentLogger = Logger.getLogger("paymentLog");
 	
 	
 	//private static Logger emailLogger = Logger.getLogger("email");

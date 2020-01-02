@@ -708,7 +708,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	private void completePayment(EdoStudent student, EdoServiceResponse response) {
-		LoggingUtil.logMessage("Transaction ID is =>" + student.getTransactionId());
+		LoggingUtil.logMessage("Transaction ID is =>" + student.getTransactionId(), LoggingUtil.paymentLogger);
 		BigDecimal amount = BigDecimal.ZERO;
 		for(EDOPackage p: student.getPackages()) {
 			if(p.getPrice() != null && StringUtils.equals(student.getExamMode(), "Online")) {
@@ -724,6 +724,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
 				student.setPayment(paymentResponse);
 				testsDao.updatePaymentId(student);
+				LoggingUtil.logMessage("Got the payment Id as =>" + paymentResponse.getPaymentId());
 			}
 			response.setPaymentStatus(paymentResponse);
 		}
@@ -784,6 +785,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e), LoggingUtil.paymentLogger);
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
 		}

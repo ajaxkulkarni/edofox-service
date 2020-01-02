@@ -57,6 +57,7 @@ public class PaymentUtil implements EdoConstants {
 			api = InstamojoImpl.getApi(EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_ID), EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_SECRET), EdoPropertyUtil.getProperty(EdoPropertyUtil.API_ENDPOINT), EdoPropertyUtil.getProperty(EdoPropertyUtil.AUTH_ENDPOINT));
 		} catch (ConnectionException e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e), LoggingUtil.paymentLogger);
 			setPaymentStatus(status, EdoConstants.ERROR_IN_PROCESSING);
 		}
 
@@ -64,11 +65,9 @@ public class PaymentUtil implements EdoConstants {
 
 		if (isOrderValid) {
 			try {
-				System.out.println("JSON === > " + new ObjectMapper().writeValueAsString(order));
 				CreatePaymentOrderResponse createPaymentOrderResponse = api.createNewPaymentOrder(order);
 				// print the status of the payment order.
-				System.out.println(createPaymentOrderResponse.getPaymentOrder().getStatus());
-				LoggingUtil.logMessage("Payment response => " + createPaymentOrderResponse.getJsonResponse());
+				LoggingUtil.logMessage("Successful Payment response => " + createPaymentOrderResponse.getJsonResponse(), LoggingUtil.paymentLogger);
 				status.setPaymentUrl(createPaymentOrderResponse.getPaymentOptions().getPaymentUrl());
 				status.setPaymentId(createPaymentOrderResponse.getPaymentOrder().getId());
 			} catch (InvalidPaymentOrderException e) {
@@ -81,18 +80,13 @@ public class PaymentUtil implements EdoConstants {
 					setPaymentStatus(status, "Currency is invalid.");
 				}
 				
-				LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+				LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+				LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e), LoggingUtil.paymentLogger);
 				setPaymentStatus(status, EdoConstants.ERROR_IN_PROCESSING);
 			} catch (ConnectionException e) {
 				LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 				setPaymentStatus(status, EdoConstants.ERROR_IN_PROCESSING);
-			} catch (JsonGenerationException e) {
-				e.printStackTrace();
-			} catch (JsonMappingException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			} 
 		} else {
 			// inform validation errors to the user.
 			if (order.isTransactionIdInvalid()) {

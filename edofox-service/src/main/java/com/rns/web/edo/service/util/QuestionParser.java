@@ -937,7 +937,15 @@ agent-platform-version: 4
 			return;
 		}
 		if(StringUtils.equals("A", question.getStatus())) {
-			LoggingUtil.logMessage("Skipping the parse check for " + question.getId());
+			question.setQuestion(StringUtils.replace(question.getQuestion(), "$$", "$"));
+			question.setOption1(StringUtils.replace(question.getOption1(), "$$", "$"));
+			question.setOption2(StringUtils.replace(question.getOption2(), "$$", "$"));
+			question.setOption3(StringUtils.replace(question.getOption3(), "$$", "$"));
+			question.setOption4(StringUtils.replace(question.getOption4(), "$$", "$"));
+			question.setOption5(StringUtils.replace(question.getOption5(), "$$", "$"));
+			question.setSolution(StringUtils.replace(question.getSolution(), "$$", "$"));
+			
+			LoggingUtil.logMessage("Skipping the parse check after replacing next line for " + question.getId());
 			return;
 		}
 		boolean isLatex = false;
