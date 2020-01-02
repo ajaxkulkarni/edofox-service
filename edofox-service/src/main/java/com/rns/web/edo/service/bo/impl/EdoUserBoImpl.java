@@ -425,7 +425,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			answer.setFlagged(0);
 		}
 		if(request.getQuestion().getAnswer() != null) {
-			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), "[^a-zA-Z0-9\\s\\-\\,\\+\\-\\*\\/\\^\\~]", ""));
+			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), "[^a-zA-Z0-9\\s\\-\\,\\+\\*\\/\\^\\~\\.]", ""));
 		} else {
 			answer.setOptionSelected("");
 		}
