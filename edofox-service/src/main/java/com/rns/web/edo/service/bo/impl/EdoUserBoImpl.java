@@ -22,6 +22,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import com.itextpdf.kernel.pdf.colorspace.PdfSpecialCs.Pattern;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
@@ -44,6 +45,7 @@ import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
+import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
@@ -425,7 +427,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			answer.setFlagged(0);
 		}
 		if(request.getQuestion().getAnswer() != null) {
-			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), "[^a-zA-Z0-9\\s\\-\\,\\+\\*\\/\\^\\~\\.]", ""));
+			String pattern = EdoPropertyUtil.getProperty(EdoPropertyUtil.ALLOWED_CHARS);
+			if(StringUtils.isBlank(pattern)) {
+				pattern = "[^a-zA-Z0-9\\s\\-\\,\\+\\*\\/\\^\\~\\.]";
+			}
+			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), pattern, ""));
 		} else {
 			answer.setOptionSelected("");
 		}

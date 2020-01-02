@@ -26,6 +26,7 @@ public class EdoPropertyUtil {
 	public static final String MAIL_PORT = "mail.port";
 	public static final String SETTLEMENT_URL = "settlement.url";
 	public static final String SETTLEMENT_TOKEN = "settlement.token";
+	public static final String ALLOWED_CHARS = "allowed.chars";
 
 	public static String getProperty(String name) {
 		try {
