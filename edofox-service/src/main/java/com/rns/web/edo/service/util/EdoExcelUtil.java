@@ -96,10 +96,10 @@ public class EdoExcelUtil {
 				}
 			} else {
 				if (colName != null || colPhone != null || colRoll != null) {
-					String phone = dataFormatter.formatCellValue(row.getCell(colPhone));
-					/*if (StringUtils.isBlank(phone)) {
-						continue;
-					}*/
+					String phone = "";
+					if (StringUtils.isNotBlank(phone)) {
+						phone = dataFormatter.formatCellValue(row.getCell(colPhone));
+					}
 					EdoStudent student = new EdoStudent();
 					student.setName(getCellValue(colName, row));
 					student.setPhone(phone);

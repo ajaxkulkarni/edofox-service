@@ -117,10 +117,11 @@
 		<result column="time_taken" property="question.timeSpent" />
 		<result column="status" property="question.status"/>
 		<result column="question_disabled" property="question.disabled"/>
+		<result column="questionStatus" property="question.status"/>
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		SELECT *,test_result.id as mapId FROM test 
+		SELECT *,test_result.id as mapId,test_questions.status as questionStatus FROM test 
 		join test_questions_map on test.test_id = test_questions_map.test_id
 		join test_questions on test_questions_map.question_id = test_questions.id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
