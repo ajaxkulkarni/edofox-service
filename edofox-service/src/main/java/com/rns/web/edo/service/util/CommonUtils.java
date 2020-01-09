@@ -535,6 +535,9 @@ public class CommonUtils {
 		
 		String absoluteUrls = EdoPropertyUtil.getProperty(EdoPropertyUtil.ABSOLUTE_IMAGE_URLS);
 		if(StringUtils.equals(absoluteUrls, "true")) {
+			if(!StringUtils.contains(question.getQuestionImageUrl(), "http") && !StringUtils.contains(question.getQuestionImageUrl(), "https")) {
+				question.setQuestionImageUrl("http://" + question.getQuestionImageUrl());
+			}
 			return;
 		}
 		
