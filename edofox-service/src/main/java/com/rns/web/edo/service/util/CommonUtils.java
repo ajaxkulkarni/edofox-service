@@ -533,7 +533,12 @@ public class CommonUtils {
 		
 		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
 		
-		if(EdoConstants.ABSOLUTE_IMAGE_URLS || StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
+		String absoluteUrls = EdoPropertyUtil.getProperty(EdoPropertyUtil.ABSOLUTE_IMAGE_URLS);
+		if(StringUtils.equals(absoluteUrls, "true")) {
+			return;
+		}
+		
+		if(/*EdoConstants.ABSOLUTE_IMAGE_URLS || */StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
 				question.setQuestionImageUrl(prepareUrl(question.getQuestionImageUrl()));
 			}
@@ -585,9 +590,9 @@ public class CommonUtils {
 	
 
 	public static String prepareUrl(String url) {
-		if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
+		/*if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
 			return url;
-		}
+		}*/
 		String folderPath = null;
 		//reliancedlp.edofox.com/public_html/testImages/371344/QuestionImg.jpg"
 		String hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);

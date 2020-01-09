@@ -71,7 +71,7 @@ public interface EdoConstants {
 	//String CLIENT_ID = "KfpmvuHq07V98YAaH3qROzmad6L6VLKtdHhPS430";
 	//String CLIENT_SECRET = "lK2O6nmZoT9JozLbhND9qCDKPNMwBOnhrLPkcoylrVBolH0CJEYsBQpyjv2OzeyPvv4rh51AzUiXEh41FwW5tlZM2C7Z3xegib4oJclzR9bTMxYqeOK9pZQ7ypxvSSLb";
 
-	boolean ABSOLUTE_IMAGE_URLS = false;
+	//boolean ABSOLUTE_IMAGE_URLS = false;
 
 	String JSON_PATH =  "/home/service/testData/";
 	

@@ -27,6 +27,7 @@ public class EdoPropertyUtil {
 	public static final String SETTLEMENT_URL = "settlement.url";
 	public static final String SETTLEMENT_TOKEN = "settlement.token";
 	public static final String ALLOWED_CHARS = "allowed.chars";
+	public static final String ABSOLUTE_IMAGE_URLS = "absolute.image.url";
 
 	public static String getProperty(String name) {
 		try {
