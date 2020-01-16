@@ -1119,7 +1119,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			ClientConfig config = new DefaultClientConfig();
 			config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			Client client = Client.create(config);
-			
+			client.setConnectTimeout(10000); //10 seconds
 			String url = EdoPropertyUtil.getProperty(EdoPropertyUtil.UPLINK_SERVER) + method;
 			WebResource webResource = client.resource(url);
 			LoggingUtil.logMessage("Calling uplink with URL =>" + url);
