@@ -28,6 +28,9 @@ public class EdoPropertyUtil {
 	public static final String SETTLEMENT_TOKEN = "settlement.token";
 	public static final String ALLOWED_CHARS = "allowed.chars";
 	public static final String ABSOLUTE_IMAGE_URLS = "absolute.image.url";
+	public static final String UPLINK_SERVER = "uplink.server";
+	public static final String UPLINK_LOCATION = "uplink.location";
+	public static final String UPLINK_FREQUENCY = "uplink.frequency";
 
 	public static String getProperty(String name) {
 		try {

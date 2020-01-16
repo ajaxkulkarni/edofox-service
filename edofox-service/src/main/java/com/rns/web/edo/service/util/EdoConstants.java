@@ -63,6 +63,7 @@ public interface EdoConstants {
 	//DEV
 	String TESTS_JSON_PATH = "F:\\Resoneuronance\\Edofox\\Document\\tests";
 	String Q_BANK_PATH = "/home/service/questionData/";
+	String TEMP_QUESTION_PATH = "/home/service/tempQuestions/";
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";

@@ -32,6 +32,10 @@
 		<property name="testsDao" ref="testsDao" />
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"></property>
 	</bean>
+	
+	<bean id="taskService" class="com.rns.web.edo.service.util.EdoBackupRoutine">
+		<property name="adminBo" ref="adminBo"></property>
+	</bean>
 
 
 	<bean id="executor"
@@ -91,6 +95,7 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoQuestionEntity</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoAnswerEntity</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoUplinkStatus</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

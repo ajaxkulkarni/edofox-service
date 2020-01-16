@@ -40,6 +40,8 @@ public class EdoTestStatusEntity {
 	private Date createdDate;
 	@Column(name = "time_left", unique = true)
 	private Long timeLeft;
+	@Column(name = "updated_date", unique = true)
+	private Date updatedDate;
 	
 	public Integer getId() {
 		return id;
@@ -100,6 +102,12 @@ public class EdoTestStatusEntity {
 	}
 	public Long getTimeLeft() {
 		return timeLeft;
+	}
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+	public Date getUpdatedDate() {
+		return updatedDate;
 	}
 	
 }

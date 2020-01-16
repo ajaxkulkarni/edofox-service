@@ -2,6 +2,8 @@ package com.rns.web.edo.service.domain.jpa;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -73,6 +75,9 @@ public class EdoQuestionEntity {
 	private String status;
 	@Column(name = "correct_answer")
 	private String correctAnswer;
+	@Column(name = "created_date")
+	private Date createdDate;
+	
 	
 	public Integer getId() {
 		return id;
@@ -241,5 +246,11 @@ public class EdoQuestionEntity {
 	}
 	public String getCorrectAnswer() {
 		return correctAnswer;
+	}
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 }

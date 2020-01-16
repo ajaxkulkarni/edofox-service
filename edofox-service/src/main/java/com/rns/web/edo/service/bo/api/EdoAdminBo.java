@@ -1,5 +1,9 @@
 package com.rns.web.edo.service.bo.api;
 
+import java.io.InputStream;
+import java.util.Date;
+
+import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -22,4 +26,13 @@ public interface EdoAdminBo {
 	EdoServiceResponse getFeedbackData(EdoServiceRequest request);
 	EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request);
 	void fixQuestions();
+	EdoApiStatus cropQuestionImage(EdoServiceRequest request, InputStream fileData);
+	
+	//Super admin
+	EdoApiStatus backupData(EdoAdminRequest request);
+	EdoApiStatus uplinkData(EdoAdminRequest request);
+	EdoAdminRequest downloadData(EdoAdminRequest request);
+	EdoApiStatus downlinkData(EdoAdminRequest request);
+	EdoAdminRequest getLastUplinkDate();
+	
 }

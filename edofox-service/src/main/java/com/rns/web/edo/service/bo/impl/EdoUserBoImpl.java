@@ -441,6 +441,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		answer.setTimeTaken(request.getQuestion().getTimeSpent());
 		//Will update only for save test
 		answer.setMarks(request.getQuestion().getMarks());
+		answer.setUpdatedDate(new Date());
 		
 		System.out.println("Saving answer .. " + answer.getOptionSelected());
 		
@@ -538,6 +539,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			map.setFlagged(test.getFlaggedCount());
 			map.setScore(test.getScore());
 			map.setStatus(TEST_STATUS_COMPLETED);
+			map.setUpdatedDate(new Date());
 			if(map.getId() == null) {
 				session.persist(map);
 			}

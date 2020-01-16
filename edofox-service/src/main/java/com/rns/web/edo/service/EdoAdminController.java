@@ -15,8 +15,10 @@ import org.springframework.stereotype.Component;
 
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
+import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoExcelUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
@@ -262,6 +264,73 @@ public class EdoAdminController {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		adminBo.fixQuestions();
 		LoggingUtil.logMessage("Fix questions Response " + response.getStatus().getResponseText());
+		return response;
+	}
+	
+	@POST
+	@Path("/cropQuestionImage")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse cropQuestionImage(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
+			@FormDataParam("testId") Integer testId, @FormDataParam("fileName") String fileName) {
+		LoggingUtil.logMessage("Crop image request :" + testId + " for " + fileName);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EdoServiceRequest request = new EdoServiceRequest();
+			EdoTest test = new EdoTest();
+			test.setId(testId);
+			request.setFilePath(fileName);
+			request.setTest(test);
+			adminBo.cropQuestionImage(request, fileData);
+			LoggingUtil.logMessage("Crop image completed ..");
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+	
+	@POST
+	@Path("/backup")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse fixQuestions(EdoAdminRequest request) {
+		LoggingUtil.logMessage("Backup Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.backupData(request));
+		LoggingUtil.logMessage("Backup Response " + response.getStatus().getResponseText());
+		return response;
+	}
+	
+	@POST
+	@Path("/uplink")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse uplink(EdoAdminRequest request) {
+		LoggingUtil.logMessage("Uplink Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.uplinkData(request));
+		LoggingUtil.logMessage("Uplink Response " + response.getStatus().getResponseText());
+		return response;
+	}
+	
+	@POST
+	@Path("/download")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoAdminRequest downloadData(EdoAdminRequest request) {
+		LoggingUtil.logMessage("Download Request :" + request);
+		return adminBo.downloadData(request);
+	}
+	
+	@POST
+	@Path("/downlink")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse downlink(EdoAdminRequest request) {
+		LoggingUtil.logMessage("Downlink Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.downlinkData(request));
+		LoggingUtil.logMessage("Downlink Response " + response.getStatus().getResponseText());
 		return response;
 	}
 	

@@ -38,6 +38,9 @@ public class EdoAnswerEntity {
 	private BigDecimal marks;
 	@Column(name = "created_date", unique = true)
 	private Date createdDate;
+	@Column(name = "updated_date", unique = true)
+	private Date updatedDate;
+	
 	
 	public Date getCreatedDate() {
 		return createdDate;
@@ -92,6 +95,12 @@ public class EdoAnswerEntity {
 	}
 	public void setMarks(BigDecimal marks) {
 		this.marks = marks;
+	}
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+	public Date getUpdatedDate() {
+		return updatedDate;
 	}
 	
 }

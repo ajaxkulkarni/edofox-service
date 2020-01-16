@@ -1,5 +1,7 @@
 package com.rns.web.edo.service.bo.impl;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -7,9 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.Order;
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.poi.ss.formula.functions.T;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -21,8 +30,8 @@ import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
+import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
-import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -31,13 +40,23 @@ import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
+import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
+import com.rns.web.edo.service.domain.jpa.EdoUplinkStatus;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
+import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.QuestionParser;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
@@ -855,4 +874,331 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 	}
 
+	public EdoApiStatus cropQuestionImage(EdoServiceRequest request, InputStream fileData) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(request.getTest() == null || request.getTest().getId() == null || StringUtils.isBlank(request.getFilePath())) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		try {
+			//byte[] buffer = new byte[fileData.available()];
+			//fileData.read(buffer);
+			IOUtils.copy(fileData, new FileOutputStream(TEMP_QUESTION_PATH + request.getTest().getId() + "/" + request.getFilePath()));
+			//IOUtils.write(buffer, );
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
+	}
+
+	public EdoApiStatus backupData(EdoAdminRequest request) {
+		if(CollectionUtils.isEmpty(request.getTestQuestionMaps())) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		
+		Session session = null;
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			
+			LoggingUtil.logMessage(".... Uplink started for " + request.getHostName());
+			
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			
+			saveData(request, session);
+
+			tx.commit();
+			
+			LoggingUtil.logMessage(".... Uplink successful for " + request.getHostName() + " ..........");
+			
+		} catch (Exception e) {
+			LoggingUtil.logError("Error in uplink of " + request.getHostName() + " ==== " + ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+	
+	private void saveData(EdoAdminRequest request, Session session) {
+		
+		int statusCount = 0;
+		int solvedCount = 0;
+		
+		if(CollectionUtils.isNotEmpty(request.getTestStudentMaps())) {
+			for(EdoTestStudentMap map: request.getTestStudentMaps()) {
+				if(map.getTest() == null || map.getStudent() == null) {
+					continue;
+				}
+				List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+						.add(Restrictions.eq("testId", map.getTest().getId()))
+						.add(Restrictions.eq("studentId", map.getStudent().getId()))
+						.list();
+				EdoTestStatusEntity dbMap = null;
+				if(CollectionUtils.isNotEmpty(maps)) {
+					dbMap = maps.get(0);
+				} else {
+					dbMap = new EdoTestStatusEntity();
+					dbMap.setCreatedDate(new Date());
+					dbMap.setTestId(map.getTest().getId());
+					dbMap.setStudentId(map.getStudent().getId());
+				}
+				dbMap.setStatus(map.getStatus());
+				dbMap.setFlagged(map.getTest().getFlaggedCount());
+				dbMap.setSolved(map.getTest().getSolvedCount());
+				if(dbMap.getId() == null) {
+					session.persist(dbMap);
+				}
+				statusCount++;
+			}
+		}
+		
+		if(CollectionUtils.isNotEmpty(request.getTestQuestionMaps())) {
+			for(EdoTestQuestionMap map: request.getTestQuestionMaps()) {
+				saveAnswer(map, session);
+				solvedCount++;
+			}
+		}
+		
+		EdoUplinkStatus uplinkStatus = new EdoUplinkStatus();
+		uplinkStatus.setCreatedDate(new Date());
+		uplinkStatus.setHostLocation(request.getHostName());
+		uplinkStatus.setQuestionsUpdated(solvedCount);
+		uplinkStatus.setStudentsUpdated(statusCount);
+		session.persist(uplinkStatus);
+		
+		LoggingUtil.logMessage(".... Backup done for " + request.getHostName() + " for questions " + solvedCount + " of students ... " + statusCount);
+		
+	}
+	
+	private void saveAnswer(EdoTestQuestionMap request, Session session) {
+		EdoAnswerEntity answer = new EdoAnswerEntity();
+		List<EdoAnswerEntity> existing = session.createCriteria(EdoAnswerEntity.class)
+						.add(Restrictions.eq("testId", request.getTest().getId()))
+						.add(Restrictions.eq("studentId", request.getStudent().getId()))
+						.add(Restrictions.eq("questionId", request.getQuestion().getQn_id()))
+						.list();
+		if(CollectionUtils.isNotEmpty(existing)) {
+			answer = existing.get(0);
+		} else {
+			answer.setQuestionId(request.getQuestion().getQn_id());
+			answer.setStudentId(request.getStudent().getId());
+			answer.setTestId(request.getTest().getId());
+			answer.setCreatedDate(new Date());
+		}
+		
+		if (StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, request.getQuestion().getType())) {
+			CommonUtils.setComplexAnswer(request.getQuestion());
+		}
+		
+		answer.setFlagged(request.getQuestion().getFlagged());
+		if(answer.getFlagged() == null) {
+			answer.setFlagged(0);
+		}
+		if(request.getQuestion().getAnswer() != null) {
+			String pattern = EdoPropertyUtil.getProperty(EdoPropertyUtil.ALLOWED_CHARS);
+			if(StringUtils.isBlank(pattern)) {
+				pattern = "[^a-zA-Z0-9\\s\\-\\,\\+\\*\\/\\^\\~\\.]";
+			}
+			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), pattern, ""));
+		} else {
+			answer.setOptionSelected("");
+		}
+		if(answer.getOptionSelected() == null) {
+			answer.setOptionSelected("");
+		}
+		answer.setTimeTaken(request.getQuestion().getTimeSpent());
+		//Will update only for save test
+		answer.setMarks(request.getQuestion().getMarks());
+		
+		System.out.println("Saving answer .. " + answer.getOptionSelected());
+		
+		if(answer.getId() == null) {
+			session.persist(answer);
+		}
+	}
+	
+	public EdoApiStatus uplinkData(EdoAdminRequest request) {
+		if(request.getDate() == null) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		Session session = null;
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			session = this.sessionFactory.openSession();
+			//Fetch test status after specied date
+			EdoAdminRequest uplinkRequest = getDataForBackup(request, session);
+			String hostLocation = EdoPropertyUtil.getProperty(EdoPropertyUtil.UPLINK_LOCATION);
+			uplinkRequest.setHostName(hostLocation);
+			//Send data uplink
+			EdoServiceResponse uplinkResponse = connectToServer(uplinkRequest, "backup", EdoServiceResponse.class);
+			if(uplinkResponse != null && uplinkResponse.getStatus() != null && uplinkResponse.getStatus().getStatusCode() == 200) {
+				Transaction tx = session.beginTransaction();
+				
+				EdoUplinkStatus uplinkStatus = new EdoUplinkStatus();
+				uplinkStatus.setCreatedDate(new Date());
+				uplinkStatus.setHostLocation("local-" + hostLocation);
+				uplinkStatus.setHostLocation(request.getHostName());
+				if(uplinkRequest.getTestQuestionMaps() != null) {
+					uplinkStatus.setQuestionsUpdated(uplinkRequest.getTestQuestionMaps().size());
+				}
+				if(uplinkRequest.getTestStudentMaps() != null) {
+					uplinkStatus.setStudentsUpdated(uplinkRequest.getTestStudentMaps().size());
+				}
+				session.persist(uplinkStatus);
+				
+				tx.commit();
+			} else {
+				status.setStatus(-111, ERROR_IN_PROCESSING);
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+
+	private EdoAdminRequest getDataForBackup(EdoAdminRequest request, Session session) {
+		List<EdoTestStatusEntity> statuses = session.createCriteria(EdoTestStatusEntity.class)
+				.add(Restrictions.ge("createdDate", request.getDate())).list();
+		
+		EdoAdminRequest uplinkRequest = new EdoAdminRequest();
+		if(CollectionUtils.isNotEmpty(statuses)) {
+			List<EdoTestStudentMap> studentMaps = new ArrayList<EdoTestStudentMap>();
+			for(EdoTestStatusEntity ts: statuses) {
+				EdoTestStudentMap studentMap = new EdoTestStudentMap();
+				//student
+				EdoStudent student = new EdoStudent();
+				student.setId(ts.getStudentId());
+				studentMap.setStudent(student);
+				//test
+				EdoTest test = new EdoTest();
+				test.setId(ts.getTestId());
+				test.setSolvedCount(ts.getSolved());
+				test.setFlaggedCount(ts.getFlagged());
+				studentMap.setTest(test);
+				studentMap.setStatus(ts.getStatus());
+				studentMaps.add(studentMap);
+			}
+			uplinkRequest.setTestStudentMaps(studentMaps);
+		}
+		
+		//Fetch test questions after specied date
+		List<EdoAnswerEntity> answers = session.createCriteria(EdoAnswerEntity.class)
+				.add(Restrictions.ge("createdDate", request.getDate())).list();
+		if(CollectionUtils.isNotEmpty(answers)) {
+			List<EdoTestQuestionMap> questionMaps = new ArrayList<EdoTestQuestionMap>();
+			for(EdoAnswerEntity answer: answers) {
+				EdoTestQuestionMap questionMap = new EdoTestQuestionMap();
+				EdoQuestion question = new EdoQuestion();
+				question.setId(answer.getQuestionId());
+				question.setQn_id(question.getId());
+				question.setAnswer(answer.getOptionSelected());
+				question.setTimeSpent(answer.getTimeTaken());
+				question.setFlagged(answer.getFlagged());
+				questionMap.setQuestion(question);
+				EdoTest test = new EdoTest();
+				test.setId(answer.getTestId());
+				questionMap.setTest(test);
+				EdoStudent student = new EdoStudent();
+				student.setId(answer.getStudentId());
+				questionMap.setStudent(student);
+				questionMaps.add(questionMap);
+			}
+			uplinkRequest.setTestQuestionMaps(questionMaps);
+		}
+		return uplinkRequest;
+	}
+	
+	public <T> T  connectToServer(EdoAdminRequest request, String method, Class<T> type) {
+		try {
+			ClientConfig config = new DefaultClientConfig();
+			config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+			Client client = Client.create(config);
+			
+			String url = EdoPropertyUtil.getProperty(EdoPropertyUtil.UPLINK_SERVER) + method;
+			WebResource webResource = client.resource(url);
+			LoggingUtil.logMessage("Calling uplink with URL =>" + url);
+			
+			ClientResponse response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, request);
+			//ClientResponse response = webResource.queryParam("receiverId", id.toString()).post(ClientResponse.class);
+
+			String output = response.getEntity(String.class);
+			if (response.getStatus() != 200) {
+				throw new RuntimeException("Failed : HTTP error code : " + response.getStatus() + " RESP:" + output);
+			}
+			LoggingUtil.logMessage("Output from uplink URL ...." + response.getStatus() + " RESP:" + output + " \n");
+			return new ObjectMapper().readValue(output, type);
+
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return null;
+	}
+
+	public EdoAdminRequest downloadData(EdoAdminRequest request) {
+		if(request.getDate() == null) {
+			return null;
+		}
+		Session session = null;
+		EdoAdminRequest uplinkRequest = new EdoAdminRequest();
+		try {
+			session = this.sessionFactory.openSession();
+			//Fetch test status after specied date
+			uplinkRequest = getDataForBackup(request, session);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return uplinkRequest;
+	}
+
+	public EdoApiStatus downlinkData(EdoAdminRequest request) {
+		if(request.getDate() == null) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		Session session = null;
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			session = this.sessionFactory.openSession();
+			//download data after specied date
+			EdoAdminRequest response = connectToServer(request, "download", EdoAdminRequest.class);
+			if(response != null) {
+				Transaction tx = session.beginTransaction();
+				saveData(response, session);
+				tx.commit();
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+
+	public EdoAdminRequest getLastUplinkDate() {
+		Session session = null;
+		EdoAdminRequest response = new EdoAdminRequest();
+		try {
+			session = this.sessionFactory.openSession();
+			//Last uplink date
+			Criteria latestUplinks = session.createCriteria(EdoUplinkStatus.class).addOrder(org.hibernate.criterion.Order.desc("createdDate"));
+			latestUplinks.setMaxResults(1);
+			List<EdoUplinkStatus> statuses = latestUplinks.list();
+			if(CollectionUtils.isNotEmpty(statuses)) {
+				response.setDate(statuses.get(0).getCreatedDate());
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
 }

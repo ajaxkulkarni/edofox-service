@@ -4,6 +4,7 @@ public class EdoTestQuestionMap {
 	
 	private EdoTest test;
 	private EdoQuestion question;
+	private EdoStudent student;
 	
 	public EdoTest getTest() {
 		return test;
@@ -16,6 +17,12 @@ public class EdoTestQuestionMap {
 	}
 	public void setQuestion(EdoQuestion question) {
 		this.question = question;
+	}
+	public EdoStudent getStudent() {
+		return student;
+	}
+	public void setStudent(EdoStudent student) {
+		this.student = student;
 	}
 	
 }
