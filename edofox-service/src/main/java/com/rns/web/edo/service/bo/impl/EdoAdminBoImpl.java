@@ -928,9 +928,18 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		
 		if(CollectionUtils.isNotEmpty(request.getTestStudentMaps())) {
 			for(EdoTestStudentMap map: request.getTestStudentMaps()) {
-				if(map.getTest() == null || map.getStudent() == null) {
+				
+				if(map.getTest() == null || map.getStudent() == null || map.getStudent().getId() == null) {
 					continue;
 				}
+				
+				//Check if student exists..if not .. skip the student
+				EdoStudent existingStudent = testsDao.getStudentById(map.getStudent().getId());
+				if(existingStudent == null) {
+					LoggingUtil.logMessage("Student does not exist for " + map.getStudent().getId() + " .. so skipping ..");
+					continue;
+				}
+				
 				List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
 						.add(Restrictions.eq("testId", map.getTest().getId()))
 						.add(Restrictions.eq("studentId", map.getStudent().getId()))
@@ -1029,28 +1038,30 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			session = this.sessionFactory.openSession();
 			//Fetch test status after specied date
 			EdoAdminRequest uplinkRequest = getDataForBackup(request, session);
-			String hostLocation = EdoPropertyUtil.getProperty(EdoPropertyUtil.UPLINK_LOCATION);
-			uplinkRequest.setHostName(hostLocation);
-			//Send data uplink
-			EdoServiceResponse uplinkResponse = connectToServer(uplinkRequest, "backup", EdoServiceResponse.class);
-			if(uplinkResponse != null && uplinkResponse.getStatus() != null && uplinkResponse.getStatus().getStatusCode() == 200) {
-				Transaction tx = session.beginTransaction();
-				
-				EdoUplinkStatus uplinkStatus = new EdoUplinkStatus();
-				uplinkStatus.setCreatedDate(new Date());
-				uplinkStatus.setHostLocation("local-" + hostLocation);
-				uplinkStatus.setHostLocation(request.getHostName());
-				if(uplinkRequest.getTestQuestionMaps() != null) {
-					uplinkStatus.setQuestionsUpdated(uplinkRequest.getTestQuestionMaps().size());
+			if(uplinkRequest != null && (CollectionUtils.isNotEmpty(uplinkRequest.getTestQuestionMaps()) || CollectionUtils.isNotEmpty(uplinkRequest.getTestStudentMaps()))) {
+				String hostLocation = EdoPropertyUtil.getProperty(EdoPropertyUtil.UPLINK_LOCATION);
+				uplinkRequest.setHostName(hostLocation);
+				//Send data uplink
+				EdoServiceResponse uplinkResponse = connectToServer(uplinkRequest, "backup", EdoServiceResponse.class);
+				if(uplinkResponse != null && uplinkResponse.getStatus() != null && uplinkResponse.getStatus().getStatusCode() == 200) {
+					Transaction tx = session.beginTransaction();
+					
+					EdoUplinkStatus uplinkStatus = new EdoUplinkStatus();
+					uplinkStatus.setCreatedDate(new Date());
+					uplinkStatus.setHostLocation("local-" + hostLocation);
+					uplinkStatus.setHostLocation(request.getHostName());
+					if(uplinkRequest.getTestQuestionMaps() != null) {
+						uplinkStatus.setQuestionsUpdated(uplinkRequest.getTestQuestionMaps().size());
+					}
+					if(uplinkRequest.getTestStudentMaps() != null) {
+						uplinkStatus.setStudentsUpdated(uplinkRequest.getTestStudentMaps().size());
+					}
+					session.persist(uplinkStatus);
+					
+					tx.commit();
+				} else {
+					status.setStatus(-111, ERROR_IN_PROCESSING);
 				}
-				if(uplinkRequest.getTestStudentMaps() != null) {
-					uplinkStatus.setStudentsUpdated(uplinkRequest.getTestStudentMaps().size());
-				}
-				session.persist(uplinkStatus);
-				
-				tx.commit();
-			} else {
-				status.setStatus(-111, ERROR_IN_PROCESSING);
 			}
 			
 		} catch (Exception e) {
@@ -1064,7 +1075,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 
 	private EdoAdminRequest getDataForBackup(EdoAdminRequest request, Session session) {
 		List<EdoTestStatusEntity> statuses = session.createCriteria(EdoTestStatusEntity.class)
-				.add(Restrictions.ge("createdDate", request.getDate())).list();
+				.add(Restrictions.ge("updatedDate", request.getDate())).list();
 		
 		EdoAdminRequest uplinkRequest = new EdoAdminRequest();
 		if(CollectionUtils.isNotEmpty(statuses)) {
@@ -1089,7 +1100,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		
 		//Fetch test questions after specied date
 		List<EdoAnswerEntity> answers = session.createCriteria(EdoAnswerEntity.class)
-				.add(Restrictions.ge("createdDate", request.getDate())).list();
+				.add(Restrictions.ge("updatedDate", request.getDate())).list();
 		if(CollectionUtils.isNotEmpty(answers)) {
 			List<EdoTestQuestionMap> questionMaps = new ArrayList<EdoTestQuestionMap>();
 			for(EdoAnswerEntity answer: answers) {
