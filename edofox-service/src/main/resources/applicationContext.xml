@@ -31,6 +31,7 @@
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"></property>
+		<property name="txManager" ref="transactionManager" />
 	</bean>
 	
 	<bean id="taskService" class="com.rns.web.edo.service.util.EdoBackupRoutine">

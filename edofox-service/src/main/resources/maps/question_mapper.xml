@@ -34,17 +34,29 @@
 		insert into test_questions
 		(subject_id,question,option1,option2,option3,option4,correct_answer,question_img_url,
 		solution,weightage,negative_marks,created_date,question_type,exam_type,
-		<if test="chapter.chapterId != null">
+		<if test="chapter != null &amp;&amp; chapter.chapterId != null">
 			chapter,
+		</if>
+		<if test="instituteId != null">
+			institute_id,
 		</if>
 		level, ref_id)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
 		'${solution}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
-		<if test="chapter.chapterId != null">
+		<if test="chapter != null &amp;&amp; chapter.chapterId != null">
 		${chapter.chapterId},
 		</if>
-		${level}, '${referenceId}')
+		<if test="instituteId != null">
+			${instituteId},
+		</if>
+		<if test="level != null">
+			${level}, 
+		</if>
+		<if test="level == null">
+			NULL, 
+		</if>
+		'${referenceId}')
 	</insert>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"

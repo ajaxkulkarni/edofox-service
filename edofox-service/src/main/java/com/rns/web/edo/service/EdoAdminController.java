@@ -334,5 +334,60 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/parsePdf")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse parsePdf(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition fileDetails,
+			@FormDataParam("testId") Integer testId, @FormDataParam("buffer") Integer buffer, @FormDataParam("questionSuffix") String questionSuffix, @FormDataParam("questionPrefix") String questionPrefix) {
+		LoggingUtil.logMessage("Parse PDF request :" + testId + " for " + fileDetails.getFileName());
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EdoAdminRequest request = new EdoAdminRequest();
+			EdoTest test = new EdoTest();
+			test.setId(testId);
+			request.setTest(test);
+			request.setBuffer(buffer);
+			request.setQuestionPrefix(questionPrefix);
+			request.setQuestionSuffix(questionSuffix);
+			response = adminBo.parsePdf(request, fileData);
+			LoggingUtil.logMessage("Parsing PDF for " + testId + " completed ..");
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+	
+	@POST
+	@Path("/loadParsedPdf")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse loadParsedPdf(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Load Parsed PDF request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response =  adminBo.loadParsedQuestions(request);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Load Parsed PDF Response");
+		return response;
+	}
+	
+	@POST
+	@Path("/saveParsedQuestionPaper")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse saveParsedQuestionPaper(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Save Parsed paper request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setStatus(adminBo.saveParsedQuestions(request));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		LoggingUtil.logMessage("Save Parsed paper Response");
+		return response;
+	}
 	
 }

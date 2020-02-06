@@ -13,7 +13,7 @@ public interface EdoUserBo {
 	EdoServiceResponse getTestResult(EdoServiceRequest request);
 	EdoServiceResponse getTest(Integer testId, Integer studentId);
 	EdoApiStatus saveTest(EdoServiceRequest request);
-	EdoFile getQuestionImage(Integer questionId, String imageType);
+	EdoFile getQuestionImage(Integer questionId, String imageType, Integer testId);
 	EdoServiceResponse getPackages(EDOInstitute institute);
 	EdoServiceResponse getPackages(EdoStudent student);
 	EdoServiceResponse registerStudent(EdoStudent student);

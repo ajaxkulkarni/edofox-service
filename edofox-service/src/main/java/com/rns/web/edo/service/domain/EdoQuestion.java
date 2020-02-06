@@ -54,6 +54,7 @@ public class EdoQuestion {
 	private EdoFeedback feedback;
 	private String status;
 	private Integer disabled;
+	private Integer instituteId;
 	
 	public String getOption1() {
 		return option1;
@@ -322,6 +323,12 @@ public class EdoQuestion {
 	}
 	public void setDisabled(Integer disabled) {
 		this.disabled = disabled;
+	}
+	public Integer getInstituteId() {
+		return instituteId;
+	}
+	public void setInstituteId(Integer instituteId) {
+		this.instituteId = instituteId;
 	}
 
 }

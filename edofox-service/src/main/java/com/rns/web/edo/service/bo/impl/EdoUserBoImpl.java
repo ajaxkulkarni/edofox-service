@@ -45,6 +45,7 @@ import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
+import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
@@ -568,12 +569,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return status;
 	}
 	
-	public EdoFile getQuestionImage(Integer questionId, String imageType) {
+	public EdoFile getQuestionImage(Integer questionId, String imageType, Integer testId) {
 		
 		try {
 			EdoFile file = new EdoFile();
 			EdoQuestion question = testsDao.getQuestion(questionId);
-			if(question == null) {
+			if(question == null && !StringUtils.equals(imageType, "TEMP")) {
 				return null;
 			}
 			String path = null;
@@ -589,6 +590,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				path = question.getOption4ImageUrl();
 			} else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
 				path = question.getMetaDataImageUrl();
+			} else if (StringUtils.equals(imageType, "TEMP")) {
+				path = TEMP_QUESTION_PATH + testId + "/" + EdoPDFUtil.QUESTION_PREFIX + questionId + ".png";
 			}
 			
 			if(path != null) {

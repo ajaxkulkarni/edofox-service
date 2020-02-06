@@ -33,7 +33,7 @@ public class EdoBackupRoutine implements SchedulingConfigurer {
 					public void run() {
 						EdoAdminRequest request = new EdoAdminRequest();
 						EdoAdminRequest lastDate = adminBo.getLastUplinkDate();
-						if(lastDate != null) {
+						if(lastDate != null && lastDate.getDate() != null) {
 							request.setDate(lastDate.getDate());
 						} else {
 							Calendar cal = Calendar.getInstance();

@@ -710,39 +710,7 @@ agent-platform-version: 4
 				in = new FileInputStream(file);
 				String json = IOUtils.toString(in);
 				//System.out.println(json);
-				ExtDataRoot data = new ObjectMapper().readValue(json, ExtDataRoot.class);
-				if(data.getData() != null) {
-					if(CollectionUtils.isEmpty(data.getData().getQuestions())) {
-						System.out.println("No questions found!!!");
-					} else {
-						for(ExtDataQuestion q: data.getData().getQuestions()) {
-							//System.out.println(q);
-							if(StringUtils.isBlank(q.getQuestion_style()) || questionStyles.get(q.getQuestion_style()) == null) {
-								continue;
-							}
-							
-							if(CollectionUtils.isNotEmpty(q.getPassage_child_questions())) {
-								//Add multiple questions
-								for(ExtDataQuestion subQ: q.getPassage_child_questions()) {
-									EdoQuestion edoQuestion = prepareQuestion(chapterId, subjectId, subQ, exam);
-									if(edoQuestion != null) {
-										edoQuestion.setQuestion(Jsoup.parse(q.getQuestion()).text() + "\n" +  edoQuestion.getQuestion());
-										edoQuestion.setType("PASSAGE");
-										questions.add(edoQuestion);
-									}
-								}
-							} else if (CollectionUtils.isNotEmpty(q.getChoices()) || StringUtils.equals("blank", q.getQuestion_style())) {
-								EdoQuestion edoQuestion = prepareQuestion(chapterId, subjectId, q, exam);
-								if(edoQuestion != null) {
-									questions.add(edoQuestion);
-								}
-							}
-							
-						}
-					}
-				} else {
-					System.out.println("............. Not found ..........");
-				}
+				extractDataFromJson(chapterId, subjectId, exam, questions, json);
 			}
 			System.out.println("................... Total questions added " + questions.size());
 		
@@ -754,6 +722,43 @@ agent-platform-version: 4
 			}
 		}
 		return questions;
+	}
+
+	public static void extractDataFromJson(Integer chapterId, Integer subjectId, String exam, List<EdoQuestion> questions, String json)
+			throws IOException, JsonParseException, JsonMappingException {
+		ExtDataRoot data = new ObjectMapper().readValue(json, ExtDataRoot.class);
+		if(data.getData() != null) {
+			if(CollectionUtils.isEmpty(data.getData().getQuestions())) {
+				System.out.println("No questions found!!!");
+			} else {
+				for(ExtDataQuestion q: data.getData().getQuestions()) {
+					//System.out.println(q);
+					if(StringUtils.isBlank(q.getQuestion_style()) || questionStyles.get(q.getQuestion_style()) == null) {
+						continue;
+					}
+					
+					if(CollectionUtils.isNotEmpty(q.getPassage_child_questions())) {
+						//Add multiple questions
+						for(ExtDataQuestion subQ: q.getPassage_child_questions()) {
+							EdoQuestion edoQuestion = prepareQuestion(chapterId, subjectId, subQ, exam);
+							if(edoQuestion != null) {
+								edoQuestion.setQuestion(Jsoup.parse(q.getQuestion()).text() + "\n" +  edoQuestion.getQuestion());
+								edoQuestion.setType("PASSAGE");
+								questions.add(edoQuestion);
+							}
+						}
+					} else if (CollectionUtils.isNotEmpty(q.getChoices()) || StringUtils.equals("blank", q.getQuestion_style())) {
+						EdoQuestion edoQuestion = prepareQuestion(chapterId, subjectId, q, exam);
+						if(edoQuestion != null) {
+							questions.add(edoQuestion);
+						}
+					}
+					
+				}
+			}
+		} else {
+			System.out.println("............. Not found ..........");
+		}
 	}
 
 	private static EdoQuestion prepareQuestion(Integer chapterId, Integer subjectId, ExtDataQuestion q, String exam) {
@@ -901,6 +906,9 @@ agent-platform-version: 4
 	}
 	
 	public static String downloadFile(String url, String fileName, Integer questionId) throws FileNotFoundException, IOException {
+		if(StringUtils.isBlank(url)) {
+			return null;
+		}
 		InputStream in = null;
 		FileOutputStream os = null;
 		try {
@@ -920,7 +928,8 @@ agent-platform-version: 4
 			return filePath;
 		
 		} catch (Exception e) {
-			System.out.println("Error downloading file ..");
+			System.out.println("Error downloading file from " + url);
+			e.printStackTrace();
 		} finally {
 			if(in != null) {
 				in.close();

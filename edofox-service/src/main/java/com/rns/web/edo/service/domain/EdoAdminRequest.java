@@ -19,6 +19,10 @@ public class EdoAdminRequest {
 	private List<EdoTestStudentMap> testStudentMaps;
 	private String hostName;
 	private Date date;
+	private Integer buffer;
+	private String questionPrefix;
+	private String questionSuffix;
+	private EdoTest test;
 	
 	public List<EdoTestQuestionMap> getTestQuestionMaps() {
 		return testQuestionMaps;
@@ -43,6 +47,30 @@ public class EdoAdminRequest {
 	}
 	public void setDate(Date date) {
 		this.date = date;
+	}
+	public Integer getBuffer() {
+		return buffer;
+	}
+	public void setBuffer(Integer buffer) {
+		this.buffer = buffer;
+	}
+	public String getQuestionPrefix() {
+		return questionPrefix;
+	}
+	public void setQuestionPrefix(String questionPrefix) {
+		this.questionPrefix = questionPrefix;
+	}
+	public EdoTest getTest() {
+		return test;
+	}
+	public void setTest(EdoTest test) {
+		this.test = test;
+	}
+	public String getQuestionSuffix() {
+		return questionSuffix;
+	}
+	public void setQuestionSuffix(String questionSuffix) {
+		this.questionSuffix = questionSuffix;
 	}
 
 }

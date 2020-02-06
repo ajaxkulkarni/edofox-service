@@ -1,30 +1,34 @@
 package com.rns.web.edo.service.bo.impl;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.criteria.Order;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.poi.ss.formula.functions.T;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
@@ -47,6 +51,7 @@ import com.rns.web.edo.service.domain.jpa.EdoUplinkStatus;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
+import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
@@ -63,6 +68,15 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	private ThreadPoolTaskExecutor executor;
 	private EdoTestsDao testsDao;
 	private SessionFactory sessionFactory;
+	private DataSourceTransactionManager txManager;
+	
+	public void setTxManager(DataSourceTransactionManager txManager) {
+		this.txManager = txManager;
+	}
+	
+	public DataSourceTransactionManager getTxManager() {
+		return txManager;
+	}
 
 	public void setExecutor(ThreadPoolTaskExecutor executor) {
 		this.executor = executor;
@@ -876,15 +890,24 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 
 	public EdoApiStatus cropQuestionImage(EdoServiceRequest request, InputStream fileData) {
 		EdoApiStatus status = new EdoApiStatus();
-		if(request.getTest() == null || request.getTest().getId() == null || StringUtils.isBlank(request.getFilePath())) {
+		if (request.getTest() == null || request.getTest().getId() == null || StringUtils.isBlank(request.getFilePath())) {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
 			return status;
 		}
 		try {
-			//byte[] buffer = new byte[fileData.available()];
-			//fileData.read(buffer);
-			IOUtils.copy(fileData, new FileOutputStream(TEMP_QUESTION_PATH + request.getTest().getId() + "/" + request.getFilePath()));
-			//IOUtils.write(buffer, );
+			// byte[] buffer = new byte[fileData.available()];
+			// fileData.read(buffer);
+			FileOutputStream fileOutputStream = new FileOutputStream(TEMP_QUESTION_PATH + request.getTest().getId() + "/" + request.getFilePath());
+			//IOUtils.copy(fileData, fileOutputStream);
+			//FileOutputStream out = new FileOutputStream(new File(fileLocation));
+			int read = 0;
+			byte[] bytes = new byte[1024];
+			while ((read = fileData.read(bytes)) != -1) {
+				fileOutputStream.write(bytes, 0, read);
+			}
+			fileOutputStream.flush();
+			fileOutputStream.close();
+
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111, ERROR_IN_PROCESSING);
@@ -1211,5 +1234,129 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return response;
+	}
+
+	public EdoServiceResponse parsePdf(EdoAdminRequest request, InputStream fileData) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			String folderPath = TEMP_QUESTION_PATH + request.getTest().getId() + "/";
+			if(request.getBuffer() == null) {
+				request.setBuffer(10);
+			}
+			if(request.getQuestionPrefix() == null) {
+				request.setQuestionPrefix("");
+			}
+			if(request.getQuestionSuffix() == null) {
+				request.setQuestionSuffix("");
+			}
+			request.getTest().setTest(EdoPDFUtil.pdfBox(request.getQuestionSuffix(), request.getQuestionPrefix(), fileData, folderPath , request.getBuffer(), request.getTest().getId()));
+			response.setTest(request.getTest()); 
+		} catch (Exception e) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse loadParsedQuestions(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			String folderPath = TEMP_QUESTION_PATH + request.getTest().getId() + "/";
+			File folder = new File(folderPath);
+			if(folder.exists()) {
+				List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
+				for(File file: folder.listFiles()) {
+					String[] values = StringUtils.split(file.getName(), "-");
+					if(ArrayUtils.isNotEmpty(values) && values.length > 1) {
+						EdoQuestion question = new EdoQuestion();
+						Integer questionNumber = new Integer(StringUtils.removeEnd(values[1], ".png"));
+						question.setQuestionNumber(questionNumber);
+						question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber));
+						questions.add(question);
+					}
+				}
+				Collections.sort(questions, new Comparator<EdoQuestion>() {
+
+					public int compare(EdoQuestion o1, EdoQuestion o2) {
+						if(o1 != null && o2 != null && o1.getQuestionNumber() != null && o2.getQuestionNumber() != null) {
+							if(o1.getQuestionNumber() < o2.getQuestionNumber()) {
+								return -1;
+							} else if (o1.getQuestionNumber() > o2.getQuestionNumber()) {
+								return 1;
+							} else if (o1.getQuestionNumber() == o2.getQuestionNumber()) {
+								return 0;
+							}
+						}
+						return 0;
+					}
+				});
+				request.getTest().setTest(questions);
+				response.setTest(request.getTest());
+			}
+		} catch (Exception e) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
+	public EdoApiStatus saveParsedQuestions(EdoServiceRequest request) {
+		if(request.getTest() == null || CollectionUtils.isEmpty(request.getTest().getTest())) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		EdoApiStatus status = new EdoApiStatus();
+		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
+		try {
+			String sourceDir = TEMP_QUESTION_PATH + request.getTest().getId();
+			File source = new File(sourceDir);
+			String destinationDir = TEST_QUESTION_PATH /*+ request.getTest().getId()*/;
+			File destination = new File(destinationDir);
+			if(destination.exists()) {
+				//destination.mkdirs();
+				FileUtils.deleteDirectory(destination);
+			}
+			LoggingUtil.logMessage("Moving temp directory " + sourceDir + " to " + destinationDir);
+			FileUtils.copyDirectoryToDirectory(source, destination);
+			for(EdoQuestion question: request.getTest().getTest()) {
+				question.setQuestionImageUrl(destinationDir + request.getTest().getId()  + "/" + EdoPDFUtil.QUESTION_PREFIX + question.getQuestionNumber() + ".png");
+				if(StringUtils.isBlank(question.getType())) {
+					question.setType("SINGLE");
+				}
+				if(question.getExamType() == null) {
+					question.setExamType("");
+				}
+				if(question.getCorrectAnswer() == null) {
+					question.setCorrectAnswer("");
+				}
+				if(question.getNegativeMarks() == null) {
+					question.setNegativeMarks(0f);
+				}
+				if(question.getWeightage() == null) {
+					question.setWeightage(1f);
+				}
+				if(StringUtils.isBlank(question.getOption1())) {
+					question.setOption1("1)");
+					question.setOption2("2)");
+					question.setOption3("3)");
+					question.setOption4("4)");
+				}
+				if(question.getQn_id() == null) {
+					question.setQn_id(question.getQuestionNumber());
+				}
+				testsDao.addQuestion(question);
+			}
+			testsDao.createExam(request);
+			txManager.commit(txStatus);
+			FileUtils.deleteDirectory(source);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111,ERROR_IN_PROCESSING);
+			try {
+				txManager.rollback(txStatus);
+			} catch (Exception e2) {
+				LoggingUtil.logError(ExceptionUtils.getStackTrace(e2));
+			}
+		}
+		return status;
 	}
 }

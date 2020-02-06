@@ -139,7 +139,27 @@ public class EdoUserController {
 	public Response getImage(@PathParam("questionId") Integer questionId, @PathParam("imageType") String imageType) {
 		//LoggingUtil.logObject("Image request:", userId);
 		try {
-			EdoFile file = userBo.getQuestionImage(questionId, imageType);
+			EdoFile file = userBo.getQuestionImage(questionId, imageType, null);
+			if(file != null) {
+				ResponseBuilder response = Response.ok(file.getContent());
+				//response.header("Content-Disposition", "filename=" + file.getFileName());
+				return response.build();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@GET
+	@Path("/getTempImage/{testId}/{questionId}")
+	//@Produces(MediaType.MULTIPART_FORM_DATA)
+	@Produces("image/png")
+	public Response geTempImage(@PathParam("questionId") Integer questionId, @PathParam("testId") Integer testId) {
+		//LoggingUtil.logObject("Image request:", userId);
+		try {
+			EdoFile file = userBo.getQuestionImage(questionId, "TEMP", testId);
 			if(file != null) {
 				ResponseBuilder response = Response.ok(file.getContent());
 				//response.header("Content-Disposition", "filename=" + file.getFileName());

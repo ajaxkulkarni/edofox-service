@@ -27,6 +27,11 @@ public interface EdoAdminBo {
 	EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request);
 	void fixQuestions();
 	EdoApiStatus cropQuestionImage(EdoServiceRequest request, InputStream fileData);
+	EdoServiceResponse parsePdf(EdoAdminRequest request, InputStream fileData);
+	EdoServiceResponse loadParsedQuestions(EdoServiceRequest request);
+	EdoApiStatus saveParsedQuestions(EdoServiceRequest request);
+	
+	
 	
 	//Super admin
 	EdoApiStatus backupData(EdoAdminRequest request);
