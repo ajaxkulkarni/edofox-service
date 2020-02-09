@@ -39,5 +39,6 @@ public interface EdoAdminBo {
 	EdoAdminRequest downloadData(EdoAdminRequest request);
 	EdoApiStatus downlinkData(EdoAdminRequest request);
 	EdoAdminRequest getLastUplinkDate();
+	EdoApiStatus createInstitute(EdoAdminRequest request);
 	
 }

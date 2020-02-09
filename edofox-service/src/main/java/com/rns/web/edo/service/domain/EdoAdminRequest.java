@@ -23,6 +23,11 @@ public class EdoAdminRequest {
 	private String questionPrefix;
 	private String questionSuffix;
 	private EdoTest test;
+	private EDOInstitute institute;
+	private boolean cet;
+	private boolean jee;
+	private boolean neet;
+	private EdoStudent student;
 	
 	public List<EdoTestQuestionMap> getTestQuestionMaps() {
 		return testQuestionMaps;
@@ -71,6 +76,36 @@ public class EdoAdminRequest {
 	}
 	public void setQuestionSuffix(String questionSuffix) {
 		this.questionSuffix = questionSuffix;
+	}
+	public EDOInstitute getInstitute() {
+		return institute;
+	}
+	public void setInstitute(EDOInstitute institute) {
+		this.institute = institute;
+	}
+	public boolean isCet() {
+		return cet;
+	}
+	public void setCet(boolean cet) {
+		this.cet = cet;
+	}
+	public boolean isJee() {
+		return jee;
+	}
+	public void setJee(boolean jee) {
+		this.jee = jee;
+	}
+	public boolean isNeet() {
+		return neet;
+	}
+	public void setNeet(boolean neet) {
+		this.neet = neet;
+	}
+	public EdoStudent getStudent() {
+		return student;
+	}
+	public void setStudent(EdoStudent student) {
+		this.student = student;
 	}
 
 }

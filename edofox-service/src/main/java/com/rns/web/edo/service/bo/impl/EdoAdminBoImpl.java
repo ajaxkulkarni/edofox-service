@@ -18,6 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -33,6 +34,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -690,6 +692,12 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					question.setSubject("Maths");
 					questions = testsDao.getQuestionsByExam(question);
 					addQuestionsToExam(request, questions, startId, "Maths", null);
+					//Biology
+					startId = startId + questions.size();
+					question.setSubjectId(4);
+					question.setSubject("Biology");
+					questions = testsDao.getQuestionsByExam(question);
+					addQuestionsToExam(request, questions, startId, "Biology", null);
 				}
 			}
 		} catch (Exception e) {
@@ -1348,6 +1356,94 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			testsDao.createExam(request);
 			txManager.commit(txStatus);
 			FileUtils.deleteDirectory(source);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111,ERROR_IN_PROCESSING);
+			try {
+				txManager.rollback(txStatus);
+			} catch (Exception e2) {
+				LoggingUtil.logError(ExceptionUtils.getStackTrace(e2));
+			}
+		}
+		return status;
+	}
+
+	public EdoApiStatus createInstitute(EdoAdminRequest request) {
+		if(request.getInstitute() == null || StringUtils.isBlank(request.getInstitute().getName())) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		EdoApiStatus status = new EdoApiStatus();
+		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
+		try {
+			Date expiryDate = DateUtils.addDays(new Date(), 30);
+			EDOInstitute institute = request.getInstitute();
+			institute.setExpiryDate(expiryDate);
+			//Create institute and login
+			testsDao.saveInstitute(institute);
+			testsDao.createAdminLogin(institute);
+			LoggingUtil.logMessage("Institute " + institute.getId() + " and login " + institute.getUsername() + " created ..");
+			//Add default package
+			EDOPackage pkg = new EDOPackage();
+			pkg.setInstitute(institute);
+			pkg.setName("Default");
+			testsDao.createPackage(pkg);
+			LoggingUtil.logMessage("Institute package " + pkg.getId() + " created ..");
+			//Add first student
+			EdoStudent student = request.getStudent();
+			if(request.getStudent() != null && pkg.getId() != null) {
+				if(student.getPhone() == null) {
+					student.setPhone(institute.getContact());
+				}
+				EdoServiceRequest addStudentRequest = new EdoServiceRequest();
+				addStudentRequest.setInstitute(institute);
+				List<EDOPackage> packages = new ArrayList<EDOPackage>();
+				packages.add(pkg);
+				student.setPackages(packages);
+				addStudent(addStudentRequest, student);
+			}
+			//Add a test
+			if(pkg.getId() != null && student != null) {
+				EdoTestStudentMap map = new EdoTestStudentMap();
+				student.setCurrentPackage(pkg);
+				map.setStudent(student);
+				EdoTest test = new EdoTest();
+				test.setStartDate(new Date());
+				test.setEndDate(expiryDate);
+				map.setTest(test);
+				if(request.isCet()) {
+					map.getTest().setName("CET Practice test");
+					map.getTest().setNoOfQuestions(200);
+					map.getTest().setDuration(10800);
+					map.getTest().setTestUi("JEE");
+					testsDao.addTest(map);
+					EdoServiceRequest automateTestRequest = new EdoServiceRequest();
+					EdoTest automateTest = new EdoTest();
+					automateTest.setId(map.getTest().getId());
+					automateTest.setName("CET19");
+					automateTestRequest.setTest(automateTest);
+					//Prepare a CET sample test
+					automateTest(automateTestRequest);
+					LoggingUtil.logMessage("CET Test created ..");
+				}
+				if(request.isJee()) {
+					map.getTest().setName("JEE Practice test");
+					map.getTest().setNoOfQuestions(90);
+					map.getTest().setDuration(10800);
+					map.getTest().setTestUi("JEEM");
+					testsDao.addTest(map);
+					EdoServiceRequest automateTestRequest = new EdoServiceRequest();
+					EdoTest automateTest = new EdoTest();
+					automateTest.setId(map.getTest().getId());
+					automateTest.setName("JEE19");
+					automateTestRequest.setTest(automateTest);
+					//Prepare a CET sample test
+					automateTest(automateTestRequest);
+					LoggingUtil.logMessage("JEE Mains Test created ..");
+				}
+			}
+			
+			txManager.commit(txStatus);
+			LoggingUtil.logMessage("Admin account created successfully .....");
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111,ERROR_IN_PROCESSING);

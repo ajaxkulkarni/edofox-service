@@ -18,6 +18,21 @@
 	<update id="updateSolution" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
 		UPDATE test_questions set correct_answer = "${correctAnswer}", solution = "${solution}"  WHERE id = ${qn_id}
 	</update>
+	
+	<insert id="saveInstitute" parameterType="com.rns.web.edo.service.domain.EDOInstitute" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into institute (institute_name, created_date, status, expiry_date, contact_number) 
+		values ('${name}', CURRENT_TIMESTAMP, 'Active', '${expiryDate}', '${contact}');
+	</insert>
+	
+	<insert id="createAdminLogin" parameterType="com.rns.web.edo.service.domain.EDOInstitute">
+		insert into admin (username, password, institute_id, created_date, expiry_date) 
+		values ('${username}', '${password}', ${id}, CURRENT_TIMESTAMP, '${expiryDate}');
+	</insert>
+	
+	<insert id="createPackage" parameterType="com.rns.web.edo.service.domain.EDOPackage">
+		insert into packages (package_name, institute_id, created_date) values('${name}', ${institute.id}, CURRENT_TIMESTAMP);
+	</insert>
+	
 
 
 </mapper>

@@ -67,6 +67,10 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentByPayment(String paymentId);
 	List<EdoStudent> getAllStudents(Integer id);
 	Integer getLastQuestionNumber(Integer testId);
+	Integer saveInstitute(EDOInstitute institute);
+	void createAdminLogin(EDOInstitute institute);
+	Integer createPackage(EDOPackage pkg);
+	Integer addTest(EdoTestStudentMap map);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects();

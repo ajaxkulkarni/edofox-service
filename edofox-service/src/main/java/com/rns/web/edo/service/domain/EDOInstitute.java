@@ -1,11 +1,16 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.Date;
+
 public class EDOInstitute {
 	
 	private Integer id;
 	private String name;
 	private String firebaseId;
 	private String contact;
+	private String username;
+	private String password;
+	private Date expiryDate;
 	
 	public Integer getId() {
 		return id;
@@ -30,6 +35,24 @@ public class EDOInstitute {
 	}
 	public void setContact(String contact) {
 		this.contact = contact;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public Date getExpiryDate() {
+		return expiryDate;
+	}
+	public void setExpiryDate(Date expiryDate) {
+		this.expiryDate = expiryDate;
 	}
 
 }
