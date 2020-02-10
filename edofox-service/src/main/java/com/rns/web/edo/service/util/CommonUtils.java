@@ -565,25 +565,25 @@ public class CommonUtils {
 			}
 		} else {
 			Integer qn_id = question.getQn_id() != null ? question.getQn_id() : question.getId();
-			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
+			if(StringUtils.isNotBlank(question.getQuestionImageUrl()) && !StringUtils.contains(question.getQuestionImageUrl(), "http")) {
 				question.setQuestionImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_QUESTION);
 			}
-			if(StringUtils.isNotBlank(question.getOption1ImageUrl())) {
+			if(StringUtils.isNotBlank(question.getOption1ImageUrl()) && !StringUtils.contains(question.getOption1ImageUrl(), "http")) {
 				question.setOption1ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION1);
 			}
-			if(StringUtils.isNotBlank(question.getOption2ImageUrl())) {
+			if(StringUtils.isNotBlank(question.getOption2ImageUrl()) && !StringUtils.contains(question.getOption2ImageUrl(), "http")) {
 				question.setOption2ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION2);
 			}
-			if(StringUtils.isNotBlank(question.getOption3ImageUrl())) {
+			if(StringUtils.isNotBlank(question.getOption3ImageUrl()) && !StringUtils.contains(question.getOption3ImageUrl(), "http")) {
 				question.setOption3ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION3);
 			}
-			if(StringUtils.isNotBlank(question.getOption4ImageUrl())) {
+			if(StringUtils.isNotBlank(question.getOption3ImageUrl()) && !StringUtils.contains(question.getOption3ImageUrl(), "http")) {
 				question.setOption4ImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_OPTION4);
 			}
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
 				question.setMetaDataImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_META_DATA);
 			}
-			if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
+			if(StringUtils.isNotBlank(question.getSolutionImageUrl()) && !StringUtils.contains(question.getSolutionImageUrl(), "http")) {
 				question.setSolutionImageUrl(hostUrl + "getImage/" + qn_id + "/" + EdoConstants.ATTR_SOLUTION);
 			}
 		}
