@@ -534,10 +534,11 @@ public class CommonUtils {
 		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
 		
 		String absoluteUrls = EdoPropertyUtil.getProperty(EdoPropertyUtil.ABSOLUTE_IMAGE_URLS);
-		if(StringUtils.equals(absoluteUrls, "true")) {
+		if(StringUtils.equals(absoluteUrls, "true") && !StringUtils.contains(question.getQuestionImageUrl(), "home")) {
 			if(!StringUtils.contains(question.getQuestionImageUrl(), "http") && !StringUtils.contains(question.getQuestionImageUrl(), "https")) {
 				question.setQuestionImageUrl("http://" + question.getQuestionImageUrl());
 			}
+			LoggingUtil.logMessage("Setting question image ==> " + question.getQuestionImageUrl() + " ABS URL ==> " + absoluteUrls);
 			return;
 		}
 		
