@@ -474,7 +474,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoApiStatus status = new EdoApiStatus();
 		
 		try {
-			
+			LoggingUtil.logMessage("Adding total students ==> " + request.getStudents().size());
 			for(EdoStudent student: request.getStudents()) {
 				addStudent(request, student);
 			}
@@ -493,6 +493,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		if(CollectionUtils.isEmpty(existingStudent)) {
 			testsDao.saveStudent(student);
 		} else {
+			LoggingUtil.logMessage("Student already exists with phone number ... " + student.getPhone() + " and roll no " + student.getRollNo());
 			student.setId(existingStudent.get(0).getId());
 			testsDao.updateStudent(student);
 		}
@@ -1248,6 +1249,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
 			String folderPath = TEMP_QUESTION_PATH + request.getTest().getId() + "/";
+			File dir = new File(folderPath);
+			if(dir.exists()) {
+				FileUtils.cleanDirectory(dir);
+			}
 			if(request.getBuffer() == null) {
 				request.setBuffer(10);
 			}
@@ -1257,7 +1262,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(request.getQuestionSuffix() == null) {
 				request.setQuestionSuffix("");
 			}
-			request.getTest().setTest(EdoPDFUtil.pdfBox(request.getQuestionSuffix(), request.getQuestionPrefix(), fileData, folderPath , request.getBuffer(), request.getTest().getId()));
+			request.getTest().setTest(EdoPDFUtil.pdfBox(request.getQuestionSuffix(), request.getQuestionPrefix(), fileData, folderPath , request.getBuffer(), request.getTest().getId(), request.getFromQuestion(), request.getToQuestion()));
 			response.setTest(request.getTest()); 
 		} catch (Exception e) {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
