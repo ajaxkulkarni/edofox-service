@@ -49,9 +49,8 @@ public class EdoPDFUtil {
 	//95.621284 - 759.48
 	//95.621284 - 685.54
 	
-	public static List<EdoQuestion> pdfBox(final String questionNumberSuffix, final String questionNumberPrefix, InputStream is, String outputFolder, int buffer, int testId) {
+	public static List<EdoQuestion> pdfBox(final String questionNumberSuffix, final String questionNumberPrefix, InputStream is, String outputFolder, int buffer, int testId, final Integer from, final Integer to) {
 		try {
-			
 			//String questionNumberSuffix = ".";
 			List<EdoQuestion> parsedQuestions = new ArrayList<EdoQuestion>();
 			PDDocument document = PDDocument.load(is);
@@ -101,22 +100,34 @@ public class EdoPDFUtil {
 									}
 								}
 							} else if (StringUtils.contains(text, questionNumberPrefix + questionCount + questionNumberSuffix)) {
-								EdoPDFCoordinate coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), firstProsition.getPageWidth(), questionCount);
-								//coord.setHeight(firstProsition.getHeight());
-								List<EdoPDFCoordinate> coordList = coordinates.get(pg);
-								if(coordList == null) {
-									coordList = new ArrayList<EdoPDFCoordinate>();
+								if(withinRange()) {
+									EdoPDFCoordinate coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), firstProsition.getPageWidth(), questionCount);
+									//coord.setHeight(firstProsition.getHeight());
+									List<EdoPDFCoordinate> coordList = coordinates.get(pg);
+									if(coordList == null) {
+										coordList = new ArrayList<EdoPDFCoordinate>();
+									}
+									coordList.add(coord);
+									//coord.setPage(pg);
+									coordinates.put(pg, coordList);
+									System.out.println(questionCount + ":" + firstProsition.getEndX() + " - " + firstProsition.getEndY() + " width " + firstProsition.getHeight() + " pg w " + firstProsition.getPageWidth() +  " for " + text);
 								}
-								coordList.add(coord);
-								//coord.setPage(pg);
-								coordinates.put(pg, coordList);
-								System.out.println(questionCount + ":" + firstProsition.getEndX() + " - " + firstProsition.getEndY() + " width " + firstProsition.getHeight() + " pg w " + firstProsition.getPageWidth() +  " for " + text);
 								questionCount++;
 							}
 							//writeString(String.format("[%s]", firstProsition.getXDirAdj()));
 							startOfLine = false;
 						}
 						super.writeString(text, textPositions);
+					}
+
+					private boolean withinRange() {
+						if(from != null && from > questionCount) {
+							return false;
+						}
+						if(to != null && (to) < questionCount) {
+							return false;
+						}
+						return true;
 					}
 
 					boolean startOfLine = true;

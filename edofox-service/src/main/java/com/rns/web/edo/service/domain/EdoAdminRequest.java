@@ -28,6 +28,8 @@ public class EdoAdminRequest {
 	private boolean jee;
 	private boolean neet;
 	private EdoStudent student;
+	private Integer fromQuestion;
+	private Integer toQuestion;
 	
 	public List<EdoTestQuestionMap> getTestQuestionMaps() {
 		return testQuestionMaps;
@@ -106,6 +108,18 @@ public class EdoAdminRequest {
 	}
 	public void setStudent(EdoStudent student) {
 		this.student = student;
+	}
+	public Integer getFromQuestion() {
+		return fromQuestion;
+	}
+	public void setFromQuestion(Integer fromQuestion) {
+		this.fromQuestion = fromQuestion;
+	}
+	public Integer getToQuestion() {
+		return toQuestion;
+	}
+	public void setToQuestion(Integer toQuestion) {
+		this.toQuestion = toQuestion;
 	}
 
 }

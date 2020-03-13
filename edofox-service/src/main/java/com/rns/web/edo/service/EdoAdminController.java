@@ -339,7 +339,10 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse parsePdf(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition fileDetails,
-			@FormDataParam("testId") Integer testId, @FormDataParam("buffer") Integer buffer, @FormDataParam("questionSuffix") String questionSuffix, @FormDataParam("questionPrefix") String questionPrefix) {
+			@FormDataParam("testId") Integer testId, @FormDataParam("buffer") Integer buffer, 
+			@FormDataParam("questionSuffix") String questionSuffix, @FormDataParam("questionPrefix") String questionPrefix,
+			@FormDataParam("fromQuestion") Integer fromQuestion, @FormDataParam("toQuestion") Integer toQuestion
+			) {
 		LoggingUtil.logMessage("Parse PDF request :" + testId + " for " + fileDetails.getFileName());
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
@@ -350,6 +353,8 @@ public class EdoAdminController {
 			request.setBuffer(buffer);
 			request.setQuestionPrefix(questionPrefix);
 			request.setQuestionSuffix(questionSuffix);
+			request.setFromQuestion(fromQuestion);
+			request.setToQuestion(toQuestion);
 			response = adminBo.parsePdf(request, fileData);
 			LoggingUtil.logMessage("Parsing PDF for " + testId + " completed ..");
 		} catch (Exception e) {
