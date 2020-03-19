@@ -277,7 +277,7 @@
 		<if test="student != null  &amp;&amp; student.id != null">
 			AND student_id = ${student.id}
 		</if>
-		AND institute_id = ${institute.id}
+		AND exam_feedback.institute_id = ${institute.id}
 		group by question_id order by exam_feedback.created_date desc;
 	</select>
 	
