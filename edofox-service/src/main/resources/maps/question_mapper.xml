@@ -231,7 +231,7 @@
 		<if test="test.currentQuestion.subjectId != null">
 		subject_id,
 		</if>
-		 type, student_id)
+		 type, student_id, institute_id)
 		values ('${test.currentQuestion.feedback.feedback}', CURRENT_TIMESTAMP, ${test.currentQuestion.id}, 
 		<if test="test.id != null">
 			${test.id},
@@ -243,7 +243,7 @@
 		<if test="test.currentQuestion.subjectId != null">
 		${test.currentQuestion.subjectId},
 		</if>
-		'${test.currentQuestion.feedback.type}', ${student.id});
+		'${test.currentQuestion.feedback.type}', ${student.id}, ${student.instituteId});
 	</insert>
 	
 	<update id="addResolution" parameterType="com.rns.web.edo.service.domain.EdoFeedback">
@@ -277,6 +277,7 @@
 		<if test="student != null  &amp;&amp; student.id != null">
 			AND student_id = ${student.id}
 		</if>
+		AND institute_id = ${institute.id}
 		group by question_id order by exam_feedback.created_date desc;
 	</select>
 	
