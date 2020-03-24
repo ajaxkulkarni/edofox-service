@@ -401,10 +401,10 @@ public class EdoAdminController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse createAdmin(EdoAdminRequest request) {
 		LoggingUtil.logMessage("Create admin Request :" + request);
-		EdoServiceResponse response = CommonUtils.initResponse();
-		response.setStatus(adminBo.createInstitute(request));
-		LoggingUtil.logMessage("Create admin response " + response.getStatus().getResponseText());
-		return response;
+		//EdoServiceResponse response = CommonUtils.initResponse();
+		return adminBo.createInstitute(request);
+		//LoggingUtil.logMessage("Create admin response " + response.getStatus().getResponseText());
+		//return response;
 	}
 	
 }

@@ -24,7 +24,7 @@
 		values ('${name}', CURRENT_TIMESTAMP, 'Active', '${expiryDateString}', '${contact}');
 	</insert>
 	
-	<insert id="createAdminLogin" parameterType="com.rns.web.edo.service.domain.EDOInstitute">
+	<insert id="createAdminLogin" parameterType="com.rns.web.edo.service.domain.EDOInstitute" useGeneratedKeys="true" keyProperty="adminId" keyColumn="id">
 		insert into admin (username, password, institute_id, created_date, expiry_date) 
 		values ('${username}', '${password}', ${id}, CURRENT_TIMESTAMP, '${expiryDateString}');
 	</insert>

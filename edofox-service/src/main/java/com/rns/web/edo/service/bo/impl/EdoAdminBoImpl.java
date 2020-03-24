@@ -1374,15 +1374,20 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return status;
 	}
 
-	public EdoApiStatus createInstitute(EdoAdminRequest request) {
+	public EdoServiceResponse createInstitute(EdoAdminRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
 		if(request.getInstitute() == null || StringUtils.isBlank(request.getInstitute().getName())) {
-			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			EdoApiStatus status = new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			response.setStatus(status);
+			return response;
 		}
 		//Is admin login already present
 		Integer result = testsDao.isAdminLogin(request.getInstitute());
 		if(result != null && result > 0) {
 			LoggingUtil.logMessage("Admin login already present for " + request.getInstitute().getUsername());
-			return new EdoApiStatus(-111, "Edofox login already present with this username. Please choose another username.");
+			EdoApiStatus status = new EdoApiStatus(-111, "Edofox login already present with this username. Please choose another username.");
+			response.setStatus(status);
+			return response;
 		}
 		EdoApiStatus status = new EdoApiStatus();
 		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
@@ -1395,7 +1400,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			//Create institute and login
 			testsDao.saveInstitute(institute);
 			testsDao.createAdminLogin(institute);
-			LoggingUtil.logMessage("Institute " + institute.getId() + " and login " + institute.getUsername() + " created ..");
+			LoggingUtil.logMessage("Institute " + institute.getId() + " and login " + institute.getAdminId() + " created ..");
 			//Add default package
 			EDOPackage pkg = new EDOPackage();
 			pkg.setInstitute(institute);
@@ -1481,6 +1486,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			edoSMSUtil.setStudent(student);
 			edoSMSUtil.sendSMS();
 			//executor.execute(edoSMSUtil);
+			response.setStudent(student);
+			response.setInstitute(institute);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111,ERROR_IN_PROCESSING);
@@ -1490,6 +1497,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				LoggingUtil.logError(ExceptionUtils.getStackTrace(e2));
 			}
 		}
-		return status;
+		response.setStatus(status);
+		return response;
 	}
 }

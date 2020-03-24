@@ -12,6 +12,7 @@ public class EDOInstitute {
 	private String password;
 	private Date expiryDate;
 	private String expiryDateString;
+	private Integer adminId;
 	
 	public Integer getId() {
 		return id;
@@ -60,6 +61,12 @@ public class EDOInstitute {
 	}
 	public void setExpiryDateString(String expiryDateString) {
 		this.expiryDateString = expiryDateString;
+	}
+	public Integer getAdminId() {
+		return adminId;
+	}
+	public void setAdminId(Integer adminId) {
+		this.adminId = adminId;
 	}
 
 }
