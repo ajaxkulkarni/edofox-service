@@ -100,7 +100,7 @@ public class EdoPDFUtil {
 									}
 								}
 							} else if (StringUtils.contains(text, questionNumberPrefix + questionCount + questionNumberSuffix)) {
-								if(withinRange()) {
+								//if(withinRange()) {
 									EdoPDFCoordinate coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), firstProsition.getPageWidth(), questionCount);
 									//coord.setHeight(firstProsition.getHeight());
 									List<EdoPDFCoordinate> coordList = coordinates.get(pg);
@@ -111,23 +111,13 @@ public class EdoPDFUtil {
 									//coord.setPage(pg);
 									coordinates.put(pg, coordList);
 									System.out.println(questionCount + ":" + firstProsition.getEndX() + " - " + firstProsition.getEndY() + " width " + firstProsition.getHeight() + " pg w " + firstProsition.getPageWidth() +  " for " + text);
-								}
+								//}
 								questionCount++;
 							}
 							//writeString(String.format("[%s]", firstProsition.getXDirAdj()));
 							startOfLine = false;
 						}
 						super.writeString(text, textPositions);
-					}
-
-					private boolean withinRange() {
-						if(from != null && from > questionCount) {
-							return false;
-						}
-						if(to != null && (to) < questionCount) {
-							return false;
-						}
-						return true;
 					}
 
 					boolean startOfLine = true;
@@ -163,6 +153,9 @@ public class EdoPDFUtil {
 						EdoPDFCoordinate edoPDFCoordinate = list.get(i);
 						// suffix in filename will be used as the file format
 					    Integer questionNumber = list.get(i - 1).getQuestionNumber();
+					    if(!withinRange(from, to, questionNumber)) {
+					    	continue;
+					    }
 					    //int buffer = 10;
 						float y = edoPDFCoordinate.getY() + edoPDFCoordinate.getHeight() + buffer;
 						float width = edoPDFCoordinate.getWidth();
@@ -173,6 +166,10 @@ public class EdoPDFUtil {
 						question.setQuestionImageUrl(getQuestionUrl(testId, questionNumber));
 						parsedQuestions.add(question);
 						if(i == list.size() - 1) {
+							if(!withinRange(from, to, list.get(i).getQuestionNumber())) {
+								continue;
+							}
+							
 							float startY = 0;
 							if(edoPDFCoordinate.getWhiteSpaceY() != null) {
 								startY = edoPDFCoordinate.getWhiteSpaceY();
@@ -196,6 +193,8 @@ public class EdoPDFUtil {
 					    //ImageIOUtil.writeImage(bim, /*pdfFilename +*/ "Q" + edoPDFCoordinate.getQuestionNumber() + ".png", 300);
 					}
 				}
+				
+				
 				
 				/*PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND,true,true); 
 				PDFont pdfFont= PDType1Font.HELVETICA_BOLD;
@@ -244,6 +243,16 @@ public class EdoPDFUtil {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return null;
+	}
+	
+	private static boolean withinRange(Integer from, Integer to, Integer questionNumber) {
+		if(from != null && from > questionNumber) {
+			return false;
+		}
+		if(to != null && (to) < questionNumber) {
+			return false;
+		}
+		return true;
 	}
 
 
