@@ -31,6 +31,7 @@ public class EdoPropertyUtil {
 	public static final String UPLINK_SERVER = "uplink.server";
 	public static final String UPLINK_LOCATION = "uplink.location";
 	public static final String UPLINK_FREQUENCY = "uplink.frequency";
+	public static final String SMS_AUTH_KEY = "sms.key";
 
 	public static String getProperty(String name) {
 		try {

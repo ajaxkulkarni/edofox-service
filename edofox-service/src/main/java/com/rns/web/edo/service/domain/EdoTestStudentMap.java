@@ -11,6 +11,7 @@ public class EdoTestStudentMap {
 	private Date registerDate;
 	private String studentAccess;
 	private EdoStudentSubjectAnalysis subjectScore;
+	private String testEndDateString;
 	
 	public EdoTest getTest() {
 		return test;
@@ -53,6 +54,12 @@ public class EdoTestStudentMap {
 	}
 	public void setSubjectScore(EdoStudentSubjectAnalysis subjectScore) {
 		this.subjectScore = subjectScore;
+	}
+	public String getTestEndDateString() {
+		return testEndDateString;
+	}
+	public void setTestEndDateString(String testEndDateString) {
+		this.testEndDateString = testEndDateString;
 	}
 	
 }

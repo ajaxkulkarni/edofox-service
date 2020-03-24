@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -20,13 +21,15 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 public class EdoSMSUtil implements Runnable, EdoConstants {
 
-	public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
+	//public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
+	public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=EDOFOX&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
 	private EdoStudent student;
 	private String type;
 	private EdoTest test;
 	private EDOInstitute institute;
 	private String additionalMessage;
 	private boolean copyParent;
+	private boolean copyAdmin;
 
 	public EdoSMSUtil() {
 
@@ -52,7 +55,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		sendSMS();
 	}
 
-	private void sendSMS() {
+	public void sendSMS() {
 
 		if (student == null) {
 			return;
@@ -60,7 +63,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 
 		try {
 
-			String url = StringUtils.replace(SMS_URL, "{phoneNo}", student.getPhone());
+			String url = initUrl(student.getPhone());
 
 			String message = SMS_TEMPLATES.get(type);
 			/*
@@ -81,15 +84,32 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 
 			if (copyParent && StringUtils.isNotBlank(student.getParentMobileNo())) {
 				// Send same SMS to parents
-				url = StringUtils.replace(SMS_URL, "{phoneNo}", student.getParentMobileNo());
+				url = initUrl(student.getParentMobileNo());
 				url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 				sendSMS(url);
+			}
+			
+			if(copyAdmin) {
+				// Send same SMS to admin
+				if(ArrayUtils.isNotEmpty(ADMIN_NUMBERS)) {
+					for(String number: ADMIN_NUMBERS) {
+						url = initUrl(number);
+						url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
+						sendSMS(url);
+					}
+				}
 			}
 
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
 
+	}
+
+	private String initUrl(String phone) {
+		String url = StringUtils.replace(SMS_URL, "{phoneNo}", phone);
+		url = StringUtils.replace(url, "{auth}", EdoPropertyUtil.getProperty(EdoPropertyUtil.SMS_AUTH_KEY));
+		return url;
 	}
 
 	private void sendSMS(String url) {
@@ -136,6 +156,14 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		this.additionalMessage = additionalMessage;
 	}
 
+	public boolean isCopyAdmin() {
+		return copyAdmin;
+	}
+
+	public void setCopyAdmin(boolean copyAdmin) {
+		this.copyAdmin = copyAdmin;
+	}
+
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION,
@@ -145,6 +173,10 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}" + "\n{additionalMessage}");
 			put(MAIL_TYPE_TEST_RESULT_RANK,
 					"Hi {name}, your {instituteName} {testName} score is {score} " + "\nYour final rank is {rank} out of {totalStudents}\n{additionalMessage}");
+			put(MAIL_TYPE_SIGN_UP,
+					"Thank you for signing up {instituteName} at Edofox.\nFeel free to check out admin panel at test.edofox.com/test-adminPanel.\nYour login credentials are login ID - {username}, password - {password}."
+					+ "\nUse your registered mobile number and the same password to login as student at test.edofox.com. Our associate will contact you for further assistance.");
+			
 		}
 	});
 

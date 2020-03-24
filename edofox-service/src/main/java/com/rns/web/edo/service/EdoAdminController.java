@@ -395,4 +395,16 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/createAdmin")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse createAdmin(EdoAdminRequest request) {
+		LoggingUtil.logMessage("Create admin Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.createInstitute(request));
+		LoggingUtil.logMessage("Create admin response " + response.getStatus().getResponseText());
+		return response;
+	}
+	
 }

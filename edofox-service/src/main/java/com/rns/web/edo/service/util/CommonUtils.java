@@ -229,6 +229,9 @@ public class CommonUtils {
 	public static String prepareInstituteNotification(String result, EDOInstitute institute) {
 		if(institute != null) {
 			result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
+			result = StringUtils.replace(result, "{username}", CommonUtils.getStringValue(institute.getUsername()));
+			result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(institute.getPassword()));
+			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 		}
 		return result;
 	}

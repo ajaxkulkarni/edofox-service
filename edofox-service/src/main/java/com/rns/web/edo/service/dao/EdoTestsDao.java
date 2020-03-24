@@ -71,6 +71,7 @@ public interface EdoTestsDao {
 	void createAdminLogin(EDOInstitute institute);
 	Integer createPackage(EDOPackage pkg);
 	Integer addTest(EdoTestStudentMap map);
+	Integer isAdminLogin(EDOInstitute institute);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects();

@@ -55,8 +55,8 @@
 	<insert id="addTest" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap" useGeneratedKeys="true" keyProperty="test.id" keyColumn="test_id">
 	insert into test (test_name, no_of_questions, total_marks, duration, status, 
 	institute_id, package_id, created_date, start_date, end_date, test_ui, show_result)
-	values ('${test.name}', ${noOfQuestions}, ${totalMarks} , ${duration}, 'Active', ${student.currentPackage.institute.id},
-	${student.currentPackage.id}, CURRENT_TIMESTAMP, '${test.startDate}', '${test.endDate}', '${test.testUi}', 'Y')
+	values ('${test.name}', ${test.noOfQuestions}, ${test.totalMarks} , ${test.duration}, 'Active', ${student.currentPackage.institute.id},
+	${student.currentPackage.id}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '${testEndDateString}', '${test.testUi}', 'Y')
 	</insert>
 	
 

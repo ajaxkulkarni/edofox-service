@@ -38,6 +38,7 @@ import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -1377,12 +1378,20 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		if(request.getInstitute() == null || StringUtils.isBlank(request.getInstitute().getName())) {
 			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
 		}
+		//Is admin login already present
+		Integer result = testsDao.isAdminLogin(request.getInstitute());
+		if(result != null && result > 0) {
+			LoggingUtil.logMessage("Admin login already present for " + request.getInstitute().getUsername());
+			return new EdoApiStatus(-111, "Edofox login already present with this username. Please choose another username.");
+		}
 		EdoApiStatus status = new EdoApiStatus();
 		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
 			Date expiryDate = DateUtils.addDays(new Date(), 30);
 			EDOInstitute institute = request.getInstitute();
 			institute.setExpiryDate(expiryDate);
+			String expiryDateString = CommonUtils.convertDate(expiryDate);
+			institute.setExpiryDateString(expiryDateString);
 			//Create institute and login
 			testsDao.saveInstitute(institute);
 			testsDao.createAdminLogin(institute);
@@ -1395,6 +1404,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			LoggingUtil.logMessage("Institute package " + pkg.getId() + " created ..");
 			//Add first student
 			EdoStudent student = request.getStudent();
+			if(student == null) {
+				student = new EdoStudent();
+				student.setPhone(institute.getContact());
+				student.setName("Demo student");	
+				student.setPassword(institute.getPassword());
+				request.setStudent(student);
+			}
 			if(request.getStudent() != null && pkg.getId() != null) {
 				if(student.getPhone() == null) {
 					student.setPhone(institute.getContact());
@@ -1402,6 +1418,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				EdoServiceRequest addStudentRequest = new EdoServiceRequest();
 				addStudentRequest.setInstitute(institute);
 				List<EDOPackage> packages = new ArrayList<EDOPackage>();
+				pkg.setStatus("Completed");
+				EdoPaymentStatus payment = new EdoPaymentStatus();
+				payment.setMode("Offline");
+				student.setExamMode("Online");
+				student.setPayment(payment);
 				packages.add(pkg);
 				student.setPackages(packages);
 				addStudent(addStudentRequest, student);
@@ -1413,13 +1434,16 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				map.setStudent(student);
 				EdoTest test = new EdoTest();
 				test.setStartDate(new Date());
-				test.setEndDate(expiryDate);
+				//test.setEndDate(expiryDate);
 				map.setTest(test);
 				if(request.isCet()) {
 					map.getTest().setName("CET Practice test");
-					map.getTest().setNoOfQuestions(200);
+					//50 maths 50 phy 50 che
+					map.getTest().setNoOfQuestions(150);
 					map.getTest().setDuration(10800);
 					map.getTest().setTestUi("JEE");
+					map.getTest().setTotalMarks(200);
+					map.setTestEndDateString(expiryDateString);
 					testsDao.addTest(map);
 					EdoServiceRequest automateTestRequest = new EdoServiceRequest();
 					EdoTest automateTest = new EdoTest();
@@ -1435,11 +1459,12 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					map.getTest().setNoOfQuestions(90);
 					map.getTest().setDuration(10800);
 					map.getTest().setTestUi("JEEM");
+					map.getTest().setTotalMarks(200);
 					testsDao.addTest(map);
 					EdoServiceRequest automateTestRequest = new EdoServiceRequest();
 					EdoTest automateTest = new EdoTest();
 					automateTest.setId(map.getTest().getId());
-					automateTest.setName("JEE19");
+					automateTest.setName("JEE19AF");
 					automateTestRequest.setTest(automateTest);
 					//Prepare a CET sample test
 					automateTest(automateTestRequest);
@@ -1449,6 +1474,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			
 			txManager.commit(txStatus);
 			LoggingUtil.logMessage("Admin account created successfully .....");
+			//Notify with SMS
+			EdoSMSUtil edoSMSUtil = new EdoSMSUtil(MAIL_TYPE_SIGN_UP);
+			edoSMSUtil.setCopyAdmin(true);
+			edoSMSUtil.setInstitute(institute);
+			edoSMSUtil.setStudent(student);
+			edoSMSUtil.sendSMS();
+			//executor.execute(edoSMSUtil);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111,ERROR_IN_PROCESSING);

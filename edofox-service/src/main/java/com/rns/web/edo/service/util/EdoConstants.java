@@ -53,6 +53,8 @@ public interface EdoConstants {
 	String MAIL_TYPE_ACTIVATED = "PackageActivated";
 	String MAIL_TYPE_TEST_RESULT = "TestResult";
 	String MAIL_TYPE_TEST_RESULT_RANK = "TestResultRank";
+	String MAIL_TYPE_SIGN_UP = "signUpMail";
+	
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
 	String QUESTION_TYPE_MATCH = "MATCH";
@@ -76,6 +78,7 @@ public interface EdoConstants {
 	//boolean ABSOLUTE_IMAGE_URLS = false;
 
 	String JSON_PATH =  "/home/service/testData/";
+	String[] ADMIN_NUMBERS = {"9423040642", "9769154460"};
 	
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";

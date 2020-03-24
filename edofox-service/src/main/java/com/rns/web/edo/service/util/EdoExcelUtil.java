@@ -96,14 +96,14 @@ public class EdoExcelUtil {
 				}
 			} else {
 				if (colName != null || colPhone != null || colRoll != null) {
-					String phone = "";
+					/*String phone = "";
 					Cell cellValue = row.getCell(colPhone);
 					if (cellValue != null) {
 						phone = dataFormatter.formatCellValue(cellValue);
-					}
+					}*/
 					EdoStudent student = new EdoStudent();
 					student.setName(getCellValue(colName, row));
-					student.setPhone(phone);
+					student.setPhone(getCellValue(colPhone, row));
 					student.setRollNo(getCellValue(colRoll, row));
 					student.setEmail(getCellValue(colEmail, row));
 					student.setParentMobileNo(getCellValue(colParentPhone, row));
