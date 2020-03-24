@@ -78,7 +78,7 @@ public interface EdoConstants {
 	//boolean ABSOLUTE_IMAGE_URLS = false;
 
 	String JSON_PATH =  "/home/service/testData/";
-	String[] ADMIN_NUMBERS = {"9423040642", "9769154460"};
+	String[] ADMIN_NUMBERS = {"9423040642", "8830579708", "8668937047", "8669042562"};
 	
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";

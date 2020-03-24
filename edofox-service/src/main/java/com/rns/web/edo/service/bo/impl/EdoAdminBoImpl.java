@@ -494,9 +494,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		if(CollectionUtils.isEmpty(existingStudent)) {
 			testsDao.saveStudent(student);
 		} else {
-			LoggingUtil.logMessage("Student already exists with phone number ... " + student.getPhone() + " and roll no " + student.getRollNo());
+			LoggingUtil.logMessage("Student already exists with phone number (Not updating) ... " + student.getPhone() + " and roll no " + student.getRollNo());
 			student.setId(existingStudent.get(0).getId());
-			testsDao.updateStudent(student);
+			//testsDao.updateStudent(student);
 		}
 		
 		LoggingUtil.logMessage("Student ID is =>" + student.getId());
