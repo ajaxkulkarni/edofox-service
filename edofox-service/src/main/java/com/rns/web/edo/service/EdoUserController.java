@@ -15,6 +15,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,6 +31,8 @@ import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
+import com.rns.web.edo.service.util.VideoTokenGenerator;
+import com.rns.web.edo.service.util.RtcTokenBuilder.Role;
 
 @Component
 @Path("/service")
@@ -318,6 +321,40 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse ping() {
 		return new EdoServiceResponse();
+	}
+	
+	@POST
+	@Path("/getVideoToken")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getToken(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Token Request :" + request);
+		Role role = Role.Role_Attendee;
+		if(StringUtils.equals(request.getRequestType(), "host")) {
+			role = Role.Role_Publisher;
+		} 
+		String token = VideoTokenGenerator.generateToken(request.getStudent().getCurrentPackage().getName(), request.getStudent().getName(), role);
+		LoggingUtil.logMessage("Token Response == " + token);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setToken(token);
+		return response;
+	}
+	
+	@POST
+	@Path("/getVideoTokenUid")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getVideoTokenUid(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Token Request with Id :" + request);
+		Role role = Role.Role_Attendee;
+		if(StringUtils.equals(request.getRequestType(), "host")) {
+			role = Role.Role_Publisher;
+		} 
+		String token = VideoTokenGenerator.generateToken(request.getStudent().getCurrentPackage().getName(), request.getStudent().getId(), role);
+		LoggingUtil.logMessage("Token Response with id == " + token);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setToken(token);
+		return response;
 	}
 	
 }

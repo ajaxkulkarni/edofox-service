@@ -15,6 +15,7 @@ public class EdoServiceResponse {
 	private List<EdoSubject> subjects;
 	private EDOQuestionAnalysis questionAnalysis;
 	private List<EdoFeedback> feedbacks;
+	private String token;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -105,6 +106,14 @@ public class EdoServiceResponse {
 
 	public void setFeedbacks(List<EdoFeedback> feedbacks) {
 		this.feedbacks = feedbacks;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 }
