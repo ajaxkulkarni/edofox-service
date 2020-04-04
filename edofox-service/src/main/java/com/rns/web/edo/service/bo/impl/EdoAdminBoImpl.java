@@ -788,6 +788,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			List<EdoQuestion> feedbackData = testsDao.getFeedbackData(request);
 			if(CollectionUtils.isNotEmpty(feedbackData)) {
 				for(EdoQuestion edoFeedback: feedbackData) {
+					CommonUtils.setQuestionURLs(edoFeedback);
 					QuestionParser.fixQuestion(edoFeedback);
 				}
 			}
