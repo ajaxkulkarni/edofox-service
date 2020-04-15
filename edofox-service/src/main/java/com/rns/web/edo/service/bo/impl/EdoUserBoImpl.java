@@ -1032,7 +1032,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			File folder = new File(path);
 			Integer noOfFiles = null;
 			if (!folder.exists()) {
-				folder.mkdirs();
+				boolean mkdirResult = folder.mkdirs();
+				LoggingUtil.logMessage("Directory created for " + folder.getAbsolutePath() + " result is " + mkdirResult);
 				noOfFiles = 0;
 			}
 			if(noOfFiles == null) {
