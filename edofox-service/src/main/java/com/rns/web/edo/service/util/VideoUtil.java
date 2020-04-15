@@ -96,6 +96,33 @@ public class VideoUtil {
 				// abnormal...
 				LoggingUtil.logMessage(output.toString(), LoggingUtil.videoLogger);
 				LoggingUtil.logMessage("Video output failed by command at " + folderLocation, LoggingUtil.videoLogger);
+				//Run again with another command
+				processBuilder.command("ffmpeg", "-y", "-f", "concat", "-safe", "0","-i",
+						folderLocation + "list.txt", "-y", "-acodec", "copy", "-vcodec", "copy", outputFolder);
+				//-y -acodec copy -vcodec copy
+				
+				LoggingUtil.logMessage("Commands again=>" + processBuilder.command(), LoggingUtil.videoLogger);
+				
+				Process process2 = processBuilder.start();
+
+				StringBuilder output2 = new StringBuilder();
+
+				BufferedReader reader2 = new BufferedReader(new InputStreamReader(process2.getInputStream()));
+
+				String line2;
+				while ((line2 = reader2.readLine()) != null) {
+					output2.append(line2 + "\n");
+				}
+
+				int exitVal2 = process2.waitFor();
+				if (exitVal2 == 0) {
+					LoggingUtil.logMessage(output.toString(), LoggingUtil.videoLogger);
+					LoggingUtil.logMessage("Video output success by second command at " + folderLocation, LoggingUtil.videoLogger);
+					return true;
+				} else {
+					LoggingUtil.logMessage(output.toString(), LoggingUtil.videoLogger);
+					LoggingUtil.logMessage("Video output failed by command at " + folderLocation, LoggingUtil.videoLogger);
+				}
 				return false;
 			}
 
