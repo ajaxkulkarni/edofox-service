@@ -7,11 +7,6 @@ import java.io.InputStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 
-import net.bramp.ffmpeg.FFmpeg;
-import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.FFprobe;
-import net.bramp.ffmpeg.builder.FFmpegBuilder;
-
 public class VideoUtil {
 
 	public static String FFMPEG_BIN = "F:\\Resoneuronance\\Setups\\ffmpeg-20200403-52523b6-win64-static\\bin\\";
@@ -132,7 +127,7 @@ public class VideoUtil {
 		return process;
 	}
 
-	public static void combine(String path) throws IOException {
+	/*public static void combine(String path) throws IOException {
 		FFmpeg ffmpeg = new FFmpeg(FFMPEG_BIN);
 		FFprobe ffprobe = new FFprobe(FFMPEG_BIN);
 		FFmpegBuilder builder = new FFmpegBuilder();
@@ -143,5 +138,5 @@ public class VideoUtil {
 		// Run a one-pass encode
 		executor.createJob(builder).run();
 
-	}
+	}*/
 }
