@@ -23,6 +23,7 @@ public class LoggingUtil {
 	
 	public static Logger paymentLogger = Logger.getLogger("paymentLog");
 	
+	public static Logger videoLogger = Logger.getLogger("videoLog");
 	
 	//private static Logger emailLogger = Logger.getLogger("email");
 	

@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.domain;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -16,6 +17,8 @@ public class EDOPackage {
 	private EDOInstitute institute;
 	private boolean selected;
 	private String status;
+	private Date createdDate;
+	private String videoUrl;
 	
 	public Integer getId() {
 		return id;
@@ -59,7 +62,17 @@ public class EDOPackage {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+	public String getVideoUrl() {
+		return videoUrl;
+	}
+	public void setVideoUrl(String videoUrl) {
+		this.videoUrl = videoUrl;
+	}
 	
-	
-
 }

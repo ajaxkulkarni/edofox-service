@@ -1,5 +1,6 @@
 package com.rns.web.edo.service;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -23,16 +24,21 @@ import org.springframework.stereotype.Component;
 
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoExcelUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.VideoTokenGenerator;
+import com.rns.web.edo.service.util.VideoUtil;
 import com.rns.web.edo.service.util.RtcTokenBuilder.Role;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataParam;
 
 @Component
 @Path("/service")
@@ -354,6 +360,56 @@ public class EdoUserController {
 		LoggingUtil.logMessage("Token Response with id == " + token);
 		EdoServiceResponse response = new EdoServiceResponse();
 		response.setToken(token);
+		return response;
+	}
+	
+	@POST
+	@Path("/uploadRecording")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse uploadRecording(@FormDataParam("data") InputStream recordingData, @FormDataParam("data") FormDataContentDisposition recordingDataDetails,
+			@FormDataParam("sessionId") Integer sessionId, @FormDataParam("channelId") Integer channelId) {
+		LoggingUtil.logMessage("Upload recording :" + sessionId, LoggingUtil.videoLogger);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			return userBo.uploadRecording(sessionId, recordingData, channelId);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		LoggingUtil.logMessage("Upload recording Response", LoggingUtil.videoLogger);
+		return response;
+	}
+	
+	@POST
+	@Path("/startLiveSession")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse startLiveSession(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Start live session request :" + request);
+		EdoServiceResponse response = userBo.startLiveSession(request);
+		LoggingUtil.logObject("Start live session response ", response);
+		return response;
+	}
+	
+	@POST
+	@Path("/getLiveSessions")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getLiveSessions(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get live sessions request :" + request);
+		EdoServiceResponse response = userBo.getLiveSessions(request);
+		LoggingUtil.logObject("Get live session response ", response);
+		return response;
+	}
+	
+	@POST
+	@Path("/finishRecording")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse finishRecording(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Finish recording request request :" + request);
+		EdoServiceResponse response = userBo.finishRecording(request);
+		LoggingUtil.logObject("Finish recording response ", response);
 		return response;
 	}
 	

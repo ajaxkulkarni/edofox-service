@@ -1,7 +1,11 @@
 package com.rns.web.edo.service.bo.impl;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +26,6 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.itextpdf.kernel.pdf.colorspace.PdfSpecialCs.Pattern;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
@@ -41,6 +44,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
@@ -51,6 +55,7 @@ import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
 import com.rns.web.edo.service.util.QuestionParser;
+import com.rns.web.edo.service.util.VideoUtil;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -989,6 +994,190 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		} finally {
 			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
+
+	public EdoServiceResponse uploadRecording(Integer sessionId, InputStream data, Integer classroomId) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		//EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			/*if(data.available() <= 0) {
+				response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+				return response;
+			}*/
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", sessionId))
+			 								.list();
+			 if(CollectionUtils.isEmpty(sessions)) {
+				 //Create new
+				 EdoLiveSession live = createLiveSession(classroomId, "Live session_" + new Date().getTime());
+				 session.persist(live);
+				 sessionId = live.getId();
+			 } else {
+				 EdoLiveSession live = sessions.get(0);
+				 if(!StringUtils.equals("Active", live.getStatus())) {
+					 //Not active.. so create new with same name
+					 live = createLiveSession(classroomId, live.getSessionName());
+					 session.persist(live);
+					 sessionId = live.getId();
+				 } else {
+					 live.setLastUpdated(new Date());
+				 }
+				 
+			 }
+			String path = VIDEOS_PATH + sessionId + "/";
+			File folder = new File(path);
+			Integer noOfFiles = null;
+			if (!folder.exists()) {
+				folder.mkdirs();
+				noOfFiles = 0;
+			}
+			if(noOfFiles == null) {
+				File[] fileList = folder.listFiles();
+				if(ArrayUtils.isNotEmpty(fileList)) {
+					noOfFiles = fileList.length;
+				} else {
+					noOfFiles = 0;
+				}
+			}
+			String filePath = path + "video" + (noOfFiles + 1) + ".webm";
+			FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+			//IOUtils.copy(data, fileOutputStream);
+			
+			int read;
+			byte[] bytes = new byte[1024];
+
+			while ((read = data.read(bytes)) != -1) {
+				fileOutputStream.write(bytes, 0, read);
+			}
+			
+			fileOutputStream.close();
+			
+			//Update meta data file
+			FileWriter fileWriter = new FileWriter(path + "list.txt", true); //Set true for append mode
+		    PrintWriter printWriter = new PrintWriter(fileWriter);
+		    printWriter.println("file '" + filePath + "'");  //New line
+		    printWriter.close();
+		    
+		    tx.commit();
+		    
+		    List<EDOPackage> packages = new ArrayList<EDOPackage>();
+		    EDOPackage currPackage = new EDOPackage();
+		    currPackage.setId(sessionId);
+			packages.add(currPackage);
+		    response.setPackages(packages);
+
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
+
+	private EdoLiveSession createLiveSession(Integer classroomId, String sessionName) {
+		EdoLiveSession live = new EdoLiveSession();
+		live.setSessionName(sessionName);
+		live.setClassroomId(classroomId);
+		live.setCreatedDate(new Date());
+		live.setLastUpdated(new Date());
+		live.setStatus("Active");
+		return live;
+	}
+
+	public EdoServiceResponse startLiveSession(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			EDOPackage channel = request.getStudent().getCurrentPackage();
+			EdoLiveSession live = createLiveSession(channel.getId(), channel.getName());
+			session.persist(live);
+			List<EDOPackage> packages = new ArrayList<EDOPackage>();
+			channel.setId(live.getId());
+			packages.add(channel);
+			response.setPackages(packages);
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getLiveSessions(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		try {
+			response.setPackages(testsDao.getLiveSessions(request.getStudent().getCurrentPackage().getId()));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			
+		}
+		return response;
+	}
+
+	public EdoServiceResponse finishRecording(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		
+		if(request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		Session session = null;
+		try {
+			EDOPackage currentPackage = request.getStudent().getCurrentPackage();
+			Integer sessionId = currentPackage.getId();
+			String outputFolder = EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT);
+			String fileExtension = request.getRequestType();
+			if(StringUtils.isBlank(fileExtension)) {
+				fileExtension = "webm";
+			}
+			outputFolder = outputFolder + "media/" + sessionId + "/";
+			File outputDir = new File(outputFolder);
+			if(!outputDir.exists()) {
+				outputDir.mkdirs();
+			}
+			outputFolder = outputFolder +  "merged." + fileExtension;
+
+			boolean result = VideoUtil.mergeFiles(VIDEOS_PATH + sessionId + "/", outputFolder);
+			if(result) {
+				//Prepare video URL
+				session = this.sessionFactory.openSession();
+				Transaction tx = session.beginTransaction();
+				List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", sessionId))
+							.list();
+				if(CollectionUtils.isNotEmpty(sessions)) {
+					sessions.get(0).setStatus("Completed");
+					sessions.get(0).setRecording_url(StringUtils.replace(outputFolder, EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT), EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME)));
+					currentPackage.setVideoUrl(sessions.get(0).getRecording_url());
+					List<EDOPackage> packages = new ArrayList<EDOPackage>();
+					packages.add(currentPackage);
+					response.setPackages(packages);
+				}
+				tx.commit();
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			
 		}
 		return response;
 	}

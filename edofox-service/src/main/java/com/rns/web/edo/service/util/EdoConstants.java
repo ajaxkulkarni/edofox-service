@@ -67,6 +67,7 @@ public interface EdoConstants {
 	String Q_BANK_PATH = "/home/service/questionData/";
 	String TEMP_QUESTION_PATH = "/home/service/tempQuestions/";
 	String TEST_QUESTION_PATH = "/home/service/testQuestionData/";
+	String VIDEOS_PATH = "/home/service/videos/";
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";

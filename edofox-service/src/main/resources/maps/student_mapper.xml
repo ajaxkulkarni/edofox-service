@@ -13,68 +13,88 @@
 
 	</resultMap>
 
+	<resultMap id="classrooms" type="com.rns.web.edo.service.domain.EDOPackage">
+		<result column="id" property="id" />
+		<result column="session_name" property="name" />
+		<result column="created_date" property="createdDate"/>
+	</resultMap>
+
 	<select id="getInstituePackages" resultMap="packages"
 		parameterType="Integer">
-		select *, packages.id as packageId from institute join packages on institute.id =
+		select *, packages.id as packageId from institute join
+		packages on institute.id =
 		packages.institute_id
-		where institute.status = 'Active' AND
+		where institute.status
+		= 'Active' AND
 		institute.id =${value};
 
 	</select>
-	
+
 	<select id="getStudentPackages" resultMap="packages"
 		parameterType="Integer">
-		select *, packages.id as packageId from packages join student_institute on student_institute.package_id =
+		select *, packages.id as packageId from packages join
+		student_institute on student_institute.package_id =
 		packages.id
-		where student_institute.student_id = ${value};
+		where
+		student_institute.student_id = ${value};
 
 	</select>
 
 	<insert id="saveStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		insert into student
-		(name, email, mobile_no, password, roll_no, gender, school_district, date_of_birth, caste_category, parent_mobile_no )
-		values('${name}', '${email}', '${phone}', '${password}', '${rollNo}', '${gender}', '${schoolDistrict}', '${dob}', '${casteCategory}', '${parentMobileNo}');
+		(name, email, mobile_no, password, roll_no, gender, school_district,
+		date_of_birth, caste_category, parent_mobile_no )
+		values('${name}',
+		'${email}', '${phone}', '${password}', '${rollNo}', '${gender}',
+		'${schoolDistrict}', '${dob}', '${casteCategory}',
+		'${parentMobileNo}');
 	</insert>
-	
+
 	<update id="updateStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent">
-		update student SET 
+		update student SET
 		<if test="name != null">
-		name = '${name}' , 
+			name = '${name}' ,
 		</if>
 		<if test="email != null">
-		email = '${email}', 
+			email = '${email}',
 		</if>
 		<if test="rollNo != null">
-		roll_no = '${rollNo}',
+			roll_no = '${rollNo}',
 		</if>
-		gender = '${gender}' , 
-		school_district = '${schoolDistrict}', date_of_birth = '${dob}', caste_category =  '${casteCategory}' 
+		gender = '${gender}' ,
+		school_district = '${schoolDistrict}', date_of_birth = '${dob}', caste_category =
+		'${casteCategory}'
 		where id = ${id}
 	</update>
 
 	<insert id="createStudentPackage" parameterType="com.rns.web.edo.service.domain.EdoStudent"
 		useGeneratedKeys="true" keyProperty="transactionId" keyColumn="id">
 		insert into student_institute
-		(student_id,institute_id,package_id,status,exam_mode,payment_mode) values
+		(student_id,institute_id,package_id,status,exam_mode,payment_mode)
+		values
 		<foreach item="package" index="index" collection="packages"
 			open="(" separator="),(" close=")">
-			${id},${package.institute.id}, ${package.id}, '${package.status}', '${examMode}', '${payment.mode}'
+			${id},${package.institute.id},
+			${package.id}, '${package.status}', '${examMode}', '${payment.mode}'
 		</foreach>
-		<!-- (${id},${currentPackage.institute.id}, ${currentPackage.id}, 'Created', '${examMode}', '${payment.mode}')
-		ON DUPLICATE KEY UPDATE exam_mode = '${examMode}', payment_mode = '${payment.mode}' -->
+		<!-- (${id},${currentPackage.institute.id}, ${currentPackage.id}, 'Created', 
+			'${examMode}', '${payment.mode}') ON DUPLICATE KEY UPDATE exam_mode = '${examMode}', 
+			payment_mode = '${payment.mode}' -->
 	</insert>
-	
-	<delete id="deleteExistingPackages" parameterType="com.rns.web.edo.service.domain.EdoStudent" >
-		delete from student_institute where 
+
+	<delete id="deleteExistingPackages" parameterType="com.rns.web.edo.service.domain.EdoStudent">
+		delete from student_institute where
 		<foreach item="package" index="index" collection="packages"
 			open="(" separator=") OR (" close=")">
-			student_id = ${id} AND package_id = ${package.id}
+			student_id = ${id} AND package_id =
+			${package.id}
 		</foreach>
 	</delete>
 
 	<update id="updatePaymentId" parameterType="com.rns.web.edo.service.domain.EdoStudent">
-		UPDATE student_institute set payment_id = '${payment.paymentId}' WHERE student_id =
+		UPDATE student_institute set payment_id = '${payment.paymentId}' WHERE
+		student_id =
 		${id} AND status != 'Completed' AND package_id IN
 		<foreach item="package" index="index" collection="packages"
 			open="(" separator="," close=")">
@@ -84,32 +104,49 @@
 	</update>
 
 	<update id="updatePayment" parameterType="com.rns.web.edo.service.domain.EdoPaymentStatus">
-		UPDATE student_institute set status = '${responseText}' WHERE payment_id = '${paymentId}';
+		UPDATE
+		student_institute set status = '${responseText}' WHERE payment_id =
+		'${paymentId}';
 	</update>
-	
-	<select id="getStudentByPhoneNumber" parameterType="com.rns.web.edo.service.domain.EdoPaymentStatus" resultMap="studentInfo" >
-		select * from student where mobile_no = '${phone}'
+
+	<select id="getStudentByPhoneNumber" parameterType="com.rns.web.edo.service.domain.EdoPaymentStatus"
+		resultMap="studentInfo">
+		select * from student where mobile_no =
+		'${phone}'
 	</select>
-	
-	<select id="getStudentById" parameterType="Integer" resultMap="studentInfo" >
+
+	<select id="getStudentById" parameterType="Integer" resultMap="studentInfo">
 		select * from student where id = ${value}
 	</select>
-	
-	<select id="getAllStudents"  parameterType="Integer" resultMap="studentInfo" >
-		select * from student join student_institute on student.id = student_institute.student_id 
+
+	<select id="getAllStudents" parameterType="Integer" resultMap="studentInfo">
+		select * from student join student_institute on student.id =
+		student_institute.student_id
 		where institute_id = ${value}
 	</select>
-	
-	<select id="getTestPackage"  parameterType="Integer" resultMap="packages" >
-		select * from test join packages on test.package_id = packages.id where test.test_id = ${value}
+
+	<select id="getTestPackage" parameterType="Integer" resultMap="packages">
+		select * from test join packages on test.package_id = packages.id
+		where test.test_id = ${value}
 	</select>
-	
-	<select id="getStudentByPayment" parameterType="String" resultMap="studentInfo" >
-		SELECT *,student_institute.status as paymentStatus FROM student_institute 
+
+	<select id="getStudentByPayment" parameterType="String"
+		resultMap="studentInfo">
+		SELECT *,student_institute.status as
+		paymentStatus FROM student_institute
 		join student on student.id = student_institute.student_id
-		join packages on student_institute.package_id = packages.id
-		join institute on institute.id = packages.institute_id
-		where student_institute.payment_id = '${value}';
+		join packages on
+		student_institute.package_id = packages.id
+		join institute on
+		institute.id = packages.institute_id
+		where student_institute.payment_id
+		= '${value}';
 	</select>
 	
+
+<!-- join packages on live_session.classroom_id = packages.id -->
+	<select id="getLiveSessions" parameterType="Integer" resultMap="classrooms">
+		select * from live_session where classroom_id = ${value} AND status = 'Active';
+	</select>
+
 </mapper>

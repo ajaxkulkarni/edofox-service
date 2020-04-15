@@ -34,6 +34,7 @@ public class EdoPropertyUtil {
 	public static final String SMS_AUTH_KEY = "sms.key";
 	public static final String VIDEO_APP_ID = "video.key";
 	public static final String VIDEO_APP_SECRET = "video.secret";
+	public static final String VIDEO_OUTPUT = "video.output";
 	
 
 	public static String getProperty(String name) {

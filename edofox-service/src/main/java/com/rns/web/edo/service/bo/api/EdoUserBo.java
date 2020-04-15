@@ -1,6 +1,9 @@
 package com.rns.web.edo.service.bo.api;
 
+import java.io.InputStream;
+
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -26,5 +29,8 @@ public interface EdoUserBo {
 	EdoServiceResponse raiseDoubt(EdoServiceRequest request);
 	EdoApiStatus saveAnswer(EdoServiceRequest request);
 	EdoServiceResponse getSolved(EdoServiceRequest request);
-	
+	EdoServiceResponse uploadRecording(Integer sessionId, InputStream data, Integer packageId);
+	EdoServiceResponse startLiveSession(EdoServiceRequest request);
+	EdoServiceResponse getLiveSessions(EdoServiceRequest request);
+	EdoServiceResponse finishRecording(EdoServiceRequest request);
 }
