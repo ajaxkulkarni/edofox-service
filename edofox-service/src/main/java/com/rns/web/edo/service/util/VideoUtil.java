@@ -61,8 +61,11 @@ public class VideoUtil {
 		// -- Linux --
 
 		// Run a shell command
+		/*processBuilder.command("ffmpeg", "-y", "-f", "concat", "-safe", "0","-i",
+				folderLocation + "list.txt", "-c", "copy", "-c:v", "libvpx", outputFolder);*/
+		
 		processBuilder.command("ffmpeg", "-y", "-f", "concat", "-safe", "0","-i",
-				folderLocation + "list.txt", "-c", "copy", "-c:v", "libvpx", outputFolder);
+				folderLocation + "list.txt", "-y", "-acodec", "copy", "-vcodec", "copy", outputFolder);
 		
 		LoggingUtil.logMessage("Commands=>" + processBuilder.command(), LoggingUtil.videoLogger);
 
