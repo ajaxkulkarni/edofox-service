@@ -33,4 +33,5 @@ public interface EdoUserBo {
 	EdoServiceResponse startLiveSession(EdoServiceRequest request);
 	EdoServiceResponse getLiveSessions(EdoServiceRequest request);
 	EdoServiceResponse finishRecording(EdoServiceRequest request);
+	EdoServiceResponse getSession(EdoServiceRequest request);
 }

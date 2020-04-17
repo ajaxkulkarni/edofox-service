@@ -26,6 +26,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import com.clickntap.vimeo.VimeoResponse;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
@@ -1124,7 +1125,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return response;
 		}
 		try {
-			response.setPackages(testsDao.getLiveSessions(request.getStudent().getCurrentPackage().getId()));
+			response.setPackages(testsDao.getLiveSessions(request.getStudent().getCurrentPackage()));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
@@ -1136,8 +1137,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoServiceResponse finishRecording(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
-		
-		if(request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
+
+		if (request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
 			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
 			return response;
 		}
@@ -1145,35 +1146,73 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EDOPackage currentPackage = request.getStudent().getCurrentPackage();
 			Integer sessionId = currentPackage.getId();
-			String outputFolder = EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT);
-			String fileExtension = request.getRequestType();
-			if(StringUtils.isBlank(fileExtension)) {
-				fileExtension = "webm";
-			}
-			outputFolder = outputFolder + "media/" + sessionId + "/";
-			File outputDir = new File(outputFolder);
-			if(!outputDir.exists()) {
-				outputDir.mkdirs();
-			}
-			outputFolder = outputFolder +  "merged." + fileExtension;
+
+			// Output folder is not required as vimdeo is integrated
+
+			/*
+			 * String outputFolder =
+			 * EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT); String
+			 * fileExtension = request.getRequestType();
+			 * if(StringUtils.isBlank(fileExtension)) { fileExtension = "webm";
+			 * } outputFolder = outputFolder + "media/" + sessionId + "/"; File
+			 * outputDir = new File(outputFolder); if(!outputDir.exists()) {
+			 * outputDir.mkdirs(); } outputFolder = outputFolder + "merged." +
+			 * fileExtension;
+			 */
+
+			String outputFolder = VIDEOS_PATH + sessionId + "/" + "merged.webm";
 
 			boolean result = VideoUtil.mergeFiles(VIDEOS_PATH + sessionId + "/", outputFolder);
-			if(result) {
-				//Prepare video URL
+			if (result) {
+				// Prepare video URL
 				session = this.sessionFactory.openSession();
-				Transaction tx = session.beginTransaction();
-				List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", sessionId))
-							.list();
-				if(CollectionUtils.isNotEmpty(sessions)) {
-					sessions.get(0).setStatus("Completed");
-					sessions.get(0).setRecording_url(StringUtils.replace(outputFolder, EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT), EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME)));
-					currentPackage.setVideoUrl(sessions.get(0).getRecording_url());
-					List<EDOPackage> packages = new ArrayList<EDOPackage>();
-					packages.add(currentPackage);
-					response.setPackages(packages);
+				List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", sessionId)).list();
+				if (CollectionUtils.isNotEmpty(sessions)) {
+					EdoLiveSession edoLiveSession = sessions.get(0);
+					// Upload to Vimeo
+					VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFolder, edoLiveSession.getSessionName(), "");
+					if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
+
+						Transaction tx = session.beginTransaction();
+						edoLiveSession.setStatus("Completed");
+						// sessions.get(0).setRecording_url(StringUtils.replace(outputFolder,
+						// EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT),
+						// EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME)));
+						edoLiveSession.setRecording_url("view-session.php?sessionId=" + request.getStudent().getCurrentPackage().getId() + "&sessionName=" + edoLiveSession.getSessionName());
+						currentPackage.setVideoUrl(edoLiveSession.getRecording_url());
+						List<EDOPackage> packages = new ArrayList<EDOPackage>();
+						packages.add(currentPackage);
+						response.setPackages(packages);
+						tx.commit();
+					}
 				}
-				tx.commit();
+
 			}
+
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getSession(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		try {
+			EDOPackage liveSession = testsDao.getLiveSession(request.getStudent().getCurrentPackage().getId());
+			if(liveSession != null) {
+				liveSession.setVideoUrl(StringUtils.replace(liveSession.getVideoUrl(), "vimeo.com", "player.vimeo.com/video"));
+				List<EDOPackage> pgs = new ArrayList<EDOPackage>();
+				pgs.add(liveSession);
+				response.setPackages(pgs);
+			}
+			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

@@ -413,4 +413,15 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getSession")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getSession(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get session request :" + request);
+		EdoServiceResponse response = userBo.getSession(request);
+		LoggingUtil.logObject("Get session response ", response);
+		return response;
+	}
+	
 }

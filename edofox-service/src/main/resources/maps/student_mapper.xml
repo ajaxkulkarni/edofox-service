@@ -17,6 +17,7 @@
 		<result column="id" property="id" />
 		<result column="session_name" property="name" />
 		<result column="created_date" property="createdDate"/>
+		<result column="recording_url" property="videoUrl"/>
 	</resultMap>
 
 	<select id="getInstituePackages" resultMap="packages"
@@ -145,8 +146,12 @@
 	
 
 <!-- join packages on live_session.classroom_id = packages.id -->
-	<select id="getLiveSessions" parameterType="Integer" resultMap="classrooms">
-		select * from live_session where classroom_id = ${value} AND status = 'Active';
+	<select id="getLiveSessions" parameterType="com.rns.web.edo.service.domain.EDOPackage" resultMap="classrooms">
+		select * from live_session where classroom_id = ${id} AND status = '${status}' order by created_date desc;
+	</select>
+	
+	<select id="getLiveSession" parameterType="Integer" resultMap="classrooms">
+		select * from live_session where id = ${value};
 	</select>
 
 </mapper>
