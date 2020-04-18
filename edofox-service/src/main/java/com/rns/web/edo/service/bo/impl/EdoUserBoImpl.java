@@ -1187,6 +1187,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 
+			} else {
+				response.setStatus(new EdoApiStatus(-111, "Could not process video!"));
 			}
 
 		} catch (Exception e) {
