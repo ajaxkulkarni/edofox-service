@@ -501,12 +501,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		
 		LoggingUtil.logMessage("Student ID is =>" + student.getId());
 		if(student.getId() != null) {
-			testsDao.deleteExistingPackages(student);
+			//testsDao.deleteExistingPackages(student);
+			LoggingUtil.logMessage("Adding student package for =>" + student.getId());
 			testsDao.createStudentPackage(student);
 		}
 		EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
 		EdoFirebaseUtil.updateStudent(student, currentInstitute.getFirebaseId());
-		LoggingUtil.logMessage("Added student == " + student.getRollNo() + " successfully!");
+		LoggingUtil.logMessage("Added/Updated student == " + student.getRollNo() + " successfully!");
 	}
 
 	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
