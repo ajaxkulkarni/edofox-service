@@ -1057,13 +1057,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			fileOutputStream.close();
+			//Check size of file saved
+			File savedFile = new File(filePath);
+			if(savedFile.exists()) {
+				double length = savedFile.length();
+				if(length > 10000) {
+					//If less than 10 KB, ignore it
+					//Update meta data file
+					FileWriter fileWriter = new FileWriter(path + "list.txt", true); //Set true for append mode
+				    PrintWriter printWriter = new PrintWriter(fileWriter);
+				    printWriter.println("file '" + filePath + "'");  //New line
+				    printWriter.close();
+				    LoggingUtil.logMessage("Uploaded file of " + length + " bytes at " + filePath + " for session " + sessionId);
+				}
+			} 
 			
-			//Update meta data file
-			FileWriter fileWriter = new FileWriter(path + "list.txt", true); //Set true for append mode
-		    PrintWriter printWriter = new PrintWriter(fileWriter);
-		    printWriter.println("file '" + filePath + "'");  //New line
-		    printWriter.close();
-		    
 		    tx.commit();
 		    
 		    List<EDOPackage> packages = new ArrayList<EDOPackage>();
