@@ -1021,8 +1021,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				 EdoLiveSession live = sessions.get(0);
 				 if(!StringUtils.equals("Active", live.getStatus())) {
 					 //Not active.. so create new with same name
-					 live = createLiveSession(classroomId, live.getSessionName());
-					 session.persist(live);
+					 live.setStatus("Active");
+					 //live = createLiveSession(classroomId, live.getSessionName());
+					 //session.persist(live);
 					 sessionId = live.getId();
 				 } else {
 					 live.setLastUpdated(new Date());
