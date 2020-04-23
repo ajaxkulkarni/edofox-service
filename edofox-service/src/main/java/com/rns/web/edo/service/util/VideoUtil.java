@@ -4,15 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
 import com.clickntap.vimeo.VimeoResponse;
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 
 public class VideoUtil {
 
@@ -214,7 +211,7 @@ public class VideoUtil {
 	    return info;
 	}
 	
-	public static void upload(String filePath) throws IOException {
+	/*public static void upload(String filePath) throws IOException {
 		Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
 				  "cloud_name", "edofox",
 				  "api_key", "817386265822862",
@@ -222,14 +219,14 @@ public class VideoUtil {
 		
 		Map response = cloudinary.uploader().upload(filePath, 
 			    ObjectUtils.asMap("resource_type", "video"
-			    /*"public_id", "my_folder/my_sub_folder/dog_closeup",
+			    "public_id", "my_folder/my_sub_folder/dog_closeup",
 			    "eager", Arrays.asList(
 			        new Transformation().width(300).height(300).crop("pad").audioCodec("none"),
 			        new Transformation().width(160).height(100).crop("crop").gravity("south").audioCodec("none")),
 			    "eager_async", true,
-			    "eager_notification_url", "https://mysite.example.com/notify_endpoint"*/));
+			    "eager_notification_url", "https://mysite.example.com/notify_endpoint"));
 		
 		System.out.println("Response=>" + response);
 
-	}
+	}*/
 }
