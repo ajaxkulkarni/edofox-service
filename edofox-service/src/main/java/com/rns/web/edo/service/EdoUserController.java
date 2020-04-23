@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -421,6 +422,30 @@ public class EdoUserController {
 		LoggingUtil.logMessage("Get session request :" + request);
 		EdoServiceResponse response = userBo.getSession(request);
 		LoggingUtil.logObject("Get session response ", response);
+		return response;
+	}
+	
+	@POST
+	@Path("/uploadVideoLecture")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse uploadVideoLecture(@FormDataParam("data") InputStream videoData, @FormDataParam("data") FormDataContentDisposition videoDetails,
+			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, @FormDataParam("title") String title) {
+		LoggingUtil.logMessage("Upload video :" + title, LoggingUtil.videoLogger);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EDOPackage pkg = new EDOPackage();
+			pkg.setName(title);
+			EDOInstitute institute = new EDOInstitute();
+			institute.setId(instituteId);
+			pkg.setInstitute(institute);
+			EdoServiceRequest request = new EdoServiceRequest();
+			request.setSubjectId(subjectId);
+			return userBo.uploadVideo(videoData, title, instituteId, subjectId);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		LoggingUtil.logMessage("Upload video Response", LoggingUtil.videoLogger);
 		return response;
 	}
 	

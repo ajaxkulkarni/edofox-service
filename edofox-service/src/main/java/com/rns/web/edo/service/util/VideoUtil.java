@@ -4,12 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
 import com.clickntap.vimeo.VimeoResponse;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 public class VideoUtil {
 
@@ -104,8 +107,8 @@ public class VideoUtil {
 				LoggingUtil.logMessage(output.toString(), LoggingUtil.videoLogger);
 				LoggingUtil.logMessage("Video output failed by command at " + folderLocation, LoggingUtil.videoLogger);
 				//Run again with another command
-				/*processBuilder.command("ffmpeg", "-y", "-f", "concat", "-safe", "0","-i",
-						folderLocation + "list.txt", "-y", "-acodec", "copy", "-vcodec", "copy", outputFolder);
+				processBuilder.command("ffmpeg", "-y", "-f", "concat", "-safe", "0","-i",
+						folderLocation + "list.txt", "-c", "copy", "-c:v", "libvpx", outputFolder);
 				//-y -acodec copy -vcodec copy
 				
 				LoggingUtil.logMessage("Commands again=>" + processBuilder.command(), LoggingUtil.videoLogger);
@@ -130,7 +133,7 @@ public class VideoUtil {
 					LoggingUtil.logMessage(output2.toString(), LoggingUtil.videoLogger);
 					LoggingUtil.logMessage("Video output failed by command at " + folderLocation, LoggingUtil.videoLogger);
 				}
-				return false;*/
+				return false;
 			}
 
 		} catch (IOException e) {
@@ -180,7 +183,7 @@ public class VideoUtil {
 		LoggingUtil.logMessage("Uploading file at " + path + " to vimeo .. ", LoggingUtil.videoLogger);
 		
 		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
-
+		
 		//add a video
 	    boolean upgradeTo1080 = true;
 	    String videoEndPoint = vimeo.addVideo(new File(path), upgradeTo1080);
@@ -193,17 +196,40 @@ public class VideoUtil {
 	    //String name = "Test video from java";
 	    //String desc = "Test video from java";
 	    String license = ""; //see Vimeo API Documentation
-	    String privacyView = "unlisted"; //see Vimeo API Documentation
-	    String privacyEmbed = "public"; //see Vimeo API Documentation
+	    String privacyView = "disable"; //see Vimeo API Documentation
+	    String privacyEmbed = "whitelist"; //see Vimeo API Documentation
 	    boolean reviewLink = false;
 	    vimeo.updateVideoMetadata(videoEndPoint, videoName, videoDesciption, license, privacyView, privacyEmbed, reviewLink);
-	    
+	    vimeo.addEmbedPreset(videoEndPoint, "edofox-live");
 	    //add video privacy domain
-	    //vimeo.addVideoPrivacyDomain(videoEndPoint, "clickntap.com");
-	   
-	    
+	    vimeo.addVideoPrivacyDomain(videoEndPoint, "localhost");
+		String defaultDomain = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
+		if(StringUtils.isBlank(defaultDomain)) {
+			defaultDomain = "test.edofox.com";
+		}
+		vimeo.addVideoPrivacyDomain(videoEndPoint, defaultDomain);
+		
 	    //delete video
 	    //TODO vimeo.removeVideo(videoEndPoint);
 	    return info;
+	}
+	
+	public static void upload(String filePath) throws IOException {
+		Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+				  "cloud_name", "edofox",
+				  "api_key", "817386265822862",
+				  "api_secret", "gxUY72bnB8r6WfExA4bFo7Qc23w"));
+		
+		Map response = cloudinary.uploader().upload(filePath, 
+			    ObjectUtils.asMap("resource_type", "video"
+			    /*"public_id", "my_folder/my_sub_folder/dog_closeup",
+			    "eager", Arrays.asList(
+			        new Transformation().width(300).height(300).crop("pad").audioCodec("none"),
+			        new Transformation().width(160).height(100).crop("crop").gravity("south").audioCodec("none")),
+			    "eager_async", true,
+			    "eager_notification_url", "https://mysite.example.com/notify_endpoint"*/));
+		
+		System.out.println("Response=>" + response);
+
 	}
 }

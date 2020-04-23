@@ -47,6 +47,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
+import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
@@ -1218,7 +1219,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EDOPackage liveSession = testsDao.getLiveSession(request.getStudent().getCurrentPackage().getId());
 			if(liveSession != null) {
-				liveSession.setVideoUrl(StringUtils.replace(liveSession.getVideoUrl(), "vimeo.com", "player.vimeo.com/video"));
+				liveSession.setVideoUrl(prepareVimeoEmbedLink(liveSession.getVideoUrl()));
 				List<EDOPackage> pgs = new ArrayList<EDOPackage>();
 				pgs.add(liveSession);
 				response.setPackages(pgs);
@@ -1229,6 +1230,83 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		} finally {
 			
+		}
+		return response;
+	}
+
+	private String prepareVimeoEmbedLink(String url) {
+		return StringUtils.replace(url, "vimeo.com", "player.vimeo.com/video");
+	}
+
+	public EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		//EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			/*if(data.available() <= 0) {
+				response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+				return response;
+			}*/
+			
+			String path = VIDEOS_PATH + "temp/";
+			File folder = new File(path);
+			Integer noOfFiles = null;
+			if (!folder.exists()) {
+				boolean mkdirResult = folder.mkdirs();
+				LoggingUtil.logMessage("Directory created for " + folder.getAbsolutePath() + " result is " + mkdirResult, LoggingUtil.videoLogger);
+				noOfFiles = 0;
+			}
+			String filePath = path + title;
+			FileOutputStream fileOutputStream = new FileOutputStream(filePath);
+			//IOUtils.copy(data, fileOutputStream);
+			
+			int read;
+			byte[] bytes = new byte[1024];
+
+			while ((read = videoData.read(bytes)) != -1) {
+				fileOutputStream.write(bytes, 0, read);
+			}
+			
+			fileOutputStream.close();
+			//Check size of file saved
+			File savedFile = new File(filePath);
+			if(savedFile.exists()) {
+				double length = savedFile.length();
+				LoggingUtil.logMessage("Uploading file " + title + " of " + length + " to vimeo ..", LoggingUtil.videoLogger);
+				VimeoResponse vimeoResponse = VideoUtil.uploadFile(filePath, title, title);
+				if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
+					session = this.sessionFactory.openSession();
+					Transaction tx = session.beginTransaction();
+					EdoVideoLecture lectures = new EdoVideoLecture();
+					lectures.setVideoName(title);
+					lectures.setSubjectId(subjectId);
+					lectures.setInstituteId(instituteId);
+					lectures.setCreatedDate(new Date());
+					String vimeoLink = vimeoResponse.getJson().getString("link");
+					//Prepare embed link
+					lectures.setVideo_url(prepareVimeoEmbedLink(vimeoLink));
+					session.persist(lectures);
+					//Remove the temp file
+					boolean delete = savedFile.delete();
+					LoggingUtil.logMessage("Deleted the saved file " + delete + " at " + filePath, LoggingUtil.videoLogger);
+					tx.commit();
+				}
+				
+			} 
+			
+		    
+/*		    List<EDOPackage> packages = new ArrayList<EDOPackage>();
+		    EDOPackage currPackage = new EDOPackage();
+		    currPackage.setId(id);
+		    currPackage.setVideoUrl(videoUrl);
+			packages.add(currPackage);
+		    response.setPackages(packages);
+*/
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return response;
 	}

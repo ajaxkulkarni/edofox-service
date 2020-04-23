@@ -109,14 +109,14 @@ public class EdoFirebaseUtil {
 			if(CollectionUtils.isNotEmpty(documents)) {
 				for (QueryDocumentSnapshot document : documents) {
 					Map<String, Object> request = prepareStudentRequest(student, false);
-					request.put("uniqueId", document.getReference().getId());
+					request.put("uniqueID", document.getReference().getId());
 					ApiFuture<WriteResult> result = document.getReference().set(request, SetOptions.merge());
 					LoggingUtil.logMessage("Updated student : " + result.get().getUpdateTime() + " name=> " + student.getName() + " request=> " + request);
 				}
 			} else {
 				Map<String, Object> request = prepareStudentRequest(student, true);
 				ApiFuture<DocumentReference> result = studentsCollection.add(request);
-				request.put("uniqueId", result.get().getId());
+				request.put("uniqueID", result.get().getId());
 				result.get().set(request, SetOptions.merge());
 				LoggingUtil.logMessage("Added student : " + result.get() + " name=> " + student.getName() + " request =>" + request);
 			}
@@ -140,7 +140,7 @@ public class EdoFirebaseUtil {
 			request.put("Class", "");
 			request.put("Div", "");
 			request.put("PrePercent", "");
-			request.put("uniqueId", "");
+			request.put("uniqueID", "");
 		}
 		if(StringUtils.isNotBlank(student.getName())) {
 			request.put("Name", student.getName());
