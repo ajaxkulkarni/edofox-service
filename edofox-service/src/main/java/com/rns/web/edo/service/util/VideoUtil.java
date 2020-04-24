@@ -199,11 +199,12 @@ public class VideoUtil {
 	    vimeo.updateVideoMetadata(videoEndPoint, videoName, videoDesciption, license, privacyView, privacyEmbed, reviewLink);
 	    vimeo.addEmbedPreset(videoEndPoint, "edofox-live");
 	    //add video privacy domain
-	    vimeo.addVideoPrivacyDomain(videoEndPoint, "localhost");
+	    //vimeo.addVideoPrivacyDomain(videoEndPoint, "localhost");
 		String defaultDomain = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
 		if(StringUtils.isBlank(defaultDomain)) {
 			defaultDomain = "test.edofox.com";
 		}
+		LoggingUtil.logMessage("Adding domain to privacy " + defaultDomain, LoggingUtil.videoLogger);
 		vimeo.addVideoPrivacyDomain(videoEndPoint, defaultDomain);
 		
 	    //delete video
