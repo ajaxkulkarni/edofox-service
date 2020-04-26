@@ -407,4 +407,14 @@ public class EdoAdminController {
 		//return response;
 	}
 	
+	@POST
+	@Path("/savePendingVideos")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse savePendingVideos(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Export videos :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.savePendingVideos(request));
+		return response;
+	}
 }
