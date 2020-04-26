@@ -1189,7 +1189,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						// EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT),
 						// EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME)));
 						edoLiveSession.setRecording_url(vimeoResponse.getJson().getString("link"));
-						currentPackage.setVideoUrl("view-session.php?sessionId=" + request.getStudent().getCurrentPackage().getId() + "&sessionName=" + edoLiveSession.getSessionName());
+						currentPackage.setVideoUrl("view-session.php?sessionId=" + sessionId + "&sessionName=" + edoLiveSession.getSessionName());
 						List<EDOPackage> packages = new ArrayList<EDOPackage>();
 						packages.add(currentPackage);
 						response.setPackages(packages);

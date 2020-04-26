@@ -31,6 +31,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
@@ -1501,5 +1502,21 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		response.setStatus(status);
 		return response;
+	}
+
+	public EdoApiStatus savePendingVideos(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			new VideoExportScheduler().exportVideos(session);
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
 	}
 }

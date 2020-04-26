@@ -37,6 +37,11 @@
 	<bean id="taskService" class="com.rns.web.edo.service.util.EdoBackupRoutine">
 		<property name="adminBo" ref="adminBo"></property>
 	</bean>
+	
+	<bean id="videoRoutine" class="com.rns.web.edo.service.VideoExportScheduler">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+		<property name="executor" ref="executor" />
+	</bean>
 
 
 	<bean id="executor"

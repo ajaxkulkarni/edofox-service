@@ -36,6 +36,8 @@ public class EdoPropertyUtil {
 	public static final String VIDEO_APP_SECRET = "video.secret";
 	public static final String VIDEO_OUTPUT = "video.output";
 	public static final String VIDEO_UPLOAD_KEY = "video.upload.key";
+	public static final String VIDEO_UPLOAD_FREQUENCY = "video.upload.frequency";
+	public static final String VIDEO_IDLE_TIME = "video.idle.time";
 	
 
 	public static String getProperty(String name) {
