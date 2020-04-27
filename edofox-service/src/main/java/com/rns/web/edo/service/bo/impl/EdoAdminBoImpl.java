@@ -39,6 +39,7 @@ import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -490,7 +491,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	}
 
 	private void addStudent(EdoServiceRequest request, EdoStudent student) {
-		List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
+		List<EdoStudent> existingStudent = null;
+		if(StringUtils.equals(request.getRequestType(), "ROLL")) {
+			existingStudent = testsDao.getStudentByRollNo(student);
+		} else {
+			existingStudent = testsDao.getStudentByPhoneNumber(student);
+		}
+		
 		
 		if(CollectionUtils.isEmpty(existingStudent)) {
 			testsDao.saveStudent(student);
@@ -793,6 +800,27 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					CommonUtils.setQuestionURLs(edoFeedback);
 					QuestionParser.fixQuestion(edoFeedback);
 				}
+			}
+			List<EdoQuestion> videoFeedback = testsDao.getVideoFeedback(request);
+			if(CollectionUtils.isNotEmpty(videoFeedback)) {
+				feedbackData.addAll(videoFeedback);
+				Collections.sort(feedbackData, new Comparator<EdoQuestion>() {
+
+					public int compare(EdoQuestion o1, EdoQuestion o2) {
+						if(o1.getFeedback() != null && o2.getFeedback() != null) {
+							if(o1.getFeedback().getCreatedDate().getTime() < o2.getFeedback().getCreatedDate().getTime()) {
+								return -1;
+							} 
+							if(o1.getFeedback().getCreatedDate().getTime() > o2.getFeedback().getCreatedDate().getTime()) {
+								return 1;
+							}
+							if(o1.getFeedback().getCreatedDate().getTime() == o2.getFeedback().getCreatedDate().getTime()) {
+								return 0;
+							}
+						}
+						return 0;
+					}
+				});;
 			}
 			test.setTest(feedbackData);
 			response.setTest(test); 

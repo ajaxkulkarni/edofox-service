@@ -35,6 +35,7 @@ import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoComplexOption;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -920,17 +921,38 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoServiceResponse raiseDoubt(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
+		Session session = null;
 		try {
-			EdoQuestion currentQuestion = request.getTest().getCurrentQuestion();
-			if(currentQuestion != null) {
-				if(currentQuestion.getChapter() == null || currentQuestion.getChapter().getChapterId() == null || currentQuestion.getSubjectId() == null) {
-					List<EdoQuestion> question = testsDao.getNextQuestion(currentQuestion);
-					if(CollectionUtils.isNotEmpty(question)) {
-						currentQuestion.setSubjectId(question.get(0).getSubjectId());
-						currentQuestion.setChapter(question.get(0).getChapter());
+			if(!StringUtils.equals("video", request.getRequestType())) {
+				EdoQuestion currentQuestion = request.getTest().getCurrentQuestion();
+				if(currentQuestion != null) {
+					if(currentQuestion.getChapter() == null || currentQuestion.getChapter().getChapterId() == null || currentQuestion.getSubjectId() == null) {
+						List<EdoQuestion> question = testsDao.getNextQuestion(currentQuestion);
+						if(CollectionUtils.isNotEmpty(question)) {
+							currentQuestion.setSubjectId(question.get(0).getSubjectId());
+							currentQuestion.setChapter(question.get(0).getChapter());
+						}
+						EdoTestStudentMap map = new EdoTestStudentMap();
+						map.setTest(request.getTest());
+						map.setStudent(request.getStudent());
+						testsDao.addQuestionQuery(map);
 					}
+				} 
+			} else {
+				//Video doubt
+				session = this.sessionFactory.openSession();
+				List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", request.getFeedback().getId())).list();
+				if(CollectionUtils.isNotEmpty(lectures)) {
+					EdoVideoLecture lecture = lectures.get(0);
 					EdoTestStudentMap map = new EdoTestStudentMap();
-					map.setTest(request.getTest());
+					EdoTest test = new EdoTest();
+					EdoQuestion currentQuestion = new EdoQuestion();
+					currentQuestion.setSubjectId(lecture.getSubjectId());
+					EdoFeedback feedback = request.getFeedback();
+					feedback.setId(lecture.getId());
+					currentQuestion.setFeedback(feedback);
+					test.setCurrentQuestion(currentQuestion);
+					map.setTest(test);
 					map.setStudent(request.getStudent());
 					testsDao.addQuestionQuery(map);
 				}
@@ -938,6 +960,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return response;
 	}

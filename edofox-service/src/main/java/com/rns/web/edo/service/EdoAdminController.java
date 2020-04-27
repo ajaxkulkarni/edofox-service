@@ -141,7 +141,7 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadStudentsExcel(@FormDataParam("data") InputStream studentData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
-			@FormDataParam("instituteId") Integer instituteId) {
+			@FormDataParam("instituteId") Integer instituteId, @FormDataParam("type") String type) {
 		LoggingUtil.logMessage("Upload Students Excel :" + instituteId);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
@@ -150,6 +150,7 @@ public class EdoAdminController {
 			institute.setId(instituteId);
 			request.setInstitute(institute);
 			request.setStudents(EdoExcelUtil.extractStudents(studentData, instituteId));
+			request.setRequestType(type);
 			response.setStatus(adminBo.bulkUploadStudents(request));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
@@ -228,7 +229,7 @@ public class EdoAdminController {
 	public EdoServiceResponse getFeedbackData(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Feedback data Request :" + request);
 		EdoServiceResponse response = adminBo.getFeedbackData(request);
-		LoggingUtil.logMessage("Feedback data Response");
+		LoggingUtil.logObject("Feedback data Response", response);
 		return response;
 	}
 	

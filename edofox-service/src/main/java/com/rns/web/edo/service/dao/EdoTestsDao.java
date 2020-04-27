@@ -60,6 +60,7 @@ public interface EdoTestsDao {
 	EdoStudent getStudentById(Integer id);
 	int updateStudent(EdoStudent student);
 	List<EDOPackage> getLiveSessions(EDOPackage pkg);
+	List<EdoStudent> getStudentByRollNo(EdoStudent student);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);
@@ -91,7 +92,9 @@ public interface EdoTestsDao {
 	void addQuestionQuery(EdoTestStudentMap map);
 	void addResolution(EdoFeedback feedback);
 	List<EdoQuestion> getFeedbackData(EdoServiceRequest request);
+	List<EdoQuestion> getVideoFeedback(EdoServiceRequest request);
 	List<EdoFeedback> getQuestionFeedbacks(Integer questionId);
 	EDOPackage getLiveSession(Integer id);
+	
 	
 }

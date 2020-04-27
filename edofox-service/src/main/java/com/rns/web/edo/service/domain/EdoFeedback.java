@@ -19,6 +19,8 @@ public class EdoFeedback {
 	private Integer frequency;
 	private String feedbackResolutionText;
 	private String feedbackVideoUrl;
+	private String sourceVideoUrl;
+	private String sourceVideoName;
 	
 	
 	public String getFeedback() {
@@ -80,6 +82,18 @@ public class EdoFeedback {
 	}
 	public void setFeedbackVideoUrl(String feedbackVideoUrl) {
 		this.feedbackVideoUrl = feedbackVideoUrl;
+	}
+	public String getSourceVideoUrl() {
+		return sourceVideoUrl;
+	}
+	public void setSourceVideoUrl(String sourceVideoUrl) {
+		this.sourceVideoUrl = sourceVideoUrl;
+	}
+	public String getSourceVideoName() {
+		return sourceVideoName;
+	}
+	public void setSourceVideoName(String sourceVideoName) {
+		this.sourceVideoName = sourceVideoName;
 	}
 	
 

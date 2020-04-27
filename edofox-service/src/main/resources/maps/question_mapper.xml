@@ -221,7 +221,10 @@
 	</insert>
 	
 	<insert id="addQuestionQuery" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
-		insert into exam_feedback (feedback, created_date, question_id, 
+		insert into exam_feedback (feedback, created_date, 
+		<if test="test.currentQuestion.id != null">
+			question_id, 
+		</if>
 		<if test="test.id != null">
 			test_id,
 		</if>
@@ -231,8 +234,15 @@
 		<if test="test.currentQuestion.subjectId != null">
 		subject_id,
 		</if>
+		<if test="test.currentQuestion.feedback.id != null">
+		video_id,
+		</if>
+		
 		 type, student_id, institute_id)
-		values ('${test.currentQuestion.feedback.feedback}', CURRENT_TIMESTAMP, ${test.currentQuestion.id}, 
+		values ('${test.currentQuestion.feedback.feedback}', CURRENT_TIMESTAMP, 
+		<if test="test.currentQuestion.id != null">
+			${test.currentQuestion.id}, 
+		</if>
 		<if test="test.id != null">
 			${test.id},
 		</if>
@@ -243,8 +253,13 @@
 		<if test="test.currentQuestion.subjectId != null">
 		${test.currentQuestion.subjectId},
 		</if>
+		<if test="test.currentQuestion.feedback.id != null">
+		${test.currentQuestion.feedback.id},
+		</if>
 		'${test.currentQuestion.feedback.type}', ${student.id}, ${student.instituteId});
 	</insert>
+	
+	
 	
 	<update id="addResolution" parameterType="com.rns.web.edo.service.domain.EdoFeedback">
 		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId} where question_id = ${questionId} AND resolution is NULL
@@ -259,10 +274,22 @@
 		<result column="feedback_resolution_text" property="feedback.feedbackResolutionText"/>
 		<result column="feedback_resolution_video_url" property="feedback.feedbackVideoUrl"/>
 		<result column="subject_Id" property="subjectId"/>
+		<result column="exam_feedback.created_date" property="feedback.createdDate"/>
+	</resultMap>
+	
+	<resultMap id="videoFeedbackData" type="com.rns.web.edo.service.domain.EdoQuestion">
+		<result column="feedback" property="feedback.feedback"/>
+		<result column="resolution" property="feedback.resolution"/>
+		<result column="feedback_resolution_text" property="feedback.feedbackResolutionText"/>
+		<result column="feedback_resolution_video_url" property="feedback.feedbackVideoUrl"/>
+		<result column="subject_Id" property="subjectId"/>
+		<result column="video_url" property="feedback.sourceVideoUrl"/>
+		<result column="created_date" property="feedback.createdDate"/>
+		<result column="video_name" property="feedback.sourceVideoName"/>
 	</resultMap>
 	
 	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
-		SELECT count(*) as frequency, question, question_img_url,resolution,test_questions.id,feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id FROM exam_feedback 
+		SELECT count(*) as frequency, question, question_img_url,resolution,test_questions.id,feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id, exam_feedback.created_date FROM exam_feedback 
 		join test_questions on exam_feedback.question_id = test_questions.id 
 		where 1 
 		<if test="requestType == 'Unresolved'">
@@ -279,6 +306,27 @@
 		</if>
 		AND exam_feedback.institute_id = ${institute.id}
 		group by question_id order by exam_feedback.created_date desc;
+	</select>
+	
+	<select id="getVideoFeedback" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoFeedbackData">
+		SELECT feedback,exam_feedback.created_date,video_lectures.subject_id,type,resolution,video_id,video_url,video_name
+		from exam_feedback join video_lectures on exam_feedback.video_id = video_lectures.id
+		where 1
+		<if test="requestType == 'Unresolved'">
+			AND resolution is NULL
+		</if>
+		<if test="requestType == 'Resolved'">
+			AND resolution is NOT NULL
+		</if>
+		<if test="fromDate != null &amp;&amp; toDate != null">
+			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		</if>
+		<if test="student != null  &amp;&amp; student.id != null">
+			AND student_id = ${student.id}
+		</if>
+		AND exam_feedback.institute_id = ${institute.id}
+		order by exam_feedback.created_date desc;
+	
 	</select>
 	
 	<resultMap id="feedbacks" type="com.rns.web.edo.service.domain.EdoFeedback">

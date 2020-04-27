@@ -82,7 +82,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 		List<EdoLiveSession> liveSessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.le("lastUpdated", minTime))
 				.add(Restrictions.eq("status", "Active")).list();
 		if (CollectionUtils.isNotEmpty(liveSessions)) {
-			LoggingUtil.logMessage("Exporting videos for " + liveSessions.size() + " lectures ..");
+			LoggingUtil.logMessage("Exporting videos for " + liveSessions.size() + " lectures ..", LoggingUtil.videoLogger);
 			int count = 0;
 			for (EdoLiveSession live : liveSessions) {
 				
@@ -105,9 +105,9 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 				}
 				tx.commit();
 			}
-			LoggingUtil.logMessage("Exported videos for " + count + " lectures ..");
+			LoggingUtil.logMessage("Exported videos for " + count + " lectures ..", LoggingUtil.videoLogger);
 		} else {
-			LoggingUtil.logMessage("No pending videos found for " + minTime);
+			LoggingUtil.logMessage("No pending videos found for " + minTime, LoggingUtil.videoLogger);
 		}
 	}
 

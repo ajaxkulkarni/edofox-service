@@ -115,6 +115,11 @@
 		select * from student where mobile_no =
 		'${phone}'
 	</select>
+	
+	<select id="getStudentByRollNo" parameterType="com.rns.web.edo.service.domain.EdoStudent"
+		resultMap="studentInfo">
+		select * from student where roll_no = '${rollNo}'
+	</select>
 
 	<select id="getStudentById" parameterType="Integer" resultMap="studentInfo">
 		select * from student where id = ${value}
