@@ -98,12 +98,15 @@ public class EdoFirebaseUtil {
 	}
 	
 	public static void updateStudent(EdoStudent student, String instituteId) {
+		if(StringUtils.isBlank(instituteId)) {
+			return;
+		}
 		try {
 			student.setInstituteId(instituteId);
 			//EdoStudentFirebase studentFirebase = new EdoStudentFirebase();
 			//new NullAwareBeanUtils().copyProperties(studentFirebase, student);
 			CollectionReference studentsCollection = db.collection("students");
-			ApiFuture<QuerySnapshot> docRef = studentsCollection.whereEqualTo("StudentContact", StringUtils.prependIfMissing(student.getPhone(), "+91")).whereEqualTo("instituteID", instituteId).get();
+			ApiFuture<QuerySnapshot> docRef = studentsCollection.whereEqualTo("StudentContact", StringUtils.prependIfMissing(student.getPhone(), "+91"))/*.whereEqualTo("instituteID", instituteId)*/.get();
 			List<QueryDocumentSnapshot> documents = docRef.get().getDocuments();
 			
 			if(CollectionUtils.isNotEmpty(documents)) {
