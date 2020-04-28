@@ -39,7 +39,6 @@ import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
-import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -1417,6 +1416,16 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		if(result != null && result > 0) {
 			LoggingUtil.logMessage("Admin login already present for " + request.getInstitute().getUsername());
 			EdoApiStatus status = new EdoApiStatus(-111, "Edofox login already present with this username. Please choose another username.");
+			response.setStatus(status);
+			return response;
+		}
+		//Don't add if student is already present with same number
+		EdoStudent requestStudent = new EdoStudent();
+		requestStudent.setPhone(request.getInstitute().getContact());
+		List<EdoStudent> students = testsDao.getStudentByPhoneNumber(requestStudent);
+		if(CollectionUtils.isNotEmpty(students)) {
+			LoggingUtil.logMessage("Mobile number already registered  " + request.getInstitute().getContact());
+			EdoApiStatus status = new EdoApiStatus(-111, "Mobile number " + request.getInstitute().getContact() + " is already registered. Please go to login page.");
 			response.setStatus(status);
 			return response;
 		}
