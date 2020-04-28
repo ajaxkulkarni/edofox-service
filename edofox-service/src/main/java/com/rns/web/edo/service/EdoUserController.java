@@ -430,18 +430,11 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadVideoLecture(@FormDataParam("data") InputStream videoData, @FormDataParam("data") FormDataContentDisposition videoDetails,
-			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, @FormDataParam("title") String title) {
+			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, @FormDataParam("title") String title, @FormDataParam("packageId") Integer packageId) {
 		LoggingUtil.logMessage("Upload video :" + title, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			EDOPackage pkg = new EDOPackage();
-			pkg.setName(title);
-			EDOInstitute institute = new EDOInstitute();
-			institute.setId(instituteId);
-			pkg.setInstitute(institute);
-			EdoServiceRequest request = new EdoServiceRequest();
-			request.setSubjectId(subjectId);
-			return userBo.uploadVideo(videoData, title, instituteId, subjectId);
+			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}

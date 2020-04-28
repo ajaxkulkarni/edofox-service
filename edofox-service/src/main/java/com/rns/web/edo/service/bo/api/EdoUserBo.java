@@ -34,5 +34,5 @@ public interface EdoUserBo {
 	EdoServiceResponse getLiveSessions(EdoServiceRequest request);
 	EdoServiceResponse finishRecording(EdoServiceRequest request);
 	EdoServiceResponse getSession(EdoServiceRequest request);
-	EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId);
+	EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId, Integer packageId);
 }

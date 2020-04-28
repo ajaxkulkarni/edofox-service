@@ -1262,7 +1262,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return StringUtils.replace(url, "vimeo.com", "player.vimeo.com/video");
 	}
 
-	public EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId) {
+	public EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId, Integer packageId) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		//EdoApiStatus status = new EdoApiStatus();
 		Session session = null;
@@ -1306,6 +1306,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					lectures.setSubjectId(subjectId);
 					lectures.setInstituteId(instituteId);
 					lectures.setCreatedDate(new Date());
+					lectures.setClassroomId(packageId);
 					String vimeoLink = vimeoResponse.getJson().getString("link");
 					//Prepare embed link
 					lectures.setVideo_url(prepareVimeoEmbedLink(vimeoLink));

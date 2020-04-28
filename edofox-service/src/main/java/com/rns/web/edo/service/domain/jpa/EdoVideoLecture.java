@@ -31,6 +31,9 @@ public class EdoVideoLecture {
 	private Integer instituteId;
 	@Column(name = "video_url")
 	private String video_url;
+	@Column(name = "classroom_id")
+	private Integer classroomId;
+	
 	
 	public Integer getId() {
 		return id;
@@ -68,5 +71,10 @@ public class EdoVideoLecture {
 	public void setVideo_url(String video_url) {
 		this.video_url = video_url;
 	}
-
+	public Integer getClassroomId() {
+		return classroomId;
+	}
+	public void setClassroomId(Integer classroomId) {
+		this.classroomId = classroomId;
+	}
 }
