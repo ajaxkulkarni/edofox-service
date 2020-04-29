@@ -19,6 +19,19 @@
 		<result column="created_date" property="createdDate"/>
 		<result column="recording_url" property="videoUrl"/>
 	</resultMap>
+	
+	
+	<resultMap id="videoLecture" type="com.rns.web.edo.service.domain.EdoVideoLectureMap">
+		<result column="id" property="lecture.id" />
+		<result column="video_name" property="lecture.videoName" />
+		<result column="video_url" property="lecture.video_url"/>
+		<result column="created_date" property="lecture.createdDate"/>
+		<result column="subject_id" property="subject.id"/>
+		<result column="classroom_id" property="classroom.id"/>
+		<result column="institute_id" property="lecture.instituteId"/>
+		<result column="subject" property="subject.subjectName"/>
+		<result column="package_name" property="classroom.name"/>
+	</resultMap>
 
 	<select id="getInstituePackages" resultMap="packages"
 		parameterType="Integer">
@@ -157,6 +170,15 @@
 	
 	<select id="getLiveSession" parameterType="Integer" resultMap="classrooms">
 		select * from live_session where id = ${value};
+	</select>
+	
+	<select id="getVideoLectures" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoLecture">
+	SELECT video_lectures.*, test_subjects.subject,packages.package_name FROM video_lectures
+    LEFT JOIN test_subjects ON video_lectures.subject_id = test_subjects.subject_id
+    LEFT JOIN packages on video_lectures.classroom_id = packages.id
+    WHERE video_lectures.institute_id=${institute.id} AND (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
+    ORDER BY created_date DESC
+	
 	</select>
 
 </mapper>

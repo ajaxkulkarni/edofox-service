@@ -442,4 +442,15 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getVideoLectures")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getVideoLectures(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Get video lectures request :" + request);
+		EdoServiceResponse response = userBo.getVideoLectures(request);
+		LoggingUtil.logObject("Get video lectures response ", response);
+		return response;
+	}
+	
 }

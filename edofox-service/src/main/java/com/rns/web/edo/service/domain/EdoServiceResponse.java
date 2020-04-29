@@ -2,6 +2,15 @@ package com.rns.web.edo.service.domain;
 
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_EMPTY)
 public class EdoServiceResponse {
 	
 	private EdoApiStatus status;
@@ -16,6 +25,7 @@ public class EdoServiceResponse {
 	private EDOQuestionAnalysis questionAnalysis;
 	private List<EdoFeedback> feedbacks;
 	private String token;
+	private List<EdoVideoLectureMap> lectures;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -114,6 +124,14 @@ public class EdoServiceResponse {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public List<EdoVideoLectureMap> getLectures() {
+		return lectures;
+	}
+
+	public void setLectures(List<EdoVideoLectureMap> lectures) {
+		this.lectures = lectures;
 	}
 
 }

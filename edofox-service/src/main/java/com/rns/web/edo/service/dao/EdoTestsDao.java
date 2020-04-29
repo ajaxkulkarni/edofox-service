@@ -3,10 +3,6 @@ package com.rns.web.edo.service.dao;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.InsertProvider;
-import org.mybatis.dynamic.sql.insert.render.InsertStatementProvider;
-import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
-
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoFeedback;
@@ -18,6 +14,7 @@ import com.rns.web.edo.service.domain.EdoSubject;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 
 public interface EdoTestsDao {
 
@@ -32,6 +29,7 @@ public interface EdoTestsDao {
 	EdoTest getTest(Integer id);
 	EDOInstitute getInstituteById(Integer id);
 	List<EdoTestStudentMap> getSubjectwiseScoreStudent(Map<String,Object> value);
+	List<EdoVideoLectureMap> getVideoLectures(EdoServiceRequest request);
 	
 	//Save queries
 	Integer saveTestResult(EdoServiceRequest request);

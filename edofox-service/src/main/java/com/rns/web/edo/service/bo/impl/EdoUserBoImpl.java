@@ -45,6 +45,7 @@ import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -1332,6 +1333,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		} finally {
 			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getVideoLectures(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(request.getStudent() == null || request.getInstitute() == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+			return response;
+		}
+		try {
+			response.setLectures(testsDao.getVideoLectures(request));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
 	}
