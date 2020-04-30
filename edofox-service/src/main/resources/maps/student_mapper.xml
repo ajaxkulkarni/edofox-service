@@ -67,8 +67,8 @@
 	
 	<insert id="saveLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent">
 		insert into student_login
-		(username, password, student_id, institute_id, created_date)
-		values('${rollNo}','${password}', ${id}, ${instituteId}, CURRENT_TIMESTAMP);
+		(username, password, student_id, institute_id, created_date, student_access)
+		values('${rollNo}','${password}', ${id}, ${instituteId}, CURRENT_TIMESTAMP, '${accessType}');
 	</insert>
 
 	<update id="updateStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent">

@@ -31,9 +31,11 @@
 		<result column="student.name" property="name" />
 		<result column="student.mobile_no" property="phone" />
 		<result column="student.email" property="email" />
+		<result column="student.student_access" property="accessType" />
 		<result column="institute_name" property="currentPackage.institute.name"/>	
 		<result column="institute.id" property="currentPackage.institute.id"/>
 		<result column="institute.firebase_id" property="currentPackage.institute.firebaseId"/>		
+		
 	</resultMap>
 	
 	<resultMap id="institute" type="com.rns.web.edo.service.domain.EDOInstitute">
