@@ -191,7 +191,7 @@
 		select * from student_login 
 		join institute on student_login.institute_id = institute.id 
 		join student on student_login.student_id = student.id 
-		where username = '${rollNo}'
+		where student_login.username = '${rollNo}'
 	</select>
 
 </mapper>
