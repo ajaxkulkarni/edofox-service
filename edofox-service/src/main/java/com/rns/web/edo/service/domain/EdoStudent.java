@@ -28,6 +28,7 @@ public class EdoStudent {
 	private String profilePic;
 	private String parentMobileNo;
 	private String instituteId;
+	private String accessType;
 
 	public EdoStudent() {
 
@@ -187,6 +188,14 @@ public class EdoStudent {
 
 	public void setInstituteId(String instituteId) {
 		this.instituteId = instituteId;
+	}
+
+	public String getAccessType() {
+		return accessType;
+	}
+
+	public void setAccessType(String accessType) {
+		this.accessType = accessType;
 	}
 	
 }

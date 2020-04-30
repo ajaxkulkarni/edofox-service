@@ -25,6 +25,8 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.clickntap.vimeo.VimeoResponse;
 import com.rns.web.edo.service.bo.api.EdoFile;
@@ -45,7 +47,6 @@ import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
-import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -662,6 +663,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return new EdoServiceResponse(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 		}
 		EdoServiceResponse response = new EdoServiceResponse();
+		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
 			String status = "Completed";
 			if(student.getPayment() != null && student.getPayment().isOffline()) {
@@ -681,15 +683,28 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			//student.setCurrentPackage(studentPackage);
-			student.setRollNo(""); //For new student
+			//student.setRollNo(""); //For new student
+			
+			if(StringUtils.isBlank(student.getRollNo())) {
+				response.setStatus(new EdoApiStatus(STATUS_ERROR, "Please provide a valid username/roll number which will be used for login .."));
+				return response;
+			}
+			
 			if(student.getId() == null) {
 				//Check if the student with same phone exists
-				List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
+				List<EdoStudent> existingStudent = testsDao.getStudentLogin(student);
 				
 				if(CollectionUtils.isEmpty(existingStudent)) {
 					testsDao.saveStudent(student);
+					if(CollectionUtils.isNotEmpty(student.getPackages())) {
+						LoggingUtil.logMessage("Adding student login for =>" + student.getId());
+						student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
+						testsDao.saveLogin(student);
+					}
 				} else {
-					student.setId(existingStudent.get(0).getId());
+					//student.setId(existingStudent.get(0).getId());
+					response.setStatus(new EdoApiStatus(STATUS_ERROR, "Student already exists with given username/roll number .."));
+					return response;
 				}
 				
 				LoggingUtil.logMessage("Student ID is =>" + student.getId());
@@ -708,9 +723,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				institute = testsDao.getInstituteById(student.getPackages().get(0).getInstitute().getId());
 			}
 			notifyStudent(student, MAIL_TYPE_SUBSCRIPTION, institute);
+			txManager.commit(txStatus);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
+			txManager.rollback(txStatus);
 		}
 		return response;
 	}
@@ -1345,6 +1362,35 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		try {
 			response.setLectures(testsDao.getVideoLectures(request));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse login(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			
+			EdoStudent student = request.getStudent();
+			List<EdoStudent> existing = testsDao.getStudentLogin(student);
+			if(CollectionUtils.isEmpty(existing)) {
+				response.setStatus(new EdoApiStatus(-111, ERROR_NO_STUDENT));
+				return response;
+			} else if (existing.size() > 1) {
+				response.setStatus(new EdoApiStatus(-111, ERROR_INVALID_PROFILE));
+				return response;
+			} else {
+				EdoStudent edoStudent = existing.get(0);
+				if (StringUtils.equals(student.getPassword(), edoStudent.getPassword())) {
+					response.setStudent(edoStudent);
+				} else {
+					response.setStatus(new EdoApiStatus(-111, "Username and password incorrect. Please try again."));
+					return response;
+				}
+			}
+			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

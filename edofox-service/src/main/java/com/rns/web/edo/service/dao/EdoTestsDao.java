@@ -59,6 +59,8 @@ public interface EdoTestsDao {
 	int updateStudent(EdoStudent student);
 	List<EDOPackage> getLiveSessions(EDOPackage pkg);
 	List<EdoStudent> getStudentByRollNo(EdoStudent student);
+	List<EdoStudent> getStudentLogin(EdoStudent student);
+	void saveLogin(EdoStudent student);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);

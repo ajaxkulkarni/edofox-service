@@ -24,6 +24,18 @@
 		<result column="paymentStatus" property="currentPackage.status"/>		
 	</resultMap>
 	
+	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">
+		<result column="student_id" property="id" />
+		<result column="username" property="rollNo" />
+		<result column="student_login.password" property="password" />
+		<result column="student.name" property="name" />
+		<result column="student.mobile_no" property="phone" />
+		<result column="student.email" property="email" />
+		<result column="institute_name" property="currentPackage.institute.name"/>	
+		<result column="institute.id" property="currentPackage.institute.id"/>
+		<result column="institute.firebase_id" property="currentPackage.institute.firebaseId"/>		
+	</resultMap>
+	
 	<resultMap id="institute" type="com.rns.web.edo.service.domain.EDOInstitute">
 		<result column="id" property="id" />
 		<result column="institute_name" property="name" />

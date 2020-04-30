@@ -489,25 +489,33 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return status;
 	}
 
-	private void addStudent(EdoServiceRequest request, EdoStudent student) {
+	private boolean addStudent(EdoServiceRequest request, EdoStudent student) {
 		List<EdoStudent> existingStudent = null;
-		if(StringUtils.equals(request.getRequestType(), "ROLL")) {
+		
+		/*if(StringUtils.equals(request.getRequestType(), "ROLL")) {
 			existingStudent = testsDao.getStudentByRollNo(student);
 		} else {
 			existingStudent = testsDao.getStudentByPhoneNumber(student);
-		}
+		}*/
 		
+		existingStudent = testsDao.getStudentLogin(student);
 		
 		if(CollectionUtils.isEmpty(existingStudent)) {
 			testsDao.saveStudent(student);
 		} else {
 			LoggingUtil.logMessage("Student already exists with phone number (Not updating) ... " + student.getPhone() + " and roll no " + student.getRollNo());
-			student.setId(existingStudent.get(0).getId());
+			//student.setId(existingStudent.get(0).getId());
 			//testsDao.updateStudent(student);
+			return false;
 		}
 		
 		LoggingUtil.logMessage("Student ID is =>" + student.getId());
 		if(student.getId() != null) {
+			if(CollectionUtils.isNotEmpty(student.getPackages())) {
+				LoggingUtil.logMessage("Adding student login for =>" + student.getId());
+				student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
+				testsDao.saveLogin(student);
+			}
 			//testsDao.deleteExistingPackages(student);
 			LoggingUtil.logMessage("Adding student package for =>" + student.getId());
 			testsDao.createStudentPackage(student);
@@ -515,6 +523,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
 		EdoFirebaseUtil.updateStudent(student, currentInstitute.getFirebaseId());
 		LoggingUtil.logMessage("Added/Updated student == " + student.getRollNo() + " successfully!");
+		return true;
 	}
 
 	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
@@ -845,8 +854,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 
 	public EdoApiStatus registerStudent(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();
+		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
-			if(request.getInstitute() == null || request.getInstitute().getId() == null || StringUtils.isBlank(request.getInstitute().getFirebaseId())) {
+			if(request.getInstitute() == null || request.getInstitute().getId() == null) {
 				status.setStatus(-111, "Please provide valid institute information ..");
 				return status;
 			}
@@ -867,6 +877,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return status;
 			}
 			
+			if(StringUtils.isBlank(student.getRollNo())) {
+				status.setStatus(-111, "Please provide valid student roll number/username ..");
+				return status;
+			}
+			
 			if(CollectionUtils.isEmpty(student.getPackages())) {
 				status.setStatus(-111, "Please provide atleast one valid package ..");
 				return status;
@@ -876,16 +891,22 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				student.setPassword("12345");
 			}
 			
-			List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
+			/*List<EdoStudent> existingStudent = testsDao.getStudentByPhoneNumber(student);
 			if(CollectionUtils.isNotEmpty(existingStudent)) {
 				status.setStatus(-222, "This mobile number is already registered ..");
 				return status;
-			}
+			}*/
 			
-			addStudent(request, student);
+			boolean result = addStudent(request, student);
+			if(!result) {
+				status.setStatus(-111, "Username/roll number you provided already exists ..");
+				return status;
+			}
+			txManager.commit(txStatus);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status = new EdoApiStatus(-111, ERROR_IN_PROCESSING);
+			txManager.rollback(txStatus);
 		}
 		return status;
 	}

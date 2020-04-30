@@ -24,7 +24,8 @@ public interface EdoConstants {
 	Integer STATUS_TEST_NOT_OPENED = -105;
 	
 	String ERROR_IN_PROCESSING = "Error in processing!";
-	String ERROR_INVALID_PROFILE = "Student profile was not valid! Please login again and submit.";
+	String ERROR_INVALID_PROFILE = "Student profile was not valid. Please contact support.";
+	String ERROR_NO_STUDENT = "Student profile does not exist. Please ask your administration to create one for you";
 	String ERROR_INCOMPLETE_REQUEST = "Insufficient fields!";
 	String ERROR_RESULT_NOT_FOUND = "Test result for this test was not found";
 	
