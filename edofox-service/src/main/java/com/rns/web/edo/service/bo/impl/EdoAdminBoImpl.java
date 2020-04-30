@@ -854,7 +854,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 
 	public EdoApiStatus registerStudent(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();
-		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
+		//TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
 			if(request.getInstitute() == null || request.getInstitute().getId() == null) {
 				status.setStatus(-111, "Please provide valid institute information ..");
@@ -902,11 +902,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				status.setStatus(-111, "Username/roll number you provided already exists ..");
 				return status;
 			}
-			txManager.commit(txStatus);
+			//txManager.commit(txStatus);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status = new EdoApiStatus(-111, ERROR_IN_PROCESSING);
-			txManager.rollback(txStatus);
+			//txManager.rollback(txStatus);
 		}
 		return status;
 	}
