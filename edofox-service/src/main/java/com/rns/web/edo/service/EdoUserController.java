@@ -453,4 +453,15 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/login")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse login(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Login request :" + request);
+		EdoServiceResponse response = userBo.login(request);
+		LoggingUtil.logObject("Login response ", response);
+		return response;
+	}
+	
 }
