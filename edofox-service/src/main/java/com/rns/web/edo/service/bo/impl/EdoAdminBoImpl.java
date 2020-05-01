@@ -515,10 +515,15 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				LoggingUtil.logMessage("Adding student login for =>" + student.getId());
 				student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
 				testsDao.saveLogin(student);
+				for(EDOPackage pkg: student.getPackages()) {
+					if(StringUtils.isBlank(pkg.getStatus())) {
+						pkg.setStatus("Completed");
+					}
+				}
+				//testsDao.deleteExistingPackages(student);
+				LoggingUtil.logMessage("Adding student package for =>" + student.getId());
+				testsDao.createStudentPackage(student);
 			}
-			//testsDao.deleteExistingPackages(student);
-			LoggingUtil.logMessage("Adding student package for =>" + student.getId());
-			testsDao.createStudentPackage(student);
 		}
 		EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
 		EdoFirebaseUtil.updateStudent(student, currentInstitute.getFirebaseId());
