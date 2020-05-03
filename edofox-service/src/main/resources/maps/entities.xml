@@ -27,14 +27,14 @@
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">
 		<result column="student_id" property="id" />
 		<result column="username" property="rollNo" />
-		<result column="student_login.password" property="password" />
-		<result column="student.name" property="name" />
-		<result column="student.mobile_no" property="phone" />
-		<result column="student.email" property="email" />
-		<result column="student.student_access" property="accessType" />
+		<result column="password" property="password" />
+		<result column="name" property="name" />
+		<result column="mobile_no" property="phone" />
+		<result column="email" property="email" />
+		<result column="student_access" property="accessType" />
 		<result column="institute_name" property="currentPackage.institute.name"/>	
-		<result column="institute.id" property="currentPackage.institute.id"/>
-		<result column="institute.firebase_id" property="currentPackage.institute.firebaseId"/>		
+		<result column="institute_id" property="currentPackage.institute.id"/>
+		<result column="firebase_id" property="currentPackage.institute.firebaseId"/>		
 		
 	</resultMap>
 	
