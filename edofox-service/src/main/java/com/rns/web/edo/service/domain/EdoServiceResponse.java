@@ -26,6 +26,7 @@ public class EdoServiceResponse {
 	private List<EdoFeedback> feedbacks;
 	private String token;
 	private List<EdoVideoLectureMap> lectures;
+	private List<EdoTestStudentMap> maps;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -132,6 +133,14 @@ public class EdoServiceResponse {
 
 	public void setLectures(List<EdoVideoLectureMap> lectures) {
 		this.lectures = lectures;
+	}
+
+	public void setMaps(List<EdoTestStudentMap> maps) {
+		this.maps = maps;
+	}
+	
+	public List<EdoTestStudentMap> getMaps() {
+		return maps;
 	}
 
 }

@@ -39,6 +39,7 @@ import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -792,6 +793,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 
 	public EdoServiceResponse addFeedbackResolution(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
+		if(request.getFeedback() == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		if(request.getFeedback().getId() == null && request.getFeedback().getVideoId() == null && request.getFeedback().getQuestionId() == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
 		try {
 			testsDao.addResolution(request.getFeedback());
 		} catch (Exception e) {
@@ -847,9 +856,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	public EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			if(request.getQuestion() != null) {
-				response.setFeedbacks(testsDao.getQuestionFeedbacks(request.getQuestion().getId()));
+			List<EdoTestStudentMap> questionFeedbacks = testsDao.getQuestionFeedbacks(request.getFeedback());
+			if(CollectionUtils.isNotEmpty(questionFeedbacks)) {
+				EdoTestStudentMap map = questionFeedbacks.get(0);
+				if(StringUtils.isNotBlank(map.getTest().getCurrentQuestion().getQuestion())) {
+					QuestionParser.fixQuestion(map.getTest().getCurrentQuestion());
+				}
 			}
+			response.setMaps(questionFeedbacks);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

@@ -93,7 +93,7 @@ public interface EdoTestsDao {
 	void addResolution(EdoFeedback feedback);
 	List<EdoQuestion> getFeedbackData(EdoServiceRequest request);
 	List<EdoQuestion> getVideoFeedback(EdoServiceRequest request);
-	List<EdoFeedback> getQuestionFeedbacks(Integer questionId);
+	List<EdoTestStudentMap> getQuestionFeedbacks(EdoFeedback feedback);
 	EDOPackage getLiveSession(Integer id);
 	
 	

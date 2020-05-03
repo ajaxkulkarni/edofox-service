@@ -262,7 +262,23 @@
 	
 	
 	<update id="addResolution" parameterType="com.rns.web.edo.service.domain.EdoFeedback">
-		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId} where question_id = ${questionId} AND resolution is NULL
+		update exam_feedback set resolution = '${resolution}', answered_by = ${studentId},
+		feedback_resolution_text = '${feedbackResolutionText}'
+		 <if test="feedbackVideoUrl != null">
+		 	, feedback_resolution_video_url = '${feedbackVideoUrl}'
+		 </if>
+		where 1
+		<if test="questionId != null">
+			AND question_id = ${questionId}
+		</if>
+		<if test="videoId != null">
+			AND video_id = ${videoId}
+		</if>
+		<if test="id != null">
+			AND id = ${id}
+		</if>
+		
+		AND resolution is NULL
 	</update>
 	
 	<resultMap id="feedbackData" type="com.rns.web.edo.service.domain.EdoQuestion">
@@ -274,11 +290,12 @@
 		<result column="feedback_resolution_text" property="feedback.feedbackResolutionText"/>
 		<result column="feedback_resolution_video_url" property="feedback.feedbackVideoUrl"/>
 		<result column="subject_Id" property="subjectId"/>
-		<result column="exam_feedback.created_date" property="feedback.createdDate"/>
+		<result column="created_date" property="feedback.createdDate"/>
 	</resultMap>
 	
 	<resultMap id="videoFeedbackData" type="com.rns.web.edo.service.domain.EdoQuestion">
-		<result column="feedback" property="feedback.feedback"/>
+		<!-- <result column="feedback" property="feedback.feedback"/> -->
+		<result column="frequency" property="feedback.frequency"/>
 		<result column="resolution" property="feedback.resolution"/>
 		<result column="feedback_resolution_text" property="feedback.feedbackResolutionText"/>
 		<result column="feedback_resolution_video_url" property="feedback.feedbackVideoUrl"/>
@@ -286,10 +303,16 @@
 		<result column="video_url" property="feedback.sourceVideoUrl"/>
 		<result column="created_date" property="feedback.createdDate"/>
 		<result column="video_name" property="feedback.sourceVideoName"/>
+		<result column="video_id" property="id"/>
+		
 	</resultMap>
 	
 	<select id="getFeedbackData" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
-		SELECT count(*) as frequency, question, question_img_url,resolution,test_questions.id,feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id, exam_feedback.created_date FROM exam_feedback 
+		SELECT 
+		<if test="student == null  || student.id == null">
+			count(*) as frequency, 
+		</if>
+		question, question_img_url,resolution,test_questions.id,feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id, exam_feedback.created_date,feedback_resolution_text FROM exam_feedback 
 		join test_questions on exam_feedback.question_id = test_questions.id 
 		where 1 
 		<if test="requestType == 'Unresolved'">
@@ -305,11 +328,18 @@
 			AND student_id = ${student.id}
 		</if>
 		AND exam_feedback.institute_id = ${institute.id}
-		group by question_id order by exam_feedback.created_date desc;
+		<if test="student == null  || student.id == null">
+			group by question_id
+		</if>
+		order by exam_feedback.created_date desc;
 	</select>
 	
 	<select id="getVideoFeedback" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoFeedbackData">
-		SELECT feedback,exam_feedback.created_date,video_lectures.subject_id,type,resolution,video_id,video_url,video_name
+		SELECT 
+		<if test="student == null  || student.id == null">
+			count(*) as frequency, 
+		</if>
+		exam_feedback.created_date,video_lectures.subject_id,type,resolution,video_id,video_url,video_name,feedback_resolution_text
 		from exam_feedback join video_lectures on exam_feedback.video_id = video_lectures.id
 		where 1
 		<if test="requestType == 'Unresolved'">
@@ -325,6 +355,10 @@
 			AND student_id = ${student.id}
 		</if>
 		AND exam_feedback.institute_id = ${institute.id}
+		<if test="student == null  || student.id == null">
+			group by video_id
+		</if>
+		
 		order by exam_feedback.created_date desc;
 	
 	</select>
@@ -338,8 +372,52 @@
 		<result column="feedback_resolution_video_url" property="feedbackVideoUrl"/>
 	</resultMap>
 	
-	<select id="getQuestionFeedbacks" parameterType="Integer" resultMap="feedbacks">
-		select * from exam_feedback where question_id = ${value} order by created_date desc;
+	<resultMap id="feedbackDetails" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
+		<result column="feedbackId" property="test.currentQuestion.feedback.id" />
+		<result column="feedback" property="test.currentQuestion.feedback.feedback" />
+		<result column="feedbackDate" property="test.currentQuestion.feedback.createdDate" />
+		<result column="type" property="test.currentQuestion.feedback.type"/>
+		<result column="resolution" property="test.currentQuestion.feedback.resolution"/>
+		<result column="feedback_resolution_text" property="test.currentQuestion.feedback.feedbackResolutionText"/>
+		<result column="feedback_resolution_video_url" property="test.currentQuestion.feedback.feedbackVideoUrl"/>
+		<result column="question_id" property="test.currentQuestion.feedback.questionId"/>
+		<result column="video_id" property="test.currentQuestion.feedback.videoId"/>
+		<result column="studentName" property="student.name"/>
+		<result column="student_id" property="student.id"/>
+		<result column="video_name" property="test.currentQuestion.feedback.sourceVideoName"/>
+		<result column="video_url" property="test.currentQuestion.feedback.sourceVideoUrl"/>
+		<result column="question" property="test.currentQuestion.question"/>
+		<result column="questionStatus" property="test.currentQuestion.status"/>
+		<result column="subject_id" property="test.currentQuestion.subjectId"/>
+		<result column="subject" property="test.currentQuestion.subject"/>
+		<result column="teacher" property="teacherName"/>
+		
+	</resultMap>
+	
+	<select id="getQuestionFeedbacks" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap" resultMap="feedbackDetails">
+		select exam_feedback.id as feedbackId,exam_feedback.feedback,exam_feedback.created_date as feedbackDate,exam_feedback.resolution,exam_feedback.question_id,
+		exam_feedback.video_id,exam_feedback.subject_id,exam_feedback.student_id,exam_feedback.feedback_resolution_text,student.name as studentName,test_questions.status as questionStatus,
+		test_questions.question,test_questions.question_img_url,video_lectures.video_name,video_lectures.video_url,test_subjects.subject,solvedBy.name as teacherName
+		from exam_feedback
+		left join student on exam_feedback.student_id = student.id
+		left join test_questions on test_questions.id = exam_feedback.question_id
+		left join video_lectures on video_lectures.id = exam_feedback.video_id
+		left join test_subjects on test_subjects.subject_id = exam_feedback.subject_id
+		left join student as solvedBy on exam_feedback.answered_by = solvedBy.id 
+		where 
+		<if test="type == 'video'">
+			exam_feedback.video_id = ${id} 
+		</if>
+		<if test="type != 'video'">
+			exam_feedback.question_id = ${id} 
+		</if>
+		<if test="resolution == 'Unresolved'">
+			AND exam_feedback.resolution is NULL
+		</if>
+		<if test="resolution == 'Resolved'">
+			AND exam_feedback.resolution is NOT NULL
+		</if>
+		order by exam_feedback.created_date desc;
 	</select>
 	
 </mapper>

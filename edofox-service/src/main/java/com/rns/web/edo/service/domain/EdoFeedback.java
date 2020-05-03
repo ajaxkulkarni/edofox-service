@@ -21,6 +21,7 @@ public class EdoFeedback {
 	private String feedbackVideoUrl;
 	private String sourceVideoUrl;
 	private String sourceVideoName;
+	private Integer videoId;
 	
 	
 	public String getFeedback() {
@@ -94,6 +95,12 @@ public class EdoFeedback {
 	}
 	public void setSourceVideoName(String sourceVideoName) {
 		this.sourceVideoName = sourceVideoName;
+	}
+	public Integer getVideoId() {
+		return videoId;
+	}
+	public void setVideoId(Integer videoId) {
+		this.videoId = videoId;
 	}
 	
 
