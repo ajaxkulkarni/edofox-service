@@ -20,8 +20,8 @@
 	</update>
 	
 	<insert id="saveInstitute" parameterType="com.rns.web.edo.service.domain.EDOInstitute" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-		insert into institute (institute_name, created_date, status, expiry_date, contact_number) 
-		values ('${name}', CURRENT_TIMESTAMP, 'Active', '${expiryDateString}', '${contact}');
+		insert into institute (institute_name, created_date, status, expiry_date, contact_number, purchase) 
+		values ('${name}', CURRENT_TIMESTAMP, 'Active', '${expiryDateString}', '${contact}', '${purchase}');
 	</insert>
 	
 	<insert id="createAdminLogin" parameterType="com.rns.web.edo.service.domain.EDOInstitute" useGeneratedKeys="true" keyProperty="adminId" keyColumn="id">

@@ -1484,7 +1484,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			//Add default package
 			EDOPackage pkg = new EDOPackage();
 			pkg.setInstitute(institute);
-			pkg.setName("Default");
+			pkg.setName("Default classroom");
 			testsDao.createPackage(pkg);
 			LoggingUtil.logMessage("Institute package " + pkg.getId() + " created ..");
 			//Add first student
@@ -1492,6 +1492,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(student == null) {
 				student = new EdoStudent();
 				student.setPhone(institute.getContact());
+				student.setRollNo(institute.getContact());
 				student.setName("Demo student");	
 				student.setPassword(institute.getPassword());
 				request.setStudent(student);
@@ -1499,6 +1500,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(request.getStudent() != null && pkg.getId() != null) {
 				if(student.getPhone() == null) {
 					student.setPhone(institute.getContact());
+				}
+				if(student.getRollNo() == null) {
+					student.setRollNo(institute.getContact());
 				}
 				EdoServiceRequest addStudentRequest = new EdoServiceRequest();
 				addStudentRequest.setInstitute(institute);
@@ -1510,7 +1514,15 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				student.setPayment(payment);
 				packages.add(pkg);
 				student.setPackages(packages);
-				addStudent(addStudentRequest, student);
+				boolean addStudentResult = addStudent(addStudentRequest, student);
+				if(!addStudentResult) {
+					txManager.rollback(txStatus);
+					LoggingUtil.logMessage("Mobile number already registered  " + request.getInstitute().getContact());
+					status = new EdoApiStatus(-111, "Mobile number " + request.getInstitute().getContact() + " is already registered. Please go to login page.");
+					response.setStatus(status);
+					return response;
+				}
+				
 			}
 			//Add a test
 			if(pkg.getId() != null && student != null) {
@@ -1560,7 +1572,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			txManager.commit(txStatus);
 			LoggingUtil.logMessage("Admin account created successfully .....");
 			//Notify with SMS
-			EdoSMSUtil edoSMSUtil = new EdoSMSUtil(MAIL_TYPE_SIGN_UP);
+			String mailType = MAIL_TYPE_SIGN_UP;
+			if(StringUtils.equals("Demo", institute.getPurchase())) {
+				mailType = MAIL_TYPE_SIGN_UP_DEMO;
+			}
+			EdoSMSUtil edoSMSUtil = new EdoSMSUtil(mailType);
 			edoSMSUtil.setCopyAdmin(true);
 			edoSMSUtil.setInstitute(institute);
 			edoSMSUtil.setStudent(student);

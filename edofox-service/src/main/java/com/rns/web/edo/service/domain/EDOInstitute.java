@@ -13,6 +13,7 @@ public class EDOInstitute {
 	private Date expiryDate;
 	private String expiryDateString;
 	private Integer adminId;
+	private String purchase;
 	
 	public Integer getId() {
 		return id;
@@ -67,6 +68,12 @@ public class EDOInstitute {
 	}
 	public void setAdminId(Integer adminId) {
 		this.adminId = adminId;
+	}
+	public String getPurchase() {
+		return purchase;
+	}
+	public void setPurchase(String purchase) {
+		this.purchase = purchase;
 	}
 
 }

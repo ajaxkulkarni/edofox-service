@@ -55,6 +55,8 @@ public interface EdoConstants {
 	String MAIL_TYPE_TEST_RESULT = "TestResult";
 	String MAIL_TYPE_TEST_RESULT_RANK = "TestResultRank";
 	String MAIL_TYPE_SIGN_UP = "signUpMail";
+	String MAIL_TYPE_SIGN_UP_DEMO = "freeTrial";
+	
 	
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
