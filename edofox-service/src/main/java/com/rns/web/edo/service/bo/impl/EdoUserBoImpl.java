@@ -1398,4 +1398,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
+	public EdoApiStatus updateStudentActivity(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(StringUtils.isBlank(request.getRequestType()) || request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		try {
+			testsDao.saveVideoActiviy(request);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return status;
+	}
+
 }

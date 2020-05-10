@@ -464,4 +464,16 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/saveVideoActivity")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse saveVideoActivity(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Save video activity request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.updateStudentActivity(request));
+		LoggingUtil.logObject("Save video activity response ", response);
+		return response;
+	}
+	
 }

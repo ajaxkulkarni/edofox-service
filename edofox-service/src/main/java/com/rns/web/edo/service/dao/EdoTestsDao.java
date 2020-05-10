@@ -95,6 +95,7 @@ public interface EdoTestsDao {
 	List<EdoQuestion> getVideoFeedback(EdoServiceRequest request);
 	List<EdoTestStudentMap> getQuestionFeedbacks(EdoFeedback feedback);
 	EDOPackage getLiveSession(Integer id);
+	void saveVideoActiviy(EdoServiceRequest request);
 	
 	
 }
