@@ -193,5 +193,27 @@
 		join student on student_login.student_id = student.id 
 		where student_login.username = '${rollNo}'
 	</select>
+	
+	<insert id="saveVideoActiviy" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" >
+		insert into video_activity
+		(activity_type, created_date, session_id, classroom_id, 
+		<if test="student.id != null">
+			student_id, 
+		</if>
+		student_name, student_ref
+		<if test="feedback.videoId != null">
+			,video_id 
+		</if>
+		)
+		values('${requestType}', CURRENT_TIMESTAMP, ${feedback.id}, ${student.currentPackage.id}, 
+		<if test="student.id != null">
+			${student.id},
+		 </if>
+		'${student.name}', '${student.rollNo}'
+		<if test="feedback.videoId != null">
+		,${feedback.videoId} 
+		</if>
+		)
+	</insert>
 
 </mapper>
