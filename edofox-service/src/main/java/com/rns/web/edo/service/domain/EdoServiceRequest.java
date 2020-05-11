@@ -12,6 +12,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -33,6 +34,7 @@ public class EdoServiceRequest {
 	private EdoFeedback feedback;
 	private Date fromDate;
 	private Date toDate;
+	private EdoVideoLecture lecture;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -159,6 +161,14 @@ public class EdoServiceRequest {
 
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
+	}
+
+	public EdoVideoLecture getLecture() {
+		return lecture;
+	}
+
+	public void setLecture(EdoVideoLecture lecture) {
+		this.lecture = lecture;
 	}
 	
 }

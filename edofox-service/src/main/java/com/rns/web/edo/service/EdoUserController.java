@@ -476,4 +476,16 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/updateVideoLecture")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateVideoLecture(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Update video request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.updateVideoLecture(request));
+		LoggingUtil.logObject("Update video response ", response);
+		return response;
+	}
+	
 }

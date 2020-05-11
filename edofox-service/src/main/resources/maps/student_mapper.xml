@@ -182,7 +182,8 @@
 	SELECT video_lectures.*, test_subjects.subject,packages.package_name FROM video_lectures
     LEFT JOIN test_subjects ON video_lectures.subject_id = test_subjects.subject_id
     LEFT JOIN packages on video_lectures.classroom_id = packages.id
-    WHERE video_lectures.institute_id=${institute.id} AND (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
+    WHERE video_lectures.institute_id=${institute.id} AND video_lectures.is_disabled = 0
+    AND (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
     ORDER BY created_date DESC
 	
 	</select>
@@ -196,7 +197,13 @@
 	
 	<insert id="saveVideoActiviy" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" >
 		insert into video_activity
-		(activity_type, created_date, session_id, classroom_id, 
+		(activity_type, created_date, 
+		<if test="feedback.id != null">
+			session_id, 
+		</if>
+		<if test="student.currentPackage != null">
+			classroom_id, 
+		</if>
 		<if test="student.id != null">
 			student_id, 
 		</if>
@@ -204,14 +211,32 @@
 		<if test="feedback.videoId != null">
 			,video_id 
 		</if>
+		<if test="feedback.percentViewed != null">
+			,percent_watched 
+		</if>
+		<if test="feedback.durationViewed != null">
+			,duration_watched 
+		</if>
 		)
-		values('${requestType}', CURRENT_TIMESTAMP, ${feedback.id}, ${student.currentPackage.id}, 
+		values('${requestType}', CURRENT_TIMESTAMP, 
+		<if test="feedback.id != null">
+			${feedback.id}, 
+		</if>
+		<if test="student.currentPackage != null">
+			${student.currentPackage.id}, 
+		</if>
 		<if test="student.id != null">
 			${student.id},
 		 </if>
 		'${student.name}', '${student.rollNo}'
 		<if test="feedback.videoId != null">
 		,${feedback.videoId} 
+		</if>
+		<if test="feedback.percentViewed != null">
+			,${feedback.percentViewed}  
+		</if>
+		<if test="feedback.durationViewed != null">
+			,${feedback.durationViewed}  
 		</if>
 		)
 	</insert>

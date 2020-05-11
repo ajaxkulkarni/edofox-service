@@ -22,6 +22,8 @@ public class EdoFeedback {
 	private String sourceVideoUrl;
 	private String sourceVideoName;
 	private Integer videoId;
+	private Float percentViewed;
+	private Float durationViewed;
 	
 	
 	public String getFeedback() {
@@ -101,6 +103,18 @@ public class EdoFeedback {
 	}
 	public void setVideoId(Integer videoId) {
 		this.videoId = videoId;
+	}
+	public Float getPercentViewed() {
+		return percentViewed;
+	}
+	public void setPercentViewed(Float percentViewed) {
+		this.percentViewed = percentViewed;
+	}
+	public Float getDurationViewed() {
+		return durationViewed;
+	}
+	public void setDurationViewed(Float durationViewed) {
+		this.durationViewed = durationViewed;
 	}
 	
 

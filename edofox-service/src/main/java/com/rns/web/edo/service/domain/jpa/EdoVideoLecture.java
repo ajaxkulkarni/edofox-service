@@ -33,8 +33,18 @@ public class EdoVideoLecture {
 	private String video_url;
 	@Column(name = "classroom_id")
 	private Integer classroomId;
+	@Column(name = "size")
+	private Double size;
+	@Column(name = "is_disabled")
+	private int disabled;
 	
 	
+	public int getDisabled() {
+		return disabled;
+	}
+	public void setDisabled(int disabled) {
+		this.disabled = disabled;
+	}
 	public Integer getId() {
 		return id;
 	}
@@ -76,5 +86,11 @@ public class EdoVideoLecture {
 	}
 	public void setClassroomId(Integer classroomId) {
 		this.classroomId = classroomId;
+	}
+	public Double getSize() {
+		return size;
+	}
+	public void setSize(Double size) {
+		this.size = size;
 	}
 }

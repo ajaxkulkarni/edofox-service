@@ -1328,6 +1328,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					String vimeoLink = vimeoResponse.getJson().getString("link");
 					//Prepare embed link
 					lectures.setVideo_url(prepareVimeoEmbedLink(vimeoLink));
+					lectures.setSize(length);
 					session.persist(lectures);
 					//Remove the temp file
 					boolean delete = savedFile.delete();
@@ -1400,7 +1401,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoApiStatus updateStudentActivity(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();
-		if(StringUtils.isBlank(request.getRequestType()) || request.getStudent() == null || request.getStudent().getCurrentPackage() == null) {
+		if(StringUtils.isBlank(request.getRequestType()) || request.getStudent() == null) {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
 			return status;
 		}
@@ -1408,6 +1409,39 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			testsDao.saveVideoActiviy(request);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return status;
+	}
+
+	public EdoApiStatus updateVideoLecture(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(request.getLecture() == null || request.getLecture().getId() == null) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", request.getLecture().getId())).list();
+			if(CollectionUtils.isEmpty(lectures)) {
+				status.setStatus(-111, ERROR_IN_PROCESSING);
+				return status;
+			}
+			EdoVideoLecture lecture = lectures.get(0);
+			if(request.getLecture().getDisabled() == 1) {
+				lecture.setDisabled(1);
+			} else {
+				lecture.setVideoName(request.getLecture().getVideoName());
+				lecture.setClassroomId(request.getLecture().getClassroomId());
+				lecture.setSubjectId(request.getLecture().getSubjectId());
+			}
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return status;
 	}
