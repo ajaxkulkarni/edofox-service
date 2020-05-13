@@ -1450,12 +1450,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				//Add quota
 				EDOInstitute edoInstitute = new EDOInstitute();
 				edoInstitute.setId(lecture.getInstituteId());
-				BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(lecture.getSize()));
-				edoInstitute.setStorageQuota(bd.doubleValue());
-				//Deduct quota from institute
-				LoggingUtil.logMessage("Adding quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
-				testsDao.addQuota(edoInstitute);
-				
+				if(lecture.getSize() != null) {
+					BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(lecture.getSize()));
+					edoInstitute.setStorageQuota(bd.doubleValue());
+					//Deduct quota from institute
+					LoggingUtil.logMessage("Adding quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
+					testsDao.addQuota(edoInstitute);
+				}
 			} else {
 				lecture.setVideoName(request.getLecture().getVideoName());
 				lecture.setClassroomId(request.getLecture().getClassroomId());
