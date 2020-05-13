@@ -174,8 +174,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_TEST_RESULT_RANK,
 					"Hi {name}, your {instituteName} {testName} score is {score} " + "\nYour final rank is {rank} out of {totalStudents}\n{additionalMessage}");
 			put(MAIL_TYPE_SIGN_UP,
-					"Thank you for signing up {instituteName} at Edofox.\nFeel free to check out admin panel at test.edofox.com/test-adminPanel.\nYour login credentials are login ID - {username}, password - {password}."
-					+ "\nUse your registered mobile number and the same password to login as student at test.edofox.com. Our associate will contact you for further assistance.");
+					"Thank you for signing up {instituteName} for {purchase} plan at Edofox.\nFeel free to check out admin panel at test.edofox.com/test-adminPanel.\nYour login credentials are login ID - {username}, password - {password}."
+					+ "\nUse your registered mobile number and the same password to login as teacher at test.edofox.com. Our associate will contact you for further assistance. {expiryMessage}");
 			put(MAIL_TYPE_SIGN_UP_DEMO,
 					"Thank you for signing up {instituteName} at Edofox Live."
 					+ "\nUse your registered mobile number and password to login as student at live.edofox.com. Your free trial includes live classroom feature with unlimited time upto 100 students. "

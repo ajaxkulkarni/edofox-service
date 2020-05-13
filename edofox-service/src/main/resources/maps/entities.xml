@@ -41,7 +41,10 @@
 	<resultMap id="institute" type="com.rns.web.edo.service.domain.EDOInstitute">
 		<result column="id" property="id" />
 		<result column="institute_name" property="name" />
+		<result column="storage_quota" property="storageQuota" />
+		<result column="max_students" property="maxStudents" />
 		<result column="firebase_id" property="firebaseId" />
+		<result column="currentCount" property="currentCount" />
 	</resultMap>
 	
 	<resultMap id="test" type="com.rns.web.edo.service.domain.EdoTest">

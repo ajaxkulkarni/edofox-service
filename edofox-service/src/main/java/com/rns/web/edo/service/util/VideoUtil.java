@@ -2,10 +2,33 @@ package com.rns.web.edo.service.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.security.cert.CertificateException;
+import javax.security.cert.X509Certificate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
+import org.apache.http.util.EntityUtils;
 
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
@@ -210,6 +233,88 @@ public class VideoUtil {
 	    //delete video
 	    //TODO vimeo.removeVideo(videoEndPoint);
 	    return info;
+	}
+	
+	public static Float downloadRecordedFile(Integer channelId, Integer sessionId) {
+		FileOutputStream fileOutputStream = null;
+		try {
+			String urlStr = EdoPropertyUtil.getProperty(EdoPropertyUtil.RECORDED_URL) + URLEncoder.encode(channelId + "-" + sessionId + ".mp4", "UTF-8");
+			LoggingUtil.logMessage("Downloading recorded file from .." + urlStr, LoggingUtil.videoLogger);
+			URL url = new URL(urlStr);
+			String folderLocation = EdoConstants.VIDEOS_PATH + sessionId;
+			File folder = new File(folderLocation);
+			if(!folder.exists()) {
+				folder.mkdirs();
+			}
+			String outputFile = folderLocation + "/recorded.mp4";
+			fileOutputStream = new FileOutputStream(outputFile);
+	        /*ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+	        fileOutputStream.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+	        fileOutputStream.close();
+	        rbc.close();*/
+			
+			HttpHead get = new HttpHead(urlStr);
+			 
+			//Get http client
+			CloseableHttpClient httpClient = getCloseableHttpClient();
+			 
+			//Execute HTTP method
+			CloseableHttpResponse res = httpClient.execute(get);
+			 
+			LoggingUtil.logMessage("Response from url " + res.getStatusLine().getStatusCode(), LoggingUtil.videoLogger);
+			//Verify response
+			if(res.getStatusLine().getStatusCode() == 200) {
+				Header lengthHeader = res.getFirstHeader("Content-Length");
+				if(lengthHeader != null && lengthHeader.getValue() != null) {
+					return new Float(lengthHeader.getValue());
+				}
+				/*InputStream content = res.getEntity().getContent();
+				if(content != null) {
+				    int read;
+					byte[] bytes = new byte[1024];
+					
+					while ((read = content.read(bytes)) != -1) {
+						fileOutputStream.write(bytes, 0, read);
+					}
+					fileOutputStream.close();
+				}
+				return outputFile;*/
+			} 
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			if(fileOutputStream != null) {
+				try {
+					fileOutputStream.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return null;
+	}
+
+	private static CloseableHttpClient getCloseableHttpClient() {
+		CloseableHttpClient httpClient = null;
+	    try {
+	        httpClient = HttpClients.custom().
+	                setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE).
+	                setSSLContext(new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy()
+	                {
+						public boolean isTrusted(java.security.cert.X509Certificate[] arg0, String arg1) throws java.security.cert.CertificateException {
+							return true;
+						}
+	                }).build()).build();
+	    } catch (KeyManagementException e) {
+	    	e.printStackTrace();
+	    } catch (NoSuchAlgorithmException e) {
+	    	e.printStackTrace();
+	    } catch (KeyStoreException e) {
+	    	e.printStackTrace();
+	    }
+	    return httpClient;
 	}
 	
 	/*public static void upload(String filePath) throws IOException {

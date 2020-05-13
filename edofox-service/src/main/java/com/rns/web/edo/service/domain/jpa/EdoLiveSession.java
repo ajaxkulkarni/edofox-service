@@ -33,6 +33,9 @@ public class EdoLiveSession {
 	private String status;
 	@Column(name = "recording_url")
 	private String recording_url;
+	@Column(name = "file_size")
+	private Float fileSize;
+	
 	
 	public Integer getId() {
 		return id;
@@ -76,6 +79,10 @@ public class EdoLiveSession {
 	public void setRecording_url(String recording_url) {
 		this.recording_url = recording_url;
 	}
-	
-	
+	public Float getFileSize() {
+		return fileSize;
+	}
+	public void setFileSize(Float fileSize) {
+		this.fileSize = fileSize;
+	}
 }

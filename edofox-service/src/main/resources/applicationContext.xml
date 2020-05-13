@@ -41,6 +41,7 @@
 	<bean id="videoRoutine" class="com.rns.web.edo.service.VideoExportScheduler">
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
 		<property name="executor" ref="executor" />
+		<property name="testsDao" ref="testsDao" />
 	</bean>
 
 

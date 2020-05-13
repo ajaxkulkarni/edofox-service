@@ -1,6 +1,9 @@
 package com.rns.web.edo.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,10 +24,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import com.clickntap.vimeo.VimeoException;
-import com.clickntap.vimeo.VimeoResponse;
+import com.rns.web.edo.service.dao.EdoTestsDao;
+import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.util.CommonUtils;
-import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.VideoUtil;
@@ -36,6 +40,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 
 	private SessionFactory sessionFactory;
 	private ThreadPoolTaskExecutor executor;
+	private EdoTestsDao testsDao;
 	// private Integer autoResponseSequence = 0;
 	// private Integer autoResponseSenderSequence = 0;
 
@@ -86,24 +91,37 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 			int count = 0;
 			for (EdoLiveSession live : liveSessions) {
 				
-				String folderLocation = EdoConstants.VIDEOS_PATH + live.getId();
-				String outputFile = folderLocation + "/merged.webm";
-				boolean result = VideoUtil.mergeFiles(folderLocation + "/", outputFile);
+				Float fileSize = VideoUtil.downloadRecordedFile(live.getClassroomId(), live.getId());
 				Transaction tx = session.beginTransaction();
-				if (result) {
+				if (fileSize != null && fileSize > 0) {
 					// Upload to Vimeo
-					VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFile, live.getSessionName(), "");
+					//TODO removed as file format not supported by vimeo
+					/*VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFile, live.getSessionName(), "");
 					if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
 						live.setStatus("Completed");
 						live.setRecording_url(vimeoResponse.getJson().getString("link"));
 					}
-					count++;
+					count++;*/
+					live.setFileSize(fileSize);
+					live.setStatus("Completed");
+					String urlStr = EdoPropertyUtil.getProperty(EdoPropertyUtil.RECORDED_URL) + URLEncoder.encode(live.getClassroomId() + "-" + live.getId() + ".mp4", "UTF-8");
+					live.setRecording_url(urlStr);
 					LoggingUtil.logMessage("Exported video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
 				} else {
 					live.setStatus("Failed");
 					LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
 				}
 				tx.commit();
+				EDOInstitute institute = new EDOInstitute();
+				EDOPackage pkg = testsDao.getPackage(live.getClassroomId());
+				if(pkg != null && pkg.getInstitute() != null && live.getFileSize() != null) {
+					institute.setId(pkg.getInstitute().getId());
+					BigDecimal bd = CommonUtils.calculateStorageUsed(live.getFileSize());
+					institute.setStorageQuota(bd.doubleValue());
+					//Deduct quota from institute
+					LoggingUtil.logMessage("Deducting quota " + institute.getStorageQuota() + " GBs from " + institute.getId(), LoggingUtil.videoLogger);
+					testsDao.deductQuota(institute);
+				}
 			}
 			LoggingUtil.logMessage("Exported videos for " + count + " lectures ..", LoggingUtil.videoLogger);
 		} else {
@@ -142,6 +160,14 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 
 	public void setExecutor(ThreadPoolTaskExecutor executor) {
 		this.executor = executor;
+	}
+
+	public EdoTestsDao getTestsDao() {
+		return testsDao;
+	}
+
+	public void setTestsDao(EdoTestsDao testsDao) {
+		this.testsDao = testsDao;
 	}
 
 }

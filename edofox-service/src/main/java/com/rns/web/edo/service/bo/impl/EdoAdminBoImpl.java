@@ -490,7 +490,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return status;
 	}
 
-	private boolean addStudent(EdoServiceRequest request, EdoStudent student) {
+	private String addStudent(EdoServiceRequest request, EdoStudent student) {
 		List<EdoStudent> existingStudent = null;
 		
 		/*if(StringUtils.equals(request.getRequestType(), "ROLL")) {
@@ -498,6 +498,17 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		} else {
 			existingStudent = testsDao.getStudentByPhoneNumber(student);
 		}*/
+		
+		//Check for max students limit
+		if(CollectionUtils.isNotEmpty(student.getPackages())) {
+			EDOInstitute institute = testsDao.getStudentStats(student.getPackages().get(0).getInstitute().getId());
+			if(institute != null && institute.getMaxStudents() != null && institute.getCurrentCount() != null) {
+				if((institute.getCurrentCount() + 1) >= institute.getMaxStudents()) {
+					LoggingUtil.logMessage("Max students limit reached ... " + student.getPhone() + " for institute " + student.getPackages().get(0).getInstitute().getId() + " count " +institute.getCurrentCount() + " and max " + institute.getMaxStudents());
+					return "Maximum students limit reached. Please upgrade your plan to add more students.";
+				}
+			}
+		}
 		
 		existingStudent = testsDao.getStudentLogin(student);
 		
@@ -507,7 +518,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			LoggingUtil.logMessage("Student already exists with phone number (Not updating) ... " + student.getPhone() + " and roll no " + student.getRollNo());
 			//student.setId(existingStudent.get(0).getId());
 			//testsDao.updateStudent(student);
-			return false;
+			return "Student already exists with the same username";
 		}
 		
 		LoggingUtil.logMessage("Student ID is =>" + student.getId());
@@ -529,7 +540,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
 		EdoFirebaseUtil.updateStudent(student, currentInstitute.getFirebaseId());
 		LoggingUtil.logMessage("Added/Updated student == " + student.getRollNo() + " successfully!");
-		return true;
+		return RESPONSE_OK;
 	}
 
 	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
@@ -916,9 +927,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return status;
 			}*/
 			
-			boolean result = addStudent(request, student);
-			if(!result) {
-				status.setStatus(-111, "Username/roll number you provided already exists ..");
+			String result = addStudent(request, student);
+			if(!StringUtils.equals(RESPONSE_OK, result)) {
+				status.setStatus(-111, result);
 				return status;
 			}
 			//txManager.commit(txStatus);
@@ -1472,11 +1483,21 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoApiStatus status = new EdoApiStatus();
 		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
-			Date expiryDate = DateUtils.addDays(new Date(), 30);
+			int days = 7;
+			if(StringUtils.isBlank(request.getInstitute().getPurchase())) {
+				request.getInstitute().setPurchase("Free");
+			}
+			if(StringUtils.equalsIgnoreCase("Free", request.getInstitute().getPurchase())) {
+				days = 300;
+			}
+			Date expiryDate = DateUtils.addDays(new Date(), days);
 			EDOInstitute institute = request.getInstitute();
 			institute.setExpiryDate(expiryDate);
 			String expiryDateString = CommonUtils.convertDate(expiryDate);
 			institute.setExpiryDateString(expiryDateString);
+			//Set limits based on plans
+			institute.setMaxStudents(MAX_STUDENTS.get(institute.getPurchase()));
+			institute.setStorageQuota(MAX_STORAGE.get(institute.getPurchase()));
 			//Create institute and login
 			testsDao.saveInstitute(institute);
 			testsDao.createAdminLogin(institute);
@@ -1495,6 +1516,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				student.setRollNo(institute.getContact());
 				student.setName("Demo student");	
 				student.setPassword(institute.getPassword());
+				student.setAccessType("Teacher");
 				request.setStudent(student);
 			}
 			if(request.getStudent() != null && pkg.getId() != null) {
@@ -1514,11 +1536,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				student.setPayment(payment);
 				packages.add(pkg);
 				student.setPackages(packages);
-				boolean addStudentResult = addStudent(addStudentRequest, student);
-				if(!addStudentResult) {
+				String addStudentResult = addStudent(addStudentRequest, student);
+				if(!StringUtils.equals(RESPONSE_OK, addStudentResult)) {
 					txManager.rollback(txStatus);
 					LoggingUtil.logMessage("Mobile number already registered  " + request.getInstitute().getContact());
-					status = new EdoApiStatus(-111, "Mobile number " + request.getInstitute().getContact() + " is already registered. Please go to login page.");
+					status = new EdoApiStatus(-111, addStudentResult);
 					response.setStatus(status);
 					return response;
 				}
@@ -1573,9 +1595,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			LoggingUtil.logMessage("Admin account created successfully .....");
 			//Notify with SMS
 			String mailType = MAIL_TYPE_SIGN_UP;
-			if(StringUtils.equals("Demo", institute.getPurchase())) {
+			/*if(StringUtils.equals("Demo", institute.getPurchase())) {
 				mailType = MAIL_TYPE_SIGN_UP_DEMO;
-			}
+			}*/
 			EdoSMSUtil edoSMSUtil = new EdoSMSUtil(mailType);
 			edoSMSUtil.setCopyAdmin(true);
 			edoSMSUtil.setInstitute(institute);

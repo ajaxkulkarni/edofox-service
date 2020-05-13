@@ -74,6 +74,10 @@ public interface EdoTestsDao {
 	Integer createPackage(EDOPackage pkg);
 	Integer addTest(EdoTestStudentMap map);
 	Integer isAdminLogin(EDOInstitute institute);
+	void deductQuota(EDOInstitute institute);
+	void addQuota(EDOInstitute institute);
+	EDOPackage getPackage(Integer packageId);
+	EDOInstitute getStudentStats(Integer instituteId);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects();

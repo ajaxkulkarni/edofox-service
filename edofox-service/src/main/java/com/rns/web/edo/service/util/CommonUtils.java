@@ -231,6 +231,13 @@ public class CommonUtils {
 			result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 			result = StringUtils.replace(result, "{username}", CommonUtils.getStringValue(institute.getUsername()));
 			result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(institute.getPassword()));
+			result = StringUtils.replace(result, "{purchase}", CommonUtils.getStringValue(institute.getPurchase()));
+			if(institute.getExpiryDateString() != null && !StringUtils.equals("Free", institute.getPurchase())) {
+				result = StringUtils.replace(result, "{expiryMessage}", "Your trial account will expire on " + institute.getExpiryDateString());	
+			} else {
+				result = StringUtils.replace(result, "{expiryMessage}", "");	
+				
+			}
 			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 		}
 		return result;
@@ -679,5 +686,15 @@ public class CommonUtils {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+
+	public static BigDecimal calculateStorageUsed(Float value) {
+		if(value == null || value == 0) {
+			return BigDecimal.ZERO;
+		}
+		Double storageQuota = new Double(value) / new Double(1024d * 1024d * 1024d);
+		BigDecimal bd = new BigDecimal(storageQuota).setScale(5, RoundingMode.HALF_UP);
+		return bd;
 	}
 }

@@ -14,6 +14,10 @@ public class EDOInstitute {
 	private String expiryDateString;
 	private Integer adminId;
 	private String purchase;
+	private Double storageQuota;
+	private Integer maxStudents;
+	private String email;
+	private Integer currentCount;
 	
 	public Integer getId() {
 		return id;
@@ -74,6 +78,30 @@ public class EDOInstitute {
 	}
 	public void setPurchase(String purchase) {
 		this.purchase = purchase;
+	}
+	public Double getStorageQuota() {
+		return storageQuota;
+	}
+	public void setStorageQuota(Double storageQuota) {
+		this.storageQuota = storageQuota;
+	}
+	public Integer getMaxStudents() {
+		return maxStudents;
+	}
+	public void setMaxStudents(Integer maxStudents) {
+		this.maxStudents = maxStudents;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public Integer getCurrentCount() {
+		return currentCount;
+	}
+	public void setCurrentCount(Integer currentCount) {
+		this.currentCount = currentCount;
 	}
 
 }

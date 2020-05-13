@@ -1290,6 +1290,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				return response;
 			}*/
 			
+			//Check for quota first
+			EDOInstitute institute = testsDao.getInstituteById(instituteId);
+			if(institute != null && institute.getStorageQuota() != null && institute.getStorageQuota() < 0) {
+				LoggingUtil.logMessage("Video storage quota exceeded for " + instituteId, LoggingUtil.videoLogger);
+				response.setStatus(new EdoApiStatus(-111, "Video storage quota exceeded .. Please upgrade your plan .."));
+				return response;
+			}
+			
 			String path = VIDEOS_PATH + "temp/";
 			File folder = new File(path);
 			Integer noOfFiles = null;
@@ -1334,6 +1342,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					boolean delete = savedFile.delete();
 					LoggingUtil.logMessage("Deleted the saved file " + delete + " at " + filePath, LoggingUtil.videoLogger);
 					tx.commit();
+					//Update quota
+					EDOInstitute edoInstitute = new EDOInstitute();
+					edoInstitute.setId(instituteId);
+					BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(length));
+					edoInstitute.setStorageQuota(bd.doubleValue());
+					//Deduct quota from institute
+					LoggingUtil.logMessage("Deducting quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
+					testsDao.deductQuota(edoInstitute);
 				}
 				
 			} 
@@ -1431,6 +1447,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoVideoLecture lecture = lectures.get(0);
 			if(request.getLecture().getDisabled() == 1) {
 				lecture.setDisabled(1);
+				//Add quota
+				EDOInstitute edoInstitute = new EDOInstitute();
+				edoInstitute.setId(lecture.getInstituteId());
+				BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(lecture.getSize()));
+				edoInstitute.setStorageQuota(bd.doubleValue());
+				//Deduct quota from institute
+				LoggingUtil.logMessage("Adding quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
+				testsDao.addQuota(edoInstitute);
+				
 			} else {
 				lecture.setVideoName(request.getLecture().getVideoName());
 				lecture.setClassroomId(request.getLecture().getClassroomId());
