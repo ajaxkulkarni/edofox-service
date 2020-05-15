@@ -46,7 +46,7 @@ public class EdoExcelUtil {
 					
 
 
-	public static List<EdoStudent> extractStudents(InputStream excel, Integer instituteId)
+	public static List<EdoStudent> extractStudents(InputStream excel, Integer instituteId, Integer packageId)
 			throws InvalidFormatException, IOException, IllegalAccessException, InvocationTargetException {
 		List<EdoStudent> students = new ArrayList<EdoStudent>();
 		EDOInstitute institute = new EDOInstitute();
@@ -112,27 +112,36 @@ public class EdoExcelUtil {
 					student.setCasteCategory(getCellValue(colCaste, row));
 					student.setSchoolDistrict(getCellValue(colDistrict, row));
 					List<EDOPackage> packages = new ArrayList<EDOPackage>();
-					if(colPackage1 != null && row.getCell(colPackage1)  != null) {
+					if(packageId == null) {
+						if(colPackage1 != null && row.getCell(colPackage1)  != null) {
+							EDOPackage p1 = new EDOPackage();
+							p1.setId((Double.valueOf(row.getCell(colPackage1).getNumericCellValue())).intValue());
+							p1.setInstitute(institute);
+							p1.setStatus("Completed");
+							packages.add(p1);
+						}
+						if(colPackage2 != null && row.getCell(colPackage2)  != null) {
+							EDOPackage p2 = new EDOPackage();
+							p2.setId((Double.valueOf(row.getCell(colPackage2).getNumericCellValue())).intValue());
+							p2.setInstitute(institute);
+							p2.setStatus("Completed");
+							packages.add(p2);
+						}
+						if(colPackage3 != null && row.getCell(colPackage3)  != null) {
+							EDOPackage p3 = new EDOPackage();
+							p3.setId((Double.valueOf(row.getCell(colPackage3).getNumericCellValue())).intValue());
+							p3.setInstitute(institute);
+							p3.setStatus("Completed");
+							packages.add(p3);
+						}
+					} else {
 						EDOPackage p1 = new EDOPackage();
-						p1.setId((Double.valueOf(row.getCell(colPackage1).getNumericCellValue())).intValue());
+						p1.setId(packageId);
 						p1.setInstitute(institute);
 						p1.setStatus("Completed");
 						packages.add(p1);
 					}
-					if(colPackage2 != null && row.getCell(colPackage2)  != null) {
-						EDOPackage p2 = new EDOPackage();
-						p2.setId((Double.valueOf(row.getCell(colPackage2).getNumericCellValue())).intValue());
-						p2.setInstitute(institute);
-						p2.setStatus("Completed");
-						packages.add(p2);
-					}
-					if(colPackage3 != null && row.getCell(colPackage3)  != null) {
-						EDOPackage p3 = new EDOPackage();
-						p3.setId((Double.valueOf(row.getCell(colPackage3).getNumericCellValue())).intValue());
-						p3.setInstitute(institute);
-						p3.setStatus("Completed");
-						packages.add(p3);
-					}
+					
 					if(CollectionUtils.isNotEmpty(packages)) {
 						student.setPackages(packages);
 					}
@@ -142,7 +151,7 @@ public class EdoExcelUtil {
 					student.setPayment(payment);
 					student.setPassword("12345");
 					if(colPassword != null) {
-						student.setPassword(row.getCell(colPassword).getStringCellValue());
+						student.setPassword(getCellValue(colPassword, row));
 					}
 					students.add(student);
 				}

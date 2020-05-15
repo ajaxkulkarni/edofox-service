@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
+import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
@@ -141,7 +142,7 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadStudentsExcel(@FormDataParam("data") InputStream studentData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
-			@FormDataParam("instituteId") Integer instituteId, @FormDataParam("type") String type) {
+			@FormDataParam("instituteId") Integer instituteId, @FormDataParam("type") String type, @FormDataParam("packageId") Integer packageId) {
 		LoggingUtil.logMessage("Upload Students Excel :" + instituteId);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
@@ -149,11 +150,12 @@ public class EdoAdminController {
 			EDOInstitute institute = new EDOInstitute();
 			institute.setId(instituteId);
 			request.setInstitute(institute);
-			request.setStudents(EdoExcelUtil.extractStudents(studentData, instituteId));
+			request.setStudents(EdoExcelUtil.extractStudents(studentData, instituteId, packageId));
 			request.setRequestType(type);
 			response.setStatus(adminBo.bulkUploadStudents(request));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, "There was some error parsing your excel. Please make sure that all fields are text fields and not number fields"));
 		}
 		LoggingUtil.logMessage("Upload Students Excel Response");
 		return response;

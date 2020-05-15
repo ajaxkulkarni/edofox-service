@@ -499,40 +499,62 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			existingStudent = testsDao.getStudentByPhoneNumber(student);
 		}*/
 		
-		//Check for max students limit
-		if(CollectionUtils.isNotEmpty(student.getPackages())) {
-			EDOInstitute institute = testsDao.getStudentStats(student.getPackages().get(0).getInstitute().getId());
-			if(institute != null && institute.getMaxStudents() != null && institute.getCurrentCount() != null) {
-				if((institute.getCurrentCount() + 1) >= institute.getMaxStudents()) {
-					LoggingUtil.logMessage("Max students limit reached ... " + student.getPhone() + " for institute " + student.getPackages().get(0).getInstitute().getId() + " count " +institute.getCurrentCount() + " and max " + institute.getMaxStudents());
-					return "Maximum students limit reached. Please upgrade your plan to add more students.";
+		boolean update = false;
+		if(StringUtils.equals(request.getRequestType(), "ADD_PKG")) {
+			update = true;
+		}
+		
+		if(!update) {
+			//Check for max students limit
+			if(CollectionUtils.isNotEmpty(student.getPackages())) {
+				EDOInstitute institute = testsDao.getStudentStats(student.getPackages().get(0).getInstitute().getId());
+				if(institute != null && institute.getMaxStudents() != null && institute.getCurrentCount() != null) {
+					if((institute.getCurrentCount() + 1) >= institute.getMaxStudents()) {
+						LoggingUtil.logMessage("Max students limit reached ... " + student.getPhone() + " for institute " + student.getPackages().get(0).getInstitute().getId() + " count " +institute.getCurrentCount() + " and max " + institute.getMaxStudents());
+						return "Maximum students limit reached. Please upgrade your plan to add more students.";
+					}
 				}
 			}
 		}
 		
 		existingStudent = testsDao.getStudentLogin(student);
 		
-		if(CollectionUtils.isEmpty(existingStudent)) {
-			testsDao.saveStudent(student);
+		if(!update) {
+			//If add new student request
+			if(CollectionUtils.isEmpty(existingStudent)) {
+				testsDao.saveStudent(student);
+			} else {
+				LoggingUtil.logMessage("Student already exists with phone number (Not updating) ... " + student.getPhone() + " and roll no " + student.getRollNo());
+				//student.setId(existingStudent.get(0).getId());
+				//testsDao.updateStudent(student);
+				return "Student already exists with the same username";
+			}
+			
 		} else {
-			LoggingUtil.logMessage("Student already exists with phone number (Not updating) ... " + student.getPhone() + " and roll no " + student.getRollNo());
-			//student.setId(existingStudent.get(0).getId());
-			//testsDao.updateStudent(student);
-			return "Student already exists with the same username";
+			if(CollectionUtils.isEmpty(existingStudent)) {
+				return ERROR_STUDENT_NOT_FOUND;
+			}
+			student.setId(existingStudent.get(0).getId());
 		}
+		
 		
 		LoggingUtil.logMessage("Student ID is =>" + student.getId());
 		if(student.getId() != null) {
 			if(CollectionUtils.isNotEmpty(student.getPackages())) {
-				LoggingUtil.logMessage("Adding student login for =>" + student.getId());
-				student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
-				testsDao.saveLogin(student);
+				if(!update) {
+					student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
+					LoggingUtil.logMessage("Adding student login for =>" + student.getId());
+					testsDao.saveLogin(student);
+				}
 				for(EDOPackage pkg: student.getPackages()) {
 					if(StringUtils.isBlank(pkg.getStatus())) {
 						pkg.setStatus("Completed");
 					}
 				}
-				//testsDao.deleteExistingPackages(student);
+				//if(update) {
+				LoggingUtil.logMessage("Removing student package IF PRESENT for =>" + student.getId());
+				testsDao.deleteExistingPackages(student);
+				//}
 				LoggingUtil.logMessage("Adding student package for =>" + student.getId());
 				testsDao.createStudentPackage(student);
 			}

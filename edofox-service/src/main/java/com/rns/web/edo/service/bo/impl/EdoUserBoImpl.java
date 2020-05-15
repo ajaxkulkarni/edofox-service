@@ -230,7 +230,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					EdoTest mapTest = studentMap.getTest();
 					if(mapTest != null) {
 						if(mapTest.getStartDate() != null && mapTest.getStartDate().getTime() > new Date().getTime()) {
-							response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be availble on " + CommonUtils.convertDate(mapTest.getStartDate())));
+							response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be available on " + CommonUtils.convertDate(mapTest.getStartDate())));
 							return response;
 						}
 						if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime()) {
@@ -665,6 +665,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		EdoServiceResponse response = new EdoServiceResponse();
 		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
+			
 			String status = "Completed";
 			if(student.getPayment() != null && student.getPayment().isOffline()) {
 				student.getPayment().setMode("Offline");
@@ -677,11 +678,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//Update package status
 			if(CollectionUtils.isNotEmpty(student.getPackages())) {
 				for(EDOPackage pkg: student.getPackages()) {
-					if(StringUtils.isBlank(pkg.getStatus())) {
-						pkg.setStatus(status);
-					}
+					//if(StringUtils.isNotBlank(pkg.getStatus())) {
+					pkg.setStatus(status);
+					//}
+				}
+			} else {
+				response.setStatus(new EdoApiStatus(STATUS_ERROR, "Please select at least one package"));
+				return response;
+			}
+			
+			EDOInstitute institute = testsDao.getStudentStats(student.getPackages().get(0).getInstitute().getId());
+			if(institute != null && institute.getMaxStudents() != null && institute.getCurrentCount() != null) {
+				if((institute.getCurrentCount() + 1) >= institute.getMaxStudents()) {
+					LoggingUtil.logMessage("Max students limit reached ... " + student.getPhone() + " for institute " + student.getPackages().get(0).getInstitute().getId() + " count " +institute.getCurrentCount() + " and max " + institute.getMaxStudents());
+					response.setStatus(new EdoApiStatus(-111, "Maximum students limit reached. Please contact your organization to upgrade the plan."));
+					return response;
 				}
 			}
+			
 			//student.setCurrentPackage(studentPackage);
 			//student.setRollNo(""); //For new student
 			
@@ -718,10 +732,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//SMS and email
 			//Get institute details
-			EDOInstitute institute = null;
+			/*EDOInstitute institute = null;
 			if(CollectionUtils.isNotEmpty(student.getPackages()) && student.getPackages().get(0).getInstitute() != null) {
 				institute = testsDao.getInstituteById(student.getPackages().get(0).getInstitute().getId());
-			}
+			}*/
 			notifyStudent(student, MAIL_TYPE_SUBSCRIPTION, institute);
 			txManager.commit(txStatus);
 		} catch (Exception e) {

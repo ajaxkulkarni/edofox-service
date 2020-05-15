@@ -167,7 +167,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION,
-					"Hi {name}, Thank you for registering for {instituteName}. Please complete the payment in order to have full access to {instituteName} courses.");
+					"Hi {name}, Thank you for registering to {instituteName}. Login to test.edofox.com using the username and password you provided to have access to its features. "
+					+ "{paymentMessage}");
 			put(MAIL_TYPE_ACTIVATED, "Hi {name}, your {instituteName} package {packages} is activated. Transaction ID - {transactionId}.");
 			put(MAIL_TYPE_TEST_RESULT, "Hi {name}, your {instituteName} {testName} final result is - "
 					+ "\nSolved  - {solved} \nCorrect answers - {correctCount} \nScore - {score} \nOut of - {totalMarks}" + "\n{additionalMessage}");

@@ -194,8 +194,11 @@ public class CommonUtils {
 			if (student.getPayment() != null) {
 				if (student.getPayment().isOffline()) {
 					result = StringUtils.replace(result, "{paymentMode}", "Offline");
+					result = StringUtils.replace(result, "{paymentMessage}", "");
 				} else {
 					result = StringUtils.replace(result, "{paymentMode}", "Online");
+					//
+					result = StringUtils.replace(result, "{paymentMessage}", "Please complete the payment in order to have full access to {instituteName} courses.");
 				}
 				result = StringUtils.replace(result, "{paymentId}", CommonUtils.getStringValue(student.getPayment().getPaymentId()));
 				result = StringUtils.replace(result, "{transactionId}", CommonUtils.getStringValue(student.getTransactionId()));
