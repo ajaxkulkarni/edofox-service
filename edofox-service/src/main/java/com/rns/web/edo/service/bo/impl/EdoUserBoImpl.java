@@ -1387,7 +1387,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoServiceResponse getVideoLectures(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
-		if(request.getStudent() == null || request.getInstitute() == null) {
+		if(/*request.getStudent() == null ||*/ request.getInstitute() == null) {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 			return response;
 		}

@@ -183,7 +183,11 @@
     LEFT JOIN test_subjects ON video_lectures.subject_id = test_subjects.subject_id
     LEFT JOIN packages on video_lectures.classroom_id = packages.id
     WHERE video_lectures.institute_id=${institute.id} AND video_lectures.is_disabled = 0
-    AND (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
+    <if test="student != null">
+    AND 
+    (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
+    </if>
+    
     ORDER BY created_date DESC
 	
 	</select>
