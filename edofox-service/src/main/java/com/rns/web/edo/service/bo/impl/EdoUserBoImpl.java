@@ -1320,6 +1320,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				LoggingUtil.logMessage("Directory created for " + folder.getAbsolutePath() + " result is " + mkdirResult, LoggingUtil.videoLogger);
 				noOfFiles = 0;
 			}
+			title = StringUtils.replace(title, "/", " ");
+			title = StringUtils.replace(title, "\\", " ");
 			String filePath = path + title;
 			FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 			//IOUtils.copy(data, fileOutputStream);
