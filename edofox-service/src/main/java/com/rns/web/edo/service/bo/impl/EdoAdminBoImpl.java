@@ -1538,7 +1538,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				student.setRollNo(institute.getContact());
 				student.setName("Demo student");	
 				student.setPassword(institute.getPassword());
-				student.setAccessType("Teacher");
+				//student.setAccessType("Teacher");
 				request.setStudent(student);
 			}
 			if(request.getStudent() != null && pkg.getId() != null) {
@@ -1653,6 +1653,53 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			status.setStatus(-111, ERROR_IN_PROCESSING);
 		} finally {
 			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+
+	public EdoApiStatus upgradeClient(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(request.getInstitute() == null || StringUtils.isBlank(request.getInstitute().getPurchase())) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		try {
+			EDOInstitute institute = testsDao.getInstituteById(request.getInstitute().getId());
+			institute.setPurchase(request.getInstitute().getPurchase());
+			int days = 30;
+			if(StringUtils.equals(request.getRequestType(), "TRIAL")) {
+				days = 7;
+			}
+			if(StringUtils.equals(request.getInstitute().getPurchase(), "Free")) {
+				days = 300;
+			}
+			Date expiryDate = DateUtils.addDays(new Date(), days);
+			institute.setExpiryDate(expiryDate);
+			String expiryDateString = CommonUtils.convertDate(expiryDate);
+			institute.setExpiryDateString(expiryDateString);
+			//Set limits based on plans
+			institute.setMaxStudents(MAX_STUDENTS.get(institute.getPurchase()));
+			institute.setStorageQuota(MAX_STORAGE.get(institute.getPurchase()));
+			testsDao.upgradeInstitute(institute);
+			
+			LoggingUtil.logMessage("Institute updated successfully " + institute.getId() + " by a plan " + institute.getPurchase());
+			//Notify with SMS
+			String mailType = MAIL_TYPE_UPGRADE;
+			/*if(StringUtils.equals("Demo", institute.getPurchase())) {
+				mailType = MAIL_TYPE_SIGN_UP_DEMO;
+			}*/
+			EdoSMSUtil edoSMSUtil = new EdoSMSUtil(mailType);
+			edoSMSUtil.setCopyAdmin(true);
+			EdoStudent student = new EdoStudent();
+			student.setPhone(institute.getContact());
+			edoSMSUtil.setStudent(student);
+			edoSMSUtil.setInstitute(institute);
+			edoSMSUtil.sendSMS();
+			//executor.execute(edoSMSUtil);
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
 		}
 		return status;
 	}

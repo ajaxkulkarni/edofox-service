@@ -420,4 +420,15 @@ public class EdoAdminController {
 		response.setStatus(adminBo.savePendingVideos(request));
 		return response;
 	}
+	
+	@POST
+	@Path("/upgradeClient")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse upgradeClient(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Upgrade client :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.upgradeClient(request));
+		return response;
+	}
 }

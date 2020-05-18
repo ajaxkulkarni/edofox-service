@@ -54,5 +54,14 @@
 	join institute on student_institute.institute_id = institute.id
 	where institute_id = ${value};
 	</select>
+	
+	<insert id="upgradeInstitute" parameterType="com.rns.web.edo.service.domain.EDOInstitute">
+		update institute set 
+		purchase = '${purchase}',
+		storage_quota = ${storageQuota}, 
+		max_students = ${maxStudents}, 
+		expiry_date = '${expiryDateString}'
+		where id = ${id};
+	</insert>
 
 </mapper>

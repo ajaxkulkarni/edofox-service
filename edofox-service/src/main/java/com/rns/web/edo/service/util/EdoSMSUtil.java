@@ -181,6 +181,9 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 					"Thank you for signing up {instituteName} at Edofox Live."
 					+ "\nUse your registered mobile number and password to login as student at live.edofox.com. Your free trial includes live classroom feature with unlimited time upto 100 students. "
 					+ "You can upgrade your plan anytime to enable other premium features.");
+			put(MAIL_TYPE_UPGRADE,
+					"Congratulations {instituteName}. Your account has been successfully updated to {purchase} plan at Edofox. {expiryMessage}");
+			
 			
 		}
 	});

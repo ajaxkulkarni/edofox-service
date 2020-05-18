@@ -236,7 +236,7 @@ public class CommonUtils {
 			result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(institute.getPassword()));
 			result = StringUtils.replace(result, "{purchase}", CommonUtils.getStringValue(institute.getPurchase()));
 			if(institute.getExpiryDateString() != null && !StringUtils.equals("Free", institute.getPurchase())) {
-				result = StringUtils.replace(result, "{expiryMessage}", "Your trial account will expire on " + institute.getExpiryDateString());	
+				result = StringUtils.replace(result, "{expiryMessage}", "Your account will expire on " + institute.getExpiryDateString());	
 			} else {
 				result = StringUtils.replace(result, "{expiryMessage}", "");	
 				

@@ -41,5 +41,6 @@ public interface EdoAdminBo {
 	EdoAdminRequest getLastUplinkDate();
 	EdoServiceResponse createInstitute(EdoAdminRequest request);
 	EdoApiStatus savePendingVideos(EdoServiceRequest request);
+	EdoApiStatus upgradeClient(EdoServiceRequest request);
 	
 }

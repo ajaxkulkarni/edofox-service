@@ -45,6 +45,8 @@
 		<result column="max_students" property="maxStudents" />
 		<result column="firebase_id" property="firebaseId" />
 		<result column="currentCount" property="currentCount" />
+		<result column="contact_number" property="contact" />
+		
 	</resultMap>
 	
 	<resultMap id="test" type="com.rns.web.edo.service.domain.EdoTest">
