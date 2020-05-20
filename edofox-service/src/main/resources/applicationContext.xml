@@ -105,6 +105,7 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoUplinkStatus</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoLiveSession</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoVideoLecture</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoSalesDetails</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

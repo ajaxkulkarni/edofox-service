@@ -18,6 +18,8 @@ public class EDOInstitute {
 	private Integer maxStudents;
 	private String email;
 	private Integer currentCount;
+	private String comments;
+	private String status;
 	
 	public Integer getId() {
 		return id;
@@ -102,6 +104,18 @@ public class EDOInstitute {
 	}
 	public void setCurrentCount(Integer currentCount) {
 		this.currentCount = currentCount;
+	}
+	public String getComments() {
+		return comments;
+	}
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

@@ -431,4 +431,15 @@ public class EdoAdminController {
 		response.setStatus(adminBo.upgradeClient(request));
 		return response;
 	}
+	
+	@POST
+	@Path("/updateClientSales")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateClientSales(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Update client sales :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.updateClientSales(request));
+		return response;
+	}
 }

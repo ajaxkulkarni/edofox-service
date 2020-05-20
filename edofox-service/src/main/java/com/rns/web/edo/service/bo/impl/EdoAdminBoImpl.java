@@ -51,6 +51,7 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
+import com.rns.web.edo.service.domain.jpa.EdoSalesDetails;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoUplinkStatus;
 import com.rns.web.edo.service.util.CommonUtils;
@@ -1700,6 +1701,40 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
+	}
+
+	public EdoApiStatus updateClientSales(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(request.getInstitute() == null || request.getInstitute().getId() == null) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			List<EdoSalesDetails> records = session.createCriteria(EdoSalesDetails.class).add(Restrictions.eq("instituteId", request.getInstitute().getId())).list();
+			if(CollectionUtils.isEmpty(records)) {
+				EdoSalesDetails details = new EdoSalesDetails();
+				details.setComments(request.getInstitute().getComments());
+				details.setStatus(request.getInstitute().getStatus());
+				details.setInstituteId(request.getInstitute().getId());
+				details.setLastUpdated(new Date());
+				session.persist(details);
+			} else {
+				EdoSalesDetails details = records.get(0);
+				details.setComments(request.getInstitute().getComments());
+				details.setStatus(request.getInstitute().getStatus());
+				details.setLastUpdated(new Date());
+			}
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return status;
 	}

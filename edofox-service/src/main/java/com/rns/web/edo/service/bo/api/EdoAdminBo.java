@@ -42,5 +42,6 @@ public interface EdoAdminBo {
 	EdoServiceResponse createInstitute(EdoAdminRequest request);
 	EdoApiStatus savePendingVideos(EdoServiceRequest request);
 	EdoApiStatus upgradeClient(EdoServiceRequest request);
+	EdoApiStatus updateClientSales(EdoServiceRequest request);
 	
 }
