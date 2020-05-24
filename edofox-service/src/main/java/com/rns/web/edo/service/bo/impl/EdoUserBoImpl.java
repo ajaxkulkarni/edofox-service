@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -1212,21 +1213,50 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EDOPackage currentPackage = request.getStudent().getCurrentPackage();
 			Integer sessionId = currentPackage.getId();
-
-			// Output folder is not required as vimdeo is integrated
-
-			/*
-			 * String outputFolder =
-			 * EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT); String
-			 * fileExtension = request.getRequestType();
-			 * if(StringUtils.isBlank(fileExtension)) { fileExtension = "webm";
-			 * } outputFolder = outputFolder + "media/" + sessionId + "/"; File
-			 * outputDir = new File(outputFolder); if(!outputDir.exists()) {
-			 * outputDir.mkdirs(); } outputFolder = outputFolder + "merged." +
-			 * fileExtension;
-			 */
-
-			String outputFolder = VIDEOS_PATH + sessionId + "/" + "merged.webm";
+			
+			session = this.sessionFactory.openSession();
+			List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", sessionId)).list();
+			
+			if (CollectionUtils.isNotEmpty(sessions)) {
+				Transaction tx = session.beginTransaction();
+				EdoLiveSession live = sessions.get(0);
+				Float fileSize = VideoUtil.downloadRecordedFile(live.getClassroomId(), live.getId());
+				if (fileSize != null && fileSize > 0) {
+					// Upload to Vimeo
+					//TODO removed as file format not supported by vimeo
+					/*VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFile, live.getSessionName(), "");
+					if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
+						live.setStatus("Completed");
+						live.setRecording_url(vimeoResponse.getJson().getString("link"));
+					}
+					count++;*/
+					live.setFileSize(fileSize);
+					live.setStatus("Completed");
+					String urlStr = EdoPropertyUtil.getProperty(EdoPropertyUtil.RECORDED_URL) + URLEncoder.encode(live.getClassroomId() + "-" + live.getId() + ".mp4", "UTF-8");
+					live.setRecording_url(urlStr);
+					LoggingUtil.logMessage("Exported video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
+				} else {
+					live.setStatus("Failed");
+					LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
+				}
+				tx.commit();
+				EDOInstitute institute = new EDOInstitute();
+				EDOPackage pkg = testsDao.getPackage(live.getClassroomId());
+				if(pkg != null && pkg.getInstitute() != null && live.getFileSize() != null && live.getFileSize() > 0) {
+					institute.setId(pkg.getInstitute().getId());
+					BigDecimal bd = CommonUtils.calculateStorageUsed(live.getFileSize());
+					institute.setStorageQuota(bd.doubleValue());
+					//Deduct quota from institute
+					LoggingUtil.logMessage("Deducting quota " + institute.getStorageQuota() + " GBs from " + institute.getId(), LoggingUtil.videoLogger);
+					testsDao.deductQuota(institute);
+				}
+				currentPackage.setVideoUrl("view-session.php?sessionId=" + sessionId + "&sessionName=" + live.getSessionName());
+				List<EDOPackage> packages = new ArrayList<EDOPackage>();
+				packages.add(currentPackage);
+				response.setPackages(packages);
+			}
+			
+			/*String outputFolder = VIDEOS_PATH + sessionId + "/" + "merged.webm";
 
 			boolean result = VideoUtil.mergeFiles(VIDEOS_PATH + sessionId + "/", outputFolder);
 			if (result) {
@@ -1255,7 +1285,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 			} else {
 				response.setStatus(new EdoApiStatus(-111, "Could not process video!"));
-			}
+			}*/
 
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
