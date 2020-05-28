@@ -49,6 +49,7 @@ public interface EdoConstants {
 	String ATTR_OPTION1 = "option1";
 	String ATTR_META_DATA = "meta";
 	String ATTR_SOLUTION = "solution";
+	String ATTR_VIDEO_QUESTION = "videoQuestion";
 	
 	String MAIL_TYPE_SUBSCRIPTION = "SubscriptionMail";
 	String MAIL_TYPE_ACTIVATED = "PackageActivated";
@@ -84,6 +85,8 @@ public interface EdoConstants {
 
 	String JSON_PATH =  "/home/service/testData/";
 	String[] ADMIN_NUMBERS = {"9423040642", "8830579708", "8668937047", "8669042562"};
+
+	String VIDEO_QUESTION_FILE_PATH = "/home/service/videos/questions/";
 	
 	static Map<String, Integer> MAX_STUDENTS = Collections.unmodifiableMap(new HashMap<String, Integer>() {
 		{

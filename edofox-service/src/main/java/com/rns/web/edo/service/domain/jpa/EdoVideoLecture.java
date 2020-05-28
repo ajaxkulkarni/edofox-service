@@ -37,8 +37,26 @@ public class EdoVideoLecture {
 	private Double size;
 	@Column(name = "is_disabled")
 	private int disabled;
+	@Column(name = "topic_id")
+	private Integer topicId;
+	@Column(name = "keywords")
+	private String keywords;
+	@Column(name = "question_img")
+	private String questionImg;
 	
 	
+	public Integer getTopicId() {
+		return topicId;
+	}
+	public void setTopicId(Integer topicId) {
+		this.topicId = topicId;
+	}
+	public String getKeywords() {
+		return keywords;
+	}
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
+	}
 	public int getDisabled() {
 		return disabled;
 	}
@@ -92,5 +110,11 @@ public class EdoVideoLecture {
 	}
 	public void setSize(Double size) {
 		this.size = size;
+	}
+	public String getQuestionImg() {
+		return questionImg;
+	}
+	public void setQuestionImg(String questionImg) {
+		this.questionImg = questionImg;
 	}
 }

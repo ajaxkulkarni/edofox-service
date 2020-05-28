@@ -430,11 +430,13 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadVideoLecture(@FormDataParam("data") InputStream videoData, @FormDataParam("data") FormDataContentDisposition videoDetails,
-			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, @FormDataParam("title") String title, @FormDataParam("packageId") Integer packageId) {
+			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, 
+			@FormDataParam("title") String title, @FormDataParam("packageId") Integer packageId, @FormDataParam("topicId") Integer topicId, 
+			@FormDataParam("keywords") String keywords, @FormDataParam("questionFile") InputStream questionFile, @FormDataParam("questionFile") FormDataContentDisposition questionFileDetails) {
 		LoggingUtil.logMessage("Upload video :" + title, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId);
+			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileDetails.getFileName());
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
@@ -486,6 +488,20 @@ public class EdoUserController {
 		response.setStatus(userBo.updateVideoLecture(request));
 		LoggingUtil.logObject("Update video response ", response);
 		return response;
+	}
+	
+	@GET
+	@Path("/getTags/{instituteId}")
+	//@Produces(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getTags(@PathParam("instituteId") Integer instituteId, @QueryParam("query") String query) {
+		//LoggingUtil.logMessage("Tags request:" + instituteId  + " and query " + query);
+		try {
+			return userBo.getTags(instituteId, query);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return null;
 	}
 	
 }

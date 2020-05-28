@@ -2,7 +2,9 @@ package com.rns.web.edo.service.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -18,7 +20,6 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -26,7 +27,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.hibernate.Session;
 
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -528,7 +528,7 @@ public class CommonUtils {
 	}
 
 	public static void main(String[] args) {
-		EdoQuestion question = new EdoQuestion();
+		/*EdoQuestion question = new EdoQuestion();
 		// question.setType(EdoConstants.QUESTION_TYPE_MULTIPLE);
 		question.setCorrectAnswer("option2,option3");
 		EdoQuestion answer = new EdoQuestion();
@@ -540,6 +540,8 @@ public class CommonUtils {
 		System.out.println(calculateAnswer(answer, question));
 		// answer.setMarks(new BigDecimal("1").negate());
 		// System.out.println(calculateMatchScore(question, answer));
+*/		
+		//String languageCode = RakeLanguages.EN;
 	}
 	
 	public static void setQuestionURLs(EdoQuestion question) {
@@ -699,5 +701,35 @@ public class CommonUtils {
 		Double storageQuota = new Double(value) / new Double(1024d * 1024d * 1024d);
 		BigDecimal bd = new BigDecimal(storageQuota).setScale(5, RoundingMode.HALF_UP);
 		return bd;
+	}
+	
+	public static void saveFile(InputStream content, String path, String fileName) {
+		FileOutputStream fileOutputStream = null;
+		try {
+			if(content != null) {
+				//Create directory if not present
+				File folder = new File(path);
+				if(!folder.exists()) {
+					folder.mkdirs();
+				}
+				fileOutputStream = new FileOutputStream(path + fileName);
+			    int read;
+				byte[] bytes = new byte[1024];
+				while ((read = content.read(bytes)) != -1) {
+					fileOutputStream.write(bytes, 0, read);
+				}
+				fileOutputStream.close();
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			if(fileOutputStream != null) {
+				try {
+					fileOutputStream.close();
+				} catch (IOException e) {
+					
+				}
+			}
+		}
 	}
 }
