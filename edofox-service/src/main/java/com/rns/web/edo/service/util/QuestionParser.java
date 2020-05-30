@@ -761,7 +761,7 @@ agent-platform-version: 4
 		}
 	}
 
-	private static EdoQuestion prepareQuestion(Integer chapterId, Integer subjectId, ExtDataQuestion q, String exam) {
+	public static EdoQuestion prepareQuestion(Integer chapterId, Integer subjectId, ExtDataQuestion q, String exam) {
 		EdoQuestion edoQuestion = new EdoQuestion();
 		edoQuestion.setType(questionStyles.get(q.getQuestion_style()));
 		if(edoQuestion.getType() == null) {
@@ -777,6 +777,17 @@ agent-platform-version: 4
 		EdoChapter chapter = new EdoChapter();
 		chapter.setChapterId(chapterId);
 		edoQuestion.setChapter(chapter);
+		if(subjectId == null) {
+			if(StringUtils.containsIgnoreCase(q.getSubject_slug(), "phy")) {
+				subjectId = 1;
+			} else if(StringUtils.containsIgnoreCase(q.getSubject_slug(), "che")) {
+				subjectId = 3;
+			} else if(StringUtils.containsIgnoreCase(q.getSubject_slug(), "mat")) {
+				subjectId = 2;
+			} else if(StringUtils.containsIgnoreCase(q.getSubject_slug(), "bio")) {
+				subjectId = 4;
+			}
+		} 
 		edoQuestion.setSubjectId(subjectId);
 		edoQuestion.setLevel(q.getQuestion_level());
 		edoQuestion.setReferenceId(q.getQuestion_id());
@@ -921,7 +932,7 @@ agent-platform-version: 4
 			in = resp.getEntityInputStream();
 			String filePath = "";
 			if (in != null) {
-				filePath = EdoConstants.Q_BANK_PATH + questionId + "_" + fileName;
+				filePath = EdoConstants.Q_BANK_PATH + questionId + "_" + fileName + ".png";
 				os = new FileOutputStream(filePath);
 				IOUtils.copy(in, os);
 			}
