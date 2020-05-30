@@ -45,6 +45,7 @@ public class ExtDataQuestion {
     private List<ExtDataQuestion> passage_child_questions;
     private List<String> mx_l1;//"
     private List<String> mx_l2;//"
+    private String subject_slug;
     
 	public String getPassage_image() {
 		return passage_image;
@@ -255,6 +256,12 @@ public class ExtDataQuestion {
 	}
 	public void setMx_l2(List<String> mx_l2) {
 		this.mx_l2 = mx_l2;
+	}
+	public String getSubject_slug() {
+		return subject_slug;
+	}
+	public void setSubject_slug(String subject_slug) {
+		this.subject_slug = subject_slug;
 	}
     
 
