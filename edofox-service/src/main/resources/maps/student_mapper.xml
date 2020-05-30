@@ -225,6 +225,9 @@
 		<if test="feedback.durationViewed != null">
 			,duration_watched 
 		</if>
+		<if test="feedback.foundationId != null">
+			,course_id 
+		</if>
 		)
 		values('${requestType}', CURRENT_TIMESTAMP, 
 		<if test="feedback.id != null">
@@ -245,6 +248,9 @@
 		</if>
 		<if test="feedback.durationViewed != null">
 			,${feedback.durationViewed}  
+		</if>
+		<if test="feedback.foundationId != null">
+			,${feedback.foundationId}   
 		</if>
 		)
 	</insert>
