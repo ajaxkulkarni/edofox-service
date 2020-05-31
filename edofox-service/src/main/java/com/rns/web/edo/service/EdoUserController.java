@@ -436,7 +436,11 @@ public class EdoUserController {
 		LoggingUtil.logMessage("Upload video :" + title, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileDetails.getFileName());
+			String questionFileName = "";
+			if(questionFileDetails != null) {
+				questionFileName = questionFileDetails.getFileName();
+			}
+			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileName);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
