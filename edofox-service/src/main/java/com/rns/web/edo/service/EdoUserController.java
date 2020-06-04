@@ -443,6 +443,7 @@ public class EdoUserController {
 			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileName);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));
 		}
 		LoggingUtil.logMessage("Upload video Response", LoggingUtil.videoLogger);
 		return response;

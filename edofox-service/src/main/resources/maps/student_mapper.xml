@@ -196,6 +196,10 @@
 	
 	</select>
 	
+	<select id="getTestVideoLectures" parameterType="Integer" resultMap="videoLecture">
+	SELECT * FROM video_lectures WHERE test_id=${value} AND video_lectures.is_disabled = 0 ORDER BY created_date DESC
+	</select>
+	
 	<select id="getStudentLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="loginInfo">
 		select * from student_login 
 		join institute on student_login.institute_id = institute.id 

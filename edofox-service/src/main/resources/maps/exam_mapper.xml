@@ -106,6 +106,7 @@
 		<result column="marks" property="question.marks"/>
 		<result column="test_id" property="test.id" />
 		<result column="test_name" property="test.name" />
+		<result column="solutions_pdf_url" property="test.solutionUrl" />
 		<result column="no_of_questions" property="test.noOfQuestions" />
 		<result column="total_marks" property="test.totalMarks" />
 		<result column="duration" property="test.duration" />

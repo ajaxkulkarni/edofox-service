@@ -61,6 +61,7 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentByRollNo(EdoStudent student);
 	List<EdoStudent> getStudentLogin(EdoStudent student);
 	void saveLogin(EdoStudent student);
+	List<EdoVideoLectureMap> getTestVideoLectures(Integer testId);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);

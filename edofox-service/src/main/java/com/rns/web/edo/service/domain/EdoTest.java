@@ -36,6 +36,7 @@ public class EdoTest {
 	private String timeConstraint;
 	private Long minLeft;
 	private Long secLeft;
+	private String solutionUrl;
 	
 	public EdoTest() {
 		
@@ -244,6 +245,14 @@ public class EdoTest {
 
 	public void setSecLeft(Long secLeft) {
 		this.secLeft = secLeft;
+	}
+
+	public String getSolutionUrl() {
+		return solutionUrl;
+	}
+
+	public void setSolutionUrl(String solutionUrl) {
+		this.solutionUrl = solutionUrl;
 	}
 	
 }

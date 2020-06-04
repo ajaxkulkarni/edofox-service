@@ -134,6 +134,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			analysis.setSubjectAnalysis(subjectAnalysis);
 			test.setAnalysis(analysis);
 			
+			//Set URL for solution PDF
+			if(StringUtils.isNotBlank(test.getSolutionUrl())) {
+				test.setSolutionUrl(CommonUtils.prepareUrl(test.getSolutionUrl()));
+			}
+			
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
 				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
@@ -164,6 +169,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				subjectWiseScore.put(question.getSubject(), score);*/
 			}
+			
+			//Fetch video lectures for test (if any)
+			response.setLectures(testsDao.getTestVideoLectures(test.getId()));
 			
 			response.setTest(test);
 		}
