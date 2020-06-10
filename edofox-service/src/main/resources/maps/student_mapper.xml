@@ -232,7 +232,7 @@
 		<if test="feedback.foundationId != null">
 			,course_id 
 		</if>
-		)
+		,watch_status)
 		values('${requestType}', CURRENT_TIMESTAMP, 
 		<if test="feedback.id != null">
 			${feedback.id}, 
@@ -255,6 +255,15 @@
 		</if>
 		<if test="feedback.foundationId != null">
 			,${feedback.foundationId}   
+		</if>
+		<if test="requestType == 'LIVE_JOINED'">
+			,0 
+		</if>
+		<if test="requestType == 'VIDEO_STARTED'">
+			,1  
+		</if>
+		<if test="requestType == 'VIDEO_ENDED'">
+			,2
 		</if>
 		)
 	</insert>
