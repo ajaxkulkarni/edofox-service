@@ -3,13 +3,13 @@ package com.rns.web.edo.service.bo.api;
 import java.io.InputStream;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
-import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 
 public interface EdoUserBo {
 
@@ -34,12 +34,16 @@ public interface EdoUserBo {
 	EdoServiceResponse getLiveSessions(EdoServiceRequest request);
 	EdoServiceResponse finishRecording(EdoServiceRequest request);
 	EdoServiceResponse getSession(EdoServiceRequest request);
-	EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, 
+	/*EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, 
 			Integer subjectId, Integer packageId, Integer topicId, String keywords, InputStream questionFile, String fileName);
+	*/
 	EdoServiceResponse getVideoLectures(EdoServiceRequest request);
 	EdoServiceResponse login(EdoServiceRequest request);
 	EdoApiStatus updateStudentActivity(EdoServiceRequest request);
 	EdoApiStatus updateVideoLecture(EdoServiceRequest request);
 	EdoServiceResponse getTags(Integer instituteId, String query);
+	
+	//ERP changes
+	EdoServiceResponse uploadVideo(InputStream videoData, EdoClasswork classwork, String maps, String fileName);
 	
 }

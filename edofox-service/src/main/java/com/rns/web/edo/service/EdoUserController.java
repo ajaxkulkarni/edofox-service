@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,8 @@ import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoExcelUtil;
@@ -426,26 +429,21 @@ public class EdoUserController {
 	}
 	
 	@POST
-	@Path("/uploadVideoLecture")
+	@Path("/uploadContent")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadVideoLecture(@FormDataParam("data") InputStream videoData, @FormDataParam("data") FormDataContentDisposition videoDetails,
-			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, 
-			@FormDataParam("title") String title, @FormDataParam("packageId") Integer packageId, @FormDataParam("topicId") Integer topicId, 
-			@FormDataParam("keywords") String keywords, @FormDataParam("questionFile") InputStream questionFile, @FormDataParam("questionFile") FormDataContentDisposition questionFileDetails) {
-		LoggingUtil.logMessage("Upload video :" + title, LoggingUtil.videoLogger);
+			@FormDataParam("info") String info, @FormDataParam("maps") String maps) {
+		LoggingUtil.logMessage("Upload content request :" + info, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			String questionFileName = "";
-			if(questionFileDetails != null) {
-				questionFileName = questionFileDetails.getFileName();
-			}
-			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileName);
+			EdoClasswork classwork = new ObjectMapper().readValue(info, EdoClasswork.class);
+			return userBo.uploadVideo(videoData, classwork, maps, videoDetails.getFileName());
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));
 		}
-		LoggingUtil.logMessage("Upload video Response", LoggingUtil.videoLogger);
+		LoggingUtil.logMessage("Upload content Response", LoggingUtil.videoLogger);
 		return response;
 	}
 	

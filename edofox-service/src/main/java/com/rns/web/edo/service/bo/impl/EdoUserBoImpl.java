@@ -20,6 +20,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.ibatis.io.ClassLoaderWrapper;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -52,6 +53,8 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -1345,26 +1348,26 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return StringUtils.replace(url, "vimeo.com", "player.vimeo.com/video");
 	}
 
-	public EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId, Integer packageId, Integer topicId, 
-			String keywords, InputStream questionFile, String questionFileName) {
+	public EdoServiceResponse uploadVideo(InputStream videoData, EdoClasswork classwork, String maps, String fileName) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		//EdoApiStatus status = new EdoApiStatus();
 		Session session = null;
 		try {
-			/*if(data.available() <= 0) {
-				response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
-				return response;
-			}*/
 			
 			//Check for quota first
-			EDOInstitute institute = testsDao.getInstituteById(instituteId);
+			//TODO Add Later
+			/*EDOInstitute institute = testsDao.getInstituteById(instituteId);
 			if(institute != null && institute.getStorageQuota() != null && institute.getStorageQuota() < 0) {
 				LoggingUtil.logMessage("Video storage quota exceeded for " + instituteId, LoggingUtil.videoLogger);
 				response.setStatus(new EdoApiStatus(-111, "Video storage quota exceeded .. Please upgrade your plan .."));
 				return response;
-			}
+			}*/
 			
-			String path = VIDEOS_PATH + "temp/";
+			String documentFolder = "temp/";
+			if(StringUtils.equals(classwork.getType(), CONTENT_TYPE_DOCUMENT) || StringUtils.equals(classwork.getType(), CONTENT_TYPE_IMAGE)) {
+				documentFolder = "documents/";
+			}
+			String path = VIDEOS_PATH + documentFolder;
 			File folder = new File(path);
 			Integer noOfFiles = null;
 			if (!folder.exists()) {
@@ -1372,7 +1375,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				LoggingUtil.logMessage("Directory created for " + folder.getAbsolutePath() + " result is " + mkdirResult, LoggingUtil.videoLogger);
 				noOfFiles = 0;
 			}
-			title = StringUtils.replace(title, "/", " ");
+			String title = StringUtils.replace(fileName, "/", " ");
 			title = StringUtils.replace(title, "\\", " ");
 			String filePath = path + title;
 			FileOutputStream fileOutputStream = new FileOutputStream(filePath);
@@ -1390,60 +1393,67 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			File savedFile = new File(filePath);
 			if(savedFile.exists()) {
 				double length = savedFile.length();
-				LoggingUtil.logMessage("Uploading file " + title + " of " + length + " to vimeo ..", LoggingUtil.videoLogger);
-				VimeoResponse vimeoResponse = VideoUtil.uploadFile(filePath, title, title);
-				if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
-					session = this.sessionFactory.openSession();
-					Transaction tx = session.beginTransaction();
-					EdoVideoLecture lectures = new EdoVideoLecture();
-					lectures.setVideoName(title);
-					lectures.setSubjectId(subjectId);
-					lectures.setInstituteId(instituteId);
-					lectures.setCreatedDate(new Date());
-					lectures.setClassroomId(packageId);
-					lectures.setTopicId(topicId);
-					if(StringUtils.isNotBlank(keywords)) {
-						lectures.setKeywords(StringUtils.removeEnd(keywords, ","));
+				LoggingUtil.logMessage("Uploading file " + title + " of " + length, LoggingUtil.videoLogger);
+				//If video..upload to vimeo
+				String fileUrl = null;
+				if(StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
+					VimeoResponse vimeoResponse = VideoUtil.uploadFile(filePath, classwork.getTitle(), classwork.getDescription());
+					if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
+						fileUrl = vimeoResponse.getJson().getString("link");
 					}
-					String vimeoLink = vimeoResponse.getJson().getString("link");
-					//Prepare embed link
-					lectures.setVideo_url(prepareVimeoEmbedLink(vimeoLink));
-					lectures.setSize(length);
-					session.persist(lectures);
-					//Save question file if present
-					if(questionFile != null) {
-						CommonUtils.saveFile(questionFile, EdoConstants.VIDEO_QUESTION_FILE_PATH + lectures.getId() + "/", questionFileName);
-						lectures.setQuestionImg(EdoConstants.VIDEO_QUESTION_FILE_PATH + lectures.getId() + "/" + questionFileName);
+				} 
+				
+				session = this.sessionFactory.openSession();
+				Transaction tx = session.beginTransaction();
+				classwork.setDisabled(0);
+				classwork.setSize(length);
+				classwork.setCreatedDate(new Date());
+				classwork.setFileUrl(fileUrl);
+				session.persist(classwork);
+				//Add URL
+				if (!StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
+					String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
+					fileUrl = hostUrl + "document/" + classwork.getId();
+					classwork.setFileUrl(fileUrl);
+				}
+				//Add mappings
+				if(StringUtils.isNotBlank(maps)) {
+					String[] divs = StringUtils.split(maps, ",");
+					if(ArrayUtils.isNotEmpty(divs)) {
+						for(String div: divs) {
+							EdoClassworkMap map = new EdoClassworkMap();
+							map.setClasswork(classwork.getId());
+							if(StringUtils.contains(div, "C")) {
+								//Add class
+								Integer classId = new Integer(StringUtils.removeStart(div, "C"));
+								map.setCourse(classId);
+							} else {
+								map.setDivision(new Integer(div));
+							}
+							session.persist(map);
+						}
 					}
-					//Add keywords to repo
-					if(StringUtils.isNotBlank(keywords)) {
-						updateKeywords(instituteId, keywords, session);
-					}
+				}
 					
-					//Remove the temp file
+				//Remove the temp file
+				if(StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
 					boolean delete = savedFile.delete();
 					LoggingUtil.logMessage("Deleted the saved file " + delete + " at " + filePath, LoggingUtil.videoLogger);
-					tx.commit();
+				}
+				tx.commit();
+				
 					//Update quota
-					EDOInstitute edoInstitute = new EDOInstitute();
+				//TODO Add later
+					/*EDOInstitute edoInstitute = new EDOInstitute();
 					edoInstitute.setId(instituteId);
 					BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(length));
 					edoInstitute.setStorageQuota(bd.doubleValue());
 					//Deduct quota from institute
 					LoggingUtil.logMessage("Deducting quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
-					testsDao.deductQuota(edoInstitute);
-				}
+					testsDao.deductQuota(edoInstitute);*/
 				
 			} 
 			
-		    
-/*		    List<EDOPackage> packages = new ArrayList<EDOPackage>();
-		    EDOPackage currPackage = new EDOPackage();
-		    currPackage.setId(id);
-		    currPackage.setVideoUrl(videoUrl);
-			packages.add(currPackage);
-		    response.setPackages(packages);
-*/
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

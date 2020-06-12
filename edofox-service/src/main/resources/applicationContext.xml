@@ -15,7 +15,7 @@
 	<context:component-scan base-package="com.rns.web.edo.service" />
 	
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations"  value="file:///home/service/properties/edofox-db.properties"/>
+		<property name="locations"  value="file:///home/service/properties/erp-db.properties"/>
 	</bean>
 
 	<bean id="userBo" class="com.rns.web.edo.service.bo.impl.EdoUserBoImpl">
@@ -107,6 +107,8 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoVideoLecture</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoSalesDetails</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoKeyword</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoClasswork</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoClassworkMap</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

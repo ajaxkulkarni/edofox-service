@@ -72,7 +72,7 @@ public interface EdoConstants {
 	String Q_BANK_PATH = "/home/service/questionData/";
 	String TEMP_QUESTION_PATH = "/home/service/tempQuestions/";
 	String TEST_QUESTION_PATH = "/home/service/testQuestionData/";
-	String VIDEOS_PATH = "/home/service/videos/";
+	String VIDEOS_PATH = "/home/service/classwork/";
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";
@@ -107,6 +107,10 @@ public interface EdoConstants {
 			put("Advanced", 1024d);
 		}
 	});
+	
+	String CONTENT_TYPE_DOCUMENT = "Document";
+	String CONTENT_TYPE_VIDEO = "Video";
+	String CONTENT_TYPE_IMAGE = "Image";
 	
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";
