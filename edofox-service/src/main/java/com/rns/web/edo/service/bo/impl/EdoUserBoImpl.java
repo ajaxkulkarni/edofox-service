@@ -1324,7 +1324,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return response;
 		}
 		try {
-			EDOPackage liveSession = testsDao.getLiveSession(request.getStudent().getCurrentPackage().getId());
+			
+			EDOPackage liveSession = null;
+			if(StringUtils.equals(request.getRequestType(), "package")) {
+				request.getStudent().getCurrentPackage().setStatus("Active");
+				List<EDOPackage> liveSessions = testsDao.getLiveSessions(request.getStudent().getCurrentPackage());
+				if(CollectionUtils.isNotEmpty(liveSessions)) {
+					liveSession = liveSessions.get(0);
+				}
+			} else {
+				liveSession = testsDao.getLiveSession(request.getStudent().getCurrentPackage().getId());
+			}
+			
 			if(liveSession != null) {
 				liveSession.setVideoUrl(prepareVimeoEmbedLink(liveSession.getVideoUrl()));
 				List<EDOPackage> pgs = new ArrayList<EDOPackage>();
