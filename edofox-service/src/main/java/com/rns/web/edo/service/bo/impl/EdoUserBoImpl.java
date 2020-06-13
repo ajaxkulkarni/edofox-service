@@ -189,6 +189,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
+			Date startedDate = null;
 			if(studenId != null) {
 				inputMap.setStudent(new EdoStudent(studenId));
 				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
@@ -199,6 +200,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(studentMap != null && StringUtils.equals(TEST_STATUS_COMPLETED, studentMap.getStatus())) {
 					response.setStatus(new EdoApiStatus(STATUS_TEST_SUBMITTED, ERROR_TEST_ALREADY_SUBMITTED));
 					return response;
+				}
+				
+				
+				if(studentMap != null) {
+					startedDate = studentMap.getCreatedDate();
 				}
 				
 				//Added on 11/12/19
@@ -265,20 +271,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(StringUtils.equals("1", result.getTimeConstraint())) {
 					Date startTime = result.getStartDate();
 					if(startTime != null) {
-						Long durationInMs = new Long(result.getDuration() * 1000);
-						long timeDifference = System.currentTimeMillis() - startTime.getTime();
-						if(timeDifference > 0) {
-							long timeLeft = durationInMs - timeDifference;
-							if(timeLeft < 0) {
-								result.setSecLeft(0L);
-								result.setMinLeft(0L);
-							} else {
-								long secondsDiff = timeLeft / 1000;
-								result.setSecLeft(secondsDiff % 60); //seconds left
-								result.setMinLeft(secondsDiff / 60);
-							}
-						}
+						calculateTimeLeft(result, startTime);
 						
+					}
+				} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
+					if(startedDate != null) {
+						calculateTimeLeft(result, startedDate);
 					}
 				}
 				
@@ -331,6 +329,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		return response;
+	}
+
+	private void calculateTimeLeft(EdoTest result, Date startTime) {
+		Long durationInMs = new Long(result.getDuration() * 1000);
+		long timeDifference = System.currentTimeMillis() - startTime.getTime();
+		if(timeDifference > 0) {
+			long timeLeft = durationInMs - timeDifference;
+			if(timeLeft < 0) {
+				result.setSecLeft(0L);
+				result.setMinLeft(0L);
+			} else {
+				long secondsDiff = timeLeft / 1000;
+				result.setSecLeft(secondsDiff % 60); //seconds left
+				result.setMinLeft(secondsDiff / 60);
+			}
+		}
 	}
 
 	private void randomizeQuestions(EdoTest result, Map<String, List<EdoQuestion>> sectionSets) {
