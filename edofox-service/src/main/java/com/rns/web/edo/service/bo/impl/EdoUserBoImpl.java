@@ -1365,7 +1365,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			String documentFolder = "temp/";
 			if(StringUtils.equals(classwork.getType(), CONTENT_TYPE_DOCUMENT) || StringUtils.equals(classwork.getType(), CONTENT_TYPE_IMAGE)) {
-				documentFolder = "documents/";
+				documentFolder = "documents/" + classwork.getInstituteId() + "/";
 			}
 			String path = VIDEOS_PATH + documentFolder;
 			File folder = new File(path);
@@ -1377,6 +1377,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			String title = StringUtils.replace(fileName, "/", " ");
 			title = StringUtils.replace(title, "\\", " ");
+			if(StringUtils.equals(classwork.getType(), CONTENT_TYPE_DOCUMENT) || StringUtils.equals(classwork.getType(), CONTENT_TYPE_IMAGE)) {
+				title = new Date().getTime() + "_" + title;
+			}
 			String filePath = path + title;
 			FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 			//IOUtils.copy(data, fileOutputStream);
@@ -1409,6 +1412,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				classwork.setSize(length);
 				classwork.setCreatedDate(new Date());
 				classwork.setFileUrl(fileUrl);
+				classwork.setFileLoc(filePath);
 				session.persist(classwork);
 				//Add URL
 				if (!StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
@@ -1631,6 +1635,32 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return response;
+	}
+
+	public EdoFile getDocument(Integer docId) {
+		if(docId == null) {
+			return null;
+		}
+		Session session = null;
+		EdoFile file = null;
+		try {
+			session = this.sessionFactory.openSession();
+			EdoClasswork classwork = (EdoClasswork) session.createCriteria(EdoClasswork.class).add(Restrictions.eq("id", docId)).uniqueResult();
+			if(classwork != null) {
+				file = new EdoFile();
+				file.setContent(new FileInputStream(classwork.getFileLoc()));
+				String extension = StringUtils.substringAfterLast(classwork.getFileLoc(), ".");
+				file.setFileName(classwork.getTitle() + "." + extension);
+				if(extension != null) {
+					file.setContentType(CONTENT_TYPES.get(extension));
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return file;
 	}
 
 }

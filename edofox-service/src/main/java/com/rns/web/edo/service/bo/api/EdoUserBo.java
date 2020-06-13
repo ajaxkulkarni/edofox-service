@@ -45,5 +45,6 @@ public interface EdoUserBo {
 	
 	//ERP changes
 	EdoServiceResponse uploadVideo(InputStream videoData, EdoClasswork classwork, String maps, String fileName);
+	EdoFile getDocument(Integer docId);
 	
 }

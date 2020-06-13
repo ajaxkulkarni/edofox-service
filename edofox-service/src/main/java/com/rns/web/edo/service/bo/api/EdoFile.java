@@ -6,6 +6,7 @@ public class EdoFile {
 	
 	private String fileName;
 	private InputStream content;
+	private String contentType;
 	
 	public String getFileName() {
 		return fileName;
@@ -18,6 +19,12 @@ public class EdoFile {
 	}
 	public void setContent(InputStream content) {
 		this.content = content;
+	}
+	public String getContentType() {
+		return contentType;
+	}
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 
 }

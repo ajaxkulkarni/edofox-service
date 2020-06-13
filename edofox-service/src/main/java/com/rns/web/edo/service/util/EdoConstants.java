@@ -112,6 +112,17 @@ public interface EdoConstants {
 	String CONTENT_TYPE_VIDEO = "Video";
 	String CONTENT_TYPE_IMAGE = "Image";
 	
+	static Map<String, String> CONTENT_TYPES = Collections.unmodifiableMap(new HashMap<String, String>() {
+		{
+			put("png", "image/png");
+			put("jpg", "image/jpeg");
+			put("jpeg", "image/jpeg");
+			put("doc", "application/msword");
+			put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+			put("pdf", "application/pdf");
+		}
+	});
+	
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";
 	//String CLIENT_ID = "VnK8OksaNBzM1qq6uBh1FP34bT6KbJtcp2tOGoT9";

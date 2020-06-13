@@ -33,6 +33,14 @@ public class EdoClasswork {
 	private Integer instituteId;
 	@Column(name = "file_url")
 	private String fileUrl;
+	@Column(name = "file_loc")
+	private String fileLoc;
+	public String getFileLoc() {
+		return fileLoc;
+	}
+	public void setFileLoc(String fileLoc) {
+		this.fileLoc = fileLoc;
+	}
 	@Column(name = "size")
 	private Double size;
 	@Column(name = "is_disabled")
