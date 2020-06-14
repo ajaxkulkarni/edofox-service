@@ -317,7 +317,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>edofox</finalName>
+		<finalName>erp</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
