@@ -150,7 +150,7 @@ public class EdoUserController {
 	@Produces(MediaType.MULTIPART_FORM_DATA)
 	//@Produces("image/png")
 	public Response getDocument(@PathParam("docId") Integer documentId) {
-		//LoggingUtil.logObject("Image request:", userId);
+		LoggingUtil.logMessage("Image request:" + documentId);
 		try {
 			EdoFile file = userBo.getDocument(documentId);
 			if(file != null) {
@@ -163,7 +163,7 @@ public class EdoUserController {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return null;
 	}

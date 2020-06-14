@@ -1396,7 +1396,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			File savedFile = new File(filePath);
 			if(savedFile.exists()) {
 				double length = savedFile.length();
-				LoggingUtil.logMessage("Uploading file " + title + " of " + length, LoggingUtil.videoLogger);
+				LoggingUtil.logMessage("Uploading file " + title + " of " + length + " at " + filePath, LoggingUtil.videoLogger);
 				//If video..upload to vimeo
 				String fileUrl = null;
 				if(StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
