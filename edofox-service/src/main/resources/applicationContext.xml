@@ -21,8 +21,6 @@
 	<bean id="userBo" class="com.rns.web.edo.service.bo.impl.EdoUserBoImpl">
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
-		<property name="filePath"
-			value="/home/wwwedofox/public_html/test/json_test_files/" />
 		<property name="txManager" ref="transactionManager" />
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"></property>
 	</bean>
