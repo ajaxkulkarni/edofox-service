@@ -225,10 +225,10 @@ public class VideoUtil {
 	    //vimeo.addVideoPrivacyDomain(videoEndPoint, "localhost");
 		String defaultDomain = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
 		//if(StringUtils.isBlank(defaultDomain)) {
-		defaultDomain = "test.edofox.com";
+		defaultDomain = "schoolerp.edofox.com";
 		//}
-		//LoggingUtil.logMessage("Adding domain to privacy " + defaultDomain, LoggingUtil.videoLogger);
-		//TODO vimeo.addVideoPrivacyDomain(videoEndPoint, defaultDomain);
+		LoggingUtil.logMessage("Adding domain to privacy " + defaultDomain, LoggingUtil.videoLogger);
+		vimeo.addVideoPrivacyDomain(videoEndPoint, defaultDomain);
 		
 	    //delete video
 	    //TODO vimeo.removeVideo(videoEndPoint);
