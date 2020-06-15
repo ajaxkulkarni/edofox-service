@@ -74,7 +74,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	private ThreadPoolTaskExecutor executor;
 	private EdoTestsDao testsDao;
-	private String filePath;
+	//private String filePath;
 	private DataSourceTransactionManager txManager;
 	private SessionFactory sessionFactory;
 	private Map<Integer, Integer> testSubmissions = new ConcurrentHashMap<Integer, Integer>();
@@ -87,10 +87,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return txManager;
 	}
 	
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
-
 	public ThreadPoolTaskExecutor getExecutor() {
 		return executor;
 	}
@@ -1369,6 +1365,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			String fileUrl = null;
 			double length = 0;
 			File savedFile = null;
+			String filePath = null;
 			if(StringUtils.isBlank(classwork.getFileUrl())) {
 				String documentFolder = "temp/";
 				if (StringUtils.equals(classwork.getType(), CONTENT_TYPE_DOCUMENT) || StringUtils.equals(classwork.getType(), CONTENT_TYPE_IMAGE)) {
@@ -1387,7 +1384,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if (StringUtils.equals(classwork.getType(), CONTENT_TYPE_DOCUMENT) || StringUtils.equals(classwork.getType(), CONTENT_TYPE_IMAGE)) {
 					title = new Date().getTime() + "_" + title;
 				}
-				String filePath = path + title;
+				filePath = path + title;
 				FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 				// IOUtils.copy(data, fileOutputStream);
 
@@ -1417,7 +1414,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				fileUrl = classwork.getFileUrl();
 			}
 			
-			if(StringUtils.isBlank(fileUrl)) {
+			if(StringUtils.isBlank(fileUrl) && StringUtils.isBlank(filePath)) {
 				LoggingUtil.logMessage("File URL empty " + fileUrl + " for " + classwork.getTitle());
 				response.setStatus(new EdoApiStatus(-111, "File URL not found"));
 				return response;
