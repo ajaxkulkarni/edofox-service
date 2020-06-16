@@ -1426,6 +1426,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			classwork.setCreatedDate(new Date());
 			classwork.setFileUrl(fileUrl);
 			classwork.setFileLoc(filePath);
+			classwork.setStatus("Pending");
+			
 			session.persist(classwork);
 			// Add URL
 			if (!StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {

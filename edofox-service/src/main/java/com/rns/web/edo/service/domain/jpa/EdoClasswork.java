@@ -35,6 +35,10 @@ public class EdoClasswork {
 	private String fileUrl;
 	@Column(name = "file_loc")
 	private String fileLoc;
+	@Column(name = "status")
+	private String status;
+	
+	
 	public String getFileLoc() {
 		return fileLoc;
 	}
@@ -111,6 +115,12 @@ public class EdoClasswork {
 	}
 	public void setFileUrl(String fileUrl) {
 		this.fileUrl = fileUrl;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }
