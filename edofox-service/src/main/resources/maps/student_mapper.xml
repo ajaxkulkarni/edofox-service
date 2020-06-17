@@ -208,64 +208,39 @@
 	</select>
 	
 	<insert id="saveVideoActiviy" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" >
-		insert into video_activity
-		(activity_type, created_date, 
+		insert into classwork_activity
+		(status, read_at, 
 		<if test="feedback.id != null">
-			session_id, 
-		</if>
-		<if test="student.currentPackage != null">
-			classroom_id, 
+			content_id, 
 		</if>
 		<if test="student.id != null">
-			student_id, 
-		</if>
-		student_name, student_ref
-		<if test="feedback.videoId != null">
-			,video_id 
+			read_by, 
 		</if>
 		<if test="feedback.percentViewed != null">
-			,percent_watched 
+			percentage, 
 		</if>
 		<if test="feedback.durationViewed != null">
-			,duration_watched 
+			duration, 
 		</if>
-		<if test="feedback.foundationId != null">
-			,course_id 
-		</if>
-		,watch_status)
+		downloaded)
 		values('${requestType}', CURRENT_TIMESTAMP, 
 		<if test="feedback.id != null">
 			${feedback.id}, 
 		</if>
-		<if test="student.currentPackage != null">
-			${student.currentPackage.id}, 
-		</if>
 		<if test="student.id != null">
 			${student.id},
 		 </if>
-		'${student.name}', '${student.rollNo}'
-		<if test="feedback.videoId != null">
-		,${feedback.videoId} 
-		</if>
 		<if test="feedback.percentViewed != null">
-			,${feedback.percentViewed}  
+			${feedback.percentViewed},
 		</if>
 		<if test="feedback.durationViewed != null">
-			,${feedback.durationViewed}  
+			${feedback.durationViewed},  
 		</if>
-		<if test="feedback.foundationId != null">
-			,${feedback.foundationId}   
-		</if>
-		<if test="requestType == 'LIVE_JOINED'">
-			,0 
-		</if>
-		<if test="requestType == 'VIDEO_STARTED'">
-			,1  
-		</if>
-		<if test="requestType == 'VIDEO_ENDED'">
-			,2
-		</if>
-		)
+		${feedback.downloaded})
 	</insert>
+	
+	<select id="getStudentActivityCount" resultType="Integer" parameterType="Integer">
+		select count(*) from classwork_activity where content_id = ${feedback.id} AND read_by = ${student.id};
+	</select>
 
 </mapper>

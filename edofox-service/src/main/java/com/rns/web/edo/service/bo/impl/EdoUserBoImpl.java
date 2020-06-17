@@ -54,6 +54,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoClassworkActivity;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
@@ -1571,12 +1572,49 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
 			return status;
 		}
+		Session session = null;
 		try {
-			testsDao.saveVideoActiviy(request);
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			List<EdoClassworkActivity> activity = session.createCriteria(EdoClassworkActivity.class)
+					.add(Restrictions.eq("contentId", request.getFeedback().getId()))
+					.add(Restrictions.eq("studentId", request.getFeedback().getStudentId())).list();
+			if(CollectionUtils.isNotEmpty(activity)) {
+				EdoClassworkActivity act = activity.get(0);
+				setActivity(request, act);
+			} else {
+				EdoClassworkActivity act = new EdoClassworkActivity();
+				act.setContentId(request.getFeedback().getId());
+				act.setReadBy(request.getStudent().getId());
+				act.setStudentId(request.getFeedback().getStudentId());
+				setActivity(request, act);
+				session.persist(act);
+			}
+			tx.commit();
+			//testsDao.saveVideoActiviy(request);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return status;
+	}
+
+	private void setActivity(EdoServiceRequest request, EdoClassworkActivity act) {
+		act.setReadAt(new Date());
+		if(request.getFeedback().getPercentViewed() != null) {
+			act.setPercent(request.getFeedback().getPercentViewed());
+		}
+		if(request.getFeedback().getDurationViewed() != null) {
+			act.setDuration(request.getFeedback().getDurationViewed());
+		}
+		if(StringUtils.isNotBlank(request.getRequestType())) {
+			act.setStatus(request.getRequestType());
+		}
+		if(request.getFeedback().getDownloaded() > 0) {
+			act.setDownloaded(request.getFeedback().getDownloaded());
+		}
+		
 	}
 
 	public EdoApiStatus updateVideoLecture(EdoServiceRequest request) {
