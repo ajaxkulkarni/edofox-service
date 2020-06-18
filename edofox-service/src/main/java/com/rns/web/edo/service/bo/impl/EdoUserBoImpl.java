@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -1427,6 +1428,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			classwork.setCreatedDate(new Date());
 			classwork.setFileUrl(fileUrl);
 			classwork.setFileLoc(filePath);
+			//Set date time to default 0
+			if(classwork.getStartDate() != null) {
+				classwork.setStartDate(CommonUtils.setZeroDate(classwork.getStartDate()));
+			}
+			if(classwork.getEndDate() != null) {
+				classwork.setEndDate(CommonUtils.setZeroDate(classwork.getEndDate()));
+			}
 			classwork.setStatus("Pending");
 			
 			session.persist(classwork);
@@ -1483,6 +1491,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return response;
 	}
+
 
 	private void updateKeywords(Integer instituteId, String keywords, Session session) {
 		String[] values = StringUtils.split(keywords, ",");

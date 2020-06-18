@@ -732,4 +732,13 @@ public class CommonUtils {
 			}
 		}
 	}
+	
+	public static Date setZeroDate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		return cal.getTime();
+	}
 }

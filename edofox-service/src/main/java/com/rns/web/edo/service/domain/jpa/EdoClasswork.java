@@ -37,6 +37,10 @@ public class EdoClasswork {
 	private String fileLoc;
 	@Column(name = "status")
 	private String status;
+	@Column(name = "start_date")
+	private Date startDate;
+	@Column(name = "end_date")
+	private Date endDate;
 	
 	
 	public String getFileLoc() {
@@ -121,6 +125,18 @@ public class EdoClasswork {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	public Date getEndDate() {
+		return endDate;
 	}
 	
 }
