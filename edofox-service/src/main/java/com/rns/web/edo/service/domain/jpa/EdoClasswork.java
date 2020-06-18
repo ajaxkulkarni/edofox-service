@@ -41,6 +41,8 @@ public class EdoClasswork {
 	private Date startDate;
 	@Column(name = "end_date")
 	private Date endDate;
+	@Column(name = "subject")
+	private Integer subject;
 	
 	
 	public String getFileLoc() {
@@ -138,5 +140,10 @@ public class EdoClasswork {
 	public Date getEndDate() {
 		return endDate;
 	}
-	
+	public void setSubject(Integer subject) {
+		this.subject = subject;
+	}
+	public Integer getSubject() {
+		return subject;
+	}
 }
