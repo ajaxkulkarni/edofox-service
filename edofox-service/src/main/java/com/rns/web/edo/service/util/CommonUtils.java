@@ -185,8 +185,8 @@ public class CommonUtils {
 	public static String prepareStudentNotification(String result, EdoStudent student) {
 		if (student != null) {
 			result = StringUtils.replace(result, "{name}", CommonUtils.getStringValue(student.getName()));
-			// result = StringUtils.replace(result, "{password}",
-			// CommonUtils.getStringValue(user.getPassword()));
+			result = StringUtils.replace(result, "{username}", CommonUtils.getStringValue(student.getUsername()));
+			result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(student.getPassword()));
 			result = StringUtils.replace(result, "{gender}", CommonUtils.getStringValue(student.getGender()));
 			result = StringUtils.replace(result, "{phone}", CommonUtils.getStringValue(student.getPhone()));
 			result = StringUtils.replace(result, "{examMode}", CommonUtils.getStringValue(student.getExamMode()));

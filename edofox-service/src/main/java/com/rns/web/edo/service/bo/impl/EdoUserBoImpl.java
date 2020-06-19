@@ -1726,4 +1726,29 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return file;
 	}
 
+	public EdoApiStatus sendEmail(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			List<EdoStudent> students = testsDao.getAllStudents(request.getInstitute().getId());
+			EDOInstitute institute = testsDao.getInstituteById(request.getInstitute().getId());
+			if(CollectionUtils.isNotEmpty(students)) {
+				for(EdoStudent student: students) {
+					student.setPassword("registered mobile number");
+					EdoMailUtil mailUtil = new EdoMailUtil(MAIL_TYPE_INVITE);
+					mailUtil.setStudent(student);
+					mailUtil.setInstitute(institute);
+					mailUtil.setMailer(request.getMailer());
+					if(StringUtils.isNotBlank(student.getEmail())) {
+						mailUtil.sendMail();
+					}
+				}
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
+	}
+
 }

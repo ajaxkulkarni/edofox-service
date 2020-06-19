@@ -147,9 +147,8 @@
 	</select>
 
 	<select id="getAllStudents" parameterType="Integer" resultMap="studentInfo">
-		select * from student join student_institute on student.id =
-		student_institute.student_id
-		where institute_id = ${value}
+		select * from student_information join login_details on student_information.id =
+		login_details.student_id where student_information.institute_id = ${value}
 	</select>
 
 	<select id="getTestPackage" parameterType="Integer" resultMap="packages">

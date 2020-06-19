@@ -29,6 +29,8 @@ public class EdoStudent {
 	private String parentMobileNo;
 	private String instituteId;
 	private String accessType;
+	private String username;
+	
 
 	public EdoStudent() {
 
@@ -196,6 +198,14 @@ public class EdoStudent {
 
 	public void setAccessType(String accessType) {
 		this.accessType = accessType;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 }

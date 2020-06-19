@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoStudent;
 
 
@@ -46,6 +47,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private String mailSubject;
 	private EdoStudent student;
 	private EDOInstitute institute;
+	private EdoMailer mailer;
+	
 	
 	
 	public void setInstitute(EDOInstitute institute) {
@@ -59,9 +62,38 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	public EdoMailUtil(String mailType) {
 		this.type = mailType;
 	}
+	
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
+	}
 
-	public EdoMailUtil() {
-		
+	
+	public String getMailId() {
+		if(mailer == null || mailer.getMail() == null) {
+			return MAIL_ID;
+		}
+		return mailer.getMail();
+	}
+	
+	public String getMailHost() {
+		if(mailer == null || mailer.getHost() == null) {
+			return MAIL_HOST;
+		}
+		return mailer.getHost();
+	}
+	
+	public String getMailPassword() {
+		if(mailer == null || mailer.getPassword() == null) {
+			return MAIL_PASSWORD;
+		}
+		return mailer.getPassword();
+	}
+	
+	public String getMailFrom() {
+		if(mailer == null || mailer.getSender() == null) {
+			return "Edofox";
+		}
+		return mailer.getSender();
 	}
 
 	public void sendMail() {
@@ -70,7 +102,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 		try {
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
+			message.setFrom(new InternetAddress(getMailId(), getMailFrom()));
 			prepareMailContent(message);
 			Transport.send(message);
 			LoggingUtil.logMessage("Sent email to .." + student.getEmail());
@@ -82,20 +114,20 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		}
 	}
 
-	private static Session prepareMailSession() {
+	private Session prepareMailSession() {
 		Properties props = new Properties();
 
 		props.put("mail.smtp.auth", MAIL_AUTH);
 		props.put("mail.smtp.socketFactory.port", "465"); //PROD
 		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); //PROD
 		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", MAIL_HOST);
+		props.put("mail.smtp.host", getMailHost());
 		props.put("mail.smtp.port", MAIL_PORT);
 		
 
 		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(MAIL_ID, MAIL_PASSWORD);
+				return new PasswordAuthentication(getMailId(), getMailPassword());
 			}
 		});
 		return session;
@@ -109,6 +141,13 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			result = CommonUtils.prepareStudentNotification(result, student);
 			result = CommonUtils.prepareInstituteNotification(result, institute);
 			
+			//Format URLs
+			if(mailer != null) {
+				result = StringUtils.replace(result, "{actionUrl}", CommonUtils.getStringValue(mailer.getActionUrl()));
+				result = StringUtils.replace(result, "{fileUrl}", CommonUtils.getStringValue(mailer.getFileUrl()));
+				result = StringUtils.replace(result, "{supportMail}", CommonUtils.getStringValue(mailer.getSupportMail()));
+			}
+			
 			//message.setContent(result, "text/html");
 			message.setContent(result, "text/html; charset=utf-8");
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(student.getEmail()));
@@ -119,6 +158,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 					message.setSubject(StringUtils.replace(message.getSubject(), "{instituteName}", institute.getName()));
 				}
 			}
+			
+			
 			return result;
 
 		} catch (FileNotFoundException e) {
@@ -156,6 +197,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "subscription_mail.html");
 			put(MAIL_TYPE_ACTIVATED, "package_active.html");
+			put(MAIL_TYPE_INVITE, "student_invitation.html");
 		}
 	});
 
@@ -163,6 +205,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "Thank you for registering to {instituteName}");
 			put(MAIL_TYPE_ACTIVATED, "Your course for {instituteName} is now active");
+			put(MAIL_TYPE_INVITE, "You have been invited by your institute {instituteName} on the online learning portal");
 		}
 	});
 

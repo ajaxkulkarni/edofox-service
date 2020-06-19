@@ -510,4 +510,16 @@ public class EdoUserController {
 		return null;
 	}
 	
+	@POST
+	@Path("/sendMails")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse sendMails(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Send mail request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.sendEmail(request));
+		LoggingUtil.logObject("Send mail response ", response);
+		return response;
+	}
+	
 }

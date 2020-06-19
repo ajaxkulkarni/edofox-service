@@ -15,13 +15,14 @@
 
 	<resultMap id="studentInfo" type="com.rns.web.edo.service.domain.EdoStudent">
 		<result column="id" property="id" />
-		<result column="name" property="name" />
+		<result column="first_name" property="name" />
 		<result column="email" property="email" />
-		<result column="mobile_no" property="phone" />
+		<result column="mobile_number" property="phone" />
 		<result column="package_name" property="currentPackage.name"/>		
 		<result column="profile_pic" property="profilePic"/>	
 		<result column="institute_name" property="currentPackage.institute.name"/>	
 		<result column="paymentStatus" property="currentPackage.status"/>		
+		<result column="username" property="username"/>		
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">

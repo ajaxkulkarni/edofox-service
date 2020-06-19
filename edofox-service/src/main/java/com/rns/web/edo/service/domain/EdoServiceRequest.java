@@ -35,6 +35,7 @@ public class EdoServiceRequest {
 	private Date fromDate;
 	private Date toDate;
 	private EdoVideoLecture lecture;
+	private EdoMailer mailer;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -169,6 +170,14 @@ public class EdoServiceRequest {
 
 	public void setLecture(EdoVideoLecture lecture) {
 		this.lecture = lecture;
+	}
+
+	public EdoMailer getMailer() {
+		return mailer;
+	}
+
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
 	}
 	
 }
