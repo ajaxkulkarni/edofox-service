@@ -174,6 +174,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setLectures(testsDao.getTestVideoLectures(test.getId()));
 			
 			response.setTest(test);
+		} else {
+			response.setStatus(new EdoApiStatus(-111, "Result not found. Please submit your exam first."));
 		}
 		
 		return response;
