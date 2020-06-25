@@ -169,6 +169,20 @@ public class EdoUserController {
 	}
 	
 	@GET
+	@Path("/getVideo/{docId}")
+	//@Produces(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoFile getVideo(@PathParam("docId") Integer videoId) {
+		LoggingUtil.logMessage("Video request:" + videoId);
+		try {
+			return userBo.getVideo(videoId);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return new EdoFile();
+	}
+	
+	@GET
 	@Path("/getTempImage/{testId}/{questionId}")
 	//@Produces(MediaType.MULTIPART_FORM_DATA)
 	@Produces("image/png")

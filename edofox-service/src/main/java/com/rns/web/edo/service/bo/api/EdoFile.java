@@ -7,6 +7,7 @@ public class EdoFile {
 	private String fileName;
 	private InputStream content;
 	private String contentType;
+	private String downloadUrl;
 	
 	public String getFileName() {
 		return fileName;
@@ -25,6 +26,12 @@ public class EdoFile {
 	}
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+	}
+	public String getDownloadUrl() {
+		return downloadUrl;
+	}
+	public void setDownloadUrl(String downloadUrl) {
+		this.downloadUrl = downloadUrl;
 	}
 
 }

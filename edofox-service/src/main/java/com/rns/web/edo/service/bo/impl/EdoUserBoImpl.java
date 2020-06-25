@@ -1751,4 +1751,29 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return status;
 	}
 
+	public EdoFile getVideo(Integer docId) {
+		if(docId == null) {
+			return null;
+		}
+		Session session = null;
+		EdoFile file = null;
+		try {
+			session = this.sessionFactory.openSession();
+			EdoClasswork classwork = (EdoClasswork) session.createCriteria(EdoClasswork.class).add(Restrictions.eq("id", docId)).uniqueResult();
+			if(classwork != null) {
+				if(StringUtils.contains(classwork.getFileUrl(), "vimeo")) {
+					file = new EdoFile();
+					file.setDownloadUrl(VideoUtil.getDownloadUrl(classwork.getFileUrl()));
+					file.setFileName(classwork.getTitle() + ".mp4");
+					file.setContentType("video/mp4");
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return file;
+	}
+
 }

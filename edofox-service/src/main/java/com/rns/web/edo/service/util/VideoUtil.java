@@ -2,33 +2,29 @@ package com.rns.web.edo.service.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-
-import javax.security.cert.CertificateException;
-import javax.security.cert.X509Certificate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
-import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
@@ -233,6 +229,33 @@ public class VideoUtil {
 	    //delete video
 	    //TODO vimeo.removeVideo(videoEndPoint);
 	    return info;
+	}
+	
+	//https://vimeo.com/428627420
+	public static String getDownloadUrl(String url) {
+		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
+		try {
+			String videoId = StringUtils.replace(url, "https://vimeo.com/", "");
+			VimeoResponse resp = vimeo.get("https://api.vimeo.com/videos/" + videoId);
+			if(resp != null && resp.getJson() != null) {
+				System.out.println(resp);
+				String link = "";
+				JSONArray array = resp.getJson().getJSONArray("download");
+				if( array.length() > 0)  {
+					for(int i = 0; i < array.length(); i++) {
+						JSONObject jsonObject = array.getJSONObject(i);
+						if(StringUtils.isNotBlank(jsonObject.getString("link"))) {
+							link = jsonObject.getString("link");
+						}
+					}
+				}
+				return link;
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public static Float downloadRecordedFile(Integer channelId, Integer sessionId) {

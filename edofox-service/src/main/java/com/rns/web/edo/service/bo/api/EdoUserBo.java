@@ -47,5 +47,6 @@ public interface EdoUserBo {
 	EdoServiceResponse uploadVideo(InputStream videoData, EdoClasswork classwork, String maps, String fileName);
 	EdoFile getDocument(Integer docId);
 	EdoApiStatus sendEmail(EdoServiceRequest request);
+	EdoFile getVideo(Integer docId);
 	
 }
