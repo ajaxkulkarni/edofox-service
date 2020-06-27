@@ -57,6 +57,7 @@ import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkActivity;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
+import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -1774,6 +1775,31 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return file;
+	}
+
+	public EdoApiStatus addDeviceId(EdoServiceRequest request) {
+		EdoDeviceId deviceIdInput = request.getDeviceId();
+		if(deviceIdInput == null) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			EdoDeviceId deviceId = (EdoDeviceId) session.createCriteria(EdoDeviceId.class).add(Restrictions.eq("token", deviceIdInput.getToken())).uniqueResult();
+			if(deviceId == null) {
+				Transaction tx = session.beginTransaction();
+				deviceIdInput.setCreatedDate(new Date());
+				session.persist(deviceIdInput);
+				tx.commit();
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
 	}
 
 }

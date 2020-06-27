@@ -536,4 +536,16 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/updateDeviceId")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateDeviceId(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Update device id request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.addDeviceId(request));
+		LoggingUtil.logObject("Update device Id response ", response);
+		return response;
+	}
+	
 }

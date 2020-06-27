@@ -108,6 +108,7 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoClasswork</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoClassworkMap</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoClassworkActivity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoDeviceId</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
