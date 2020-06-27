@@ -1426,7 +1426,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			classwork.setDisabled(0);
 			classwork.setSize(length);
 			classwork.setCreatedDate(new Date());
-			classwork.setFileUrl(fileUrl);
+			classwork.setFileUrl(StringUtils.trimToEmpty(fileUrl));
 			classwork.setFileLoc(filePath);
 			//Set date time to default 0
 			if(classwork.getStartDate() != null) {
