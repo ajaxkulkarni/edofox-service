@@ -23,6 +23,7 @@
 		<result column="institute_name" property="currentPackage.institute.name"/>	
 		<result column="paymentStatus" property="currentPackage.status"/>		
 		<result column="username" property="username"/>		
+		<result column="token" property="token"/>		
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">

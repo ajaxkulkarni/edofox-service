@@ -59,6 +59,9 @@ public interface EdoConstants {
 	String MAIL_TYPE_SIGN_UP_DEMO = "freeTrial";
 	String MAIL_TYPE_UPGRADE = "upgrade";
 	String MAIL_TYPE_INVITE = "StudentInvite";
+	String MAIL_TYPE_NEW_CLASSWORK = "NewClasswork";
+	String MAIL_TYPE_NEW_NOTICE = "NewNotice";
+	String MAIL_TYPE_GENERIC = "Generic";
 	
 	
 	

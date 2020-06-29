@@ -39,6 +39,9 @@ public class EdoPropertyUtil {
 	public static final String VIDEO_UPLOAD_FREQUENCY = "video.upload.frequency";
 	public static final String VIDEO_IDLE_TIME = "video.idle.time";
 	public static final String RECORDED_URL = "video.recorded.url";
+	public static final String FCM_URL = "fcm.url";
+	public static final String FCM_SERVER_KEY = "fcm.key";
+	public static final String NOTIFICATIONS_JOB = "notifications.job";
 	
 
 	public static String getProperty(String name) {

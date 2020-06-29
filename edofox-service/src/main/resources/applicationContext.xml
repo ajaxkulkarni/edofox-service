@@ -41,6 +41,12 @@
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
 	</bean>
+	
+	<bean id="notificationTask" class="com.rns.web.edo.service.NotificationTask">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+		<property name="executor" ref="executor" />
+		<property name="testsDao" ref="testsDao" />
+	</bean>
 
 
 	<bean id="executor"
@@ -121,6 +127,7 @@
 				<!-- <prop key="hibernate.connection.release_mode">after_statement</prop> -->
 				<!-- <prop key="connection.provider_class"> org.hibernate.connection.C3P0ConnectionProvider 
 					</prop> -->
+				<!-- <prop key="hibernate.connection.zeroDateTimeBehavior">convertToNull</prop> -->
 			</props>
 		</property>
 	</bean>

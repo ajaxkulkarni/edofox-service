@@ -548,4 +548,16 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/sendNotification")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse sendNotification(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Send notification request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.sendNotification(request));
+		LoggingUtil.logObject("Send notification response ", response);
+		return response;
+	}
+	
 }

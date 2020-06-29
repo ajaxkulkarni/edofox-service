@@ -49,5 +49,6 @@ public interface EdoUserBo {
 	EdoApiStatus sendEmail(EdoServiceRequest request);
 	EdoFile getVideo(Integer docId);
 	EdoApiStatus addDeviceId(EdoServiceRequest request);
+	EdoApiStatus sendNotification(EdoServiceRequest request);
 	
 }

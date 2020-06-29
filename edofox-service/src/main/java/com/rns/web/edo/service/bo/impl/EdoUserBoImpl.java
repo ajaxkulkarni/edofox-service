@@ -65,6 +65,7 @@ import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
+import com.rns.web.edo.service.util.EdoNotificationsManager;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
@@ -1798,6 +1799,25 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			status.setStatus(-111, ERROR_IN_PROCESSING);
 		} finally {
 			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+
+	public EdoApiStatus sendNotification(EdoServiceRequest request) {
+		if(request == null || request.getClasswork()  == null) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			EdoNotificationsManager mgr = new EdoNotificationsManager(this.sessionFactory);
+			mgr.setNotificationType(request.getRequestType());
+			mgr.setClasswork(request.getClasswork());
+			mgr.setTestsDao(testsDao);
+			LoggingUtil.logMessage("Executing notification task for .. " + request.getClasswork().getId(), LoggingUtil.emailLogger);
+			executor.execute(mgr);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
 		}
 		return status;
 	}

@@ -43,6 +43,16 @@ public class EdoClasswork {
 	private Date endDate;
 	@Column(name = "subject")
 	private Integer subject;
+	@Column(name = "approver")
+	private Integer approver;
+	@Column(name = "last_updated")
+	private Date lastUpdated;
+	@Column(name = "size")
+	private Double size;
+	@Column(name = "is_disabled")
+	private int disabled;
+	@Column(name = "uploaded_by")
+	private Integer uploader;
 	
 	
 	public String getFileLoc() {
@@ -51,14 +61,7 @@ public class EdoClasswork {
 	public void setFileLoc(String fileLoc) {
 		this.fileLoc = fileLoc;
 	}
-	@Column(name = "size")
-	private Double size;
-	@Column(name = "is_disabled")
-	private int disabled;
-	@Column(name = "uploaded_by")
-	private Integer uploader;
 	
-
 	public String getDescription() {
 		return description;
 	}
@@ -145,5 +148,17 @@ public class EdoClasswork {
 	}
 	public Integer getSubject() {
 		return subject;
+	}
+	public Integer getApprover() {
+		return approver;
+	}
+	public void setApprover(Integer approver) {
+		this.approver = approver;
+	}
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 }

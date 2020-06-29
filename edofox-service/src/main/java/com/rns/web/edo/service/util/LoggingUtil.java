@@ -25,7 +25,7 @@ public class LoggingUtil {
 	
 	public static Logger videoLogger = Logger.getLogger("videoLog");
 	
-	//private static Logger emailLogger = Logger.getLogger("email");
+	public static Logger emailLogger = Logger.getLogger("email");
 	
 	public static void logMessage(String message) {
 		reportLogger.info(message);

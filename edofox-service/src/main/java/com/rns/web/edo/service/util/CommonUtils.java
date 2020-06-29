@@ -38,6 +38,7 @@ import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 
 public class CommonUtils {
 
@@ -143,6 +144,23 @@ public class CommonUtils {
 		cal.setTime(date1);
 		return cal.get(value);
 	}
+	
+	public static Date getDateWithoutTime(Date date) {
+	    Calendar cal = Calendar.getInstance();
+	    cal.setTime(date);
+	    cal.set(Calendar.HOUR_OF_DAY, 0);
+	    cal.set(Calendar.MINUTE, 0);
+	    cal.set(Calendar.SECOND, 0);
+	    cal.set(Calendar.MILLISECOND, 0);
+	    return cal.getTime();
+	}
+
+	public static Date getTomorrowDate(Date date) {
+	    Calendar cal = Calendar.getInstance();
+	    cal.setTime(date);
+	    cal.add(Calendar.DATE, 1);
+	    return cal.getTime();
+	}
 
 	public static String getStringValue(Integer value) {
 		if (value == null) {
@@ -242,6 +260,13 @@ public class CommonUtils {
 				
 			}
 			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
+		}
+		return result;
+	}
+	
+	public static String prepareClassworkNotification(String result, EdoClasswork classwork) {
+		if(classwork != null) {
+			result = StringUtils.replace(result, "{title}", CommonUtils.getStringValue(classwork.getTitle()));
 		}
 		return result;
 	}

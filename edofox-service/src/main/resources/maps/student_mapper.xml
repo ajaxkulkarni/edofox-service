@@ -150,6 +150,22 @@
 		select * from student_information join login_details on student_information.id =
 		login_details.student_id where student_information.institute_id = ${value}
 	</select>
+	
+	<select id="getStudentDevices" parameterType="map" resultMap="studentInfo">
+		select * from student_information join device_id on student_information.id =
+		device_id.student_id where student_information.status != 'D' 
+		AND (
+		<if test="classes != null &amp;&amp; classes != ''">
+			student_information.class in (${classes}) 
+		</if>
+		<if test="divisions != null &amp;&amp; divisions != ''">
+			<if test="classes != null &amp;&amp; classes != ''">
+				OR 
+			</if>
+		student_information.division in (${divisions}
+		</if>
+		)
+	</select>
 
 	<select id="getTestPackage" parameterType="Integer" resultMap="packages">
 		select * from test join packages on test.package_id = packages.id

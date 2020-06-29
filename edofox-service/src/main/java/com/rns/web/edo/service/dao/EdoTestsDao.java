@@ -103,5 +103,8 @@ public interface EdoTestsDao {
 	EDOPackage getLiveSession(Integer id);
 	void saveVideoActiviy(EdoServiceRequest request);
 	
+	//ERP
+	List<EdoStudent> getStudentDevices(Map<String,Object> value);
+	
 	
 }
