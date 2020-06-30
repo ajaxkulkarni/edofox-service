@@ -1413,7 +1413,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if (StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
 						//Get embed domain for given institute
 						String embedUrl = "erp.edofox.com";
-						List<EdoConfig> configs = session.createCriteria(EdoConfig.class).add(Restrictions.eq("name", "app_url")).list();
+						List<EdoConfig> configs = session.createCriteria(EdoConfig.class)
+								.add(Restrictions.eq("name", "app_url"))
+								.add(Restrictions.eq("instituteId", classwork.getInstituteId()))
+								.list();
 						if(CollectionUtils.isNotEmpty(configs)) {
 							if(StringUtils.isNotBlank(configs.get(0).getValue())) {
 								embedUrl = CommonUtils.getDomainName(configs.get(0).getValue());
