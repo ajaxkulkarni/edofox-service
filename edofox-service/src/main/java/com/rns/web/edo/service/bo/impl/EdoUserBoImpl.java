@@ -57,6 +57,7 @@ import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkActivity;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
+import com.rns.web.edo.service.domain.jpa.EdoConfig;
 import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
@@ -1400,15 +1401,25 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 
 				fileOutputStream.close();
+				
+				session = this.sessionFactory.openSession();
+				
 				// Check size of file saved
 				savedFile = new File(filePath);
 				if (savedFile.exists()) {
 					length = savedFile.length();
 					LoggingUtil.logMessage("Uploading file " + title + " of " + length + " at " + filePath, LoggingUtil.videoLogger);
 					// If video..upload to vimeo
-
 					if (StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
-						VimeoResponse vimeoResponse = VideoUtil.uploadFile(filePath, classwork.getTitle(), classwork.getDescription());
+						//Get embed domain for given institute
+						String embedUrl = "erp.edofox.com";
+						List<EdoConfig> configs = session.createCriteria(EdoConfig.class).add(Restrictions.eq("name", "app_url")).list();
+						if(CollectionUtils.isNotEmpty(configs)) {
+							if(StringUtils.isNotBlank(configs.get(0).getValue())) {
+								embedUrl = CommonUtils.getDomainName(configs.get(0).getValue());
+							}
+						}
+						VimeoResponse vimeoResponse = VideoUtil.uploadFile(filePath, classwork.getTitle(), classwork.getDescription(), embedUrl);
 						if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
 							fileUrl = vimeoResponse.getJson().getString("link");
 						}
@@ -1423,7 +1434,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				response.setStatus(new EdoApiStatus(-111, "File URL not found"));
 				return response;
 			}
-			session = this.sessionFactory.openSession();
+			
 			Transaction tx = session.beginTransaction();
 			classwork.setDisabled(0);
 			classwork.setSize(length);

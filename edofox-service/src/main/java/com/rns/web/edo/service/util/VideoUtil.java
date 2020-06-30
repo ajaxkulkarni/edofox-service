@@ -194,8 +194,7 @@ public class VideoUtil {
 	}*/
 	
 	//https://vimeo.com/408810998
-	public static VimeoResponse uploadFile(String path, String videoName, String videoDesciption) throws IOException, VimeoException {
-		
+	public static VimeoResponse uploadFile(String path, String videoName, String videoDesciption, String embedUrl) throws IOException, VimeoException {
 		LoggingUtil.logMessage("Uploading file at " + path + " to vimeo .. ", LoggingUtil.videoLogger);
 		
 		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
@@ -219,12 +218,12 @@ public class VideoUtil {
 	    vimeo.addEmbedPreset(videoEndPoint, "edofox-live");
 	    //add video privacy domain
 	    //vimeo.addVideoPrivacyDomain(videoEndPoint, "localhost");
-		String defaultDomain = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
+		//String defaultDomain = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
 		//if(StringUtils.isBlank(defaultDomain)) {
-		defaultDomain = "stxavierspune.com";
+		//defaultDomain = "stxavierspune.com";
 		//}
-		LoggingUtil.logMessage("Adding domain to privacy " + defaultDomain, LoggingUtil.videoLogger);
-		vimeo.addVideoPrivacyDomain(videoEndPoint, defaultDomain);
+		LoggingUtil.logMessage("Adding domain to privacy " + embedUrl, LoggingUtil.videoLogger);
+		vimeo.addVideoPrivacyDomain(videoEndPoint, embedUrl);
 		
 	    //delete video
 	    //TODO vimeo.removeVideo(videoEndPoint);
