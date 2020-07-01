@@ -4,35 +4,38 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-
-import javax.security.cert.CertificateException;
-import javax.security.cert.X509Certificate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
-import org.apache.http.util.EntityUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jettison.json.JSONObject;
 
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
 import com.clickntap.vimeo.VimeoResponse;
+import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 public class VideoUtil {
 
@@ -315,6 +318,70 @@ public class VideoUtil {
 	    	e.printStackTrace();
 	    }
 	    return httpClient;
+	}
+	
+	public static String callVimeoApi(String url, JSONObject request, String methodType) throws JsonGenerationException, JsonMappingException, IOException {
+		ClientConfig config = new DefaultClientConfig();
+		config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+		Client client = Client.create(config);
+
+		WebResource webResource = client.resource(url);
+		LoggingUtil.logMessage("Calling VIMEO URL :" + url + " request:" + request, LoggingUtil.videoLogger);
+
+		
+		
+		Builder header = webResource.type("application/json").header("Authorization", "bearer " + EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY));
+		if(methodType != null) {
+			//“X-HTTP-Method-Override”: “PUT”
+			header.header("X-HTTP-Method-Override", methodType);
+		}
+		
+		ClientResponse response = header.post(ClientResponse.class, request);
+
+		if (response.getStatus() != 200) {
+			LoggingUtil.logMessage("Failed in FCM URL : HTTP error code : " + response.getStatus(), LoggingUtil.videoLogger);
+		}
+		String output = response.getEntity(String.class);
+		LoggingUtil.logMessage("Output from FCM URL : " + response.getStatus() + ".... \n " + output, LoggingUtil.videoLogger);
+		return output;
+	
+	}
+	
+	public static void createLiveEvent(EdoLiveSession liveSession) {
+		
+		try {
+			
+			JSONObject request = new JSONObject();
+			JSONObject upload = new JSONObject();
+			upload.put("approach", "live");
+			request.put("upload", upload);
+			//Create video placeholder in vimeo
+			String response = callVimeoApi("https://api.vimeo.com/me/videos", request, null);
+			if(StringUtils.isNotBlank(response)) {
+				//Get video link from response
+				JSONObject apiResponse = new JSONObject(response);
+				if(apiResponse != null) {
+					String uri = apiResponse.getString("uri");
+					LoggingUtil.logMessage("Video Link created as " + apiResponse.getString("link") + " and URI " + uri);
+					JSONObject patchRequest = new JSONObject();
+					JSONObject live = new JSONObject();
+					live.put("status", "ready");
+					patchRequest.put("live", live);
+					String liveEventResponse = callVimeoApi("https://api.vimeo.com" + uri, patchRequest, "PATCH");
+					if(StringUtils.isNotBlank(liveEventResponse)) {
+						JSONObject liveResp = new JSONObject(liveEventResponse);
+						String rtmpUrl = liveResp.getString("link");
+						String key = liveResp.getString("key");
+						LoggingUtil.logMessage("Live event created as " + rtmpUrl + " and key " + key);
+					}
+				}
+				//Call API to create live event
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
+		}
+		
 	}
 	
 	/*public static void upload(String filePath) throws IOException {
