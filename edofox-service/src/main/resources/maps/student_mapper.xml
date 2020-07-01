@@ -192,7 +192,13 @@
     <if test="lecture != null &amp;&amp; lecture.topicId != null">
     AND video_lectures.topic_id = ${lecture.topicId}
     </if>
+    <if test="searchFilter != null">
+    AND (video_name like '%${searchFilter}%' OR subject like '%${searchFilter}%' OR package_name like '%${searchFilter}%')
+    </if>
     ORDER BY created_date DESC
+    <if test = "startIndex != null">
+    	LIMIT ${startIndex}, ${startIndex + 10}
+    </if>
 	
 	</select>
 	

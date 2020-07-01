@@ -35,6 +35,8 @@ public class EdoServiceRequest {
 	private Date fromDate;
 	private Date toDate;
 	private EdoVideoLecture lecture;
+	private Integer startIndex;
+	private String searchFilter;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -169,6 +171,22 @@ public class EdoServiceRequest {
 
 	public void setLecture(EdoVideoLecture lecture) {
 		this.lecture = lecture;
+	}
+
+	public Integer getStartIndex() {
+		return startIndex;
+	}
+
+	public void setStartIndex(Integer startIndex) {
+		this.startIndex = startIndex;
+	}
+
+	public String getSearchFilter() {
+		return searchFilter;
+	}
+
+	public void setSearchFilter(String searchFilter) {
+		this.searchFilter = searchFilter;
 	}
 	
 }
