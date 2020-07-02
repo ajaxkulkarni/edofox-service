@@ -46,6 +46,7 @@ import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
+import com.rns.web.edo.service.domain.EdoSubject;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
@@ -218,6 +219,16 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			EDOInstitute institute = null;
 			if(request.getInstitute() != null) {
 				institute = testsDao.getInstituteById(request.getInstitute().getId());
+			}
+			
+			//Get subjects to avoid blank result for subject
+			List<EdoSubject> subjects = testsDao.getTestSubjects(test.getId());
+			if(CollectionUtils.isNotEmpty(subjects)) {
+				List<String> subjectsList = new ArrayList<String>();
+				for(EdoSubject sub: subjects) {
+					subjectsList.add(sub.getSubjectName());
+				}
+				existing.setSubjects(subjectsList);
 			}
 			
 			List<EdoStudent> students = testsDao.getStudentResults(test.getId());

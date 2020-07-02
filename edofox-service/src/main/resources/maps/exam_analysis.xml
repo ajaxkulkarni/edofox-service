@@ -116,5 +116,12 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		where test_id = ${test} AND student_id = ${student} GROUP BY test_result.student_id,test_questions.subject_id
 	</select>
 	
+	<select id="getTestSubjects" resultMap="subjects" parameterType="Integer">
+	SELECT subject,test_questions.subject_id FROM `test_questions_map` 
+	join test_questions on test_questions_map.question_id = test_questions.id 
+	join test_subjects on test_questions.subject_id = test_subjects.subject_id 
+	where test_id = ${value} group by test_questions.subject_id order by subject asc
+	</select>
+	
 
 </mapper>
