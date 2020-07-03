@@ -1,6 +1,5 @@
 package com.rns.web.edo.service.util;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +23,8 @@ import com.rns.web.edo.service.domain.ext.EdoGoogleNotification;
 import com.rns.web.edo.service.domain.ext.EdoGoogleNotificationRequest;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
-import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
+import com.rns.web.edo.service.domain.jpa.EdoNotice;
+import com.rns.web.edo.service.domain.jpa.EdoNoticeMap;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -33,7 +33,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 
 public class EdoNotificationsManager implements Runnable, EdoConstants {
-	
+
 	private static final String DEFAULT_INTENT = "transactionsIntent";
 	private static final String NOTIFICATION_ICON = "edofox_logo";
 	private static final String CHANNEL_PAY_PER_BILL = "Edofox";
@@ -41,93 +41,119 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 	private String notificationType;
 	private EdoClasswork classwork;
 	private EdoTestsDao testsDao;
-	
+	private EdoNotice notice;
+
 	public void setClasswork(EdoClasswork classwork) {
 		this.classwork = classwork;
 	}
-	
+
+	public void setNotice(EdoNotice notice) {
+		this.notice = notice;
+	}
+
 	public void setTestsDao(EdoTestsDao testsDao) {
 		this.testsDao = testsDao;
 	}
-	
+
 	public EdoNotificationsManager() {
-	
+
 	}
-	
+
 	public EdoNotificationsManager(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
-	
+
 	public void setNotificationType(String notificationType) {
 		this.notificationType = notificationType;
 	}
-	
+
 	public void broadcastNotification() {
-		
+
 		Session session = null;
 		try {
 			session = this.sessionFactory.openSession();
 			EdoGoogleNotificationRequest request = new EdoGoogleNotificationRequest();
+			StringBuilder classes = new StringBuilder();
+			StringBuilder divisions = new StringBuilder();
 			EdoClasswork classworkInfo = null;
-			if(classwork != null) {
+			String bodyText = NOTIFICATION_BODY.get(notificationType);
+			String titleText = NOTIFICATION_TITLE.get(notificationType);
+			if(bodyText == null || titleText == null) {
+				return;
+			}
+			
+			if (classwork != null) {
 				classworkInfo = classwork;
-				if(classworkInfo.getTitle() == null) {
+				if (classworkInfo.getTitle() == null) {
 					classworkInfo = (EdoClasswork) session.createCriteria(EdoClasswork.class).add(Restrictions.eq("id", classwork.getId())).uniqueResult();
 				}
-				if(classworkInfo != null) {
+				if (classworkInfo != null) {
 					List<EdoClassworkMap> maps = session.createCriteria(EdoClassworkMap.class).add(Restrictions.eq("classwork", classwork.getId())).list();
-					if(CollectionUtils.isNotEmpty(maps)) {
-						StringBuilder classes = new StringBuilder();
-						StringBuilder divisions = new StringBuilder();
-						for(EdoClassworkMap clsMap: maps) {
-							if(clsMap.getCourse() != null) {
+					if (CollectionUtils.isNotEmpty(maps)) {
+						for (EdoClassworkMap clsMap : maps) {
+							if (clsMap.getCourse() != null) {
 								classes.append(clsMap.getCourse()).append(",");
 							} else if (clsMap.getDivision() != null) {
 								divisions.append(clsMap.getDivision()).append(",");
 							}
 						}
-						//Fetch students based on classwork maps
-						Map<String, Object> input = new HashMap<String, Object>();
-						input.put("classes", StringUtils.removeEnd(classes.toString(), ","));
-						input.put("divisions", StringUtils.removeEnd(divisions.toString(), ","));
-						List<EdoStudent> devices = testsDao.getStudentDevices(input);
-						request.setRegistration_ids(prepareRegistrationIds(devices));
 					}
+					bodyText = CommonUtils.prepareClassworkNotification(bodyText, classworkInfo);
+				}
+			} else if (notice != null) {
+				notice = (EdoNotice) session.createCriteria(EdoNotice.class).add(Restrictions.eq("id", notice.getId())).uniqueResult();
+				if (notice != null) {
+					List<EdoNoticeMap> maps = session.createCriteria(EdoNoticeMap.class).add(Restrictions.eq("notice", notice.getId())).list();
+					if (CollectionUtils.isNotEmpty(maps)) {
+						for (EdoNoticeMap clsMap : maps) {
+							if (clsMap.getCourse() != null) {
+								classes.append(clsMap.getCourse()).append(",");
+							} else if (clsMap.getDivision() != null) {
+								divisions.append(clsMap.getDivision()).append(",");
+							}
+						}
+					}
+					bodyText = CommonUtils.prepareNoticeNotification(bodyText, notice);
+					titleText = CommonUtils.prepareNoticeNotification(titleText, notice);
 				}
 			}
-			if(classworkInfo == null) {
-				return;
-			}
-			EdoGoogleNotification notification = new EdoGoogleNotification();
-			String bodyText = NOTIFICATION_BODY.get(notificationType);
-			bodyText = CommonUtils.prepareClassworkNotification(bodyText, classworkInfo);
-			String titleText = NOTIFICATION_TEXT.get(notificationType);
-			notification.setBody(bodyText);
-			notification.setTitle(titleText);
-			notification.setIcon(NOTIFICATION_ICON);
-			//notification.setAndroid_channel_id(android_channel_id);
-			request.setNotification(notification);
-			postNotification(request);
+
+			// Fetch students based on classwork maps
+			Map<String, Object> input = new HashMap<String, Object>();
+			input.put("classes", StringUtils.removeEnd(classes.toString(), ","));
+			input.put("divisions", StringUtils.removeEnd(divisions.toString(), ","));
+			List<EdoStudent> devices = testsDao.getStudentDevices(input);
+			request.setRegistration_ids(prepareRegistrationIds(devices));
+			notify(request, bodyText, titleText);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		} finally {
 			CommonUtils.closeSession(session);
 		}
-	    
+
 	}
 
-	/*private String setStatus(String bodyText) {
-		if(StringUtils.equals(BillConstants.PAYMENT_STATUS_CREDIT, invoice.getStatus())) {
-			bodyText = StringUtils.replace(bodyText, "{status}", "Successful");	
-		} else {
-			bodyText = StringUtils.replace(bodyText, "{status}", "Failed");	
-		}
-		return bodyText;
-	}*/
+	private void notify(EdoGoogleNotificationRequest request, String bodyText, String titleText) throws IOException, JsonGenerationException, JsonMappingException {
+		EdoGoogleNotification notification = new EdoGoogleNotification();
+		notification.setBody(bodyText);
+		notification.setTitle(titleText);
+		notification.setIcon(NOTIFICATION_ICON);
+		// notification.setAndroid_channel_id(android_channel_id);
+		request.setNotification(notification);
+		postNotification(request);
+	}
+
+	/*
+	 * private String setStatus(String bodyText) {
+	 * if(StringUtils.equals(BillConstants.PAYMENT_STATUS_CREDIT,
+	 * invoice.getStatus())) { bodyText = StringUtils.replace(bodyText,
+	 * "{status}", "Successful"); } else { bodyText =
+	 * StringUtils.replace(bodyText, "{status}", "Failed"); } return bodyText; }
+	 */
 
 	private void postNotification(EdoGoogleNotificationRequest request) throws IOException, JsonGenerationException, JsonMappingException {
 		String url = EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_URL);
@@ -138,7 +164,8 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 		WebResource webResource = client.resource(url);
 		LoggingUtil.logMessage("Calling FCM URL :" + url + " request:" + new ObjectMapper().writeValueAsString(request), LoggingUtil.emailLogger);
 
-		ClientResponse response = webResource.type("application/json").header("Authorization", "key=" + EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_SERVER_KEY)).post(ClientResponse.class, request);
+		ClientResponse response = webResource.type("application/json")
+				.header("Authorization", "key=" + EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_SERVER_KEY)).post(ClientResponse.class, request);
 
 		if (response.getStatus() != 200) {
 			LoggingUtil.logMessage("Failed in FCM URL : HTTP error code : " + response.getStatus(), LoggingUtil.emailLogger);
@@ -148,9 +175,9 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 	}
 
 	private List<String> prepareRegistrationIds(List<EdoStudent> devices) {
-		if(CollectionUtils.isNotEmpty(devices)) {
+		if (CollectionUtils.isNotEmpty(devices)) {
 			List<String> deviceIds = new ArrayList<String>();
-			for(EdoStudent device: devices) {
+			for (EdoStudent device : devices) {
 				deviceIds.add(device.getToken());
 			}
 			return deviceIds;
@@ -161,20 +188,29 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 	public void run() {
 		broadcastNotification();
 	}
-	
+
 	private static Map<String, String> NOTIFICATION_BODY = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
-			//put(MAIL_TYPE_PAYMENT_RESULT, "Your Bill payment for {month} {year} of Rs. {payable} to {businessName} is {status} \nPayment ID: {paymentId} \nBill No: {invoiceId}\nGet exciting offers on this bill now - {offersUrl}");
+			// put(MAIL_TYPE_PAYMENT_RESULT, "Your Bill payment for {month}
+			// {year} of Rs. {payable} to {businessName} is {status} \nPayment
+			// ID: {paymentId} \nBill No: {invoiceId}\nGet exciting offers on
+			// this bill now - {offersUrl}");
 			put(MAIL_TYPE_NEW_CLASSWORK, "New classwork {title} added for you");
 			put(MAIL_TYPE_GENERIC, "{message}");
+			put(MAIL_TYPE_NEW_NOTICE, "{description}");
+			
 		}
 	});
-	
-	private static Map<String, String> NOTIFICATION_TEXT = Collections.unmodifiableMap(new HashMap<String, String>() {
+
+	private static Map<String, String> NOTIFICATION_TITLE = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
-			//put(MAIL_TYPE_PAYMENT_RESULT, "Your Bill payment for {month} {year} of Rs. {payable} to {businessName} is {status} \nPayment ID: {paymentId} \nBill No: {invoiceId}\nGet exciting offers on this bill now - {offersUrl}");
+			// put(MAIL_TYPE_PAYMENT_RESULT, "Your Bill payment for {month}
+			// {year} of Rs. {payable} to {businessName} is {status} \nPayment
+			// ID: {paymentId} \nBill No: {invoiceId}\nGet exciting offers on
+			// this bill now - {offersUrl}");
 			put(MAIL_TYPE_NEW_CLASSWORK, "New classwork added");
 			put(MAIL_TYPE_GENERIC, "{message}");
+			put(MAIL_TYPE_NEW_NOTICE, "{title}");
 		}
 	});
 

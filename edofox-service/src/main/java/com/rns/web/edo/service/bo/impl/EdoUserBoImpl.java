@@ -1818,16 +1818,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	public EdoApiStatus sendNotification(EdoServiceRequest request) {
-		if(request == null || request.getClasswork()  == null) {
-			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
-		}
 		EdoApiStatus status = new EdoApiStatus();
 		try {
 			EdoNotificationsManager mgr = new EdoNotificationsManager(this.sessionFactory);
 			mgr.setNotificationType(request.getRequestType());
 			mgr.setClasswork(request.getClasswork());
+			mgr.setNotice(request.getNotice());
 			mgr.setTestsDao(testsDao);
-			LoggingUtil.logMessage("Executing notification task for .. " + request.getClasswork().getId(), LoggingUtil.emailLogger);
+			LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
 			executor.execute(mgr);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));

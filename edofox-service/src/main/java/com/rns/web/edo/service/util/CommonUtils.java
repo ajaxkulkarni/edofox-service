@@ -41,6 +41,7 @@ import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoNotice;
 
 public class CommonUtils {
 
@@ -776,5 +777,13 @@ public class CommonUtils {
 	    URI uri = new URI(url);
 	    String domain = uri.getHost();
 	    return domain.startsWith("www.") ? domain.substring(4) : domain;
+	}
+
+	public static String prepareNoticeNotification(String result, EdoNotice notice) {
+		if(notice != null) {
+			result = StringUtils.replace(result, "{title}", CommonUtils.getStringValue(notice.getTitle()));
+			result = StringUtils.replace(result, "{description}", CommonUtils.getStringValue(notice.getDescription()));
+		}
+		return result;
 	}
 }

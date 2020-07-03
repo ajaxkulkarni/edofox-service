@@ -21,6 +21,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoNotice;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoNotificationsManager;
@@ -39,8 +40,8 @@ public class NotificationTask implements SchedulingConfigurer {
 	// private Integer autoResponseSenderSequence = 0;
 
 	public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-		
-		// Add session clean up task
+
+		// Add classwork notification task
 		taskRegistrar.addTriggerTask(new Runnable() {
 			public void run() {
 				notificationsJob();
@@ -51,6 +52,7 @@ public class NotificationTask implements SchedulingConfigurer {
 				return nextNotificationsJob();
 			}
 		});
+
 
 	}
 
@@ -65,24 +67,49 @@ public class NotificationTask implements SchedulingConfigurer {
 			mgr.setNotificationType(EdoConstants.MAIL_TYPE_NEW_CLASSWORK);
 			mgr.setTestsDao(testsDao);
 			mgr.setSessionFactory(sessionFactory);
-			List<EdoClasswork> classworkList = session.createCriteria(EdoClasswork.class)
-					.add(Restrictions.lt("startDate", toDate))
-					.add(Restrictions.ge("startDate", fromDate))
-					.add(Restrictions.eq("disabled", 0))
-					.add(Restrictions.eq("status", "Approved")).list();
-			if(CollectionUtils.isNotEmpty(classworkList)) {
-				for(EdoClasswork classwork: classworkList) {
+			classworkNotifications(session, fromDate, toDate, mgr);
+			mgr.setNotificationType(EdoConstants.MAIL_TYPE_NEW_NOTICE);
+			noticeNotifications(session, fromDate, toDate, mgr);
+			
+		} catch (Exception e) {
+			logger.error(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		LoggingUtil.logMessage("... End of video export job ..", LoggingUtil.videoLogger);
+	}
+
+	private void noticeNotifications(Session session, Date fromDate, Date toDate, EdoNotificationsManager mgr) {
+		try {
+			List<EdoNotice> classworkList = session.createCriteria(EdoNotice.class).add(Restrictions.lt("startDate", toDate))
+					.add(Restrictions.ge("startDate", fromDate)).add(Restrictions.eq("status", "A"))
+					.list();
+			if (CollectionUtils.isNotEmpty(classworkList)) {
+				for (EdoNotice notice : classworkList) {
+					mgr.setNotice(notice);
+					mgr.broadcastNotification();
+					logger.info("Sent notification for notice " + notice.getTitle() + " of ID " + notice.getId());
+				}
+			}
+		} catch (Exception e) {
+			logger.error(ExceptionUtils.getStackTrace(e));
+		}
+	}
+
+	private void classworkNotifications(Session session, Date fromDate, Date toDate, EdoNotificationsManager mgr) {
+		try {
+			List<EdoClasswork> classworkList = session.createCriteria(EdoClasswork.class).add(Restrictions.lt("startDate", toDate))
+					.add(Restrictions.ge("startDate", fromDate)).add(Restrictions.eq("disabled", 0)).add(Restrictions.eq("status", "Approved")).list();
+			if (CollectionUtils.isNotEmpty(classworkList)) {
+				for (EdoClasswork classwork : classworkList) {
 					mgr.setClasswork(classwork);
 					mgr.broadcastNotification();
 					logger.info("Sent notification for classwork " + classwork.getTitle() + " of ID " + classwork.getId());
 				}
 			}
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
-		} finally {
-			CommonUtils.closeSession(session);
+			logger.error(ExceptionUtils.getStackTrace(e));
 		}
-		LoggingUtil.logMessage("... End of video export job ..", LoggingUtil.videoLogger);
 	}
 
 	private Date nextNotificationsJob() {
@@ -90,7 +117,7 @@ public class NotificationTask implements SchedulingConfigurer {
 		try {
 			Calendar cal = Calendar.getInstance();
 			String notificationsJob = EdoPropertyUtil.getProperty(EdoPropertyUtil.NOTIFICATIONS_JOB);
-			if(StringUtils.isBlank(notificationsJob)) {
+			if (StringUtils.isBlank(notificationsJob)) {
 				return null;
 			}
 			logger.info("-------- Notifications job variable:" + notificationsJob);

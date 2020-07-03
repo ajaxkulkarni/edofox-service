@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
+import com.rns.web.edo.service.domain.jpa.EdoNotice;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 
 
@@ -40,6 +41,7 @@ public class EdoServiceRequest {
 	private EdoMailer mailer;
 	private EdoDeviceId deviceId;
 	private EdoClasswork classwork;
+	private EdoNotice notice;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -198,6 +200,14 @@ public class EdoServiceRequest {
 
 	public void setClasswork(EdoClasswork classwork) {
 		this.classwork = classwork;
+	}
+	
+	public EdoNotice getNotice() {
+		return notice;
+	}
+	
+	public void setNotice(EdoNotice notice) {
+		this.notice = notice;
 	}
 	
 }
