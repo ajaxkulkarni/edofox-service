@@ -34,7 +34,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 
 public class EdoNotificationsManager implements Runnable, EdoConstants {
 
-	private static final String DEFAULT_INTENT = "transactionsIntent";
+	private static final String DEFAULT_INTENT = "commonIntent";
 	private static final String NOTIFICATION_ICON = "edofox_logo";
 	private static final String CHANNEL_PAY_PER_BILL = "Edofox";
 	private SessionFactory sessionFactory;
