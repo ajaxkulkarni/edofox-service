@@ -1626,6 +1626,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	private void setActivity(EdoServiceRequest request, EdoClassworkActivity act) {
+		if(StringUtils.equalsIgnoreCase(act.getStatus(), "Completed")) {
+			//Don't update if already marked Completed
+			return;
+		}
 		act.setReadAt(new Date());
 		if(request.getFeedback().getPercentViewed() != null) {
 			act.setPercent(request.getFeedback().getPercentViewed());
