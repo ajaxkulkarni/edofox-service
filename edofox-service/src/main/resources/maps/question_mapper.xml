@@ -339,7 +339,7 @@
 		<if test="student == null  || student.id == null">
 			count(*) as frequency, 
 		</if>
-		exam_feedback.created_date,video_lectures.subject_id,type,resolution,video_id,video_url,video_name,feedback_resolution_text
+		exam_feedback.created_date,video_lectures.subject_id,exam_feedback.type,resolution,video_id,video_url,video_name,feedback_resolution_text
 		from exam_feedback join video_lectures on exam_feedback.video_id = video_lectures.id
 		where 1
 		<if test="requestType == 'Unresolved'">
