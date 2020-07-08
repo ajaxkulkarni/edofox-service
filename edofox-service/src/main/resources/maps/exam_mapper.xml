@@ -123,6 +123,9 @@
 		<result column="status" property="question.status"/>
 		<result column="question_disabled" property="question.disabled"/>
 		<result column="questionStatus" property="question.status"/>
+		<result column="chapter" property="question.chapter.chapterId"/>
+		<result column="chapter_name" property="question.chapter.chapterName"/>
+		<result column="level" property="question.level"/>
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
@@ -130,6 +133,7 @@
 		join test_questions_map on test.test_id = test_questions_map.test_id
 		join test_questions on test_questions_map.question_id = test_questions.id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
+		left join chapters on test_questions.chapter = chapters.id
 		left join test_status on test.test_id = test_status.test_id
 		left join test_result on test.test_id = test_result.test_id AND test_status.student_id = test_result.student_id AND test_questions.id = test_result.question_id
 		where

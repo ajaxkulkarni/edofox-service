@@ -139,6 +139,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				test.setSolutionUrl(CommonUtils.prepareUrl(test.getSolutionUrl()));
 			}
 			
+			//Get question correctness analysis
+			List<EdoQuestion> questionCorrectness = null;
+			if(StringUtils.equals(test.getShowResult(), "Y")) {
+				questionCorrectness = testsDao.getQuestionCorrectness(test.getId());
+			}
+			
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
 				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
@@ -149,6 +155,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(question.getDisabled() != null && question.getDisabled() == 1) {
 					if(StringUtils.isBlank(question.getAnswer())) {
 						continue;
+					}
+				}
+				
+				if(CollectionUtils.isNotEmpty(questionCorrectness)) {
+					for(EdoQuestion correctness: questionCorrectness) {
+						if(correctness.getQn_id() != null && question.getQn_id() != null && correctness.getQn_id().intValue() == question.getQn_id().intValue()) {
+							question.setAnalysis(correctness.getAnalysis());
+							break;
+						}
 					}
 				}
 				
