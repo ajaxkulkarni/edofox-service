@@ -16,6 +16,8 @@ public class EdoGoogleNotification {
     private String android_channel_id;
     private String icon;
 	private String click_action;
+	private String visibility;//": enum (Visibility)
+	private String notification_priority;//PRIORITY_HIGH
 	
 	public String getTitle() {
 		return title;
@@ -46,6 +48,18 @@ public class EdoGoogleNotification {
 	}
 	public void setClick_action(String click_action) {
 		this.click_action = click_action;
+	}
+	public String getVisibility() {
+		return visibility;
+	}
+	public void setVisibility(String visibility) {
+		this.visibility = visibility;
+	}
+	public String getNotification_priority() {
+		return notification_priority;
+	}
+	public void setNotification_priority(String notification_priority) {
+		this.notification_priority = notification_priority;
 	}
 
 }

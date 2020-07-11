@@ -16,6 +16,7 @@ public class EdoGoogleNotificationRequest {
 	private List<String> registration_ids;
 	private String to;
 	private EdoGoogleNotification notification;
+	private EdoGoogleNotificationData data;
 	
 	public List<String> getRegistration_ids() {
 		return registration_ids;
@@ -34,6 +35,12 @@ public class EdoGoogleNotificationRequest {
 	}
 	public void setNotification(EdoGoogleNotification notification) {
 		this.notification = notification;
+	}
+	public EdoGoogleNotificationData getData() {
+		return data;
+	}
+	public void setData(EdoGoogleNotificationData data) {
+		this.data = data;
 	}
 	
 }

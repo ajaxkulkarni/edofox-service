@@ -1,7 +1,9 @@
 package com.rns.web.edo.service.util;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +19,29 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.FirestoreOptions;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.messaging.AndroidConfig;
+import com.google.firebase.messaging.AndroidConfig.Priority;
+import com.google.firebase.messaging.AndroidNotification;
+import com.google.firebase.messaging.AndroidNotification.Visibility;
+import com.google.firebase.messaging.ApnsConfig;
+import com.google.firebase.messaging.ApnsFcmOptions;
+import com.google.firebase.messaging.Aps;
+import com.google.firebase.messaging.FcmOptions;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.WebpushConfig;
+import com.google.firebase.messaging.WebpushNotification;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.ext.EdoGoogleNotification;
+import com.rns.web.edo.service.domain.ext.EdoGoogleNotificationData;
 import com.rns.web.edo.service.domain.ext.EdoGoogleNotificationRequest;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
@@ -36,12 +58,38 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 
 	private static final String DEFAULT_INTENT = "commonIntent";
 	private static final String NOTIFICATION_ICON = "edofox_logo";
-	private static final String CHANNEL_PAY_PER_BILL = "Edofox";
+	private static final String CHANNEL_EDOFOX = "Edofox";
 	private SessionFactory sessionFactory;
 	private String notificationType;
 	private EdoClasswork classwork;
 	private EdoTestsDao testsDao;
 	private EdoNotice notice;
+	
+	static {
+		
+		try {
+			FileInputStream serviceAccount = new FileInputStream(EdoPropertyUtil.getProperty(EdoPropertyUtil.FIREBASE_CREDENTIALS));//"/home/service/properties/edofox-key.json"
+			GoogleCredentials credentials;
+			credentials = GoogleCredentials.fromStream(serviceAccount);
+			FirebaseOptions options = 
+					FirebaseOptions.builder()
+					  .setCredentials(credentials)
+					  .setProjectId(EdoPropertyUtil.getProperty(EdoPropertyUtil.FIREBASE_PROJECT))//"edofox-management-module"
+					  .build();
+			FirebaseApp.initializeApp(options);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		/*FirebaseOptions options = new FirebaseOptions.Builder()
+			    .setCredentials(GoogleCredentials.getApplicationDefault())
+			    .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
+			    .build();*/
+
+			
+	}
 
 	public void setClasswork(EdoClasswork classwork) {
 		this.classwork = classwork;
@@ -127,8 +175,10 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			input.put("classes", StringUtils.removeEnd(classes.toString(), ","));
 			input.put("divisions", StringUtils.removeEnd(divisions.toString(), ","));
 			List<EdoStudent> devices = testsDao.getStudentDevices(input);
-			request.setRegistration_ids(prepareRegistrationIds(devices));
+			List<String> registrationIds = prepareRegistrationIds(devices);
+			request.setRegistration_ids(registrationIds);
 			notify(request, bodyText, titleText);
+			//send(titleText, bodyText, registrationIds);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		} finally {
@@ -142,8 +192,16 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 		notification.setBody(bodyText);
 		notification.setTitle(titleText);
 		notification.setIcon(NOTIFICATION_ICON);
-		// notification.setAndroid_channel_id(android_channel_id);
+		notification.setVisibility("VISIBILITY_PUBLIC"); //Public
+		notification.setNotification_priority("PRIORITY_HIGH");
+		notification.setAndroid_channel_id("Edofox");
+		notification.setClick_action(".MainActivity");
 		request.setNotification(notification);
+		
+		EdoGoogleNotificationData data = new EdoGoogleNotificationData();
+		data.setTitle(titleText);
+		data.setText(bodyText);
+		request.setData(data);
 		postNotification(request);
 	}
 
@@ -160,12 +218,15 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 		ClientConfig config = new DefaultClientConfig();
 		config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 		Client client = Client.create(config);
-
+		
+		
 		WebResource webResource = client.resource(url);
 		LoggingUtil.logMessage("Calling FCM URL :" + url + " request:" + new ObjectMapper().writeValueAsString(request), LoggingUtil.emailLogger);
 
 		ClientResponse response = webResource.type("application/json")
-				.header("Authorization", "key=" + EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_SERVER_KEY)).post(ClientResponse.class, request);
+				.header("Authorization", "key=" + EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_SERVER_KEY))
+				//.header("Authorization ", "Bearer " + EdoFirebaseUtil.accessToken)
+				.post(ClientResponse.class, request);
 
 		if (response.getStatus() != 200) {
 			LoggingUtil.logMessage("Failed in FCM URL : HTTP error code : " + response.getStatus(), LoggingUtil.emailLogger);
@@ -183,6 +244,32 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			return deviceIds;
 		}
 		return null;
+	}
+	
+	public void send(String title, String body, List<String> tokens) {
+		try {
+			AndroidNotification notification = AndroidNotification.builder()
+					.setTitle(title)
+					.setBody(body)
+					.setIcon(NOTIFICATION_ICON)
+					.setChannelId(CHANNEL_EDOFOX)
+					.setVisibility(Visibility.PUBLIC)
+					.setPriority(com.google.firebase.messaging.AndroidNotification.Priority.HIGH)
+					.build();
+			Notification notificationMain = Notification.builder().setBody(body).setTitle(title).build();
+			MulticastMessage message = MulticastMessage.builder()
+					//.setNotification(notificationMain)
+					//.setAndroidConfig(AndroidConfig.builder().setNotification(notification)
+					//		.build())
+					.putData("title", title)
+					.addAllTokens(tokens)
+					.build();
+			FirebaseMessaging.getInstance().sendMulticast(message);
+			System.out.println("Done!");
+		} catch (FirebaseMessagingException e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			e.printStackTrace();
+		}
 	}
 
 	public void run() {
