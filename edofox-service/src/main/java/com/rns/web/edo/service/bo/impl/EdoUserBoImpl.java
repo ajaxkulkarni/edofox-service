@@ -1438,6 +1438,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				return response;
 			}
 			
+			if(session == null) {
+				session = this.sessionFactory.openSession();
+			}
+			
 			Transaction tx = session.beginTransaction();
 			classwork.setDisabled(0);
 			classwork.setSize(length);
