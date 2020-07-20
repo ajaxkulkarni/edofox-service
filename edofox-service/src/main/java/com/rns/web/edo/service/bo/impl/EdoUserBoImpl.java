@@ -409,7 +409,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						for(String right: rightCol) {
 							EdoComplexOption subOption = new EdoComplexOption();
 							subOption.setOptionName(right);
-							if(StringUtils.contains(question.getAnswer(), right)) {
+							if(StringUtils.contains(question.getAnswer(), left + "-" + right)) {
 								subOption.setSelected(true);
 							}
 							subOptions.add(subOption);
