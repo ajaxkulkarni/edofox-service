@@ -150,6 +150,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
 				CommonUtils.setQuestionURLs(question);
 				QuestionParser.fixQuestion(question);
+				prepareMatchTypeQuestion(question);
 				
 				//Add only if not disabled
 				if(question.getDisabled() != null && question.getDisabled() == 1) {
@@ -408,6 +409,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						for(String right: rightCol) {
 							EdoComplexOption subOption = new EdoComplexOption();
 							subOption.setOptionName(right);
+							if(StringUtils.contains(question.getAnswer(), right)) {
+								subOption.setSelected(true);
+							}
 							subOptions.add(subOption);
 						}
 						if(CollectionUtils.isNotEmpty(subOptions)) {
