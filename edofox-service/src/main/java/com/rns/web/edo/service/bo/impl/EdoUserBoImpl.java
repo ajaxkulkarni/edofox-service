@@ -145,6 +145,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				questionCorrectness = testsDao.getQuestionCorrectness(test.getId());
 			}
 			
+			test.setSections(new ArrayList<String>());
+
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
 				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
@@ -165,6 +167,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							question.setAnalysis(correctness.getAnalysis());
 							break;
 						}
+					}
+				}
+				
+				if(StringUtils.isNotBlank(question.getSection())) {
+					if(!test.getSections().contains(question.getSection())) {
+						test.getSections().add(question.getSection());
 					}
 				}
 				

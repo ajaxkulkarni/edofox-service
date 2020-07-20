@@ -127,6 +127,7 @@
 		<result column="chapter_name" property="question.chapter.chapterName"/>
 		<result column="level" property="question.level"/>
 		<result column="question_type" property="question.type"/>
+		<result column="section" property="question.section" />
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
