@@ -118,6 +118,7 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoConfig</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoNotice</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoNoticeMap</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoActivityLogs</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

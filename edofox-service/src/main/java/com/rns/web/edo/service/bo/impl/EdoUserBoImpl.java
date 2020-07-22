@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,7 +20,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.ibatis.io.ClassLoaderWrapper;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -53,6 +51,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.jpa.EdoActivityLogs;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkActivity;
@@ -1458,6 +1457,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			classwork.setStatus("Pending");
 			
 			session.persist(classwork);
+			//Add log
+			EdoActivityLogs log = new EdoActivityLogs();
+			log.setLoginId(classwork.getUploader());
+			log.setModule("Classwork");
+			log.setLogTime(new Date());
+			log.setInstituteId(classwork.getInstituteId());
+			String liveMessage = "";
+			if(classwork.getStartDate() != null && classwork.getEndDate() != null) {
+				liveMessage = " live from " + CommonUtils.convertDate(classwork.getStartDate()) + " to " + CommonUtils.convertDate(classwork.getEndDate());
+			}
+			log.setComment("Added new classwork " + classwork.getTitle() + " of type " + classwork.getType() + liveMessage);
+			session.persist(log);
+			
 			// Add URL
 			if (!StringUtils.equals(classwork.getType(), CONTENT_TYPE_VIDEO)) {
 				String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
