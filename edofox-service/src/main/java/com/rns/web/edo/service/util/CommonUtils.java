@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +41,8 @@ import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoNotice;
 
 public class CommonUtils {
 
@@ -144,6 +148,23 @@ public class CommonUtils {
 		cal.setTime(date1);
 		return cal.get(value);
 	}
+	
+	public static Date getDateWithoutTime(Date date) {
+	    Calendar cal = Calendar.getInstance();
+	    cal.setTime(date);
+	    cal.set(Calendar.HOUR_OF_DAY, 0);
+	    cal.set(Calendar.MINUTE, 0);
+	    cal.set(Calendar.SECOND, 0);
+	    cal.set(Calendar.MILLISECOND, 0);
+	    return cal.getTime();
+	}
+
+	public static Date getTomorrowDate(Date date) {
+	    Calendar cal = Calendar.getInstance();
+	    cal.setTime(date);
+	    cal.add(Calendar.DATE, 1);
+	    return cal.getTime();
+	}
 
 	public static String getStringValue(Integer value) {
 		if (value == null) {
@@ -186,8 +207,8 @@ public class CommonUtils {
 	public static String prepareStudentNotification(String result, EdoStudent student) {
 		if (student != null) {
 			result = StringUtils.replace(result, "{name}", CommonUtils.getStringValue(student.getName()));
-			// result = StringUtils.replace(result, "{password}",
-			// CommonUtils.getStringValue(user.getPassword()));
+			result = StringUtils.replace(result, "{username}", CommonUtils.getStringValue(student.getUsername()));
+			result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(student.getPassword()));
 			result = StringUtils.replace(result, "{gender}", CommonUtils.getStringValue(student.getGender()));
 			result = StringUtils.replace(result, "{phone}", CommonUtils.getStringValue(student.getPhone()));
 			result = StringUtils.replace(result, "{examMode}", CommonUtils.getStringValue(student.getExamMode()));
@@ -243,6 +264,13 @@ public class CommonUtils {
 				
 			}
 			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
+		}
+		return result;
+	}
+	
+	public static String prepareClassworkNotification(String result, EdoClasswork classwork) {
+		if(classwork != null) {
+			result = StringUtils.replace(result, "{title}", CommonUtils.getStringValue(classwork.getTitle()));
 		}
 		return result;
 	}
@@ -757,5 +785,31 @@ public class CommonUtils {
 				}
 			}
 		}
+	}
+	
+	public static Date setZeroDate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		return cal.getTime();
+	}
+	
+	public static String getDomainName(String url) throws URISyntaxException {
+		if(url == null) {
+			return null;
+		}
+	    URI uri = new URI(url);
+	    String domain = uri.getHost();
+	    return domain.startsWith("www.") ? domain.substring(4) : domain;
+	}
+
+	public static String prepareNoticeNotification(String result, EdoNotice notice) {
+		if(notice != null) {
+			result = StringUtils.replace(result, "{title}", CommonUtils.getStringValue(notice.getTitle()));
+			result = StringUtils.replace(result, "{description}", CommonUtils.getStringValue(notice.getDescription()));
+		}
+		return result;
 	}
 }

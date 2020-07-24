@@ -12,6 +12,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
+import com.rns.web.edo.service.domain.jpa.EdoNotice;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 
 
@@ -35,8 +38,15 @@ public class EdoServiceRequest {
 	private Date fromDate;
 	private Date toDate;
 	private EdoVideoLecture lecture;
+
 	private Integer startIndex;
 	private String searchFilter;
+
+	private EdoMailer mailer;
+	private EdoDeviceId deviceId;
+	private EdoClasswork classwork;
+	private EdoNotice notice;
+
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -173,6 +183,7 @@ public class EdoServiceRequest {
 		this.lecture = lecture;
 	}
 
+
 	public Integer getStartIndex() {
 		return startIndex;
 	}
@@ -187,6 +198,38 @@ public class EdoServiceRequest {
 
 	public void setSearchFilter(String searchFilter) {
 		this.searchFilter = searchFilter;
+
+	public EdoMailer getMailer() {
+		return mailer;
+	}
+
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
+	}
+
+	public EdoDeviceId getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(EdoDeviceId deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public EdoClasswork getClasswork() {
+		return classwork;
+	}
+
+	public void setClasswork(EdoClasswork classwork) {
+		this.classwork = classwork;
+	}
+	
+	public EdoNotice getNotice() {
+		return notice;
+	}
+	
+	public void setNotice(EdoNotice notice) {
+		this.notice = notice;
+
 	}
 	
 }

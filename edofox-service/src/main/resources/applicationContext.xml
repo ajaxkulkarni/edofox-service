@@ -15,14 +15,12 @@
 	<context:component-scan base-package="com.rns.web.edo.service" />
 	
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations"  value="file:///home/service/properties/edofox-db.properties"/>
+		<property name="locations"  value="file:///home/service/properties/erp-db.properties"/>
 	</bean>
 
 	<bean id="userBo" class="com.rns.web.edo.service.bo.impl.EdoUserBoImpl">
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
-		<property name="filePath"
-			value="/home/wwwedofox/public_html/test/json_test_files/" />
 		<property name="txManager" ref="transactionManager" />
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"></property>
 	</bean>
@@ -39,6 +37,12 @@
 	</bean>
 	
 	<bean id="videoRoutine" class="com.rns.web.edo.service.VideoExportScheduler">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+		<property name="executor" ref="executor" />
+		<property name="testsDao" ref="testsDao" />
+	</bean>
+	
+	<bean id="notificationTask" class="com.rns.web.edo.service.NotificationTask">
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
@@ -107,6 +111,14 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoVideoLecture</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoSalesDetails</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoKeyword</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoClasswork</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoClassworkMap</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoClassworkActivity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoDeviceId</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoConfig</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoNotice</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoNoticeMap</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoActivityLogs</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -119,6 +131,7 @@
 				<!-- <prop key="hibernate.connection.release_mode">after_statement</prop> -->
 				<!-- <prop key="connection.provider_class"> org.hibernate.connection.C3P0ConnectionProvider 
 					</prop> -->
+				<!-- <prop key="hibernate.connection.zeroDateTimeBehavior">convertToNull</prop> -->
 			</props>
 		</property>
 	</bean>

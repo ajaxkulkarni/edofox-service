@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class EdoPropertyUtil {
 	
-	private static final String PROPERTIES_PATH = "/home/service/properties/edofox.properties";
+	private static final String PROPERTIES_PATH = "/home/service/properties/erp.properties";
 	public static final String FIREBASE_PROJECT = "firebase.project";
 	public static final String FIREBASE_CREDENTIALS = "firebase.credentials.path";
 	public static final String HOST_URL = "host.url";
@@ -39,6 +39,9 @@ public class EdoPropertyUtil {
 	public static final String VIDEO_UPLOAD_FREQUENCY = "video.upload.frequency";
 	public static final String VIDEO_IDLE_TIME = "video.idle.time";
 	public static final String RECORDED_URL = "video.recorded.url";
+	public static final String FCM_URL = "fcm.url";
+	public static final String FCM_SERVER_KEY = "fcm.key";
+	public static final String NOTIFICATIONS_JOB = "notifications.job";
 	
 
 	public static String getProperty(String name) {

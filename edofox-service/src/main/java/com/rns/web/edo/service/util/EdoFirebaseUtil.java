@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
@@ -34,6 +35,7 @@ public class EdoFirebaseUtil {
 	static FirebaseDatabase database = null;
 	private static Firestore db;
 	private static FirebaseApp app;
+	public static AccessToken accessToken;
 	
 	static {
 		// Fetch the service account key JSON file contents
@@ -72,6 +74,8 @@ public class EdoFirebaseUtil {
 			serviceAccount = new FileInputStream(EdoPropertyUtil.getProperty(EdoPropertyUtil.FIREBASE_CREDENTIALS));//"/home/service/properties/edofox-key.json"
 			GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
 			
+			accessToken = credentials.getAccessToken();
+			
 			FirestoreOptions options = 
 					  FirestoreOptions.newBuilder()
 					  .setTimestampsInSnapshotsEnabled(true)
@@ -79,6 +83,7 @@ public class EdoFirebaseUtil {
 					  .setProjectId(EdoPropertyUtil.getProperty(EdoPropertyUtil.FIREBASE_PROJECT))//"edofox-management-module"
 					  .setDatabaseId("(default)")//"(default)"
 					  .build();
+			
 			
 			db = options.getService();
 			/*FirebaseOptions options = new FirebaseOptions.Builder()
@@ -234,5 +239,6 @@ public class EdoFirebaseUtil {
 		request.put("instituteId", CommonUtils.getStringValue(instituteId));
 		return request;
 	}
+	
 
 }

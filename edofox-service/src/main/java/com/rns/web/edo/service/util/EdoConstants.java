@@ -58,6 +58,10 @@ public interface EdoConstants {
 	String MAIL_TYPE_SIGN_UP = "signUpMail";
 	String MAIL_TYPE_SIGN_UP_DEMO = "freeTrial";
 	String MAIL_TYPE_UPGRADE = "upgrade";
+	String MAIL_TYPE_INVITE = "StudentInvite";
+	String MAIL_TYPE_NEW_CLASSWORK = "NewClasswork";
+	String MAIL_TYPE_NEW_NOTICE = "NewNotice";
+	String MAIL_TYPE_GENERIC = "Generic";
 	
 	
 	
@@ -72,7 +76,7 @@ public interface EdoConstants {
 	String Q_BANK_PATH = "/home/service/questionData/";
 	String TEMP_QUESTION_PATH = "/home/service/tempQuestions/";
 	String TEST_QUESTION_PATH = "/home/service/testQuestionData/";
-	String VIDEOS_PATH = "/home/service/videos/";
+	String VIDEOS_PATH = "/home/service/classwork/";
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";
@@ -105,6 +109,21 @@ public interface EdoConstants {
 			put("Pro", 200d);
 			put("Business", 500d);
 			put("Advanced", 1024d);
+		}
+	});
+	
+	String CONTENT_TYPE_DOCUMENT = "Document";
+	String CONTENT_TYPE_VIDEO = "Video";
+	String CONTENT_TYPE_IMAGE = "Image";
+	
+	static Map<String, String> CONTENT_TYPES = Collections.unmodifiableMap(new HashMap<String, String>() {
+		{
+			put("png", "image/png");
+			put("jpg", "image/jpeg");
+			put("jpeg", "image/jpeg");
+			put("doc", "application/msword");
+			put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+			put("pdf", "application/pdf");
 		}
 	});
 	

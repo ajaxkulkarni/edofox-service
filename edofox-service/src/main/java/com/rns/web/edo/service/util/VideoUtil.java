@@ -2,6 +2,7 @@ package com.rns.web.edo.service.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,9 +22,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
+
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jettison.json.JSONObject;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
@@ -201,8 +207,7 @@ public class VideoUtil {
 	}*/
 	
 	//https://vimeo.com/408810998
-	public static VimeoResponse uploadFile(String path, String videoName, String videoDesciption) throws IOException, VimeoException {
-		
+	public static VimeoResponse uploadFile(String path, String videoName, String videoDesciption, String embedUrl) throws IOException, VimeoException {
 		LoggingUtil.logMessage("Uploading file at " + path + " to vimeo .. ", LoggingUtil.videoLogger);
 		
 		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
@@ -226,16 +231,43 @@ public class VideoUtil {
 	    vimeo.addEmbedPreset(videoEndPoint, "edofox-live");
 	    //add video privacy domain
 	    //vimeo.addVideoPrivacyDomain(videoEndPoint, "localhost");
-		String defaultDomain = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
+		//String defaultDomain = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
 		//if(StringUtils.isBlank(defaultDomain)) {
-		defaultDomain = "test.edofox.com";
+		//defaultDomain = "stxavierspune.com";
 		//}
-		LoggingUtil.logMessage("Adding domain to privacy " + defaultDomain, LoggingUtil.videoLogger);
-		vimeo.addVideoPrivacyDomain(videoEndPoint, defaultDomain);
+		LoggingUtil.logMessage("Adding domain to privacy " + embedUrl, LoggingUtil.videoLogger);
+		vimeo.addVideoPrivacyDomain(videoEndPoint, embedUrl);
 		
 	    //delete video
 	    //TODO vimeo.removeVideo(videoEndPoint);
 	    return info;
+	}
+	
+	//https://vimeo.com/428627420
+	public static String getDownloadUrl(String url) {
+		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
+		try {
+			String videoId = StringUtils.replace(url, "https://vimeo.com/", "");
+			VimeoResponse resp = vimeo.get("https://api.vimeo.com/videos/" + videoId);
+			if(resp != null && resp.getJson() != null) {
+				System.out.println(resp);
+				String link = "";
+				JSONArray array = resp.getJson().getJSONArray("download");
+				if( array.length() > 0)  {
+					for(int i = 0; i < array.length(); i++) {
+						JSONObject jsonObject = array.getJSONObject(i);
+						if(StringUtils.isNotBlank(jsonObject.getString("link"))) {
+							link = jsonObject.getString("link");
+						}
+					}
+				}
+				return link;
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public static Float downloadRecordedFile(Integer channelId, Integer sessionId) {
@@ -332,7 +364,7 @@ public class VideoUtil {
 		
 		Builder header = webResource.type("application/json").header("Authorization", "bearer " + EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY));
 		if(methodType != null) {
-			//“X-HTTP-Method-Override”: “PUT”
+			//ï¿½X-HTTP-Method-Overrideï¿½: ï¿½PUTï¿½
 			header.header("X-HTTP-Method-Override", methodType);
 		}
 		

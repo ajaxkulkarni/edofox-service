@@ -817,7 +817,7 @@ agent-platform-version: 4
 		String replace = StringUtils.replace(text, "'", "''");
 		//replace = StringUtils.replace(text, "\\", "\\\\");
 		//replace = StringUtils.replace(text, "\\P{Print}", "");
-		replace = CharMatcher.ASCII.retainFrom(text);
+		replace = CharMatcher.ascii().retainFrom(text);
 		return replace;
 	}
 

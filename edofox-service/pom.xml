@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.rns.web.edo.service</groupId>
-	<artifactId>edofox</artifactId>
+	<artifactId>erp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ERP Project</name>
+	<name>School ERP Project</name>
 	<packaging>war</packaging>
 
 	<properties>
@@ -160,7 +160,7 @@
 		<dependency>
 			<groupId>com.google.firebase</groupId>
 			<artifactId>firebase-admin</artifactId>
-			<version>6.5.0</version>
+			<version>6.14.0</version>
 		</dependency>
 
 		<dependency>
@@ -278,11 +278,8 @@
 		<!-- <dependency> <groupId>io.agora.rtc</groupId> <artifactId>full-sdk</artifactId> 
 			<version>2.0.0</version> </dependency> -->
 
-		<!-- <dependency>
-			<groupId>io.agora</groupId>
-			<artifactId>authentication</artifactId>
-			<version>1.6.1</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>io.agora</groupId> <artifactId>authentication</artifactId> 
+			<version>1.6.1</version> </dependency> -->
 
 		<dependency>
 			<groupId>net.bramp.ffmpeg</groupId>
@@ -309,13 +306,18 @@
 			<version>1.10</version>
 		</dependency>
 
+		<!-- <dependency>
+			<groupId>com.matter.nlp</groupId>
+			<artifactId>rake</artifactId>
+			<version>1.0.0</version>
+		</dependency> -->
 
 
 
 	</dependencies>
 
 	<build>
-		<finalName>edofox</finalName>
+		<finalName>erp</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>

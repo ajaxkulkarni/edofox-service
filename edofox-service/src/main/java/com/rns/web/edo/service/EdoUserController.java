@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,8 @@ import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoExcelUtil;
@@ -143,23 +146,40 @@ public class EdoUserController {
 	}
 	
 	@GET
-	@Path("/getImage/{questionId}/{imageType}")
-	//@Produces(MediaType.MULTIPART_FORM_DATA)
-	@Produces("image/png")
-	public Response getImage(@PathParam("questionId") Integer questionId, @PathParam("imageType") String imageType) {
-		//LoggingUtil.logObject("Image request:", userId);
+	@Path("/document/{docId}")
+	@Produces(MediaType.MULTIPART_FORM_DATA)
+	//@Produces("image/png")
+	public Response getDocument(@PathParam("docId") Integer documentId) {
+		LoggingUtil.logMessage("Image request:" + documentId);
 		try {
-			EdoFile file = userBo.getQuestionImage(questionId, imageType, null);
+			EdoFile file = userBo.getDocument(documentId);
 			if(file != null) {
 				ResponseBuilder response = Response.ok(file.getContent());
-				//response.header("Content-Disposition", "filename=" + file.getFileName());
+				response.header("Content-Disposition", "filename=" + file.getFileName());
+				if(file.getContentType() != null) {
+					response.header("Content-Type", file.getContentType());
+				}
 				return response.build();
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return null;
+	}
+	
+	@GET
+	@Path("/getVideo/{docId}")
+	//@Produces(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoFile getVideo(@PathParam("docId") Integer videoId) {
+		LoggingUtil.logMessage("Video request:" + videoId);
+		try {
+			return userBo.getVideo(videoId);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return new EdoFile();
 	}
 	
 	@GET
@@ -426,26 +446,21 @@ public class EdoUserController {
 	}
 	
 	@POST
-	@Path("/uploadVideoLecture")
+	@Path("/uploadContent")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadVideoLecture(@FormDataParam("data") InputStream videoData, @FormDataParam("data") FormDataContentDisposition videoDetails,
-			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, 
-			@FormDataParam("title") String title, @FormDataParam("packageId") Integer packageId, @FormDataParam("topicId") Integer topicId, 
-			@FormDataParam("keywords") String keywords, @FormDataParam("questionFile") InputStream questionFile, @FormDataParam("questionFile") FormDataContentDisposition questionFileDetails) {
-		LoggingUtil.logMessage("Upload video :" + title, LoggingUtil.videoLogger);
+			@FormDataParam("info") String info, @FormDataParam("maps") String maps) {
+		LoggingUtil.logMessage("Upload content request :" + info, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			String questionFileName = "";
-			if(questionFileDetails != null) {
-				questionFileName = questionFileDetails.getFileName();
-			}
-			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileName);
+			EdoClasswork classwork = new ObjectMapper().readValue(info, EdoClasswork.class);
+			return userBo.uploadVideo(videoData, classwork, maps, videoDetails.getFileName());
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));
 		}
-		LoggingUtil.logMessage("Upload video Response", LoggingUtil.videoLogger);
+		LoggingUtil.logMessage("Upload content Response", LoggingUtil.videoLogger);
 		return response;
 	}
 	
@@ -507,6 +522,42 @@ public class EdoUserController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return null;
+	}
+	
+	@POST
+	@Path("/sendMails")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse sendMails(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Send mail request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.sendEmail(request));
+		LoggingUtil.logObject("Send mail response ", response);
+		return response;
+	}
+	
+	@POST
+	@Path("/updateDeviceId")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateDeviceId(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Update device id request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.addDeviceId(request));
+		LoggingUtil.logObject("Update device Id response ", response);
+		return response;
+	}
+	
+	@POST
+	@Path("/sendNotification")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse sendNotification(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Send notification request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.sendNotification(request));
+		LoggingUtil.logObject("Send notification response ", response);
+		return response;
 	}
 	
 }

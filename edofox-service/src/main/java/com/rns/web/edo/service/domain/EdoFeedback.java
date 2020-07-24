@@ -25,6 +25,7 @@ public class EdoFeedback {
 	private Float percentViewed;
 	private Float durationViewed;
 	private Integer foundationId;
+	private int downloaded;
 	
 	public String getFeedback() {
 		return feedback;
@@ -121,6 +122,12 @@ public class EdoFeedback {
 	}
 	public void setFoundationId(Integer foundationId) {
 		this.foundationId = foundationId;
+	}
+	public int getDownloaded() {
+		return downloaded;
+	}
+	public void setDownloaded(int downloaded) {
+		this.downloaded = downloaded;
 	}
 	
 
