@@ -36,6 +36,9 @@
 		<result column="optionCount" property="analysis.optionCount" />
 		<result column="option_selected" property="analysis.optionSelected" />
 		<result column="subject" property="subject" />
+		<result column="correctCount" property="analysis.correctCount"/>
+		<result column="wrongCount" property="analysis.wrongCount"/>
+		<result column="solvedCount" property="analysis.solvedCount"/>
 		
 	</resultMap>
 	
@@ -53,6 +56,20 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
 		left join (select count(*) as optionCount,test_id, question_id, option_selected from test_result group by option_selected, test_id, question_id) as result
 		on result.question_id = test_questions_map.question_id where test_questions_map.test_id = ${value};
+	</select>
+	
+	<select id="getQuestionCorrectness" resultMap="questionAnalysis" parameterType="Integer">
+		select count(*) as solvedCount,test_result.question_id,correctQuery.correctCount, wrongQuery.wrongCount from test_result 
+        left join 
+        (select count(*) as correctCount, question_id from test_result 
+        where test_id = ${value} AND option_selected != '' AND marks &gt; 0
+        group by question_id) as correctQuery on test_result.question_id = correctQuery.question_id
+        left join
+        (select count(*) as wrongCount, question_id from test_result 
+        where test_id = ${value} AND option_selected != '' AND marks &lt;= 0
+        group by question_id) as wrongQuery on test_result.question_id = wrongQuery.question_id
+        where test_result.test_id = ${value} AND test_result.option_selected != ''
+        group by test_result.question_id
 	</select>
 	
 	<resultMap id="students" type="com.rns.web.edo.service.domain.EdoStudent">
@@ -114,6 +131,13 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		join test_questions on test_result.question_id = test_questions.id 
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id 
 		where test_id = ${test} AND student_id = ${student} GROUP BY test_result.student_id,test_questions.subject_id
+	</select>
+	
+	<select id="getTestSubjects" resultMap="subjects" parameterType="Integer">
+	SELECT subject,test_questions.subject_id FROM `test_questions_map` 
+	join test_questions on test_questions_map.question_id = test_questions.id 
+	join test_subjects on test_questions.subject_id = test_subjects.subject_id 
+	where test_id = ${value} group by test_questions.subject_id order by subject asc
 	</select>
 	
 

@@ -78,7 +78,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	private ThreadPoolTaskExecutor executor;
 	private EdoTestsDao testsDao;
-	//private String filePath;
+
 	private DataSourceTransactionManager txManager;
 	private SessionFactory sessionFactory;
 	private Map<Integer, Integer> testSubmissions = new ConcurrentHashMap<Integer, Integer>();
@@ -91,6 +91,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return txManager;
 	}
 	
+
 	public ThreadPoolTaskExecutor getExecutor() {
 		return executor;
 	}
@@ -142,11 +143,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				test.setSolutionUrl(CommonUtils.prepareUrl(test.getSolutionUrl()));
 			}
 			
+
+			//Get question correctness analysis
+			List<EdoQuestion> questionCorrectness = null;
+			if(StringUtils.equals(test.getShowResult(), "Y")) {
+				questionCorrectness = testsDao.getQuestionCorrectness(test.getId());
+			}
+			
+			test.setSections(new ArrayList<String>());
+
+
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
 				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
 				CommonUtils.setQuestionURLs(question);
 				QuestionParser.fixQuestion(question);
+
+				prepareMatchTypeQuestion(question);
+
 				
 				//Add only if not disabled
 				if(question.getDisabled() != null && question.getDisabled() == 1) {
@@ -155,6 +169,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				
+
+				if(CollectionUtils.isNotEmpty(questionCorrectness)) {
+					for(EdoQuestion correctness: questionCorrectness) {
+						if(correctness.getQn_id() != null && question.getQn_id() != null && correctness.getQn_id().intValue() == question.getQn_id().intValue()) {
+							question.setAnalysis(correctness.getAnalysis());
+							break;
+						}
+					}
+				}
+				
+				if(StringUtils.isNotBlank(question.getSection())) {
+					if(!test.getSections().contains(question.getSection())) {
+						test.getSections().add(question.getSection());
+					}
+				}
+				
+
 				test.getTest().add(question);
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
@@ -177,6 +208,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setLectures(testsDao.getTestVideoLectures(test.getId()));
 			
 			response.setTest(test);
+
+		} else {
+			response.setStatus(new EdoApiStatus(-111, "Result not found. Please submit your exam first."));
+
 		}
 		
 		return response;
@@ -192,6 +227,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
+
+			Date startedDate = null;
+
 			if(studenId != null) {
 				inputMap.setStudent(new EdoStudent(studenId));
 				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
@@ -204,6 +242,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					return response;
 				}
 				
+
+				
+				if(studentMap != null) {
+					startedDate = studentMap.getCreatedDate();
+				}
+				
+
 				//Added on 11/12/19
 				if(studentMap == null) {
 					//Add test status as 'STARTED' to track students who logged in
@@ -268,6 +313,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(StringUtils.equals("1", result.getTimeConstraint())) {
 					Date startTime = result.getStartDate();
 					if(startTime != null) {
+
+						calculateTimeLeft(result, startTime);
+						
+					}
+				} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
+					if(startedDate != null) {
+						calculateTimeLeft(result, startedDate);
+					}
+
 						Long durationInMs = new Long(result.getDuration() * 1000);
 						long timeDifference = System.currentTimeMillis() - startTime.getTime();
 						if(timeDifference > 0) {
@@ -283,6 +337,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						}
 						
 					}
+
 				}
 				
 				Integer count = 1;
@@ -336,6 +391,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
+
+	private void calculateTimeLeft(EdoTest result, Date startTime) {
+		Long durationInMs = new Long(result.getDuration() * 1000);
+		long timeDifference = System.currentTimeMillis() - startTime.getTime();
+		if(timeDifference > 0) {
+			long timeLeft = durationInMs - timeDifference;
+			if(timeLeft < 0) {
+				result.setSecLeft(0L);
+				result.setMinLeft(0L);
+			} else {
+				long secondsDiff = timeLeft / 1000;
+				result.setSecLeft(secondsDiff % 60); //seconds left
+				result.setMinLeft(secondsDiff / 60);
+			}
+		}
+	}
+
+
 	private void randomizeQuestions(EdoTest result, Map<String, List<EdoQuestion>> sectionSets) {
 		if(CollectionUtils.isNotEmpty(sectionSets.keySet()) && result != null) {
 			List<EdoQuestion> shuffled = new ArrayList<EdoQuestion>();
@@ -380,6 +453,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						for(String right: rightCol) {
 							EdoComplexOption subOption = new EdoComplexOption();
 							subOption.setOptionName(right);
+
+							if(StringUtils.contains(question.getAnswer(), left + "-" + right)) {
+								subOption.setSelected(true);
+							}
+
 							subOptions.add(subOption);
 						}
 						if(CollectionUtils.isNotEmpty(subOptions)) {
@@ -1327,7 +1405,20 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return response;
 		}
 		try {
-			EDOPackage liveSession = testsDao.getLiveSession(request.getStudent().getCurrentPackage().getId());
+
+			
+			EDOPackage liveSession = null;
+			if(StringUtils.equals(request.getRequestType(), "package")) {
+				request.getStudent().getCurrentPackage().setStatus("Active");
+				List<EDOPackage> liveSessions = testsDao.getLiveSessions(request.getStudent().getCurrentPackage());
+				if(CollectionUtils.isNotEmpty(liveSessions)) {
+					liveSession = liveSessions.get(0);
+				}
+			} else {
+				liveSession = testsDao.getLiveSession(request.getStudent().getCurrentPackage().getId());
+			}
+			
+
 			if(liveSession != null) {
 				liveSession.setVideoUrl(prepareVimeoEmbedLink(liveSession.getVideoUrl()));
 				List<EDOPackage> pgs = new ArrayList<EDOPackage>();
@@ -1347,6 +1438,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	private String prepareVimeoEmbedLink(String url) {
 		return StringUtils.replace(url, "vimeo.com", "player.vimeo.com/video");
 	}
+
 
 	public EdoServiceResponse uploadVideo(InputStream videoData, EdoClasswork classwork, String maps, String fileName) {
 		EdoServiceResponse response = new EdoServiceResponse();
@@ -1515,6 +1607,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			 * testsDao.deductQuota(edoInstitute);
 			 */
 
+
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
@@ -1523,6 +1616,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return response;
 	}
+
+
 
 
 	private void updateKeywords(Integer instituteId, String keywords, Session session) {
@@ -1613,6 +1708,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
 			return status;
 		}
+
 		Session session = null;
 		try {
 			session = this.sessionFactory.openSession();
@@ -1637,6 +1733,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		} finally {
 			CommonUtils.closeSession(session);
+
 		}
 		return status;
 	}
@@ -1661,6 +1758,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 	}
+
 
 	public EdoApiStatus updateVideoLecture(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();
@@ -1735,6 +1833,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return response;
 	}
+
 
 	public EdoFile getDocument(Integer docId) {
 		if(docId == null) {

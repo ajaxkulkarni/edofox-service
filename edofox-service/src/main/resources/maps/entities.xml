@@ -89,4 +89,10 @@
 		<result column="status" property="status"/>
 	</resultMap>
 	
+	<resultMap type="com.rns.web.edo.service.domain.EdoSubject" id="subjects">
+		<id property="id" column="subject_id" />
+		<result property="subjectName" column="subject" />
+
+	</resultMap>
+	
 </mapper>

@@ -34,6 +34,7 @@ public class EdoTest {
 	private String showResult;
 	private String firebaseId;
 	private String timeConstraint;
+	private String studentTimeConstraint;
 	private Long minLeft;
 	private Long secLeft;
 	private String solutionUrl;
@@ -253,6 +254,14 @@ public class EdoTest {
 
 	public void setSolutionUrl(String solutionUrl) {
 		this.solutionUrl = solutionUrl;
+	}
+
+	public String getStudentTimeConstraint() {
+		return studentTimeConstraint;
+	}
+
+	public void setStudentTimeConstraint(String studentTimeConstraint) {
+		this.studentTimeConstraint = studentTimeConstraint;
 	}
 	
 }

@@ -14,6 +14,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -547,11 +548,35 @@ public class CommonUtils {
 		for(EdoTestStudentMap map: subjectScores) {
 			if(map.getStudent() != null && map.getStudent().getId().intValue() == student.getId().intValue() && map.getSubjectScore() != null ) {
 				subjectAnalysis.add(map.getSubjectScore());
-				if( !existing.getSubjects().contains(map.getSubjectScore().getSubject())) {
+				/*if(  !existing.getSubjects().contains(map.getSubjectScore().getSubject()) CollectionUtils.isEmpty(existing.getSubjects())) {
 					existing.getSubjects().add(map.getSubjectScore().getSubject());
+				}*/
+			}
+			
+		}
+		//Look for subject now found
+		for(String subject: existing.getSubjects()) {
+			boolean found = false;
+			for(EdoStudentSubjectAnalysis map: subjectAnalysis) {
+				if(subject.equals(map.getSubject())) {
+					found = true;
+					break;
 				}
 			}
+			if(!found) {
+				EdoStudentSubjectAnalysis analysis = new EdoStudentSubjectAnalysis();
+				analysis.setSubject(subject);
+				subjectAnalysis.add(analysis);
+			}
 		}
+		
+		Collections.sort(subjectAnalysis, new Comparator<EdoStudentSubjectAnalysis>() {
+
+			public int compare(EdoStudentSubjectAnalysis o1, EdoStudentSubjectAnalysis o2) {
+				return o1.getSubject().compareTo(o2.getSubject());
+			}
+		});
+		
 		return subjectAnalysis;
 	}
 
@@ -570,6 +595,7 @@ public class CommonUtils {
 		// System.out.println(calculateMatchScore(question, answer));
 */		
 		//String languageCode = RakeLanguages.EN;
+		System.out.println("Physics".compareTo("Physics"));
 	}
 	
 	public static void setQuestionURLs(EdoQuestion question) {

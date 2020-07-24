@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -41,24 +42,11 @@
 		<result column="partial" property="question.partialCorrection"/>
 		<result column="solution" property="question.solution"/>
 		<result column="solution_img_url" property="question.solutionImageUrl"/>
-		
+		<result column="chapter" property="question.chapter.chapterId" />
+		<result column="chapter_name" property="question.chapter.chapterName" />
+		<result column="level" property="question.level" />
 	</resultMap>
 
-
-	<select id="getExam" resultMap="testQuestionsMap" parameterType="Integer">
-		SELECT *,test_questions.status as qStatus FROM test
-		join test_questions_map on test.test_id =
-		test_questions_map.test_id
-		join test_questions on
-		test_questions_map.question_id = test_questions.id
-		join test_subjects
-		on test_questions.subject_id = test_subjects.subject_id
-		where
-		test.test_id = ${value} 
-		AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)
-		order by test_questions_map.question_number,test_questions_map.id asc
-
-	</select>
 
 	<resultMap id="testStudentMap" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
 		<result column="id" property="mapId" />
@@ -70,19 +58,6 @@
 		<result column="test_ui" property="test.testUi"/>
 	</resultMap>
 
-	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
-		SELECT * FROM test_status where student_id=${student.id} AND test_id=${test.id}
-	</select>
-	
-	<!-- result maps -->
-	
-	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">
-		SELECT * FROM test_questions_map 
-		join test_questions on test_questions_map.question_id = test_questions.id
-		where test_questions_map.test_id = ${value} order by test_questions_map.id asc
-
-	</select>
-	
 	<resultMap id="testAnswersMap" type="com.rns.web.edo.service.domain.EdoTestQuestionMap">
 		<result column="question_id" property="question.qn_id" />
 		<result column="question" property="question.question" />
@@ -119,7 +94,44 @@
 		<result column="status" property="question.status"/>
 		<result column="question_disabled" property="question.disabled"/>
 		<result column="questionStatus" property="question.status"/>
+		<result column="chapter" property="question.chapter.chapterId"/>
+		<result column="chapter_name" property="question.chapter.chapterName"/>
+		<result column="level" property="question.level"/>
+		<result column="question_type" property="question.type"/>
+		<result column="section" property="question.section" />
 	</resultMap>
+	
+
+
+	<select id="getExam" resultMap="testQuestionsMap" parameterType="Integer">
+		SELECT *,test_questions.status as qStatus FROM test
+		join test_questions_map on test.test_id =
+		test_questions_map.test_id
+		join test_questions on
+		test_questions_map.question_id = test_questions.id
+		join test_subjects
+		on test_questions.subject_id = test_subjects.subject_id
+		where
+		test.test_id = ${value} 
+		AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)
+		order by test_questions_map.question_number,test_questions_map.id asc
+
+	</select>
+
+
+	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
+		SELECT * FROM test_status where student_id=${student.id} AND test_id=${test.id}
+	</select>
+	
+	<!-- result maps -->
+	
+	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">
+		SELECT * FROM test_questions_map 
+		join test_questions on test_questions_map.question_id = test_questions.id
+		where test_questions_map.test_id = ${value} order by test_questions_map.id asc
+
+	</select>
+	
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		SELECT *,test_result.id as mapId,test_questions.status as questionStatus FROM test 
@@ -154,5 +166,6 @@
 	<select id="getLastQuestionNumber" resultType="Integer" parameterType="Integer">
 		SELECT question_number FROM test_questions_map where test_id = ${value} order by question_number desc limit 1;
 	</select>
+
 
 </mapper>

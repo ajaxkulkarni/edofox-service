@@ -12,6 +12,8 @@ public class EDOQuestionAnalysis {
 	private Integer option3Count;
 	private Integer option4Count;
 	private Integer correctCount;
+	private Integer solvedCount;
+	private Integer wrongCount;
 	private BigDecimal option1percent;
 	private BigDecimal option2percent;
 	private BigDecimal option3percent;
@@ -149,6 +151,18 @@ public class EDOQuestionAnalysis {
 	}
 	public void setQuestionType(String questionType) {
 		this.questionType = questionType;
+	}
+	public Integer getSolvedCount() {
+		return solvedCount;
+	}
+	public void setSolvedCount(Integer solvedCount) {
+		this.solvedCount = solvedCount;
+	}
+	public Integer getWrongCount() {
+		return wrongCount;
+	}
+	public void setWrongCount(Integer wrongCount) {
+		this.wrongCount = wrongCount;
 	}
 	
 	
