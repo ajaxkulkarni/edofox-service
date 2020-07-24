@@ -268,7 +268,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				//Added on 11/12/19
 				
-				studentMaps = testsDao.getStudentActivePackage(inputMap);
+				/*studentMaps = testsDao.getStudentActivePackage(inputMap);
 				
 				if(CollectionUtils.isNotEmpty(studentMaps)) {
 					studentMap = studentMaps.get(0);
@@ -280,7 +280,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					//Test or package not active
 					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_PAID, ERROR_TEST_NOT_PAID));
 					return response;
-				}
+				}*/
 				
 				if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
 					if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
@@ -313,33 +313,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(StringUtils.equals("1", result.getTimeConstraint())) {
 					Date startTime = result.getStartDate();
 					if(startTime != null) {
-
 						calculateTimeLeft(result, startTime);
-						
 					}
 				} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
 					if(startedDate != null) {
 						calculateTimeLeft(result, startedDate);
 					}
+				} 
 
-						Long durationInMs = new Long(result.getDuration() * 1000);
-						long timeDifference = System.currentTimeMillis() - startTime.getTime();
-						if(timeDifference > 0) {
-							long timeLeft = durationInMs - timeDifference;
-							if(timeLeft < 0) {
-								result.setSecLeft(0L);
-								result.setMinLeft(0L);
-							} else {
-								long secondsDiff = timeLeft / 1000;
-								result.setSecLeft(secondsDiff % 60); //seconds left
-								result.setMinLeft(secondsDiff / 60);
-							}
-						}
-						
-					}
-
-				}
-				
 				Integer count = 1;
 				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
 				for(EdoTestQuestionMap mapper: map) {

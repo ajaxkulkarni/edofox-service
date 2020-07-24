@@ -25,7 +25,6 @@ import org.apache.http.ssl.TrustStrategy;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jettison.json.JSONObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

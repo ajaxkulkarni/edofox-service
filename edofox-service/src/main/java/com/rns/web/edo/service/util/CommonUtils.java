@@ -600,9 +600,17 @@ public class CommonUtils {
 	
 	public static void setQuestionURLs(EdoQuestion question) {
 		
+		if(StringUtils.isBlank(question.getQuestionImageUrl())) {
+			return;
+		}
+		
 		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
 		
-		String absoluteUrls = EdoPropertyUtil.getProperty(EdoPropertyUtil.ABSOLUTE_IMAGE_URLS);
+		if(StringUtils.contains(question.getQuestionImageUrl(), "http")) {
+			return;
+		}
+		
+		/*String absoluteUrls = EdoPropertyUtil.getProperty(EdoPropertyUtil.ABSOLUTE_IMAGE_URLS);
 		if(StringUtils.equals(absoluteUrls, "true") && !StringUtils.contains(question.getQuestionImageUrl(), "home")) {
 			if(!StringUtils.contains(question.getQuestionImageUrl(), "http") && !StringUtils.contains(question.getQuestionImageUrl(), "https")) {
 				question.setQuestionImageUrl("http://" + question.getQuestionImageUrl());
@@ -610,6 +618,7 @@ public class CommonUtils {
 			LoggingUtil.logMessage("Setting question image ==> " + question.getQuestionImageUrl() + " ABS URL ==> " + absoluteUrls);
 			return;
 		}
+		*/
 		
 		if(/*EdoConstants.ABSOLUTE_IMAGE_URLS || */StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {

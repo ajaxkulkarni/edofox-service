@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -53,8 +52,8 @@
 		<result column="testStatus" property="status" />
 		<result column="start_date" property="test.startDate"/>
 		<result column="end_date" property="test.endDate"/>
-		<result column="registerDate" property="registerDate"/>
-		<result column="student_access" property="studentAccess"/>
+		<!-- <result column="registerDate" property="registerDate"/>
+		<result column="student_access" property="studentAccess"/> -->
 		<result column="test_ui" property="test.testUi"/>
 	</resultMap>
 
@@ -104,15 +103,15 @@
 
 
 	<select id="getExam" resultMap="testQuestionsMap" parameterType="Integer">
-		SELECT *,test_questions.status as qStatus FROM test
-		join test_questions_map on test.test_id =
+		SELECT *,test_questions.status as qStatus FROM exam_details
+		join test_questions_map on exam_details.id =
 		test_questions_map.test_id
 		join test_questions on
 		test_questions_map.question_id = test_questions.id
-		join test_subjects
-		on test_questions.subject_id = test_subjects.subject_id
+		join subjects
+		on test_questions.subject_id = subjects.id
 		where
-		test.test_id = ${value} 
+		exam_details.id = ${value} 
 		AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)
 		order by test_questions_map.question_number,test_questions_map.id asc
 
@@ -120,7 +119,7 @@
 
 
 	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
-		SELECT * FROM test_status where student_id=${student.id} AND test_id=${test.id}
+		SELECT * FROM exam_results where stu_id=${student.id} AND exam_id=${test.id}
 	</select>
 	
 	<!-- result maps -->

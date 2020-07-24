@@ -198,6 +198,7 @@ public class EdoServiceRequest {
 
 	public void setSearchFilter(String searchFilter) {
 		this.searchFilter = searchFilter;
+	}
 
 	public EdoMailer getMailer() {
 		return mailer;
