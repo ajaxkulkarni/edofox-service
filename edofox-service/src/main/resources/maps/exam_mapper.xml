@@ -78,15 +78,15 @@
 		<result column="solution" property="question.solution" />
 		<result column="mapId" property="question.mapId"/>
 		<result column="marks" property="question.marks"/>
-		<result column="test_id" property="test.id" />
-		<result column="test_name" property="test.name" />
+		<result column="exam_id" property="test.id" />
+		<result column="exam_name" property="test.name" />
 		<result column="solutions_pdf_url" property="test.solutionUrl" />
 		<result column="no_of_questions" property="test.noOfQuestions" />
 		<result column="total_marks" property="test.totalMarks" />
 		<result column="duration" property="test.duration" />
 		<result column="score" property="test.score"/>
 		<result column="solved" property="test.solvedCount"/>
-		<result column="correct" property="test.correctCount"/>
+		<result column="correct_ans" property="test.correctCount"/>
 		<result column="flagged" property="test.flaggedCount"/>
 		<result column="show_result" property="test.showResult" />
 		<result column="time_taken" property="question.timeSpent" />
@@ -133,14 +133,14 @@
 	
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		SELECT *,test_result.id as mapId,test_questions.status as questionStatus FROM test 
-		join test_questions_map on test.test_id = test_questions_map.test_id
+		SELECT *,exam_results.id as mapId,test_questions.status as questionStatus FROM exam_details 
+		join test_questions_map on exam_details.id = test_questions_map.test_id
 		join test_questions on test_questions_map.question_id = test_questions.id
-		join test_subjects on test_questions.subject_id = test_subjects.subject_id
-		left join test_status on test.test_id = test_status.test_id
-		left join test_result on test.test_id = test_result.test_id AND test_status.student_id = test_result.student_id AND test_questions.id = test_result.question_id
+		join subjects on test_questions.subject_id = subjects.id
+		left join exam_results on exam_details.id = exam_results.exam_id
+		left join test_result on exam_details.id = test_result.test_id AND exam_results.stu_id = test_result.student_id AND test_questions.id = test_result.question_id
 		where
-		test.test_id = ${test.id} AND test_status.student_id = ${student.id} AND test_status.student_id AND question_disabled = 0 order by test_questions_map.id asc
+		exam_details.id = ${test.id} AND exam_results.stu_id = ${student.id} AND question_disabled = 0 order by test_questions_map.id asc
 
 	</select>
 	
@@ -150,8 +150,11 @@
 	</select>
 	
 	<select id="getStudentActivePackage"  parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap" resultMap="testStudentMap" >
-		SELECT *, test.status as testStatus, student_institute.created_date as registerDate FROM student_institute join test on student_institute.package_id = test.package_id 
-		where test_id = ${test.id} AND student_id = ${student.id} AND (student_institute.status = 'Completed' OR student_institute.student_access = 'Admin') ;
+		SELECT *, test.status as testStatus 
+		FROM student_institute join test on student_institute.package_id = test.package_id 
+		where exam_id = ${test.id} 
+		AND stu_id = ${student.id} 
+		<!-- AND (student_institute.status = 'Completed' OR student_institute.student_access = 'Admin') --> ;
 	</select>
 	
 	<select id="getTest" resultMap="test" parameterType="Integer">

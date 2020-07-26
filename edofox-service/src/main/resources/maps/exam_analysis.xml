@@ -7,7 +7,7 @@
 	<resultMap id="examAnalysis" type="com.rns.web.edo.service.domain.EdoTest">
 
 		<result column="testId" property="id" />
-		<result column="test_name" property="name" />
+		<result column="exam_name" property="name" />
 		<result column="no_of_questions" property="noOfQuestions" />
 		<result column="total_marks" property="totalMarks" />
 		<result column="duration" property="duration" />
@@ -127,9 +127,9 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	</select>
 	
 	<select id="getSubjectwiseScoreStudent" resultMap="subjectScore" parameterType="map">
-		SELECT sum(marks) as score, test_subjects.subject, student_id FROM `test_result` 
+		SELECT sum(marks) as score, subjects.subject_name, student_id FROM `test_result` 
 		join test_questions on test_result.question_id = test_questions.id 
-		join test_subjects on test_questions.subject_id = test_subjects.subject_id 
+		join subjects on test_questions.subject_id = subjects.id 
 		where test_id = ${test} AND student_id = ${student} GROUP BY test_result.student_id,test_questions.subject_id
 	</select>
 	

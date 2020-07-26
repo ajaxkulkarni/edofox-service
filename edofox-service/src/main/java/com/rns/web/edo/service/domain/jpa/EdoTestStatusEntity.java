@@ -14,7 +14,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
-@Table(name = "test_status")
+@Table(name = "exam_results")
 @DynamicUpdate
 public class EdoTestStatusEntity {
 	
@@ -22,9 +22,9 @@ public class EdoTestStatusEntity {
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "id", unique = true)
 	private Integer id;
-	@Column(name = "test_id", unique = true)
+	@Column(name = "exam_id", unique = true)
 	private Integer testId;
-	@Column(name = "student_id", unique = true)
+	@Column(name = "stu_id", unique = true)
 	private Integer studentId;
 	@Column(name = "status", unique = true)
 	private String status;
@@ -32,7 +32,7 @@ public class EdoTestStatusEntity {
 	private Integer solved;
 	@Column(name = "flagged", unique = true)
 	private Integer flagged;
-	@Column(name = "correct", unique = true)
+	@Column(name = "correct_ans", unique = true)
 	private Integer correct;
 	@Column(name = "score", unique = true)
 	private BigDecimal score;

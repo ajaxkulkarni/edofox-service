@@ -205,7 +205,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			//Fetch video lectures for test (if any)
-			response.setLectures(testsDao.getTestVideoLectures(test.getId()));
+			//TODO later if needed response.setLectures(testsDao.getTestVideoLectures(test.getId()));
 			
 			response.setTest(test);
 
@@ -217,7 +217,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	public EdoServiceResponse getTest(Integer testId, Integer studenId) {
+	public EdoServiceResponse getTest(Integer testId, Integer studentId) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		if(testId == null) {
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
@@ -230,8 +230,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 			Date startedDate = null;
 
-			if(studenId != null) {
-				inputMap.setStudent(new EdoStudent(studenId));
+			if(studentId != null) {
+				inputMap.setStudent(new EdoStudent(studentId));
 				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
 				EdoTestStudentMap studentMap = null;
 				if(CollectionUtils.isNotEmpty(studentMaps)) {
@@ -254,7 +254,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					//Add test status as 'STARTED' to track students who logged in
 					EdoServiceRequest request = new EdoServiceRequest();
 					EdoStudent student = new EdoStudent();
-					student.setId(studenId);
+					student.setId(studentId);
 					request.setStudent(student);
 					EdoTest test = new EdoTest();
 					test.setId(testId);
@@ -282,7 +282,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					return response;
 				}*/
 				
-				if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
+				/*if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
 					if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
 						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
 						return response;
@@ -301,7 +301,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							}
 						}
 					}
-				}
+				}*/
 				
 			}
 			
@@ -309,6 +309,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			if(CollectionUtils.isNotEmpty(map)) {
 				EdoTest result = map.get(0).getTest();
+				
+				//Check if test exists
+				if(result != null && studentId != null) {
+					if(result.getStartDate() != null && result.getStartDate().getTime() > new Date().getTime()) {
+						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be available on " + CommonUtils.convertDate(result.getStartDate())));
+						return response;
+					}
+					if(result.getEndDate() != null && result.getEndDate().getTime() < new Date().getTime()) {
+						response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
+						return response;
+					}
+				}
+				
 				//Check if time constraint is present
 				if(StringUtils.equals("1", result.getTimeConstraint())) {
 					Date startTime = result.getStartDate();
@@ -331,7 +344,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						prepareMatchTypeQuestion(question);
 						QuestionParser.fixQuestion(question);
 						//Don't show answers in case of student getTest call
-						if(studenId != null) {
+						if(studentId != null) {
 							question.setCorrectAnswer(null);
 							question.setAlternateAnswer(null);
 							question.setSolution(null);
@@ -357,7 +370,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						count++;
 					}
 				}
-				if(isRandomizeQuestions(result) && studenId != null) {
+				if(isRandomizeQuestions(result) && studentId != null) {
 					//Randomize only for student NOT for Admin
 					randomizeQuestions(result, sectionSets);
 				}
