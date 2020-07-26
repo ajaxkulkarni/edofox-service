@@ -1438,45 +1438,55 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		try {
 			String sourceDir = TEMP_QUESTION_PATH + request.getTest().getId();
 			File source = new File(sourceDir);
-			String destinationDir = TEST_QUESTION_PATH /*+ request.getTest().getId()*/;
+			String destinationDir = TEST_QUESTION_PATH + request.getTest().getId();
 			File destination = new File(destinationDir);
-			if(destination.exists()) {
-				//destination.mkdirs();
-				FileUtils.deleteDirectory(destination);
+			if(!destination.exists()) {
+				destination.mkdirs();
+				//FileUtils.deleteDirectory(destination);
 			}
-			LoggingUtil.logMessage("Moving temp directory " + sourceDir + " to " + destinationDir);
-			FileUtils.copyDirectoryToDirectory(source, destination);
-			for(EdoQuestion question: request.getTest().getTest()) {
-				question.setQuestionImageUrl(destinationDir + request.getTest().getId()  + "/" + EdoPDFUtil.QUESTION_PREFIX + question.getQuestionNumber() + ".png");
-				if(StringUtils.isBlank(question.getType())) {
-					question.setType("SINGLE");
+			if(ArrayUtils.isNotEmpty(source.listFiles())) {
+			
+				LoggingUtil.logMessage("Moving all files from directory " + sourceDir + " to " + destinationDir);
+				//FileUtils.copyDirectoryToDirectory(source, destination);
+				int count = 0;
+				for(File file: source.listFiles()) {
+					FileUtils.copyFile(file, new File(destinationDir + "/" + file.getName()));
+					count++;
 				}
-				if(question.getExamType() == null) {
-					question.setExamType("");
+				LoggingUtil.logMessage("Moved " + count + "  files from directory " + sourceDir + " to " + destinationDir);
+				
+				for(EdoQuestion question: request.getTest().getTest()) {
+					question.setQuestionImageUrl(destinationDir + "/" + EdoPDFUtil.QUESTION_PREFIX + question.getQuestionNumber() + ".png");
+					if(StringUtils.isBlank(question.getType())) {
+						question.setType("SINGLE");
+					}
+					if(question.getExamType() == null) {
+						question.setExamType("");
+					}
+					if(question.getCorrectAnswer() == null) {
+						question.setCorrectAnswer("");
+					}
+					if(question.getNegativeMarks() == null) {
+						question.setNegativeMarks(0f);
+					}
+					if(question.getWeightage() == null) {
+						question.setWeightage(1f);
+					}
+					if(StringUtils.isBlank(question.getOption1())) {
+						question.setOption1("1)");
+						question.setOption2("2)");
+						question.setOption3("3)");
+						question.setOption4("4)");
+					}
+					if(question.getQn_id() == null) {
+						question.setQn_id(question.getQuestionNumber());
+					}
+					testsDao.addQuestion(question);
 				}
-				if(question.getCorrectAnswer() == null) {
-					question.setCorrectAnswer("");
-				}
-				if(question.getNegativeMarks() == null) {
-					question.setNegativeMarks(0f);
-				}
-				if(question.getWeightage() == null) {
-					question.setWeightage(1f);
-				}
-				if(StringUtils.isBlank(question.getOption1())) {
-					question.setOption1("1)");
-					question.setOption2("2)");
-					question.setOption3("3)");
-					question.setOption4("4)");
-				}
-				if(question.getQn_id() == null) {
-					question.setQn_id(question.getQuestionNumber());
-				}
-				testsDao.addQuestion(question);
+				testsDao.createExam(request);
+				txManager.commit(txStatus);
+				FileUtils.deleteDirectory(source);
 			}
-			testsDao.createExam(request);
-			txManager.commit(txStatus);
-			FileUtils.deleteDirectory(source);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111,ERROR_IN_PROCESSING);
