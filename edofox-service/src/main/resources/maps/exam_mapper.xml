@@ -25,7 +25,7 @@
 		<result column="section" property="question.section" />
 		<result column="question_number" property="question.questionNumber"/>
 		<result column="test_id" property="test.id" />
-		<result column="test_name" property="test.name" />
+		<result column="exam_name" property="test.name" />
 		<result column="no_of_questions" property="test.noOfQuestions" />
 		<result column="total_marks" property="test.totalMarks" />
 		<result column="duration" property="test.duration" />
