@@ -101,7 +101,30 @@ public class EdoPDFUtil {
 								}
 							} else if (StringUtils.contains(text, questionNumberPrefix + questionCount + questionNumberSuffix)) {
 								//if(withinRange()) {
-									EdoPDFCoordinate coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), firstProsition.getPageWidth(), questionCount);
+									
+									//Find start X based on question suffix/prefix
+									if(StringUtils.isNotBlank(questionNumberSuffix)) {
+										for(TextPosition position: textPositions) {
+											if(position.toString().equals(questionNumberSuffix)) {
+												firstProsition = position;
+												break;
+											}
+										}
+									} else {
+										for(TextPosition position: textPositions) {
+											if(position.toString().equals(new Integer(questionCount).toString())) {
+												firstProsition = position;
+												break;
+											}
+										}
+									}
+								
+									//Width of the line is last character X of the first line - first X
+									//TextPosition lastCharacter = textPositions.get(textPositions.size() - 1);
+									//float width = lastCharacter.getEndX() - firstProsition.getEndX();
+									float width = firstProsition.getPageWidth();
+									
+									EdoPDFCoordinate coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), width, questionCount);
 									//coord.setHeight(firstProsition.getHeight());
 									List<EdoPDFCoordinate> coordList = coordinates.get(pg);
 									if(coordList == null) {
@@ -110,7 +133,7 @@ public class EdoPDFUtil {
 									coordList.add(coord);
 									//coord.setPage(pg);
 									coordinates.put(pg, coordList);
-									System.out.println(questionCount + ":" + firstProsition.getEndX() + " - " + firstProsition.getEndY() + " width " + firstProsition.getHeight() + " pg w " + firstProsition.getPageWidth() +  " for " + text);
+									System.out.println(questionCount + ":" + coord.getX() + " - " + coord.getY() + " width " + coord.getHeight() + " pg w " + coord.getWidth() +  " for " + text);
 								//}
 								questionCount++;
 							}
@@ -160,7 +183,8 @@ public class EdoPDFUtil {
 						float y = edoPDFCoordinate.getY() + edoPDFCoordinate.getHeight() + buffer;
 						float width = edoPDFCoordinate.getWidth();
 						float height = list.get(i - 1).getY() - edoPDFCoordinate.getY() + buffer;
-						cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber);
+						Float x = edoPDFCoordinate.getX();
+						cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber, x);
 						EdoQuestion question = new EdoQuestion();
 						question.setQuestionNumber(questionNumber);
 						question.setQuestionImageUrl(getQuestionUrl(testId, questionNumber));
@@ -176,7 +200,7 @@ public class EdoPDFUtil {
 							}
 							//for last item
 							height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + buffer;
-							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, startY, edoPDFCoordinate.getWidth(), height, list.get(i).getQuestionNumber());
+							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, startY, edoPDFCoordinate.getWidth(), height, list.get(i).getQuestionNumber(), list.get(i).getX());
 							EdoQuestion lastQuestion = new EdoQuestion();
 							lastQuestion.setQuestionNumber(list.get(i).getQuestionNumber());
 							lastQuestion.setQuestionImageUrl(getQuestionUrl(testId, questionNumber));
@@ -262,8 +286,12 @@ public class EdoPDFUtil {
 
 
 	private static BufferedImage cropQuestion(String outputFolder, PDFRenderer pdfRenderer, int pgNo, PDPage page, List<EdoPDFCoordinate> list, int i,
-			float y, float width, float height, Integer questionNumber) throws IOException {
-		page.setCropBox(new PDRectangle(0, y, width, height));
+			float y, float width, float height, Integer questionNumber, Float x) throws IOException {
+		float xCoord = 0;
+		if(x != null) {
+			xCoord = x;
+		}
+		page.setCropBox(new PDRectangle(xCoord, y, width, height));
 		//document.save(OUT + "Test_new.pdf");
 		BufferedImage bim = pdfRenderer.renderImageWithDPI(pgNo, 300, ImageType.RGB);
 		File output = new File(outputFolder);

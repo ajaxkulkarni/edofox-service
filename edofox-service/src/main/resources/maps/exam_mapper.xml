@@ -13,7 +13,7 @@
 		<result column="option3" property="question.option3" />
 		<result column="option4" property="question.option4" />
 		<result column="option5" property="question.option5" />
-		<result column="subject" property="question.subject" />
+		<result column="subject_name" property="question.subject" />
 		<result column="question_img_url" property="question.questionImageUrl" />
 		<result column="option1_img_url" property="question.option1ImageUrl" />
 		<result column="option2_img_url" property="question.option2ImageUrl" />
@@ -64,7 +64,7 @@
 		<result column="option2" property="question.option2" />
 		<result column="option3" property="question.option3" />
 		<result column="option4" property="question.option4" />
-		<result column="subject" property="question.subject" />
+		<result column="subject_name" property="question.subject" />
 		<result column="correct_answer" property="question.correctAnswer"/>
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>
