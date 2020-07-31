@@ -90,8 +90,8 @@
 	</resultMap>
 	
 	<resultMap type="com.rns.web.edo.service.domain.EdoSubject" id="subjects">
-		<id property="id" column="subject_id" />
-		<result property="subjectName" column="subject" />
+		<id property="id" column="id" />
+		<result property="subjectName" column="subject_name" />
 
 	</resultMap>
 	

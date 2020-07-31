@@ -33,8 +33,8 @@
 	</insert>
 	
 	<update id="updateTestStatus" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		update test_status set solved = ${test.solvedCount}, correct_ans = ${test.correctCount}, score = ${test.score} 
-		where test_id = ${test.id} AND student_id = ${student.id}
+		update exam_results set solved = ${test.solvedCount}, correct_ans = ${test.correctCount}, score = ${test.score} 
+		where exam_id = ${test.id} AND stu_id = ${student.id}
 	</update>
 	
 	<!-- <update id="updateTestResult" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">

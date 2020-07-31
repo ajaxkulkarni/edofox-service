@@ -44,9 +44,9 @@
 	
 	
 	<select id="getExamAnalysis" resultMap="examAnalysis" parameterType="Integer">
-	select * from test left join 
-(select  count(student_id) as studentsAppeared, avg(score) as avgScore, avg(correct) as avgCorrect, avg(solved) as avgSolved, test_id as testId 
-from test_status group by test_id) as result on test.test_id = result.testId where test.test_id = ${value};
+	select * from exam_details left join 
+(select  count(stu_id) as studentsAppeared, avg(score) as avgScore, avg(correct_ans) as avgCorrect, avg(solved) as avgSolved, exam_id as testId 
+from exam_results group by exam_id) as result on exam_details.id = result.testId where exam_details.id = ${value};
 
 	</select>
 	
@@ -77,29 +77,35 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="studentId" property="id" />
 		<result column="name" property="name" />
 		<result column="email" property="email" />
-		<result column="roll_no" property="rollNo" />
-		<result column="mobile_no" property="phone"/>
+		<result column="roll_number" property="rollNo" />
+		<result column="mobile_number" property="phone"/>
 		<result column="caste_category" property="casteCategory" />
 		<result column="score" property="analysis.score" />
-		<result column="correct" property="analysis.correctCount" />
+		<result column="correct_ans" property="analysis.correctCount" />
 		<result column="solved" property="analysis.solvedCount" />
 		<result column="flagged" property="analysis.flaggedCount" />
 		<result column="parent_mobile_no" property="parentMobileNo"/>
 		<result column="school_district" property="schoolDistrict"/>
+		<result column="course_name" property="course"/>
+		<result column="division_name" property="division"/>
 		
 	</resultMap>
 	
 	
 	
 	<select id="getStudentResults" resultMap="students" parameterType="Integer">
-		select *,student.id as studentId from test_status join student on test_status.student_id = student.id where test_status.test_id = ${value} order by test_status.score desc
+		select *,student_information.id as studentId, concat(first_name, ' ', last_name) as name from exam_results join student_information 
+		on exam_results.stu_id = student_information.id 
+		left join courses on student_information.class = courses.id
+		left join divisions on student_information.division = divisions.id
+		where exam_results.exam_id = ${value} order by exam_results.score desc
 	</select>
 	
 	<resultMap id="subjectScore" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
 
 		<result column="student_id" property="student.id" />
 		<result column="score" property="subjectScore.score" />
-		<result column="subject" property="subjectScore.subject" />
+		<result column="subject_name" property="subjectScore.subject" />
 		<result column="totalQuestions" property="subjectScore.totalQuestions" />
 		<result column="negativeScore" property="subjectScore.deductions" />
 		<result column="solved" property="subjectScore.solvedCount" />
@@ -116,12 +122,12 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	</select> -->
 	
 	<select id="getSubjectwiseScore" resultMap="subjectScore" parameterType="Integer">
-		SELECT sum(marks) as score, count(*) as solved, test_subjects.subject, test_result.student_id,totalQuestions.totalQuestions,totalWrong.totalDeductions,totalWrong.negativeScore,totalIncorrect.incorrects FROM `test_result` 
+		SELECT sum(marks) as score, count(*) as solved, subjects.subject_name, test_result.student_id,totalQuestions.totalQuestions,totalWrong.totalDeductions,totalWrong.negativeScore,totalIncorrect.incorrects FROM `test_result` 
 		join test_questions on test_result.question_id = test_questions.id 
-		join test_subjects on test_questions.subject_id = test_subjects.subject_id 
-        left join (select count(*) as totalQuestions,subject_id from test_questions_map join test_questions on test_questions_map.question_id = test_questions.id where test_id = ${value} group by subject_id) as totalQuestions on totalQuestions.subject_id = test_subjects.subject_id 
-        left join (select count(*) as totalDeductions, sum(marks) as negativeScore,subject_id,student_id from test_result join test_questions on test_result.question_id = test_questions.id where test_id = ${value} AND marks &lt; 0 group by student_id, subject_id) as totalWrong on totalWrong.student_id = test_result.student_id AND  totalWrong.subject_id = test_subjects.subject_id
-		left join (select count(*) as incorrects, subject_id,student_id from test_result join test_questions on test_result.question_id = test_questions.id where test_id = ${value} AND marks &lt;= 0 AND length(option_selected) &gt; 0 group by student_id, subject_id) as totalIncorrect on totalIncorrect.student_id = test_result.student_id AND  totalIncorrect.subject_id = test_subjects.subject_id
+		join subjects on test_questions.subject_id = subjects.id 
+        left join (select count(*) as totalQuestions,subject_id from test_questions_map join test_questions on test_questions_map.question_id = test_questions.id where test_id = ${value} group by subject_id) as totalQuestions on totalQuestions.subject_id = subjects.id 
+        left join (select count(*) as totalDeductions, sum(marks) as negativeScore,subject_id,student_id from test_result join test_questions on test_result.question_id = test_questions.id where test_id = ${value} AND marks &lt; 0 group by student_id, subject_id) as totalWrong on totalWrong.student_id = test_result.student_id AND  totalWrong.subject_id = subjects.id
+		left join (select count(*) as incorrects, subject_id,student_id from test_result join test_questions on test_result.question_id = test_questions.id where test_id = ${value} AND marks &lt;= 0 AND length(option_selected) &gt; 0 group by student_id, subject_id) as totalIncorrect on totalIncorrect.student_id = test_result.student_id AND  totalIncorrect.subject_id = subjects.id
         where test_id = ${value} AND length(option_selected) > 0 GROUP BY test_result.student_id,test_questions.subject_id
 	
 	</select>
@@ -134,10 +140,10 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	</select>
 	
 	<select id="getTestSubjects" resultMap="subjects" parameterType="Integer">
-	SELECT subject,test_questions.subject_id FROM `test_questions_map` 
+	SELECT subject_name,test_questions.subject_id FROM `test_questions_map` 
 	join test_questions on test_questions_map.question_id = test_questions.id 
-	join test_subjects on test_questions.subject_id = test_subjects.subject_id 
-	where test_id = ${value} group by test_questions.subject_id order by subject asc
+	join subjects on test_questions.subject_id = subjects.id 
+	where test_id = ${value} group by test_questions.subject_id order by subject_name asc
 	</select>
 	
 

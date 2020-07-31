@@ -31,6 +31,8 @@ public class EdoStudent {
 	private String accessType;
 	private String username;
 	private String token;
+	private String course;
+	private String division;
 
 	public EdoStudent() {
 
@@ -214,6 +216,22 @@ public class EdoStudent {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public String getCourse() {
+		return course;
+	}
+
+	public void setCourse(String course) {
+		this.course = course;
+	}
+
+	public String getDivision() {
+		return division;
+	}
+
+	public void setDivision(String division) {
+		this.division = division;
 	}
 	
 }

@@ -158,7 +158,7 @@
 	</select>
 	
 	<select id="getTest" resultMap="test" parameterType="Integer">
-		SELECT * FROM test where test_id = ${value};
+		SELECT * FROM exam_details where id = ${value};
 	</select>
 	
 	<select id="getInstituteById" resultMap="institute" parameterType="Integer">
