@@ -1,5 +1,6 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -28,9 +29,11 @@ public class EdoServiceResponse {
 	private List<EdoVideoLectureMap> lectures;
 	private List<EdoTestStudentMap> maps;
 	private List<EdoSuggestion> suggestions;
+	private Date currentTime;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
+		setCurrentTime(new Date());
 	}
 	
 	public EdoServiceResponse(EdoApiStatus edoApiStatus) {
@@ -150,6 +153,14 @@ public class EdoServiceResponse {
 
 	public void setSuggestions(List<EdoSuggestion> suggestions) {
 		this.suggestions = suggestions;
+	}
+
+	public Date getCurrentTime() {
+		return currentTime;
+	}
+
+	public void setCurrentTime(Date currentTime) {
+		this.currentTime = currentTime;
 	}
 
 }

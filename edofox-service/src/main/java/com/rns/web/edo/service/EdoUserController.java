@@ -331,6 +331,13 @@ public class EdoUserController {
 	}
 	
 	@POST
+	@Path("/systemTime")
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse systemTime() {
+		return new EdoServiceResponse();
+	}
+	
+	@POST
 	@Path("/getVideoToken")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
