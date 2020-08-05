@@ -273,5 +273,9 @@
 		</if>
 		)
 	</insert>
+	
+	<select id="getDeeperRegistration" parameterType="String" resultMap="studentInfo">
+		SELECT concat(first_name, ' ', last_name) as name,email,mobile_no,application_id as roll_no, exams as package_name FROM `deeper_reg` where application_id = '${value}' LIMIT 1
+	</select>
 
 </mapper>

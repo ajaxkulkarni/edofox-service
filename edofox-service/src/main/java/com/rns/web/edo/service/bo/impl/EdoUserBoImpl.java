@@ -1677,4 +1677,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
+	public EdoServiceResponse getDeeperRegistration(String rollNo) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			response.setStudent(testsDao.getDeeperRegistration(rollNo));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			
+		}
+		return response;
+	}
+
 }

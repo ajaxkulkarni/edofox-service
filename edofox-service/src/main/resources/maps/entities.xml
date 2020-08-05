@@ -21,7 +21,8 @@
 		<result column="package_name" property="currentPackage.name"/>		
 		<result column="profile_pic" property="profilePic"/>	
 		<result column="institute_name" property="currentPackage.institute.name"/>	
-		<result column="paymentStatus" property="currentPackage.status"/>		
+		<result column="paymentStatus" property="currentPackage.status"/>
+		<result column="roll_no" property="rollNo"/>		
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">

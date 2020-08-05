@@ -516,4 +516,13 @@ public class EdoUserController {
 		return null;
 	}
 	
+	@POST
+	@Path("/searchForDeeperRegistration")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse searchForDeeperRegistration(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Deeper search request :" + request);
+		return userBo.getDeeperRegistration(request.getStudent().getRollNo());
+	}
+	
 }
