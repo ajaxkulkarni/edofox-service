@@ -160,7 +160,7 @@
 	<select id="getStudentByPayment" parameterType="String"
 		resultMap="studentInfo">
 		SELECT *,student_institute.status as
-		paymentStatus FROM student_institute
+		paymentStatus,institute.id as institute_id FROM student_institute
 		join student on student.id = student_institute.student_id
 		join packages on
 		student_institute.package_id = packages.id

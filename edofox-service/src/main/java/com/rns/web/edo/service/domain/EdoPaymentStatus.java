@@ -1,5 +1,7 @@
 package com.rns.web.edo.service.domain;
 
+import java.math.BigDecimal;
+
 import com.rns.web.edo.service.util.EdoConstants;
 
 public class EdoPaymentStatus extends EdoApiStatus {
@@ -8,6 +10,7 @@ public class EdoPaymentStatus extends EdoApiStatus {
 	private String paymentId;
 	private boolean offline;
 	private String mode;
+	private Double amount;
 	
 	public EdoPaymentStatus() {
 		setStatusCode(EdoConstants.STATUS_OK);
@@ -41,6 +44,14 @@ public class EdoPaymentStatus extends EdoApiStatus {
 
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
 	}
 	
 	

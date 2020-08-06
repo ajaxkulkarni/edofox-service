@@ -27,6 +27,7 @@ import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
@@ -241,13 +242,14 @@ public class EdoUserController {
 	//@Produces(MediaType.APPLICATION_JSON)
 	public Response processPayment(@QueryParam("id") String id, @QueryParam("transaction_id") String transactionId, @QueryParam("payment_id") String paymentId) {
 		LoggingUtil.logMessage("Process payment Request :" + id + " : " + transactionId, LoggingUtil.paymentLogger);
-		EdoApiStatus response = userBo.processPayment(id, transactionId, paymentId);
+		EdoPaymentStatus response = userBo.processPayment(id, transactionId, paymentId);
 		String urlString = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "payment.php?payment_id=" + id + "&status=";
 		if(response == null || response.getStatusCode() != EdoConstants.STATUS_OK) {
 			urlString = urlString + "Failed";
 		} else {
 			urlString = urlString + "Success";
 		}
+		urlString = urlString + "&amount=" + response.getAmount();
 		URI url = null;
 		try {
 			url = new URI(urlString);

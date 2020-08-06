@@ -855,8 +855,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		testsDao.createStudentPackage(student);
 	}
 
-	public EdoApiStatus processPayment(String id, String transactionId, String paymentId) {
-		EdoApiStatus status = new EdoApiStatus();
+	public EdoPaymentStatus processPayment(String id, String transactionId, String paymentId) {
+		//EdoApiStatus status = new EdoApiStatus();
+		EdoPaymentStatus status = new EdoPaymentStatus();
 		try {
 
 			List<EdoStudent> studentPackages = testsDao.getStudentByPayment(id);
@@ -890,7 +891,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						clientId = EdoPropertyUtil.getProperty("deeper.insta.client.id");
 						clientSecret = EdoPropertyUtil.getProperty("deeper.insta.client.secret");
 					}
-					boolean validPayment = PaymentUtil.getPaymentStatus(id, clientId, clientSecret);
+					boolean validPayment = PaymentUtil.getPaymentStatus(id, clientId, clientSecret, status);
 					if (validPayment) {
 						EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
 						paymentStatus.setPaymentId(id);

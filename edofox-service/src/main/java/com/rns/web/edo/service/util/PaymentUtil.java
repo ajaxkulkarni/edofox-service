@@ -127,7 +127,7 @@ public class PaymentUtil implements EdoConstants {
 		status.setResponseText(message);
 	}
 
-	public static boolean getPaymentStatus(String id, String clientId, String clientSecret) {
+	public static boolean getPaymentStatus(String id, String clientId, String clientSecret, EdoPaymentStatus status) {
 		try {
 			if(clientId == null) {
 				clientId = EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_ID);
@@ -140,6 +140,7 @@ public class PaymentUtil implements EdoConstants {
 			// print the status of the payment order.
 			LoggingUtil.logMessage("Payment status for id " + id + " is - " + paymentOrderDetailsResponse.getStatus());
 			if (StringUtils.equalsIgnoreCase(PAYMENT_STATUS_COMPLETED, paymentOrderDetailsResponse.getStatus())) {
+				status.setAmount(paymentOrderDetailsResponse.getAmount());
 				return true;
 			}
 		} catch (ConnectionException e) {

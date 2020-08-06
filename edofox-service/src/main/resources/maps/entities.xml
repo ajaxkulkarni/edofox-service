@@ -21,6 +21,7 @@
 		<result column="package_name" property="currentPackage.name"/>		
 		<result column="profile_pic" property="profilePic"/>	
 		<result column="institute_name" property="currentPackage.institute.name"/>	
+		<result column="institute_id" property="currentPackage.institute.id"/>	
 		<result column="paymentStatus" property="currentPackage.status"/>
 		<result column="roll_no" property="rollNo"/>		
 	</resultMap>
