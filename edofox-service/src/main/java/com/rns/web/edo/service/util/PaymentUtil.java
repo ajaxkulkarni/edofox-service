@@ -1,16 +1,11 @@
 package com.rns.web.edo.service.util;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.instamojo.wrapper.api.Instamojo;
 import com.instamojo.wrapper.api.InstamojoImpl;
@@ -28,14 +23,19 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.MultiPart;
 
 public class PaymentUtil implements EdoConstants {
 
-	public static EdoPaymentStatus paymentRequest(Double amount, EdoStudent student, Integer transactionId) {
+	public static EdoPaymentStatus paymentRequest(Double amount, EdoStudent student, Integer transactionId, String clientId, String clientSecret) {
+		
+		if(clientId == null) {
+			clientId = EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_ID);
+		}
+		if(clientSecret == null) {
+			clientSecret = EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_SECRET);
+		}
+		
 		EdoPaymentStatus status = new EdoPaymentStatus();
 		
 		PaymentOrder order = new PaymentOrder();
@@ -54,7 +54,7 @@ public class PaymentUtil implements EdoConstants {
 
 		try {
 			// gets the reference to the instamojo api
-			api = InstamojoImpl.getApi(EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_ID), EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_SECRET), EdoPropertyUtil.getProperty(EdoPropertyUtil.API_ENDPOINT), EdoPropertyUtil.getProperty(EdoPropertyUtil.AUTH_ENDPOINT));
+			api = InstamojoImpl.getApi(clientId, clientSecret, EdoPropertyUtil.getProperty(EdoPropertyUtil.API_ENDPOINT), EdoPropertyUtil.getProperty(EdoPropertyUtil.AUTH_ENDPOINT));
 		} catch (ConnectionException e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e), LoggingUtil.paymentLogger);
@@ -127,9 +127,15 @@ public class PaymentUtil implements EdoConstants {
 		status.setResponseText(message);
 	}
 
-	public static boolean getPaymentStatus(String id) {
+	public static boolean getPaymentStatus(String id, String clientId, String clientSecret) {
 		try {
-			Instamojo api = InstamojoImpl.getApi(EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_ID), EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_SECRET), EdoPropertyUtil.getProperty(EdoPropertyUtil.API_ENDPOINT), EdoPropertyUtil.getProperty(EdoPropertyUtil.AUTH_ENDPOINT));
+			if(clientId == null) {
+				clientId = EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_ID);
+			}
+			if(clientSecret == null) {
+				clientSecret = EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_SECRET);
+			}
+			Instamojo api = InstamojoImpl.getApi(clientId, clientSecret, EdoPropertyUtil.getProperty(EdoPropertyUtil.API_ENDPOINT), EdoPropertyUtil.getProperty(EdoPropertyUtil.AUTH_ENDPOINT));
 			PaymentOrderDetailsResponse paymentOrderDetailsResponse = api.getPaymentOrderDetails(id);
 			// print the status of the payment order.
 			LoggingUtil.logMessage("Payment status for id " + id + " is - " + paymentOrderDetailsResponse.getStatus());

@@ -835,8 +835,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		if(!student.getPayment().isOffline()) {
 			//Set transaction ID to be unique
-			
-			EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId());
+			String clientId = null, clientSecret = null;
+			if(student.getPackages().get(0).getInstitute().getId() == 22) {
+				clientId = EdoPropertyUtil.getProperty("deeper.insta.client.id");
+				clientSecret = EdoPropertyUtil.getProperty("deeper.insta.client.secret");
+			}
+			EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId(), clientId, clientSecret);
 			if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
 				student.setPayment(paymentResponse);
 				testsDao.updatePaymentId(student);
@@ -854,50 +858,57 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoApiStatus processPayment(String id, String transactionId, String paymentId) {
 		EdoApiStatus status = new EdoApiStatus();
 		try {
-			boolean validPayment = PaymentUtil.getPaymentStatus(id);
-			if(validPayment) {
-				List<EdoStudent> studentPackages = testsDao.getStudentByPayment(id);
-				EDOInstitute institute = null;
-				if(CollectionUtils.isNotEmpty(studentPackages)) {
-					EdoStudent edoStudent = new EdoStudent();
-					List<EDOPackage> packages = new ArrayList<EDOPackage>();
-					boolean incompletePackageFound = false;
-					for(EdoStudent student: studentPackages) {
-						if(student.getCurrentPackage() != null) {
-							packages.add(student.getCurrentPackage());
-							if(student.getCurrentPackage().getInstitute() != null) {
-								institute = new EDOInstitute();
-								institute.setName(student.getCurrentPackage().getInstitute().getName());
-							}
-							if(!StringUtils.equals(student.getCurrentPackage().getStatus(), "Completed")) {
-								incompletePackageFound = true;
-							}
+
+			List<EdoStudent> studentPackages = testsDao.getStudentByPayment(id);
+			EDOInstitute institute = null;
+			if (CollectionUtils.isNotEmpty(studentPackages)) {
+				EdoStudent edoStudent = new EdoStudent();
+				List<EDOPackage> packages = new ArrayList<EDOPackage>();
+				boolean incompletePackageFound = false;
+				for (EdoStudent student : studentPackages) {
+					if (student.getCurrentPackage() != null) {
+						packages.add(student.getCurrentPackage());
+						if (student.getCurrentPackage().getInstitute() != null) {
+							institute = new EDOInstitute();
+							institute.setName(student.getCurrentPackage().getInstitute().getName());
 						}
-						edoStudent.setName(student.getName());
-						edoStudent.setPhone(student.getPhone());
-						edoStudent.setEmail(student.getEmail());
+						if (!StringUtils.equals(student.getCurrentPackage().getStatus(), "Completed")) {
+							incompletePackageFound = true;
+						}
 					}
-					if(transactionId != null) {
-						edoStudent.setTransactionId(new Integer(StringUtils.removeStart(transactionId, "T")));
+					edoStudent.setName(student.getName());
+					edoStudent.setPhone(student.getPhone());
+					edoStudent.setEmail(student.getEmail());
+				}
+				if (transactionId != null) {
+					edoStudent.setTransactionId(new Integer(StringUtils.removeStart(transactionId, "T")));
+				}
+
+				if (incompletePackageFound) {
+					String clientId = null, clientSecret = null;
+					if(studentPackages.get(0).getCurrentPackage().getInstitute().getId() == 22) {
+						clientId = EdoPropertyUtil.getProperty("deeper.insta.client.id");
+						clientSecret = EdoPropertyUtil.getProperty("deeper.insta.client.secret");
 					}
-					
-					if(incompletePackageFound) {
+					boolean validPayment = PaymentUtil.getPaymentStatus(id, clientId, clientSecret);
+					if (validPayment) {
 						EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
 						paymentStatus.setPaymentId(id);
 						paymentStatus.setResponseText("Completed");
 						paymentStatus.setOffline(false);
 						testsDao.updatePayment(paymentStatus);
-						
+
 						edoStudent.setPackages(packages);
 						edoStudent.setPayment(paymentStatus);
 						notifyStudent(edoStudent, MAIL_TYPE_ACTIVATED, institute);
+					} else {
+						EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
+						paymentStatus.setPaymentId(id);
+						paymentStatus.setResponseText("Failed");
+						testsDao.updatePayment(paymentStatus);
 					}
+
 				}
-			} else {
-				EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
-				paymentStatus.setPaymentId(id);
-				paymentStatus.setResponseText("Failed");
-				testsDao.updatePayment(paymentStatus);
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
@@ -1680,7 +1691,25 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoServiceResponse getDeeperRegistration(String rollNo) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			response.setStudent(testsDao.getDeeperRegistration(rollNo));
+			boolean unpaidPackageFound = true;
+			EdoStudent student = testsDao.getDeeperRegistration(rollNo);
+			if(student.getId() != null) {
+				List<EDOPackage> packages = testsDao.getStudentPackages(student.getId());
+				if(CollectionUtils.isNotEmpty(packages)) {
+					unpaidPackageFound = false;
+					for(EDOPackage pkg: packages) {
+						if(!StringUtils.equals(pkg.getStatus(), "Completed")) {
+							unpaidPackageFound = true;
+						}
+					}
+				}
+			}
+			if(unpaidPackageFound) {
+				response.setStudent(student);
+			} else {
+				response.setStatus(new EdoApiStatus(-111, "You have already registered for this course. Please login to test.edofox.com"));
+			}
+			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
