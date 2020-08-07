@@ -1694,7 +1694,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			boolean unpaidPackageFound = true;
 			EdoStudent student = testsDao.getDeeperRegistration(rollNo);
-			if(student.getId() != null) {
+			if(student != null && student.getId() != null) {
 				List<EDOPackage> packages = testsDao.getStudentPackages(student.getId());
 				if(CollectionUtils.isNotEmpty(packages)) {
 					unpaidPackageFound = false;
