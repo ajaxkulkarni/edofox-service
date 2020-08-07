@@ -1940,6 +1940,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			mgr.setTestsDao(testsDao);
 			LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
 			executor.execute(mgr);
+			
+			//Send mail also
+			if(request.getStudent() != null) {
+				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
+				student.setPassword("registered mobile number");
+				EdoMailUtil mailUtil = new EdoMailUtil(request.getRequestType());
+				mailUtil.setStudent(student);
+				mailUtil.setInstitute(testsDao.getInstituteById(request.getInstitute().getId()));
+				mailUtil.setMailer(request.getMailer());
+				if(StringUtils.isNotBlank(student.getEmail())) {
+					mailUtil.sendMail();
+				}
+			}
+			
+			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111, ERROR_IN_PROCESSING);

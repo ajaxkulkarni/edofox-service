@@ -29,14 +29,12 @@ public class EdoActivityLogs {
 	private String module;
 	@Column(name = "comment")
 	private String comment;
-	@Column(name = "user_type")
-	private Integer userType;
 	@Column(name = "institute_id")
 	private Integer instituteId;
 	
 	
 	public EdoActivityLogs() {
-		setUserType(0);
+		//setUserType(0);
 	}
 	
 	
@@ -69,12 +67,6 @@ public class EdoActivityLogs {
 	}
 	public void setComment(String comment) {
 		this.comment = comment;
-	}
-	public void setUserType(Integer userType) {
-		this.userType = userType;
-	}
-	public Integer getUserType() {
-		return userType;
 	}
 	public void setInstituteId(Integer instituteId) {
 		this.instituteId = instituteId;

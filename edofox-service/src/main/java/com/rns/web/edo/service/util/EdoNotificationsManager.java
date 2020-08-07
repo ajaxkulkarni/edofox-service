@@ -169,6 +169,10 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 					titleText = CommonUtils.prepareNoticeNotification(titleText, notice);
 				}
 			}
+			
+			if(StringUtils.isBlank(classes) && StringUtils.isBlank(divisions)) {
+				return;
+			}
 
 			// Fetch students based on classwork maps
 			Map<String, Object> input = new HashMap<String, Object>();

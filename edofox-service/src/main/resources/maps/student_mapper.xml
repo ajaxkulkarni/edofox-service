@@ -143,7 +143,7 @@
 	</select>
 
 	<select id="getStudentById" parameterType="Integer" resultMap="studentInfo">
-		select * from student where id = ${value}
+		select * from student_information where id = ${value}
 	</select>
 
 	<select id="getAllStudents" parameterType="Integer" resultMap="studentInfo">
