@@ -27,8 +27,11 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 
 public class PaymentUtil implements EdoConstants {
 
-	public static EdoPaymentStatus paymentRequest(Double amount, EdoStudent student, Integer transactionId, String clientId, String clientSecret) {
-		
+	public static EdoPaymentStatus paymentRequest(Double amount, EdoStudent student, Integer transactionId, String clientId, String clientSecret, String paymentPurpose) {
+		//String paymentPurpose = "Edofox payment";
+		if(paymentPurpose == null) {
+			paymentPurpose =  "Edofox payment";
+		}
 		if(clientId == null) {
 			clientId = EdoPropertyUtil.getProperty(EdoPropertyUtil.CLIENT_ID);
 		}
@@ -45,7 +48,7 @@ public class PaymentUtil implements EdoConstants {
 		order.setPhone(student.getPhone());
 		order.setCurrency("INR");
 		order.setAmount(amount);
-		order.setDescription("Edofox payment");
+		order.setDescription(paymentPurpose);
 		order.setRedirectUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "processPayment");
 		order.setWebhookUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "paymentWebhook");
 		order.setTransactionId("T" + transactionId);

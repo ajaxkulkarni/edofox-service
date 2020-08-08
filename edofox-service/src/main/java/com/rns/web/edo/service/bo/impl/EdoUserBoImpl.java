@@ -835,12 +835,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		if(!student.getPayment().isOffline()) {
 			//Set transaction ID to be unique
-			String clientId = null, clientSecret = null;
+			String clientId = null, clientSecret = null, purpose = null;
 			if(student.getPackages().get(0).getInstitute().getId() == 22) {
 				clientId = EdoPropertyUtil.getProperty("deeper.insta.client.id");
 				clientSecret = EdoPropertyUtil.getProperty("deeper.insta.client.secret");
+				purpose = "Deeper exams";
 			}
-			EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId(), clientId, clientSecret);
+			EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId(), clientId, clientSecret, purpose);
 			if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
 				student.setPayment(paymentResponse);
 				testsDao.updatePaymentId(student);
