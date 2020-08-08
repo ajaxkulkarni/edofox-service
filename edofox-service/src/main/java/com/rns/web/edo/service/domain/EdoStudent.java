@@ -29,6 +29,7 @@ public class EdoStudent {
 	private String parentMobileNo;
 	private String instituteId;
 	private String accessType;
+	private String previousMarks;
 
 	public EdoStudent() {
 
@@ -196,6 +197,14 @@ public class EdoStudent {
 
 	public void setAccessType(String accessType) {
 		this.accessType = accessType;
+	}
+
+	public String getPreviousMarks() {
+		return previousMarks;
+	}
+
+	public void setPreviousMarks(String previousMarks) {
+		this.previousMarks = previousMarks;
 	}
 	
 }
