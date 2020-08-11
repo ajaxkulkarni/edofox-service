@@ -123,6 +123,9 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.smtp.host", getMailHost());
 		props.put("mail.smtp.port", MAIL_PORT);
+		/*props.put("mail.debug", "true");
+		props.put("mail.smtp.user", getMailId());
+		props.put("ssl-verify", "ignore");*/
 		
 
 		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
