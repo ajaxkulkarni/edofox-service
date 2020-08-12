@@ -442,6 +442,7 @@
 		</if>
 		
 		AND length(trim(option1)) > 0
+		AND id not IN (select question_id from test_questions_map where test_id = ${qn_id})
     	order by created_date desc 
     	limit ${lastIndex},10
 		
