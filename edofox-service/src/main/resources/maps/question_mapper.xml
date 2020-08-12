@@ -420,4 +420,31 @@
 		order by exam_feedback.created_date desc;
 	</select>
 	
+	<select id="getQuestionBank" resultMap="questions" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
+		
+		SELECT * FROM test_questions 
+    	WHERE (status = 'A' or status is NULL) 
+    	AND subject_id = ${subjectId} 
+    	<if test="level != null">
+			AND level between ${level - 1} AND ${level}
+		</if>
+		<if test="type != null &amp;&amp; type != ''">
+			AND question_type = '${type}'
+		</if>
+		<if test="chapter != null &amp;&amp; chapter.chapterId != null">
+			AND chapter = ${chapter.chapterId}
+		</if>
+		<if test="instituteId != null">
+			AND institute_id = ${instituteId}
+		</if>
+		<if test="instituteId == null">
+			AND institute_id IS NULL
+		</if>
+		
+		AND length(trim(option1)) > 0
+    	order by created_date desc 
+    	limit ${lastIndex},10
+		
+	</select>
+	
 </mapper>

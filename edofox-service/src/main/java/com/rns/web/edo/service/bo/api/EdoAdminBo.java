@@ -30,7 +30,7 @@ public interface EdoAdminBo {
 	EdoServiceResponse parsePdf(EdoAdminRequest request, InputStream fileData);
 	EdoServiceResponse loadParsedQuestions(EdoServiceRequest request);
 	EdoApiStatus saveParsedQuestions(EdoServiceRequest request);
-	
+	EdoServiceResponse loadQuestionBank(EdoServiceRequest request);
 	
 	
 	//Super admin

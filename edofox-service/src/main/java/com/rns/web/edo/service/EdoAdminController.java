@@ -442,4 +442,13 @@ public class EdoAdminController {
 		response.setStatus(adminBo.updateClientSales(request));
 		return response;
 	}
+	
+	@POST
+	@Path("/loadQuestionBank")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse loadQuestionBank(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Load question bank :" + request);
+		return adminBo.loadQuestionBank(request);
+	}
 }

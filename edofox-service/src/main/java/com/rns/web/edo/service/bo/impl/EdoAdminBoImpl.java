@@ -1436,6 +1436,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoApiStatus status = new EdoApiStatus();
 		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
+			EdoTest test = testsDao.getTest(request.getTest().getId());
 			String sourceDir = TEMP_QUESTION_PATH + request.getTest().getId();
 			File source = new File(sourceDir);
 			String destinationDir = TEST_QUESTION_PATH + request.getTest().getId();
@@ -1481,6 +1482,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					if(question.getQn_id() == null) {
 						question.setQn_id(question.getQuestionNumber());
 					}
+					question.setInstituteId(test.getCurrentQuestion().getInstituteId());
 					testsDao.addQuestion(question);
 				}
 				testsDao.createExam(request);
@@ -1758,5 +1760,24 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse loadQuestionBank(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			List<EdoQuestion> questions = testsDao.getQuestionBank(request.getQuestion());
+			if(CollectionUtils.isNotEmpty(questions)) {
+				for(EdoQuestion question: questions) {
+					QuestionParser.fixQuestion(question);
+					CommonUtils.setQuestionURLs(question);
+				}
+			}
+			EdoTest test = new EdoTest();
+			test.setTest(questions);
+			response.setTest(test);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
 	}
 }
