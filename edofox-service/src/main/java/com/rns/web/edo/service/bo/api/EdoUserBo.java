@@ -42,5 +42,6 @@ public interface EdoUserBo {
 	EdoApiStatus updateVideoLecture(EdoServiceRequest request);
 	EdoServiceResponse getTags(Integer instituteId, String query);
 	EdoServiceResponse getDeeperRegistration(String rollNo);
+	EdoFile getVideo(Integer videoId);
 	
 }

@@ -23,6 +23,7 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.clickntap.vimeo.Vimeo;
@@ -236,6 +237,32 @@ public class VideoUtil {
 	    //delete video
 	    //TODO vimeo.removeVideo(videoEndPoint);
 	    return info;
+	}
+	
+	public static String getDownloadUrl(String url) {
+		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
+		try {
+			String videoId = StringUtils.replace(url, "https://vimeo.com/", "");
+			VimeoResponse resp = vimeo.get("https://api.vimeo.com/videos/" + videoId);
+			if(resp != null && resp.getJson() != null) {
+				System.out.println(resp);
+				String link = "";
+				org.json.JSONArray array = resp.getJson().getJSONArray("download");
+				if( array.length() > 0)  {
+					for(int i = 0; i < array.length(); i++) {
+						org.json.JSONObject jsonObject = array.getJSONObject(i);
+						if(StringUtils.isNotBlank(jsonObject.getString("link"))) {
+							link = jsonObject.getString("link");
+						}
+					}
+				}
+				return link;
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public static Float downloadRecordedFile(Integer channelId, Integer sessionId) {
