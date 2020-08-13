@@ -243,6 +243,9 @@ public class VideoUtil {
 		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
 		try {
 			String videoId = StringUtils.replace(url, "https://vimeo.com/", "");
+			if(StringUtils.contains(videoId, "vimeo")) {
+				videoId = StringUtils.replace(url, "https://player.vimeo.com/video/", "");
+			}
 			VimeoResponse resp = vimeo.get("https://api.vimeo.com/videos/" + videoId);
 			if(resp != null && resp.getJson() != null) {
 				System.out.println(resp);
