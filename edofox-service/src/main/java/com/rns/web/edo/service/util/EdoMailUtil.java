@@ -70,7 +70,11 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 		try {
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
+			if(institute != null) {
+				message.setFrom(new InternetAddress(MAIL_ID, institute.getName()));
+			} else {
+				message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
+			}
 			prepareMailContent(message);
 			Transport.send(message);
 			LoggingUtil.logMessage("Sent email to .." + student.getEmail());

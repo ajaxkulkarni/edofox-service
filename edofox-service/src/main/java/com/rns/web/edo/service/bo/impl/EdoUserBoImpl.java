@@ -325,6 +325,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						if(!result.getSubjects().contains(question.getSubject())) {
 							result.getSubjects().add(question.getSubject());
 						}
+						if(StringUtils.isBlank(question.getSection())) {
+							question.setSection("General");
+						}
 						if(StringUtils.isNotBlank(question.getSection())) {
 							if(!result.getSections().contains(question.getSection())) {
 								result.getSections().add(question.getSection());
