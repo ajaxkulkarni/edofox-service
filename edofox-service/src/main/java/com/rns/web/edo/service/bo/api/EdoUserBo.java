@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.bo.api;
 
 import java.io.InputStream;
+import java.util.List;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
@@ -43,5 +44,6 @@ public interface EdoUserBo {
 	EdoServiceResponse getTags(Integer instituteId, String query);
 	EdoServiceResponse getDeeperRegistration(String rollNo);
 	EdoFile getVideo(Integer videoId);
+	EdoServiceResponse getStudentExams(EdoServiceRequest request);
 	
 }

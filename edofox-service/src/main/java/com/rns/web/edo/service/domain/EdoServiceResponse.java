@@ -30,6 +30,7 @@ public class EdoServiceResponse {
 	private List<EdoTestStudentMap> maps;
 	private List<EdoSuggestion> suggestions;
 	private Date currentTime;
+	private List<EdoTest> exams;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -161,6 +162,14 @@ public class EdoServiceResponse {
 
 	public void setCurrentTime(Date currentTime) {
 		this.currentTime = currentTime;
+	}
+
+	public List<EdoTest> getExams() {
+		return exams;
+	}
+
+	public void setExams(List<EdoTest> exams) {
+		this.exams = exams;
 	}
 
 }

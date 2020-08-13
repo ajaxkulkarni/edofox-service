@@ -59,6 +59,7 @@
 		<result column="duration" property="duration" />
 		<result column="firebase_id" property="firebaseId" />
 		<result column="start_date" property="startDate" />
+		<result column="end_date" property="endDate" />
 		<result column="institute_id" property="currentQuestion.instituteId"/> 
 	</resultMap>
 	

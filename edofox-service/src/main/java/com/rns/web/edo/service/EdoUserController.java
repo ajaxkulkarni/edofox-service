@@ -541,4 +541,13 @@ public class EdoUserController {
 		return userBo.getDeeperRegistration(request.getStudent().getRollNo());
 	}
 	
+	@POST
+	@Path("/getStudentExams")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getStudentExams(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Exams request :" + request);
+		return userBo.getStudentExams(request);
+	}
+	
 }
