@@ -61,6 +61,7 @@
 		<result column="start_date" property="startDate" />
 		<result column="end_date" property="endDate" />
 		<result column="institute_id" property="currentQuestion.instituteId"/> 
+		<result column="studentStatus" property="studentStatus"/>
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">

@@ -38,6 +38,8 @@ public class EdoTest {
 	private Long minLeft;
 	private Long secLeft;
 	private String solutionUrl;
+	private String status;
+	private String studentStatus;
 	
 	public EdoTest() {
 		
@@ -262,6 +264,22 @@ public class EdoTest {
 
 	public void setStudentTimeConstraint(String studentTimeConstraint) {
 		this.studentTimeConstraint = studentTimeConstraint;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getStudentStatus() {
+		return studentStatus;
+	}
+
+	public void setStudentStatus(String studentStatus) {
+		this.studentStatus = studentStatus;
 	}
 	
 }

@@ -1752,7 +1752,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoServiceResponse getStudentExams(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			response.setExams(testsDao.getStudentExams(request));
+			List<EdoTest> studentExams = testsDao.getStudentExams(request);
+			if(CollectionUtils.isNotEmpty(studentExams)) {
+				for(EdoTest studentExam: studentExams) {
+					if(studentExam.getStartDate() != null && studentExam.getEndDate() != null) {
+						if(new Date().compareTo(studentExam.getStartDate()) < 0) {
+							studentExam.setStatus("PENDING");
+						} else if (new Date().compareTo(studentExam.getEndDate()) > 0) {
+							studentExam.setStatus("EXPIRED");
+						} else {
+							studentExam.setStatus("ACTIVE");
+						}
+					}
+				}
+			}
+			response.setExams(studentExams);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
