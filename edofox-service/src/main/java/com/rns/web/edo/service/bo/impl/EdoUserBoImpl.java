@@ -140,10 +140,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			//Get question correctness analysis
-			List<EdoQuestion> questionCorrectness = null;
+			//TODO should be added question wise
+			/*List<EdoQuestion> questionCorrectness = null;
 			if(StringUtils.equals(test.getShowResult(), "Y")) {
 				questionCorrectness = testsDao.getQuestionCorrectness(test.getId());
-			}
+			}*/
 			
 			test.setSections(new ArrayList<String>());
 
@@ -161,14 +162,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				
-				if(CollectionUtils.isNotEmpty(questionCorrectness)) {
+				/*if(CollectionUtils.isNotEmpty(questionCorrectness)) {
 					for(EdoQuestion correctness: questionCorrectness) {
 						if(correctness.getQn_id() != null && question.getQn_id() != null && correctness.getQn_id().intValue() == question.getQn_id().intValue()) {
 							question.setAnalysis(correctness.getAnalysis());
 							break;
 						}
 					}
-				}
+				}*/
 				
 				if(StringUtils.isNotBlank(question.getSection())) {
 					if(!test.getSections().contains(question.getSection())) {
@@ -1770,6 +1771,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			List<EdoQuestion> questionCorrectness = testsDao.getQuestionCorrectness(request.getQuestion().getId());
+			if(CollectionUtils.isNotEmpty(questionCorrectness)) {
+				response.setQuestion(questionCorrectness.get(0));
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
 	}

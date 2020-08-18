@@ -62,15 +62,16 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		select count(*) as solvedCount,test_result.question_id,correctQuery.correctCount, wrongQuery.wrongCount from test_result 
         left join 
         (select count(*) as correctCount, question_id from test_result 
-        where test_id = ${value} AND option_selected != '' AND marks &gt; 0
+        where question_id = ${value} AND option_selected != '' AND marks &gt; 0
         group by question_id) as correctQuery on test_result.question_id = correctQuery.question_id
         left join
         (select count(*) as wrongCount, question_id from test_result 
-        where test_id = ${value} AND option_selected != '' AND marks &lt;= 0
+        where question_id = ${value} AND option_selected != '' AND marks &lt;= 0
         group by question_id) as wrongQuery on test_result.question_id = wrongQuery.question_id
-        where test_result.test_id = ${value} AND test_result.option_selected != ''
+        where test_result.question_id = ${value} AND test_result.option_selected != ''
         group by test_result.question_id
 	</select>
+	
 	
 	<resultMap id="students" type="com.rns.web.edo.service.domain.EdoStudent">
 

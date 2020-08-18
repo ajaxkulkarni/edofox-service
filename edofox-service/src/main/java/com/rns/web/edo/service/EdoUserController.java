@@ -550,4 +550,13 @@ public class EdoUserController {
 		return userBo.getStudentExams(request);
 	}
 	
+	@POST
+	@Path("/getQuestionAnalysis")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Question Analysis request :" + request);
+		return userBo.getQuestionAnalysis(request);
+	}
+	
 }

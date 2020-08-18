@@ -45,5 +45,6 @@ public interface EdoUserBo {
 	EdoServiceResponse getDeeperRegistration(String rollNo);
 	EdoFile getVideo(Integer videoId);
 	EdoServiceResponse getStudentExams(EdoServiceRequest request);
+	EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request);
 	
 }
