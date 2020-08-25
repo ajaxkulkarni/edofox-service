@@ -12,6 +12,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 
 
@@ -37,6 +38,7 @@ public class EdoServiceRequest {
 	private EdoVideoLecture lecture;
 	private Integer startIndex;
 	private String searchFilter;
+	private EdoDeviceId deviceId;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -187,6 +189,14 @@ public class EdoServiceRequest {
 
 	public void setSearchFilter(String searchFilter) {
 		this.searchFilter = searchFilter;
+	}
+
+	public EdoDeviceId getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(EdoDeviceId deviceId) {
+		this.deviceId = deviceId;
 	}
 	
 }

@@ -27,8 +27,6 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.clickntap.vimeo.VimeoResponse;
 import com.rns.web.edo.service.bo.api.EdoFile;
@@ -52,6 +50,7 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -998,10 +997,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return null;
 	}
 
-	public EdoServiceResponse getAllSubjects() {
+	public EdoServiceResponse getAllSubjects(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			 response.setSubjects(testsDao.getAllSubjects());
+			Integer instituteId = null;
+			if(request.getInstitute() != null && request.getInstitute().getId() != null) {
+				instituteId = request.getInstitute().getId();
+			}
+			response.setSubjects(testsDao.getAllSubjects(instituteId));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
@@ -1804,6 +1807,31 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
+	}
+
+	public EdoApiStatus addDeviceId(EdoServiceRequest request) {
+		EdoDeviceId deviceIdInput = request.getDeviceId();
+		if(deviceIdInput == null) {
+			return new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST);
+		}
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			EdoDeviceId deviceId = (EdoDeviceId) session.createCriteria(EdoDeviceId.class).add(Restrictions.eq("token", deviceIdInput.getToken())).uniqueResult();
+			if(deviceId == null) {
+				Transaction tx = session.beginTransaction();
+				deviceIdInput.setCreatedDate(new Date());
+				session.persist(deviceIdInput);
+				tx.commit();
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
 	}
 
 }

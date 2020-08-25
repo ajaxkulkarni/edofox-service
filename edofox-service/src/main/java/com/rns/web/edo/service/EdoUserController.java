@@ -301,7 +301,7 @@ public class EdoUserController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getAllSubjects(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Get subjects Request :" + request);
-		EdoServiceResponse response = userBo.getAllSubjects();
+		EdoServiceResponse response = userBo.getAllSubjects(request);
 		LoggingUtil.logMessage("Get subjects Response");
 		return response;
 	}
@@ -611,6 +611,18 @@ public class EdoUserController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return Response.temporaryRedirect(url).build();
+	}
+	
+	@POST
+	@Path("/updateDeviceId")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateDeviceId(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Update device id request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.addDeviceId(request));
+		LoggingUtil.logObject("Update device Id response ", response);
+		return response;
 	}
 	
 }

@@ -19,10 +19,14 @@
 	</resultMap>
 
 
-	<select id="getAllSubjects" resultMap="chapters">
+	<select id="getAllSubjects" resultMap="chapters" parameterType="Integer">
 		SELECT * FROM
 		test_subjects left join chapters on test_subjects.subject_id =
-		chapters.subject;
+		chapters.subject 
+		<if test="value != null">
+		where institute_id is null OR institute_id = ${value}
+		</if>
+		;
 	</select>
 
 	<insert id="addQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion"

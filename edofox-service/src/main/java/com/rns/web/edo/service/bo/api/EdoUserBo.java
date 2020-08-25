@@ -24,7 +24,7 @@ public interface EdoUserBo {
 	EdoPaymentStatus processPayment(String id, String transactionId, String paymentId, String txStatus);
 	EdoPaymentStatus completePayment(EdoTest test, EdoStudent student);
 	EdoFile getStudentImage(Integer studentId);
-	EdoServiceResponse getAllSubjects();
+	EdoServiceResponse getAllSubjects(EdoServiceRequest request);
 	EdoServiceResponse getNextQuestion(EdoServiceRequest request);
 	EdoServiceResponse submitAnswer(EdoServiceRequest request);
 	EdoServiceResponse raiseDoubt(EdoServiceRequest request);
@@ -46,5 +46,6 @@ public interface EdoUserBo {
 	EdoFile getVideo(Integer videoId);
 	EdoServiceResponse getStudentExams(EdoServiceRequest request);
 	EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request);
+	EdoApiStatus addDeviceId(EdoServiceRequest request);
 	
 }

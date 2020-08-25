@@ -86,7 +86,7 @@ public interface EdoTestsDao {
 	void upgradeInstitute(EDOInstitute institute);
 	
 	//Question queries
-	List<EdoSubject> getAllSubjects();
+	List<EdoSubject> getAllSubjects(Integer instituteId);
 	int addQuestion(EdoQuestion question);
 	int getNoOfQuestionsByChapter(Integer chapterId);
 	int getNoOfQuestionsByDate(String date);
