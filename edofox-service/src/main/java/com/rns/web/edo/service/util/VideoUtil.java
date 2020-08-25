@@ -369,10 +369,10 @@ public class VideoUtil {
 		ClientResponse response = header.post(ClientResponse.class, request);
 
 		if (response.getStatus() != 200) {
-			LoggingUtil.logMessage("Failed in FCM URL : HTTP error code : " + response.getStatus(), LoggingUtil.videoLogger);
+			LoggingUtil.logMessage("Failed in vimeo URL : HTTP error code : " + response.getStatus(), LoggingUtil.videoLogger);
 		}
 		String output = response.getEntity(String.class);
-		LoggingUtil.logMessage("Output from FCM URL : " + response.getStatus() + ".... \n " + output, LoggingUtil.videoLogger);
+		LoggingUtil.logMessage("Output from vimeo URL : " + response.getStatus() + ".... \n " + output, LoggingUtil.videoLogger);
 		return output;
 	
 	}

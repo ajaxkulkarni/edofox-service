@@ -149,7 +149,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
-				LoggingUtil.logMessage("Solution image ==> " + question.getSolutionImageUrl());
 				CommonUtils.setQuestionURLs(question);
 				QuestionParser.fixQuestion(question);
 				prepareMatchTypeQuestion(question);
@@ -384,7 +383,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				List<EdoQuestion> set = sectionSets.get(section);
 				if(!StringUtils.contains(set.get(0).getType(), QUESTION_TYPE_PASSAGE)) {
 					//No shuffle for comprehension type questions
-					LoggingUtil.logMessage("Shuffling for section .." + section + " - list - " + set.size());
+					//LoggingUtil.logMessage("Shuffling for section .." + section + " - list - " + set.size());
 					Collections.shuffle(set);
 				}
 				for(EdoQuestion question: set) {
@@ -394,7 +393,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			result.setTest(shuffled);
-			LoggingUtil.logMessage("Shuffled the questions for test .." + result.getId());
+			//LoggingUtil.logMessage("Shuffled the questions for test .." + result.getId());
 		}
 	}
 	
@@ -512,8 +511,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		//Will update only for save test
 		answer.setMarks(request.getQuestion().getMarks());
 		answer.setUpdatedDate(new Date());
-		
-		System.out.println("Saving answer .. " + answer.getOptionSelected());
 		
 		if(answer.getId() == null) {
 			session.persist(answer);
@@ -974,6 +971,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.paymentLogger);
 		}
 		return null;
 	}
@@ -1103,7 +1101,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoServiceResponse getSolved(EdoServiceRequest request) {
 		if(request.getTest() == null || request.getStudent() == null || request.getStudent().getId() == null) {
-			LoggingUtil.logMessage("Invalid test input", LoggingUtil.saveTestLogger);
 			EdoApiStatus edoApiStatus = new EdoApiStatus(-111, ERROR_INVALID_PROFILE);
 			return new EdoServiceResponse(edoApiStatus);
 		}
@@ -1195,7 +1192,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			Integer noOfFiles = null;
 			if (!folder.exists()) {
 				boolean mkdirResult = folder.mkdirs();
-				LoggingUtil.logMessage("Directory created for " + folder.getAbsolutePath() + " result is " + mkdirResult);
+				LoggingUtil.logMessage("Directory created for " + folder.getAbsolutePath() + " result is " + mkdirResult, LoggingUtil.videoLogger);
 				noOfFiles = 0;
 			}
 			if(noOfFiles == null) {
@@ -1229,7 +1226,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				    PrintWriter printWriter = new PrintWriter(fileWriter);
 				    printWriter.println("file '" + filePath + "'");  //New line
 				    printWriter.close();
-				    LoggingUtil.logMessage("Uploaded file of " + length + " bytes at " + filePath + " for session " + sessionId);
+				    LoggingUtil.logMessage("Uploaded file of " + length + " bytes at " + filePath + " for session " + sessionId, LoggingUtil.videoLogger);
 				}
 			} 
 			
@@ -1357,37 +1354,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				packages.add(currentPackage);
 				response.setPackages(packages);
 			}
-			
-			/*String outputFolder = VIDEOS_PATH + sessionId + "/" + "merged.webm";
-
-			boolean result = VideoUtil.mergeFiles(VIDEOS_PATH + sessionId + "/", outputFolder);
-			if (result) {
-				// Prepare video URL
-				session = this.sessionFactory.openSession();
-				List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", sessionId)).list();
-				if (CollectionUtils.isNotEmpty(sessions)) {
-					EdoLiveSession edoLiveSession = sessions.get(0);
-					// Upload to Vimeo
-					VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFolder, edoLiveSession.getSessionName(), "");
-					if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
-
-						Transaction tx = session.beginTransaction();
-						edoLiveSession.setStatus("Completed");
-						// sessions.get(0).setRecording_url(StringUtils.replace(outputFolder,
-						// EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_OUTPUT),
-						// EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME)));
-						edoLiveSession.setRecording_url(vimeoResponse.getJson().getString("link"));
-						currentPackage.setVideoUrl("view-session.php?sessionId=" + sessionId + "&sessionName=" + edoLiveSession.getSessionName());
-						List<EDOPackage> packages = new ArrayList<EDOPackage>();
-						packages.add(currentPackage);
-						response.setPackages(packages);
-						tx.commit();
-					}
-				}
-
-			} else {
-				response.setStatus(new EdoApiStatus(-111, "Could not process video!"));
-			}*/
 
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
@@ -1527,15 +1493,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				
 			} 
-			
-		    
-/*		    List<EDOPackage> packages = new ArrayList<EDOPackage>();
-		    EDOPackage currPackage = new EDOPackage();
-		    currPackage.setId(id);
-		    currPackage.setVideoUrl(videoUrl);
-			packages.add(currPackage);
-		    response.setPackages(packages);
-*/
+	
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

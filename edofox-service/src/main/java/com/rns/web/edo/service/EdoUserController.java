@@ -64,14 +64,14 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getTestResults(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get Test result Request :" + request);
+		//LoggingUtil.logMessage("Get Test result Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response =  userBo.getTestResult(request);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Get Test result Response");
+		//LoggingUtil.logMessage("Get Test result Response");
 		return response;
 	}
 	
@@ -80,7 +80,7 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getTest(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get Test Request :" + request);
+		LoggingUtil.logMessage("Get Test Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			Integer studentId = null;
@@ -91,7 +91,7 @@ public class EdoUserController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Get Test Response");
+		//LoggingUtil.logMessage("Get Test Response");
 		return response;
 	}
 	
@@ -100,14 +100,14 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse saveTest(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Save Test result Request :" + request);
+		LoggingUtil.logMessage("Save Test result Request :" + request, LoggingUtil.saveTestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response.setStatus(userBo.saveTest(request));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Save Test result Response");
+		//LoggingUtil.logMessage("Save Test result Response");
 		return response;
 	}
 	
@@ -116,14 +116,14 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse saveAnswer(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Save Answer Request :" + request);
+		LoggingUtil.logMessage("Save Answer Request :" + request, LoggingUtil.saveAnswerLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response.setStatus(userBo.saveAnswer(request));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Save Answer Response");
+		//LoggingUtil.logMessage("Save Answer Response");
 		return response;
 	}
 	
@@ -132,14 +132,14 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getSolved(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get solved Request :" + request);
+		//LoggingUtil.logMessage("Get solved Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response = userBo.getSolved(request);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Get solved Response");
+		//LoggingUtil.logMessage("Get solved Response");
 		return response;
 	}
 	
@@ -208,7 +208,7 @@ public class EdoUserController {
 	//@Produces(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	public EdoFile getVideo(@PathParam("docId") Integer videoId) {
-		LoggingUtil.logMessage("Video request:" + videoId);
+		//LoggingUtil.logMessage("Video request:" + videoId);
 		try {
 			return userBo.getVideo(videoId);
 		} catch (Exception e) {
@@ -222,9 +222,9 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getPackages(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get packages Request :" + request);
+		//LoggingUtil.logMessage("Get packages Request :" + request);
 		EdoServiceResponse response = userBo.getPackages(request.getInstitute());
-		LoggingUtil.logMessage("Get packages Response");
+		//LoggingUtil.logMessage("Get packages Response");
 		return response;
 	}
 	
@@ -244,10 +244,10 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse registerStudentPackages(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Register packages Request :" + request);
+		LoggingUtil.logMessage("Register student Request :" + request, LoggingUtil.paymentLogger);
 		EdoServiceResponse response = new EdoServiceResponse();
 		response = userBo.registerStudent(request.getStudent());
-		LoggingUtil.logMessage("Register packages Response");
+		//LoggingUtil.logMessage("Register packages Response");
 		return response;
 	}
 	
@@ -278,7 +278,7 @@ public class EdoUserController {
 	// @Produces(MediaType.APPLICATION_JSON)
 	public Response paymentWebhook(MultivaluedMap<String, String> formParams) {
 		System.out.println(formParams);
-		LoggingUtil.logMessage("Webhook payment Request :" + formParams);
+		LoggingUtil.logMessage("Webhook payment Request :" + formParams, LoggingUtil.paymentLogger);
 		/*EdoApiStatus response = */userBo.processPayment(formParams.getFirst("id"), formParams.getFirst("transaction_id"), null, null);
 		return Response.ok().build();
 	}
@@ -288,10 +288,10 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse completePayment(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Complete payment Request :" + request);
+		LoggingUtil.logMessage("Complete payment Request :" + request, LoggingUtil.paymentLogger);
 		EdoServiceResponse response = new EdoServiceResponse();
 		response.setPaymentStatus(userBo.completePayment(request.getTest(), request.getStudent()));
-		LoggingUtil.logMessage("Complete payment Response");
+		//LoggingUtil.logMessage("Complete payment Response");
 		return response;
 	}
 	
@@ -300,9 +300,7 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getAllSubjects(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get subjects Request :" + request);
 		EdoServiceResponse response = userBo.getAllSubjects(request);
-		LoggingUtil.logMessage("Get subjects Response");
 		return response;
 	}
 	
@@ -311,9 +309,8 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getNextQuestion(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get next question Request :" + request);
+		//LoggingUtil.logMessage("Get next question Request :" + request);
 		EdoServiceResponse response = userBo.getNextQuestion(request);
-		LoggingUtil.logMessage("Get next question Response");
 		return response;
 	}
 	
@@ -322,9 +319,8 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse submitAnswer(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Submit question answer Request :" + request);
+		//LoggingUtil.logMessage("Submit question answer Request :" + request);
 		EdoServiceResponse response = userBo.submitAnswer(request);
-		LoggingUtil.logMessage("Submit question answer Response");
 		return response;
 	}
 	
@@ -333,9 +329,9 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse raiseDoubt(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Doubt Request :" + request);
+		LoggingUtil.logMessage("Doubt Request :" + request, LoggingUtil.doubtsLogger);
 		EdoServiceResponse response = userBo.raiseDoubt(request);
-		LoggingUtil.logMessage("Doubt Response");
+		//LoggingUtil.logMessage("Doubt Response");
 		return response;
 	}
 	
@@ -358,7 +354,6 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getToken(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Token Request :" + request);
 		Role role = Role.Role_Attendee;
 		if(StringUtils.equals(request.getRequestType(), "host")) {
 			role = Role.Role_Publisher;
@@ -375,7 +370,6 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getVideoTokenUid(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Token Request with Id :" + request);
 		Role role = Role.Role_Attendee;
 		if(StringUtils.equals(request.getRequestType(), "host")) {
 			role = Role.Role_Publisher;
@@ -393,14 +387,12 @@ public class EdoUserController {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadRecording(@FormDataParam("data") InputStream recordingData, @FormDataParam("data") FormDataContentDisposition recordingDataDetails,
 			@FormDataParam("sessionId") Integer sessionId, @FormDataParam("channelId") Integer channelId) {
-		LoggingUtil.logMessage("Upload recording :" + sessionId, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			return userBo.uploadRecording(sessionId, recordingData, channelId);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
-		LoggingUtil.logMessage("Upload recording Response", LoggingUtil.videoLogger);
 		return response;
 	}
 	
@@ -409,9 +401,8 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse startLiveSession(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Start live session request :" + request);
+		//LoggingUtil.logMessage("Start live session request :" + request, LoggingUtil.videoLogger);
 		EdoServiceResponse response = userBo.startLiveSession(request);
-		LoggingUtil.logObject("Start live session response ", response);
 		return response;
 	}
 	
@@ -420,9 +411,9 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getLiveSessions(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get live sessions request :" + request);
+		//LoggingUtil.logMessage("Get live sessions request :" + request);
 		EdoServiceResponse response = userBo.getLiveSessions(request);
-		LoggingUtil.logObject("Get live session response ", response);
+		//LoggingUtil.logObject("Get live session response ", response);
 		return response;
 	}
 	
@@ -431,9 +422,9 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse finishRecording(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Finish recording request request :" + request);
+		LoggingUtil.logMessage("Finish recording request request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = userBo.finishRecording(request);
-		LoggingUtil.logObject("Finish recording response ", response);
+		//LoggingUtil.logObject("Finish recording response ", response);
 		return response;
 	}
 	
@@ -442,9 +433,8 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getSession(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get session request :" + request);
+		//LoggingUtil.logMessage("Get session request :" + request);
 		EdoServiceResponse response = userBo.getSession(request);
-		LoggingUtil.logObject("Get session response ", response);
 		return response;
 	}
 	
@@ -468,7 +458,7 @@ public class EdoUserController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));
 		}
-		LoggingUtil.logMessage("Upload video Response", LoggingUtil.videoLogger);
+		//LoggingUtil.logMessage("Upload video Response", LoggingUtil.videoLogger);
 		return response;
 	}
 	
@@ -477,9 +467,9 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getVideoLectures(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get video lectures request :" + request);
+		//LoggingUtil.logMessage("Get video lectures request :" + request);
 		EdoServiceResponse response = userBo.getVideoLectures(request);
-		LoggingUtil.logObject("Get video lectures response ", response);
+		//LoggingUtil.logObject("Get video lectures response ", response);
 		return response;
 	}
 	
@@ -488,9 +478,9 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse login(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Login request :" + request);
+		LoggingUtil.logMessage("Login request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = userBo.login(request);
-		LoggingUtil.logObject("Login response ", response);
+		//LoggingUtil.logObject("Login response ", response);
 		return response;
 	}
 	
@@ -499,10 +489,10 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse saveVideoActivity(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Save video activity request :" + request);
+		LoggingUtil.logMessage("Save video activity request :" + request, LoggingUtil.activityLogger);
 		EdoServiceResponse response = new EdoServiceResponse();
 		response.setStatus(userBo.updateStudentActivity(request));
-		LoggingUtil.logObject("Save video activity response ", response);
+		//LoggingUtil.logObject("Save video activity response ", response);
 		return response;
 	}
 	
@@ -511,10 +501,10 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse updateVideoLecture(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Update video request :" + request);
+		//LoggingUtil.logMessage("Update video request :" + request);
 		EdoServiceResponse response = new EdoServiceResponse();
 		response.setStatus(userBo.updateVideoLecture(request));
-		LoggingUtil.logObject("Update video response ", response);
+		//LoggingUtil.logObject("Update video response ", response);
 		return response;
 	}
 	
@@ -537,7 +527,7 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse searchForDeeperRegistration(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Deeper search request :" + request);
+		LoggingUtil.logMessage("Deeper search request :" + request, LoggingUtil.requestLogger);
 		return userBo.getDeeperRegistration(request.getStudent().getRollNo());
 	}
 	
@@ -546,7 +536,7 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getStudentExams(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Exams request :" + request);
+		LoggingUtil.logMessage("Exams request :" + request, LoggingUtil.requestLogger);
 		return userBo.getStudentExams(request);
 	}
 	
@@ -555,7 +545,6 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Question Analysis request :" + request);
 		return userBo.getQuestionAnalysis(request);
 	}
 	
@@ -618,10 +607,10 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse updateDeviceId(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Update device id request :" + request);
+		//LoggingUtil.logMessage("Update device id request :" + request);
 		EdoServiceResponse response = new EdoServiceResponse();
 		response.setStatus(userBo.addDeviceId(request));
-		LoggingUtil.logObject("Update device Id response ", response);
+		//LoggingUtil.logObject("Update device Id response ", response);
 		return response;
 	}
 	

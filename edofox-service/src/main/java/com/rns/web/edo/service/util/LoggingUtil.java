@@ -25,6 +25,12 @@ public class LoggingUtil {
 	
 	public static Logger videoLogger = Logger.getLogger("videoLog");
 	
+	public static Logger requestLogger = Logger.getLogger("requestLog");
+	
+	public static Logger doubtsLogger = Logger.getLogger("doubtsLog");
+	
+	public static Logger activityLogger = Logger.getLogger("activityLog");
+	
 	//private static Logger emailLogger = Logger.getLogger("email");
 	
 	public static void logMessage(String message) {

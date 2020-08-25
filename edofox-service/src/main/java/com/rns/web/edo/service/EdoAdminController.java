@@ -46,14 +46,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getTestAnalysis(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get Test Analysis Request :" + request);
+		//LoggingUtil.logMessage("Get Test Analysis Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response =  adminBo.getTestAnalysis(request.getTest());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Get Test analysis Response");
+		//LoggingUtil.logMessage("Get Test analysis Response");
 		return response;
 	}
 	
@@ -62,14 +62,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getTestResults(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get Test Results Request :" + request);
+		//LoggingUtil.logMessage("Get Test Results Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response =  adminBo.getTestResults(request);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Get Test Results Response");
+		//LoggingUtil.logMessage("Get Test Results Response");
 		return response;
 	}
 	
@@ -78,14 +78,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse uploadTest(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Upload Test Request :" + request);
+		LoggingUtil.logMessage("Upload Test Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response.setStatus(adminBo.fileUploadTestQuestions(request.getFilePath(), request.getFirstQuestion(), request.getTest(), request.getSubjectId(), request.getSolutionPath()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Upload Test Response");
+		//LoggingUtil.logMessage("Upload Test Response");
 		return response;
 	}
 	
@@ -94,14 +94,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse uploadSolution(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Upload Solutions Request :" + request);
+		LoggingUtil.logMessage("Upload Solutions Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response.setStatus(adminBo.fileUploadTestSolutions(request.getFilePath(), request.getTest(), request.getSubjectId()));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Upload Solutions Response");
+		//LoggingUtil.logMessage("Upload Solutions Response");
 		return response;
 	}
 	
@@ -110,14 +110,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse revaluateResult(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Revaluate Solutions Request :" + request);
+		LoggingUtil.logMessage("Revaluate Solutions Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response.setStatus(adminBo.revaluateResult(request));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Revaluate Solutions Response");
+		//LoggingUtil.logMessage("Revaluate Solutions Response");
 		return response;
 	}
 	
@@ -126,14 +126,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse uploadStudents(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Upload Students Request :" + request);
+		LoggingUtil.logMessage("Upload Students Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response.setStatus(adminBo.bulkUploadStudents(request));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Upload Students Response");
+		//LoggingUtil.logMessage("Upload Students Response");
 		return response;
 	}
 	
@@ -143,7 +143,7 @@ public class EdoAdminController {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse uploadStudentsExcel(@FormDataParam("data") InputStream studentData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
 			@FormDataParam("instituteId") Integer instituteId, @FormDataParam("type") String type, @FormDataParam("packageId") Integer packageId) {
-		LoggingUtil.logMessage("Upload Students Excel :" + instituteId);
+		LoggingUtil.logMessage("Upload Students Excel :" + instituteId, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			EdoServiceRequest request = new EdoServiceRequest();
@@ -157,7 +157,7 @@ public class EdoAdminController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, "There was some error parsing your excel. Please make sure that all fields are text fields and not number fields"));
 		}
-		LoggingUtil.logMessage("Upload Students Excel Response");
+		//LoggingUtil.logMessage("Upload Students Excel Response");
 		return response;
 	}
 	
@@ -166,10 +166,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getAllStudents(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get All Students Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response = adminBo.getAllStudents(request);
-		LoggingUtil.logMessage("Get All Students Response");
 		return response;
 	}
 	
@@ -178,10 +176,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse parseQuestion(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Parse question Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response = adminBo.parseQuestion(request);
-		LoggingUtil.logMessage("Parse question Response");
 		return response;
 	}
 	
@@ -190,10 +186,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getDataEntrySummary(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Data entry summary Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response = adminBo.getDataEntrySummary(request);
-		LoggingUtil.logMessage("Data entry summary Response");
 		return response;
 	}
 	
@@ -202,14 +196,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse createExam(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Create exam Request :" + request);
+		LoggingUtil.logMessage("Create exam Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response = adminBo.automateTest(request);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Create exam Response");
+		//LoggingUtil.logMessage("Create exam Response");
 		return response;
 	}
 	
@@ -218,9 +212,9 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse resolveDoubt(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Doubt resolve Request :" + request);
+		LoggingUtil.logMessage("Doubt resolve Request :" + request, LoggingUtil.doubtsLogger);
 		EdoServiceResponse response = adminBo.addFeedbackResolution(request);
-		LoggingUtil.logMessage("Doubt resolve Response");
+		//LoggingUtil.logMessage("Doubt resolve Response");
 		return response;
 	}
 	
@@ -229,9 +223,9 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getFeedbackData(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Feedback data Request :" + request);
+		//LoggingUtil.logMessage("Feedback data Request :" + request);
 		EdoServiceResponse response = adminBo.getFeedbackData(request);
-		LoggingUtil.logObject("Feedback data Response", response);
+		//LoggingUtil.logObject("Feedback data Response", response);
 		return response;
 	}
 	
@@ -240,9 +234,9 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request) {
-		LoggingUtil.logMessage("QuestionFeedback data Request :" + request);
+		//LoggingUtil.logMessage("QuestionFeedback data Request :" + request);
 		EdoServiceResponse response = adminBo.getQuestionFeedbacks(request);
-		LoggingUtil.logMessage("QuestionFeedback data Response");
+		//LoggingUtil.logMessage("QuestionFeedback data Response");
 		return response;
 	}
 	
@@ -251,10 +245,10 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse registerStudent(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Student info Request :" + request);
+		LoggingUtil.logMessage("Student info Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response.setStatus(adminBo.registerStudent(request));
-		LoggingUtil.logMessage("Student info Response " + response.getStatus().getResponseText());
+		LoggingUtil.logMessage("Student info Response " + response.getStatus().getResponseText(), LoggingUtil.requestLogger);
 		return response;
 	}
 	
@@ -263,10 +257,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse fixQuestions(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Fix questions Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		adminBo.fixQuestions();
-		LoggingUtil.logMessage("Fix questions Response " + response.getStatus().getResponseText());
 		return response;
 	}
 	
@@ -276,7 +268,7 @@ public class EdoAdminController {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse cropQuestionImage(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
 			@FormDataParam("testId") Integer testId, @FormDataParam("fileName") String fileName) {
-		LoggingUtil.logMessage("Crop image request :" + testId + " for " + fileName);
+		//LoggingUtil.logMessage("Crop image request :" + testId + " for " + fileName);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			EdoServiceRequest request = new EdoServiceRequest();
@@ -285,7 +277,7 @@ public class EdoAdminController {
 			request.setFilePath(fileName);
 			request.setTest(test);
 			adminBo.cropQuestionImage(request, fileData);
-			LoggingUtil.logMessage("Crop image completed ..");
+			//LoggingUtil.logMessage("Crop image completed ..");
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
@@ -297,10 +289,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse fixQuestions(EdoAdminRequest request) {
-		LoggingUtil.logMessage("Backup Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response.setStatus(adminBo.backupData(request));
-		LoggingUtil.logMessage("Backup Response " + response.getStatus().getResponseText());
 		return response;
 	}
 	
@@ -309,10 +299,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse uplink(EdoAdminRequest request) {
-		LoggingUtil.logMessage("Uplink Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response.setStatus(adminBo.uplinkData(request));
-		LoggingUtil.logMessage("Uplink Response " + response.getStatus().getResponseText());
 		return response;
 	}
 	
@@ -321,7 +309,6 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoAdminRequest downloadData(EdoAdminRequest request) {
-		LoggingUtil.logMessage("Download Request :" + request);
 		return adminBo.downloadData(request);
 	}
 	
@@ -330,10 +317,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse downlink(EdoAdminRequest request) {
-		LoggingUtil.logMessage("Downlink Request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response.setStatus(adminBo.downlinkData(request));
-		LoggingUtil.logMessage("Downlink Response " + response.getStatus().getResponseText());
 		return response;
 	}
 	
@@ -346,7 +331,7 @@ public class EdoAdminController {
 			@FormDataParam("questionSuffix") String questionSuffix, @FormDataParam("questionPrefix") String questionPrefix,
 			@FormDataParam("fromQuestion") Integer fromQuestion, @FormDataParam("toQuestion") Integer toQuestion
 			) {
-		LoggingUtil.logMessage("Parse PDF request :" + testId + " for " + fileDetails.getFileName());
+		LoggingUtil.logMessage("Parse PDF request :" + testId + " for " + fileDetails.getFileName(), LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			EdoAdminRequest request = new EdoAdminRequest();
@@ -359,7 +344,7 @@ public class EdoAdminController {
 			request.setFromQuestion(fromQuestion);
 			request.setToQuestion(toQuestion);
 			response = adminBo.parsePdf(request, fileData);
-			LoggingUtil.logMessage("Parsing PDF for " + testId + " completed ..");
+			LoggingUtil.logMessage("Parsing PDF for " + testId + " completed ..", LoggingUtil.requestLogger);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
@@ -371,14 +356,12 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse loadParsedPdf(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Load Parsed PDF request :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response =  adminBo.loadParsedQuestions(request);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Load Parsed PDF Response");
 		return response;
 	}
 	
@@ -387,14 +370,14 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse saveParsedQuestionPaper(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Save Parsed paper request :" + request);
+		LoggingUtil.logMessage("Save Parsed paper request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response.setStatus(adminBo.saveParsedQuestions(request));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		LoggingUtil.logMessage("Save Parsed paper Response");
+		//LoggingUtil.logMessage("Save Parsed paper Response");
 		return response;
 	}
 	
@@ -403,7 +386,7 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse createAdmin(EdoAdminRequest request) {
-		LoggingUtil.logMessage("Create admin Request :" + request);
+		LoggingUtil.logMessage("Create admin Request :" + request, LoggingUtil.requestLogger);
 		//EdoServiceResponse response = CommonUtils.initResponse();
 		return adminBo.createInstitute(request);
 		//LoggingUtil.logMessage("Create admin response " + response.getStatus().getResponseText());
@@ -415,7 +398,7 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse savePendingVideos(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Export videos :" + request);
+		//LoggingUtil.logMessage("Export videos :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response.setStatus(adminBo.savePendingVideos(request));
 		return response;
@@ -426,7 +409,7 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse upgradeClient(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Upgrade client :" + request);
+		//LoggingUtil.logMessage("Upgrade client :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response.setStatus(adminBo.upgradeClient(request));
 		return response;
@@ -437,7 +420,7 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse updateClientSales(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Update client sales :" + request);
+		//LoggingUtil.logMessage("Update client sales :" + request);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response.setStatus(adminBo.updateClientSales(request));
 		return response;
@@ -448,7 +431,7 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse loadQuestionBank(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Load question bank :" + request);
+		//LoggingUtil.logMessage("Load question bank :" + request);
 		return adminBo.loadQuestionBank(request);
 	}
 }

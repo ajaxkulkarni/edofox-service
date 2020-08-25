@@ -340,7 +340,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					if(question.getQn_id() != null) {
 						test.setCurrentQuestion(question);
 						testsDao.saveTestQuestion(test);
-						LoggingUtil.logMessage("... Saved question .. " + question.getId() + ":" + question.getQn_id());
+						//LoggingUtil.logMessage("... Saved question .. " + question.getId() + ":" + question.getQn_id());
 					}
 				}
 			}
@@ -372,7 +372,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					}
 					QuestionParser.parseSolution(question.getQuestionNumber(), question, filePath);
 					testsDao.updateSolution(question);
-					LoggingUtil.logMessage("Uploaded solution for .." + question.getQuestionNumber() + " : " + question.getQn_id());
+					//LoggingUtil.logMessage("Uploaded solution for .." + question.getQuestionNumber() + " : " + question.getQn_id());
 				}
 			}
 		} catch (Exception e) {
@@ -564,7 +564,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					}
 				}
 				//if(update) {
-				LoggingUtil.logMessage("Removing student package IF PRESENT for =>" + student.getId());
+				//LoggingUtil.logMessage("Removing student package IF PRESENT for =>" + student.getId());
 				testsDao.deleteExistingPackages(student);
 				//}
 				LoggingUtil.logMessage("Adding student package for =>" + student.getId());
