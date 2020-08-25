@@ -1,7 +1,5 @@
 package com.rns.web.edo.service.domain;
 
-import java.math.BigDecimal;
-
 import com.rns.web.edo.service.util.EdoConstants;
 
 public class EdoPaymentStatus extends EdoApiStatus {
@@ -11,7 +9,39 @@ public class EdoPaymentStatus extends EdoApiStatus {
 	private boolean offline;
 	private String mode;
 	private Double amount;
-	
+	private String hash;
+	private String txnid;
+	private String productInfo;
+	private String hashString;
+	private String redirectUrl;
+	private String failureUrl;
+	private String key;
+		
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
+
+	public String getTxnid() {
+		return txnid;
+	}
+
+	public void setTxnid(String txnid) {
+		this.txnid = txnid;
+	}
+
+	public String getProductInfo() {
+		return productInfo;
+	}
+
+	public void setProductInfo(String productInfo) {
+		this.productInfo = productInfo;
+	}
+
+
 	public EdoPaymentStatus() {
 		setStatusCode(EdoConstants.STATUS_OK);
 		setResponseText(EdoConstants.RESPONSE_OK);
@@ -52,6 +82,38 @@ public class EdoPaymentStatus extends EdoApiStatus {
 
 	public void setAmount(Double amount) {
 		this.amount = amount;
+	}
+
+	public String getHashString() {
+		return hashString;
+	}
+
+	public void setHashString(String hashString) {
+		this.hashString = hashString;
+	}
+
+	public String getRedirectUrl() {
+		return redirectUrl;
+	}
+
+	public void setRedirectUrl(String redirectUrl) {
+		this.redirectUrl = redirectUrl;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public String getFailureUrl() {
+		return failureUrl;
+	}
+
+	public void setFailureUrl(String failureUrl) {
+		this.failureUrl = failureUrl;
 	}
 	
 	

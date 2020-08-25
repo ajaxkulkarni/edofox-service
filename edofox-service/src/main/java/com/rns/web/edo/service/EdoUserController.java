@@ -256,7 +256,7 @@ public class EdoUserController {
 	//@Produces(MediaType.APPLICATION_JSON)
 	public Response processPayment(@QueryParam("id") String id, @QueryParam("transaction_id") String transactionId, @QueryParam("payment_id") String paymentId) {
 		LoggingUtil.logMessage("Process payment Request :" + id + " : " + transactionId, LoggingUtil.paymentLogger);
-		EdoPaymentStatus response = userBo.processPayment(id, transactionId, paymentId);
+		EdoPaymentStatus response = userBo.processPayment(id, transactionId, paymentId, null);
 		String urlString = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "payment.php?payment_id=" + id + "&status=";
 		if(response == null || response.getStatusCode() != EdoConstants.STATUS_OK) {
 			urlString = urlString + "Failed";
@@ -279,7 +279,7 @@ public class EdoUserController {
 	public Response paymentWebhook(MultivaluedMap<String, String> formParams) {
 		System.out.println(formParams);
 		LoggingUtil.logMessage("Webhook payment Request :" + formParams);
-		/*EdoApiStatus response = */userBo.processPayment(formParams.getFirst("id"), formParams.getFirst("transaction_id"), null);
+		/*EdoApiStatus response = */userBo.processPayment(formParams.getFirst("id"), formParams.getFirst("transaction_id"), null, null);
 		return Response.ok().build();
 	}
 	
@@ -557,6 +557,60 @@ public class EdoUserController {
 	public EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Question Analysis request :" + request);
 		return userBo.getQuestionAnalysis(request);
+	}
+	
+	//{country=[], udf10=[], discount=[0.00], mode=[CC], 
+	//cardhash=[This field is no longer supported in postback params.], 
+	//error_Message=[No Error], state=[], bankcode=[MAST], txnid=[T27676], 
+	//net_amount_debit=[1010.1], lastname=[], zipcode=[], additionalCharges=[10.1], 
+	//phone=[4004004031], productinfo=[Deeper exams], 
+	//hash=[863d2d7c43784034d981f0f5d7a6021d57184198981cf960403e0eb04bd0222eb10e81ced9cef95104be1c2a85109d71044dc16a8dc54a3df400dcd900b75264], 
+	//status=[success], firstname=[user  demo], city=[], isConsentPayment=[0], error=[E000], 
+	//addedon=[2020-08-24 23:34:20], udf9=[], udf7=[], udf8=[], 
+	//encryptedPaymentId=[8943EF9206AEBFCD5DF1B0B315B4D7BE], bank_ref_num=[274790348051535], key=[005QTvo8], 
+	//email=[demouser@Mail.com], amount=[1000.00], unmappedstatus=[captured], address2=[], payuMoneyId=[250461076], 
+	//address1=[], udf5=[], mihpayid=[9083979633], udf6=[], udf3=[], udf4=[], udf1=[], udf2=[], giftCardIssued=[true], 
+	//field1=[833640347203], cardnum=[512345XXXXXX2346], field7=[AUTHPOSITIVE], field6=[], field9=[], field8=[], amount_split=[{"PAYU":"1010.10"}], field3=[274790348051535], field2=[816063], field5=[02], PG_TYPE=[HDFCPG], field4=[VDZ0d1ZKV1ZaMlpXck5xdWl1WUk=], name_on_card=[Test]}
+
+	
+	@POST
+	@Path("/payUSuccess")
+	// @Produces(MediaType.APPLICATION_JSON)
+	public Response payUSuccess(MultivaluedMap<String, String> formParams) {
+		System.out.println(formParams);
+		LoggingUtil.logMessage("PayU success payment :" + formParams, LoggingUtil.paymentLogger);
+		EdoPaymentStatus response = userBo.processPayment(formParams.getFirst("txnid"), formParams.getFirst("txnid"), null, formParams.getFirst("status"));
+		String urlString = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "payment.php?payment_id=" + formParams.getFirst("txnid") + "&status=";
+		if(response == null || response.getStatusCode() != EdoConstants.STATUS_OK) {
+			urlString = urlString + "Failed";
+		} else {
+			urlString = urlString + "Success";
+		}
+		urlString = urlString + "&amount=" + formParams.getFirst("amount");
+		URI url = null;
+		try {
+			url = new URI(urlString);
+		} catch (URISyntaxException e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return Response.temporaryRedirect(url).build();
+	}
+	
+	@POST
+	@Path("/payUFailure")
+	// @Produces(MediaType.APPLICATION_JSON)
+	public Response payUFailure(MultivaluedMap<String, String> formParams) {
+		System.out.println(formParams);
+		LoggingUtil.logMessage("PayU failed payment :" + formParams, LoggingUtil.paymentLogger);
+		String urlString = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "payment.php?payment_id=" + formParams.getFirst("txnid") + "&status=Failed";
+		urlString = urlString + "&amount=" + formParams.getFirst("amount");
+		URI url = null;
+		try {
+			url = new URI(urlString);
+		} catch (URISyntaxException e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return Response.temporaryRedirect(url).build();
 	}
 	
 }

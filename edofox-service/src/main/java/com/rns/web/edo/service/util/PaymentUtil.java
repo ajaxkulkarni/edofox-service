@@ -1,6 +1,13 @@
 package com.rns.web.edo.service.util;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 import javax.ws.rs.core.MediaType;
 
@@ -193,4 +200,73 @@ public class PaymentUtil implements EdoConstants {
 		}
 	}
 
+	
+	
+	private static String hashCal(String type, String str) {
+        byte[] hashseq = str.getBytes();
+        StringBuffer hexString = new StringBuffer();
+        try {
+            MessageDigest algorithm = MessageDigest.getInstance(type);
+            algorithm.reset();
+            algorithm.update(hashseq);
+            byte messageDigest[] = algorithm.digest();
+            for (int i = 0; i < messageDigest.length; i++) {
+                String hex = Integer.toHexString(0xFF & messageDigest[i]);
+                if (hex.length() == 1) {
+                    hexString.append("0");
+                }
+                hexString.append(hex);
+            }
+
+        } catch (NoSuchAlgorithmException nsae) {
+        }
+        return hexString.toString();
+    }
+
+    public static EdoPaymentStatus getHash(String txnid, Double amount, EdoStudent student, String paymentPurpose) {
+    	EdoPaymentStatus status = new EdoPaymentStatus();
+        String key = EdoPropertyUtil.getProperty("deeper.insta.client.id");
+        String salt = EdoPropertyUtil.getProperty("deeper.insta.client.secret");
+		
+        //String action1 = "";
+        //String base_url = "https://sandboxsecure.payu.in/";
+        String base_url = "https://secure.payu.in/";
+        String hash = "";
+        //String otherPostParamSeq = "phone|surl|furl|lastname|curl|address1|address2|city|state|country|zipcode|pg";
+        String hashSequence = "{key}|{txnid}|{amount}|{productinfo}|{firstname}|{email}|||||||||||{salt}";
+        
+        //Prepare hash
+        hashSequence = StringUtils.replace(hashSequence, "{key}", key);
+        hashSequence = StringUtils.replace(hashSequence, "{txnid}", txnid);
+        hashSequence = StringUtils.replace(hashSequence, "{amount}", String.format("%.2f", amount));
+        hashSequence = StringUtils.replace(hashSequence, "{productinfo}", paymentPurpose);
+        hashSequence = StringUtils.replace(hashSequence, "{firstname}", student.getName());
+        hashSequence = StringUtils.replace(hashSequence, "{email}", student.getEmail());
+        hashSequence = StringUtils.replace(hashSequence, "{salt}", salt);
+        
+        
+        hash = hashCal("SHA-512", hashSequence);
+        
+        status.setTxnid(txnid);
+        status.setAmount(amount);
+        status.setHash(hash);
+        status.setHashString(hashSequence);
+        status.setRedirectUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "payUSuccess");
+        status.setFailureUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "payUFailure");
+        status.setPaymentUrl(base_url + "_payment");
+        status.setKey(key);
+        status.setProductInfo(paymentPurpose);
+        status.setStatusCode(200);
+        
+        LoggingUtil.logMessage("Payment Hash " + hash + " for string " + hashSequence, LoggingUtil.paymentLogger);
+        
+        return status;
+    }
+    
+    public static void main(String[] args) {
+		//System.out.println(hashCal("SHA-512", "005QTvo8|11aa|100.00|myproduct|ajinkya|ajinkyashiva@gmail.com|||||||||||YpI1nBbIqJ"));
+		//System.out.println(hashCal("SHA-512", "005QTvo8|11aa|100.00|myproduct|ajinkya|ajinkyashiva@gmail.com|||||||||||YpI1nBbIqJ"));
+		System.out.println(String.format("%.2f", new Double(100.12331)));
+    }
+	
 }

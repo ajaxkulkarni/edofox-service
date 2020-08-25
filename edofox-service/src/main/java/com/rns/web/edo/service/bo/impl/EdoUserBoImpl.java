@@ -732,7 +732,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return new EdoServiceResponse(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 		}
 		EdoServiceResponse response = new EdoServiceResponse();
-		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
+		//TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
 			
 			String status = "Completed";
@@ -759,7 +759,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EDOInstitute institute = testsDao.getStudentStats(student.getPackages().get(0).getInstitute().getId());
 			if(institute != null && institute.getMaxStudents() != null && institute.getCurrentCount() != null) {
 				if((institute.getCurrentCount() + 1) >= institute.getMaxStudents()) {
-					LoggingUtil.logMessage("Max students limit reached ... " + student.getPhone() + " for institute " + student.getPackages().get(0).getInstitute().getId() + " count " +institute.getCurrentCount() + " and max " + institute.getMaxStudents());
+					LoggingUtil.logMessage("Max students limit reached ... " + student.getPhone() + " for institute " + student.getPackages().get(0).getInstitute().getId() + " count " +institute.getCurrentCount() + " and max " + institute.getMaxStudents(), LoggingUtil.paymentLogger);
 					response.setStatus(new EdoApiStatus(-111, "Maximum students limit reached. Please contact your organization to upgrade the plan."));
 					return response;
 				}
@@ -780,7 +780,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(CollectionUtils.isEmpty(existingStudent)) {
 					testsDao.saveStudent(student);
 					if(CollectionUtils.isNotEmpty(student.getPackages())) {
-						LoggingUtil.logMessage("Adding student login for =>" + student.getId());
+						LoggingUtil.logMessage("Adding student login for =>" + student.getId(), LoggingUtil.paymentLogger);
 						student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
 						testsDao.saveLogin(student);
 					}
@@ -790,7 +790,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					return response;
 				}
 				
-				LoggingUtil.logMessage("Student ID is =>" + student.getId());
+				LoggingUtil.logMessage("Student ID is =>" + student.getId(), LoggingUtil.paymentLogger);
 				if(student.getId() != null) {
 					updateStudentPackages(student);
 				}
@@ -806,11 +806,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				institute = testsDao.getInstituteById(student.getPackages().get(0).getInstitute().getId());
 			}*/
 			notifyStudent(student, MAIL_TYPE_SUBSCRIPTION, institute);
-			txManager.commit(txStatus);
+			//txManager.commit(txStatus);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
-			txManager.rollback(txStatus);
+			//txManager.rollback(txStatus);
 		}
 		return response;
 	}
@@ -841,15 +841,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//Set transaction ID to be unique
 			String clientId = null, clientSecret = null, purpose = null;
 			if(student.getPackages().get(0).getInstitute().getId() == 22) {
-				clientId = EdoPropertyUtil.getProperty("deeper.insta.client.id");
-				clientSecret = EdoPropertyUtil.getProperty("deeper.insta.client.secret");
 				purpose = "Deeper exams";
+				//Use PayU In case of Deeper payment
+				String txnid = "T" + student.getTransactionId();
+				EdoPaymentStatus paymentStatus = PaymentUtil.getHash(txnid, amount.doubleValue(), student, purpose);
+				response.setPaymentStatus(paymentStatus);
+				paymentStatus.setPaymentId(txnid);
+				student.setPayment(paymentStatus);
+				testsDao.updatePaymentId(student);
+				return;
 			}
 			EdoPaymentStatus paymentResponse = PaymentUtil.paymentRequest(amount.doubleValue(), student, student.getTransactionId(), clientId, clientSecret, purpose);
 			if(paymentResponse != null && paymentResponse.getPaymentId() != null) {
 				student.setPayment(paymentResponse);
 				testsDao.updatePaymentId(student);
-				LoggingUtil.logMessage("Got the payment Id as =>" + paymentResponse.getPaymentId());
+				LoggingUtil.logMessage("Got the payment Id as =>" + paymentResponse.getPaymentId(), LoggingUtil.paymentLogger);
 			}
 			response.setPaymentStatus(paymentResponse);
 		}
@@ -860,7 +866,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		testsDao.createStudentPackage(student);
 	}
 
-	public EdoPaymentStatus processPayment(String id, String transactionId, String paymentId) {
+	public EdoPaymentStatus processPayment(String id, String transactionId, String paymentId, String txStatus) {
 		//EdoApiStatus status = new EdoApiStatus();
 		EdoPaymentStatus status = new EdoPaymentStatus();
 		try {
@@ -892,11 +898,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 				if (incompletePackageFound) {
 					String clientId = null, clientSecret = null;
+					boolean validPayment = false;
 					if(studentPackages.get(0).getCurrentPackage().getInstitute().getId() == 22) {
 						clientId = EdoPropertyUtil.getProperty("deeper.insta.client.id");
 						clientSecret = EdoPropertyUtil.getProperty("deeper.insta.client.secret");
+						if(StringUtils.equalsIgnoreCase("success", txStatus)) {
+							validPayment = true;
+						}
+						
+					} else {
+						validPayment = PaymentUtil.getPaymentStatus(id, clientId, clientSecret, status);
 					}
-					boolean validPayment = PaymentUtil.getPaymentStatus(id, clientId, clientSecret, status);
+					
 					if (validPayment) {
 						EdoPaymentStatus paymentStatus = new EdoPaymentStatus();
 						paymentStatus.setPaymentId(id);
@@ -950,6 +963,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				existing.setPackages(packages);
 				existing.setExamMode(student.getExamMode());
 				updateStudentPackages(existing);
+				//For Deeper go to register page again
+				if(pkg.getInstitute() != null && pkg.getInstitute().getId() == 22) {
+					payment.setPaymentUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "registration/deeper.html");
+					return payment;
+				}
 				EdoServiceResponse response = new EdoServiceResponse();
 				completePayment(existing, response);
 				return response.getPaymentStatus();

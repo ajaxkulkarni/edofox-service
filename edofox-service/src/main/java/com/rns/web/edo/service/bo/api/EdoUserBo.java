@@ -21,7 +21,7 @@ public interface EdoUserBo {
 	EdoServiceResponse getPackages(EDOInstitute institute);
 	EdoServiceResponse getPackages(EdoStudent student);
 	EdoServiceResponse registerStudent(EdoStudent student);
-	EdoPaymentStatus processPayment(String id, String transactionId, String paymentId);
+	EdoPaymentStatus processPayment(String id, String transactionId, String paymentId, String txStatus);
 	EdoPaymentStatus completePayment(EdoTest test, EdoStudent student);
 	EdoFile getStudentImage(Integer studentId);
 	EdoServiceResponse getAllSubjects();
