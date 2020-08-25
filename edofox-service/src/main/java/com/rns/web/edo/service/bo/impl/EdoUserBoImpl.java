@@ -1594,7 +1594,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			testsDao.saveVideoActiviy(request);
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.activityLogger);
 		}
 		return status;
 	}
