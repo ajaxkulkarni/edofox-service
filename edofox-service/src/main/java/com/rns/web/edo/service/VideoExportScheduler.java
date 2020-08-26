@@ -183,7 +183,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 			File recordedFile = new File(recordedFolderPath + sessionName + ".mp4");
 			LoggingUtil.logMessage("Fixing the file for " + recordedFile.getAbsolutePath(), LoggingUtil.videoLogger);
 			if(recordedFile.exists() && recordedFile.length() > 0) {
-				FileUtils.moveFileToDirectory(recordedFile, new File(outputFolder), false);
+				FileUtils.copyFileToDirectory(recordedFile, new File(outputFolder), false);
 				return true;
 			} else {
 				LoggingUtil.logMessage("Could not find file " + recordedFile.getAbsolutePath(), LoggingUtil.videoLogger);
