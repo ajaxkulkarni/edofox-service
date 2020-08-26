@@ -434,4 +434,13 @@ public class EdoAdminController {
 		//LoggingUtil.logMessage("Load question bank :" + request);
 		return adminBo.loadQuestionBank(request);
 	}
+	
+	@POST
+	@Path("/fixRecordedFile")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse fixRecordedFile(EdoServiceRequest request) {
+		//LoggingUtil.logMessage("Load question bank :" + request);
+		return adminBo.fixRecordedFile(request);
+	}
 }

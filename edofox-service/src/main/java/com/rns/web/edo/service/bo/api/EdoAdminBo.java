@@ -43,5 +43,6 @@ public interface EdoAdminBo {
 	EdoApiStatus savePendingVideos(EdoServiceRequest request);
 	EdoApiStatus upgradeClient(EdoServiceRequest request);
 	EdoApiStatus updateClientSales(EdoServiceRequest request);
+	EdoServiceResponse fixRecordedFile(EdoServiceRequest request);
 	
 }

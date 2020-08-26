@@ -50,6 +50,7 @@ import com.rns.web.edo.service.domain.EdoSubject;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
 import com.rns.web.edo.service.domain.jpa.EdoSalesDetails;
@@ -1777,6 +1778,26 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			response.setTest(test);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse fixRecordedFile(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			if(request.getLecture() != null) {
+				boolean fixed = VideoExportScheduler.fixFile(request.getLecture().getVideoName());
+				if(fixed) {
+					EdoApiStatus status = new EdoApiStatus();
+					status.setResponseText(VideoExportScheduler.FIXED_URL + request.getLecture().getVideoName());
+					response.setStatus(status);
+				} else {
+					response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
 	}

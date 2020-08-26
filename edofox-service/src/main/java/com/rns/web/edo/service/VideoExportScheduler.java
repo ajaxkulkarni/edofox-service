@@ -1,14 +1,15 @@
 package com.rns.web.edo.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
@@ -37,6 +38,11 @@ import com.rns.web.edo.service.util.VideoUtil;
 public class VideoExportScheduler implements SchedulingConfigurer {
 
 	private static Logger logger = Logger.getLogger("scheduler");
+	
+	private static String recordedFolderPath = "/usr/local/FlashphonerWebCallServer/records/";
+	private static String outputFolder = "/var/www/html/recorded/";
+	public static String FIXED_URL = "https://dev.edofox.com/recorded/";
+	
 
 	private SessionFactory sessionFactory;
 	private ThreadPoolTaskExecutor executor;
@@ -168,6 +174,24 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 
 	public void setTestsDao(EdoTestsDao testsDao) {
 		this.testsDao = testsDao;
+	}
+	
+	
+	public static boolean fixFile(String sessionName) {
+		try {
+			
+			LoggingUtil.logMessage("Fixing the file for " + sessionName);
+			File recordedFile = new File(recordedFolderPath + ".mp4");
+			if(recordedFile.exists() && recordedFile.length() > 0) {
+				FileUtils.moveFileToDirectory(recordedFile, new File(outputFolder), false);
+				return true;
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError("Error in fixing recorde file " + sessionName + " -- " + ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
+		}
+		return false;
 	}
 
 }
