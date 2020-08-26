@@ -180,7 +180,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 	public static boolean fixFile(String sessionName) {
 		try {
 			
-			File recordedFile = new File(recordedFolderPath + ".mp4");
+			File recordedFile = new File(recordedFolderPath + sessionName + ".mp4");
 			LoggingUtil.logMessage("Fixing the file for " + recordedFile.getAbsolutePath(), LoggingUtil.videoLogger);
 			if(recordedFile.exists() && recordedFile.length() > 0) {
 				FileUtils.moveFileToDirectory(recordedFile, new File(outputFolder), false);
