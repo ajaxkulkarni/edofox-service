@@ -60,11 +60,11 @@
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		insert into student
 		(name, email, mobile_no, password, roll_no, gender, school_district,
-		date_of_birth, caste_category, parent_mobile_no, previous_marks )
+		date_of_birth, caste_category, parent_mobile_no, previous_marks, referrer)
 		values('${name}',
 		'${email}', '${phone}', '${password}', '${rollNo}', '${gender}',
 		'${schoolDistrict}', '${dob}', '${casteCategory}',
-		'${parentMobileNo}', '${previousMarks}');
+		'${parentMobileNo}', '${previousMarks}', '${referrer}');
 	</insert>
 	
 	<insert id="saveLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent">

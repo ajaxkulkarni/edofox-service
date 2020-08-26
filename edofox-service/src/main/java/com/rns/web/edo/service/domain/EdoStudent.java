@@ -30,6 +30,7 @@ public class EdoStudent {
 	private String instituteId;
 	private String accessType;
 	private String previousMarks;
+	private String referrer;
 
 	public EdoStudent() {
 
@@ -205,6 +206,14 @@ public class EdoStudent {
 
 	public void setPreviousMarks(String previousMarks) {
 		this.previousMarks = previousMarks;
+	}
+
+	public String getReferrer() {
+		return referrer;
+	}
+
+	public void setReferrer(String referrer) {
+		this.referrer = referrer;
 	}
 	
 }
