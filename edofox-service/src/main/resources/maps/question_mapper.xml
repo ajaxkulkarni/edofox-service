@@ -24,7 +24,7 @@
 		test_subjects left join chapters on test_subjects.subject_id =
 		chapters.subject 
 		<if test="value != null">
-		where institute_id is null OR institute_id = ${value}
+		where test_subjects.institute_id is null OR test_subjects.institute_id = ${value}
 		</if>
 		;
 	</select>
