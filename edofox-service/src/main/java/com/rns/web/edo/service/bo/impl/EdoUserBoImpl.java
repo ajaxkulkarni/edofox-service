@@ -29,6 +29,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.clickntap.vimeo.VimeoResponse;
+import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
@@ -1335,8 +1336,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					live.setRecording_url(urlStr);
 					LoggingUtil.logMessage("Exported video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
 				} else {
-					live.setStatus("Failed");
-					LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
+					//Check if file can be fixed
+					EdoVideoLecture lecture = VideoExportScheduler.callFixFileApi(live.getClassroomId() + "-" + live.getId());
+					if(lecture != null && lecture.getSize() != null) {
+						live.setStatus("Completed");
+						live.setRecording_url(lecture.getVideo_url());
+						live.setFileSize(lecture.getSize().floatValue());
+					} else {
+						live.setStatus("Failed");
+						LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
+					}
 				}
 				tx.commit();
 				EDOInstitute institute = new EDOInstitute();
