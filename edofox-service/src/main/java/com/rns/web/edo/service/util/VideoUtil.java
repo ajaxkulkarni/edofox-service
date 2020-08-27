@@ -315,7 +315,7 @@ public class VideoUtil {
 			} 
 			
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError("Could not download file  for " + sessionId, LoggingUtil.videoLogger);
 		} finally {
 			if(fileOutputStream != null) {
 				try {

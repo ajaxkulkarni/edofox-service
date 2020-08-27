@@ -3,6 +3,7 @@ package com.rns.web.edo.service.bo.impl;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -52,10 +53,12 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
 import com.rns.web.edo.service.domain.jpa.EdoSalesDetails;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoUplinkStatus;
+import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
@@ -1786,11 +1789,16 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
 			if(request.getLecture() != null) {
-				boolean fixed = VideoExportScheduler.fixFile(request.getLecture().getVideoName());
-				if(fixed) {
-					EdoApiStatus status = new EdoApiStatus();
-					status.setResponseText(VideoExportScheduler.FIXED_URL + request.getLecture().getVideoName());
-					response.setStatus(status);
+				long fixed = VideoExportScheduler.fixFile(request.getLecture().getVideoName());
+				if(fixed > 0) {
+					List<EdoVideoLectureMap> lectures = new ArrayList<EdoVideoLectureMap>();
+					EdoVideoLectureMap lecture = new EdoVideoLectureMap();
+					EdoVideoLecture lecture2 = new EdoVideoLecture();
+					lecture2.setVideo_url(VideoExportScheduler.FIXED_URL + request.getLecture().getVideoName() + ".mp4");
+					lecture2.setSize(new Double(fixed));
+					lecture.setLecture(lecture2);
+					lectures.add(lecture);
+					response.setLectures(lectures);
 				} else {
 					response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 				}
@@ -1800,5 +1808,49 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+	
+	public EdoApiStatus fixRecordedLectures(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Criteria liveCriteria = session.createCriteria(EdoLiveSession.class);
+			List<EdoLiveSession> failedSessions = liveCriteria.add(Restrictions.eq("status", "Failed")).list();
+			if(CollectionUtils.isNotEmpty(failedSessions)) {
+				LoggingUtil.logMessage("Fixing the sessions - " + failedSessions.size());
+				for(EdoLiveSession live: failedSessions) {
+					if(StringUtils.isBlank(live.getRecording_url())) {
+						String videoName = live.getClassroomId() + "-" + live.getId();
+						LoggingUtil.logMessage("Fixing the file " + videoName, LoggingUtil.videoLogger);
+						EdoVideoLecture lecture = VideoExportScheduler.callFixFileApi(videoName);
+						if(lecture != null && lecture.getSize() != null) {
+							Transaction tx = session.beginTransaction();
+							live.setRecording_url(lecture.getVideo_url());
+							live.setFileSize(lecture.getSize().floatValue());
+							tx.commit();
+							LoggingUtil.logMessage("Fixed the file " + videoName + " with " + live.getRecording_url(), LoggingUtil.videoLogger);
+							EDOInstitute institute = new EDOInstitute();
+							EDOPackage pkg = testsDao.getPackage(live.getClassroomId());
+							if(pkg != null && pkg.getInstitute() != null && live.getFileSize() != null) {
+								institute.setId(pkg.getInstitute().getId());
+								BigDecimal bd = CommonUtils.calculateStorageUsed(live.getFileSize());
+								institute.setStorageQuota(bd.doubleValue());
+								//Deduct quota from institute
+								LoggingUtil.logMessage("Deducting quota " + institute.getStorageQuota() + " GBs from " + institute.getId(), LoggingUtil.videoLogger);
+								testsDao.deductQuota(institute);
+							}
+						}
+					}
+					
+				}
+			}
+			LoggingUtil.logMessage("Finished fixing the sessions ..", LoggingUtil.videoLogger);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
 	}
 }

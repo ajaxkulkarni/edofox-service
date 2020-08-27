@@ -443,4 +443,13 @@ public class EdoAdminController {
 		//LoggingUtil.logMessage("Load question bank :" + request);
 		return adminBo.fixRecordedFile(request);
 	}
+	
+	@POST
+	@Path("/fixRecordedSessions")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse fixRecordedSessions(EdoServiceRequest request) {
+		//LoggingUtil.logMessage("Load question bank :" + request);
+		return adminBo.fixRecordedFile(request);
+	}
 }

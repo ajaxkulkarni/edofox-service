@@ -13,6 +13,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -28,20 +32,30 @@ import com.clickntap.vimeo.VimeoException;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EdoServiceRequest;
+import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
+import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.VideoUtil;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 @EnableScheduling
 public class VideoExportScheduler implements SchedulingConfigurer {
 
-	private static Logger logger = Logger.getLogger("scheduler");
 	
 	private static String recordedFolderPath = "/usr/local/FlashphonerWebCallServer/records/";
 	private static String outputFolder = "/var/www/html/recorded/";
 	public static String FIXED_URL = "https://dev.edofox.com/recorded/";
+	private static String FIX_URL = "https://dev.edofox.com:8443/edofox/admin/fixRecordedFile";
 	
 
 	private SessionFactory sessionFactory;
@@ -69,7 +83,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 	private void videoExportJob() {
 		Session session = null;
 		try {
-			LoggingUtil.logMessage("... Start of video export job ..", LoggingUtil.videoLogger);
+			LoggingUtil.logMessage("... Start of video export job ..", LoggingUtil.schedulerLogger);
 			session = this.sessionFactory.openSession();
 			exportVideos(session);
 			
@@ -78,7 +92,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 		} finally {
 			CommonUtils.closeSession(session);
 		}
-		LoggingUtil.logMessage("... End of video export job ..", LoggingUtil.videoLogger);
+		LoggingUtil.logMessage("... End of video export job ..", LoggingUtil.schedulerLogger);
 	}
 
 	public void exportVideos(Session session) throws IOException, InterruptedException, VimeoException {
@@ -89,11 +103,11 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MINUTE, -new Integer(maxIdleTime));
 		Date minTime = cal.getTime();
-		LoggingUtil.logMessage("... Checking for date .." + minTime, LoggingUtil.videoLogger);
+		LoggingUtil.logMessage("... Checking for date .." + minTime, LoggingUtil.schedulerLogger);
 		List<EdoLiveSession> liveSessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.le("lastUpdated", minTime))
 				.add(Restrictions.eq("status", "Active")).list();
 		if (CollectionUtils.isNotEmpty(liveSessions)) {
-			LoggingUtil.logMessage("Exporting videos for " + liveSessions.size() + " lectures ..", LoggingUtil.videoLogger);
+			LoggingUtil.logMessage("Exporting videos for " + liveSessions.size() + " lectures ..", LoggingUtil.schedulerLogger);
 			int count = 0;
 			for (EdoLiveSession live : liveSessions) {
 				
@@ -112,10 +126,18 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 					live.setStatus("Completed");
 					String urlStr = EdoPropertyUtil.getProperty(EdoPropertyUtil.RECORDED_URL) + URLEncoder.encode(live.getClassroomId() + "-" + live.getId() + ".mp4", "UTF-8");
 					live.setRecording_url(urlStr);
-					LoggingUtil.logMessage("Exported video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
+					LoggingUtil.logMessage("Exported video " + live.getId() + " successfully ..", LoggingUtil.schedulerLogger);
 				} else {
-					live.setStatus("Failed");
-					LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
+					//Try fixing the file
+					EdoVideoLecture lecture = callFixFileApi(live.getClassroomId() + "-" + live.getId());
+					if(lecture != null && lecture.getSize() != null) {
+						live.setStatus("Completed");
+						live.setRecording_url(lecture.getVideo_url());
+						live.setFileSize(lecture.getSize().floatValue());
+					} else {
+						live.setStatus("Failed");
+						LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.schedulerLogger);
+					}
 				}
 				tx.commit();
 				EDOInstitute institute = new EDOInstitute();
@@ -125,13 +147,13 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 					BigDecimal bd = CommonUtils.calculateStorageUsed(live.getFileSize());
 					institute.setStorageQuota(bd.doubleValue());
 					//Deduct quota from institute
-					LoggingUtil.logMessage("Deducting quota " + institute.getStorageQuota() + " GBs from " + institute.getId(), LoggingUtil.videoLogger);
+					LoggingUtil.logMessage("Deducting quota " + institute.getStorageQuota() + " GBs from " + institute.getId(), LoggingUtil.schedulerLogger);
 					testsDao.deductQuota(institute);
 				}
 			}
-			LoggingUtil.logMessage("Exported videos for " + count + " lectures ..", LoggingUtil.videoLogger);
+			LoggingUtil.logMessage("Exported videos for " + count + " lectures ..", LoggingUtil.schedulerLogger);
 		} else {
-			LoggingUtil.logMessage("No pending videos found for " + minTime, LoggingUtil.videoLogger);
+			LoggingUtil.logMessage("No pending videos found for " + minTime, LoggingUtil.schedulerLogger);
 		}
 	}
 
@@ -143,7 +165,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 				Calendar cal = Calendar.getInstance();
 				cal.add(Calendar.MINUTE, new Integer(frequency));
 				time = cal.getTime();
-				LoggingUtil.logMessage("Next video export time:" + time, LoggingUtil.videoLogger);
+				LoggingUtil.logMessage("Next video export time:" + time, LoggingUtil.schedulerLogger);
 			}
 
 		} catch (Exception e) {
@@ -177,22 +199,52 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 	}
 	
 	
-	public static boolean fixFile(String sessionName) {
+	public static long fixFile(String sessionName) {
 		try {
 			
 			File recordedFile = new File(recordedFolderPath + sessionName + ".mp4");
 			LoggingUtil.logMessage("Fixing the file for " + recordedFile.getAbsolutePath(), LoggingUtil.videoLogger);
 			if(recordedFile.exists() && recordedFile.length() > 0) {
 				FileUtils.copyFileToDirectory(recordedFile, new File(outputFolder), false);
-				return true;
+				return recordedFile.length();
 			} else {
 				LoggingUtil.logMessage("Could not find file " + recordedFile.getAbsolutePath(), LoggingUtil.videoLogger);
-				return false;
+				return -1;
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError("Error in fixing recorde file " + sessionName + " -- " + ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
 		}
-		return false;
+		return -1;
+	}
+	
+	public static EdoVideoLecture callFixFileApi(String videoName) throws JsonGenerationException, JsonMappingException, IOException {
+		try {
+			ClientConfig config = new DefaultClientConfig();
+			config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+			Client client = Client.create(config);
+			WebResource webResource = client.resource(FIX_URL);
+			EdoServiceRequest request = new EdoServiceRequest();
+			EdoVideoLecture lecture = new EdoVideoLecture();
+			lecture.setVideoName(videoName);
+			request.setLecture(lecture);
+			LoggingUtil.logMessage("Calling fix URL with request:" + videoName, LoggingUtil.videoLogger);
+			ClientResponse response = webResource.type("application/json").post(ClientResponse.class, request);
+
+			if (response.getStatus() != 200) {
+				LoggingUtil.logMessage("Failed in fix URL URL : HTTP error code : " + response.getStatus(), LoggingUtil.videoLogger);
+			}
+			String output = response.getEntity(String.class);
+			LoggingUtil.logMessage("Output from fix URL : " + response.getStatus() + ".... \n " + output, LoggingUtil.videoLogger);
+
+			EdoServiceResponse serviceResponse = new ObjectMapper().readValue(output, EdoServiceResponse.class);
+			if(serviceResponse != null && serviceResponse.getLectures() != null && serviceResponse.getLectures().size() > 0) {
+				return serviceResponse.getLectures().get(0).getLecture();
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
+		}
+		
+		return null;
 	}
 
 }

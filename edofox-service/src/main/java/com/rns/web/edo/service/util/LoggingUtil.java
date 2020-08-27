@@ -31,6 +31,9 @@ public class LoggingUtil {
 	
 	public static Logger activityLogger = Logger.getLogger("activityLog");
 	
+	public static Logger schedulerLogger = Logger.getLogger("schedulerLog");
+	
+	
 	//private static Logger emailLogger = Logger.getLogger("email");
 	
 	public static void logMessage(String message) {
