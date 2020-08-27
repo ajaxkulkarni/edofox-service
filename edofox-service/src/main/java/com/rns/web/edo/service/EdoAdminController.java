@@ -449,7 +449,8 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse fixRecordedSessions(EdoServiceRequest request) {
-		//LoggingUtil.logMessage("Load question bank :" + request);
-		return adminBo.fixRecordedFile(request);
+		LoggingUtil.logMessage("Fix recorded sessions :" + request, LoggingUtil.videoLogger);
+		EdoServiceResponse response = new EdoServiceResponse(adminBo.fixRecordedLectures(request));
+		return response;
 	}
 }
