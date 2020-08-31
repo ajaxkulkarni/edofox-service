@@ -111,24 +111,25 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 			int count = 0;
 			for (EdoLiveSession live : liveSessions) {
 				
-				Float fileSize = VideoUtil.downloadRecordedFile(live.getClassroomId(), live.getId());
+				//Float fileSize = VideoUtil.downloadRecordedFile(live.getClassroomId(), live.getId());
 				Transaction tx = session.beginTransaction();
-				if (fileSize != null && fileSize > 0) {
+				/*if (fileSize != null && fileSize > 0) {
 					// Upload to Vimeo
 					//TODO removed as file format not supported by vimeo
-					/*VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFile, live.getSessionName(), "");
+					VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFile, live.getSessionName(), "");
 					if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
 						live.setStatus("Completed");
 						live.setRecording_url(vimeoResponse.getJson().getString("link"));
 					}
-					count++;*/
+					count++;
 					live.setFileSize(fileSize);
 					live.setStatus("Completed");
 					String urlStr = EdoPropertyUtil.getProperty(EdoPropertyUtil.RECORDED_URL) + URLEncoder.encode(live.getClassroomId() + "-" + live.getId() + ".mp4", "UTF-8");
 					live.setRecording_url(urlStr);
 					LoggingUtil.logMessage("Exported video " + live.getId() + " successfully ..", LoggingUtil.schedulerLogger);
-				} else {
+				} else {*/
 					//Try fixing the file
+					LoggingUtil.logMessage("Calling the fix lecture API for " + live.getSessionName(), LoggingUtil.schedulerLogger);
 					EdoVideoLecture lecture = callFixFileApi(live.getClassroomId() + "-" + live.getId());
 					if(lecture != null && lecture.getSize() != null) {
 						live.setStatus("Completed");
@@ -138,7 +139,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 						live.setStatus("Failed");
 						LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.schedulerLogger);
 					}
-				}
+				//}
 				tx.commit();
 				EDOInstitute institute = new EDOInstitute();
 				EDOPackage pkg = testsDao.getPackage(live.getClassroomId());
