@@ -108,6 +108,7 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoSalesDetails</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoKeyword</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoDeviceId</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoContentMap</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

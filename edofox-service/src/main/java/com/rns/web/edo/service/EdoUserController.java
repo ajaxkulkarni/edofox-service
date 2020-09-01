@@ -445,7 +445,8 @@ public class EdoUserController {
 	public EdoServiceResponse uploadVideoLecture(@FormDataParam("data") InputStream videoData, @FormDataParam("data") FormDataContentDisposition videoDetails,
 			@FormDataParam("subjectId") Integer subjectId, @FormDataParam("instituteId") Integer instituteId, 
 			@FormDataParam("title") String title, @FormDataParam("packageId") Integer packageId, @FormDataParam("topicId") Integer topicId, 
-			@FormDataParam("keywords") String keywords, @FormDataParam("questionFile") InputStream questionFile, @FormDataParam("questionFile") FormDataContentDisposition questionFileDetails) {
+			@FormDataParam("keywords") String keywords, @FormDataParam("questionFile") InputStream questionFile, 
+			@FormDataParam("questionFile") FormDataContentDisposition questionFileDetails, @FormDataParam("classrooms") String classrooms) {
 		LoggingUtil.logMessage("Upload video :" + title, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
@@ -453,7 +454,7 @@ public class EdoUserController {
 			if(questionFileDetails != null) {
 				questionFileName = questionFileDetails.getFileName();
 			}
-			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileName);
+			return userBo.uploadVideo(videoData, title, instituteId, subjectId, packageId, topicId, keywords, questionFile, questionFileName, classrooms);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));

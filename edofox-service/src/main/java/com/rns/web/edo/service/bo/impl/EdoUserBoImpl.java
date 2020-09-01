@@ -51,6 +51,7 @@ import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoContentMap;
 import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
@@ -1413,7 +1414,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	public EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId, Integer packageId, Integer topicId, 
-			String keywords, InputStream questionFile, String questionFileName) {
+			String keywords, InputStream questionFile, String questionFileName, String classrooms) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		//EdoApiStatus status = new EdoApiStatus();
 		Session session = null;
@@ -1468,7 +1469,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					lectures.setInstituteId(instituteId);
 					lectures.setCreatedDate(new Date());
 					lectures.setClassroomId(packageId);
-					lectures.setTopicId(topicId);
+					//lectures.setTopicId(topicId);
 					if(StringUtils.isNotBlank(keywords)) {
 						lectures.setKeywords(StringUtils.removeEnd(keywords, ","));
 					}
@@ -1485,6 +1486,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					//Add keywords to repo
 					if(StringUtils.isNotBlank(keywords)) {
 						updateKeywords(instituteId, keywords, session);
+					}
+					
+					//Add multiple classrroms (if any)
+					if(StringUtils.isNotBlank(classrooms)) {
+						String[] classroomArray = StringUtils.split(classrooms, ",");
+						if(ArrayUtils.isNotEmpty(classroomArray)) {
+							for(String classroom: classroomArray) {
+								if(StringUtils.isNotBlank(classroom)) {
+									EdoContentMap map = new EdoContentMap();
+									map.setContentId(lectures.getId());
+									map.setClassroomId(new Integer(classroom));
+									map.setChapterId(topicId);
+									map.setCreatedDate(new Date());
+									session.persist(map);
+								}
+							}
+						}
 					}
 					
 					//Remove the temp file
