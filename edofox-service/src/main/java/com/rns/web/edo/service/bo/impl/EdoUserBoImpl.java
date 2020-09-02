@@ -1321,22 +1321,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if (CollectionUtils.isNotEmpty(sessions)) {
 				Transaction tx = session.beginTransaction();
 				EdoLiveSession live = sessions.get(0);
-				Float fileSize = VideoUtil.downloadRecordedFile(live.getClassroomId(), live.getId());
-				if (fileSize != null && fileSize > 0) {
+				//Float fileSize = VideoUtil.downloadRecordedFile(live.getClassroomId(), live.getId());
+				/*if (fileSize != null && fileSize > 0) {
 					// Upload to Vimeo
 					//TODO removed as file format not supported by vimeo
-					/*VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFile, live.getSessionName(), "");
+					VimeoResponse vimeoResponse = VideoUtil.uploadFile(outputFile, live.getSessionName(), "");
 					if (vimeoResponse != null && vimeoResponse.getJson() != null && StringUtils.isNotBlank(vimeoResponse.getJson().getString("link"))) {
 						live.setStatus("Completed");
 						live.setRecording_url(vimeoResponse.getJson().getString("link"));
 					}
-					count++;*/
+					count++;
 					live.setFileSize(fileSize);
 					live.setStatus("Completed");
 					String urlStr = EdoPropertyUtil.getProperty(EdoPropertyUtil.RECORDED_URL) + URLEncoder.encode(live.getClassroomId() + "-" + live.getId() + ".mp4", "UTF-8");
 					live.setRecording_url(urlStr);
 					LoggingUtil.logMessage("Exported video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
-				} else {
+				} else {*/
 					//Check if file can be fixed
 					EdoVideoLecture lecture = VideoExportScheduler.callFixFileApi(live.getClassroomId() + "-" + live.getId());
 					if(lecture != null && lecture.getSize() != null) {
@@ -1347,7 +1347,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						live.setStatus("Failed");
 						LoggingUtil.logMessage("Could not export video " + live.getId() + " successfully ..", LoggingUtil.videoLogger);
 					}
-				}
+				//}
 				tx.commit();
 				EDOInstitute institute = new EDOInstitute();
 				EDOPackage pkg = testsDao.getPackage(live.getClassroomId());
