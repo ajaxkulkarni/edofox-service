@@ -1,10 +1,8 @@
 package com.rns.web.edo.service.bo.api;
 
 import java.io.InputStream;
-import java.util.List;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
-import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;

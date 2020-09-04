@@ -1614,12 +1614,63 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoApiStatus updateStudentActivity(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();
-		if(StringUtils.isBlank(request.getRequestType()) || request.getStudent() == null) {
+		if(StringUtils.isBlank(request.getRequestType()) || request.getStudent() == null || request.getFeedback() == null) {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
 			return status;
 		}
+		if(request.getStudent().getId() == null && StringUtils.isBlank(request.getStudent().getRollNo())) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		if(request.getFeedback().getId() == null && request.getFeedback().getVideoId() == null) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		
 		try {
+			
+			if(request.getStudent().getId() != null) {
+				request.getStudent().setRollNo(null);
+			}
+
 			testsDao.saveVideoActiviy(request);
+			//Update activity summary
+			Integer activityCount = 1;
+			Integer watchedTimes = 0;
+			if(StringUtils.equals(request.getRequestType(), "VIDEO_ENDED")) {
+				watchedTimes = 1;
+			}
+			Long watchDuration = 0L; 
+			EdoFeedback feedback = request.getFeedback();
+			if(feedback != null && feedback.getTotalDuration() != null) {
+				watchDuration = feedback.getTotalDuration();
+			}
+			List<EdoFeedback> activiy = testsDao.getStudentActivity(request);
+			if(CollectionUtils.isNotEmpty(activiy)) {
+				EdoFeedback existing = activiy.get(0);
+				if(existing.getActivityCount() != null) {
+					activityCount = existing.getActivityCount() + 1;
+				}
+				if(existing.getFrequency() != null) {
+					watchedTimes = existing.getFrequency() + watchedTimes;
+				}
+				if(existing.getTotalDuration() != null && watchDuration != null) {
+					watchDuration = existing.getTotalDuration() + watchDuration;
+				}
+				if(StringUtils.equals(existing.getType(), "VIDEO_ENDED")) {
+					request.setRequestType(existing.getType());
+				}
+				feedback.setActivityCount(activityCount);
+				feedback.setTotalDuration(watchDuration);
+				feedback.setFrequency(watchedTimes);
+				testsDao.updateActivitySummary(request);
+			} else {
+				feedback.setActivityCount(activityCount);
+				feedback.setTotalDuration(watchDuration);
+				feedback.setFrequency(watchedTimes);
+				testsDao.saveActivitySummary(request);
+			}
+			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.activityLogger);
 		}

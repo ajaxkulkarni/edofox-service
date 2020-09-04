@@ -66,6 +66,10 @@ public interface EdoTestsDao {
 	List<EdoVideoLectureMap> getTestVideoLectures(Integer testId);
 	EdoStudent getDeeperRegistration(String applicationId);
 	List<EdoTest> getStudentExams(EdoServiceRequest request);
+	List<EdoFeedback> getStudentActivity(EdoServiceRequest request);
+	void saveActivitySummary(EdoServiceRequest request);
+	void updateActivitySummary(EdoServiceRequest request);
+	
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);

@@ -184,7 +184,7 @@
 	SELECT video_lectures.*, test_subjects.subject,packages.package_name FROM video_lectures
     LEFT JOIN test_subjects ON video_lectures.subject_id = test_subjects.subject_id
     LEFT JOIN packages on video_lectures.classroom_id = packages.id
-    WHERE video_lectures.institute_id=${institute.id} AND video_lectures.is_disabled = 0
+    WHERE video_lectures.institute_id=${institute.id} AND video_lectures.is_disabled = 0 AND video_lectures.type is NULL
     <if test="student != null">
     AND 
     (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
@@ -211,6 +211,25 @@
 		join institute on student_login.institute_id = institute.id 
 		join student on student_login.student_id = student.id 
 		where student_login.username = '${rollNo}'
+	</select>
+	
+	<select id="getStudentActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedback">
+		select * from activity_summary where 
+		<if test="student.id != null">
+			student_id = ${student.id}  
+		</if>
+		<if test="student.rollNo != null">
+			student_ref = '${student.rollNo}'  
+		</if>
+		
+		AND
+		<if test="feedback.id != null">
+			session_id = ${feedback.id}
+		</if>
+		<if test="feedback.videoId != null">
+			video_id = ${feedback.videoId}
+		</if>
+		
 	</select>
 	
 	<insert id="saveVideoActiviy" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" >
@@ -273,6 +292,106 @@
 		</if>
 		)
 	</insert>
+	
+	<insert id="saveActivitySummary" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" >
+		insert into activity_summary
+		(status, last_watched, 
+		<if test="feedback.id != null">
+			session_id, 
+		</if>
+		<if test="student.id != null">
+			student_id, 
+		</if>
+		student_name, student_ref
+		<if test="feedback.videoId != null">
+			,video_id 
+		</if>
+		<if test="feedback.percentViewed != null">
+			,watched_percent 
+		</if>
+		<if test="feedback.durationViewed != null">
+			,watched_duration 
+		</if>
+		<if test="feedback.totalDuration != null">
+			,watch_time 
+		</if>
+		,watched_times
+		,watched_activity
+		,watch_status)
+		values('${requestType}', CURRENT_TIMESTAMP, 
+		<if test="feedback.id != null">
+			${feedback.id}, 
+		</if>
+		<if test="student.id != null">
+			${student.id},
+		 </if>
+		'${student.name}', '${student.rollNo}'
+		<if test="feedback.videoId != null">
+		,${feedback.videoId} 
+		</if>
+		<if test="feedback.percentViewed != null">
+			,${feedback.percentViewed}  
+		</if>
+		<if test="feedback.durationViewed != null">
+			,${feedback.durationViewed}  
+		</if>
+		<if test="feedback.totalDuration != null">
+			,${feedback.totalDuration}   
+		</if>
+		,${feedback.frequency}
+		,${feedback.activityCount}
+		<if test="requestType == 'LIVE_JOINED'">
+			,0 
+		</if>
+		<if test="requestType == 'VIDEO_STARTED'">
+			,1  
+		</if>
+		<if test="requestType == 'VIDEO_ENDED'">
+			,2
+		</if>
+		)
+	</insert>
+	
+	<update id="updateActivitySummary" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		update activity_summary set
+		<if test="feedback.percentViewed != null">
+			watched_percent=${feedback.percentViewed} , 
+		</if>
+		<if test="feedback.durationViewed != null">
+			watched_duration=${feedback.durationViewed},
+		</if>
+		watched_times=${feedback.frequency},
+		watched_activity=${feedback.activityCount},
+		watch_time=${feedback.totalDuration},
+		last_watched = CURRENT_TIMESTAMP,
+		status= '${requestType}',
+		watch_status =
+		<if test="requestType == 'LIVE_JOINED'">
+			0 
+		</if>
+		<if test="requestType == 'VIDEO_STARTED'">
+			1  
+		</if>
+		<if test="requestType == 'VIDEO_ENDED'">
+			2
+		</if>
+		where 
+		<if test="student.id != null">
+			student_id = ${student.id}  
+		</if>
+		<if test="student.rollNo != null">
+			student_ref = '${student.rollNo}'  
+		</if>
+		
+		AND
+		<if test="feedback.id != null">
+			session_id = ${feedback.id}
+		</if>
+		<if test="feedback.videoId != null">
+			video_id = ${feedback.videoId}
+		</if>
+		
+	</update>
 	
 	<select id="getDeeperRegistration" parameterType="String" resultMap="studentInfo">
 		SELECT concat(first_name, ' ', last_name) as name,email,mobile_no,application_id as roll_no, exams as package_name, student_id as id FROM `deeper_reg` 

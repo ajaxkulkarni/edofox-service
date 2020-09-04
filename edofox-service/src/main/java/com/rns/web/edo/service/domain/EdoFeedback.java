@@ -25,6 +25,8 @@ public class EdoFeedback {
 	private Float percentViewed;
 	private Float durationViewed;
 	private Integer foundationId;
+	private Integer activityCount;
+	private Long totalDuration;
 	
 	public String getFeedback() {
 		return feedback;
@@ -121,6 +123,18 @@ public class EdoFeedback {
 	}
 	public void setFoundationId(Integer foundationId) {
 		this.foundationId = foundationId;
+	}
+	public Integer getActivityCount() {
+		return activityCount;
+	}
+	public void setActivityCount(Integer activityCount) {
+		this.activityCount = activityCount;
+	}
+	public Long getTotalDuration() {
+		return totalDuration;
+	}
+	public void setTotalDuration(Long totalDuration) {
+		this.totalDuration = totalDuration;
 	}
 	
 

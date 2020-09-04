@@ -98,4 +98,13 @@
 
 	</resultMap>
 	
+	<resultMap type="com.rns.web.edo.service.domain.EdoFeedback" id="feedback">
+		<id property="id" column="id" />
+		<result property="frequency" column="watched_times" />
+		<result property="activityCount" column="watched_activity" />
+		<result property="totalDuration" column="watch_time" />
+		<result property="type" column="status" />
+		
+	</resultMap>
+	
 </mapper>
