@@ -620,7 +620,6 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getStudentSubjects(EdoServiceRequest request) {
-		//LoggingUtil.logMessage("Update device id request :" + request);
 		EdoServiceResponse response = new EdoServiceResponse();
 		return userBo.getStudentSubjects(request);
 	}
@@ -631,7 +630,15 @@ public class EdoUserController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getStudentChapters(EdoServiceRequest request) {
 		//LoggingUtil.logMessage("Update device id request :" + request);
-		EdoServiceResponse response = new EdoServiceResponse();
 		return userBo.getStudentChapters(request);
+	}
+	
+	@POST
+	@Path("/getChapterContent")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getChapterContent(EdoServiceRequest request) {
+		//LoggingUtil.logMessage("Update device id request :" + request);
+		return userBo.getChapterContent(request);
 	}
 }

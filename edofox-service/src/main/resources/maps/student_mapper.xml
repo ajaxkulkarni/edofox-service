@@ -440,7 +440,7 @@
 	
 	<select id="getStudentSubjects" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="subjects">
 	
-		SELECT * FROM edo_prod.dlp_subjects_classroom_map 
+		SELECT * FROM dlp_subjects_classroom_map 
 			join test_subjects on dlp_subjects_classroom_map.subject_id = test_subjects.subject_id
 			join packages on dlp_subjects_classroom_map.classroom_id = packages.id
 			where classroom_id in (select package_id from student_institute where student_id = ${student.id} AND institute_id = ${institute.id});
