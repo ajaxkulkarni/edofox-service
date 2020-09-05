@@ -449,7 +449,7 @@
 	
 	<select id="getStudentChapters" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="chapters">
 	
-		SELECT * FROM dlp_chapters_classroom_map 
+		SELECT chapters.id as id,chapters.chapter_name,dlp_chapters_classroom_map.classroom_id,dlp_chapters_classroom_map.chapter_id FROM dlp_chapters_classroom_map 
 			join chapters on dlp_chapters_classroom_map.chapter_id = chapters.id
 			join packages on dlp_chapters_classroom_map.classroom_id = packages.id
 			where classroom_id = ${student.currentPackage.id} AND chapters.subject = ${subjectId}
