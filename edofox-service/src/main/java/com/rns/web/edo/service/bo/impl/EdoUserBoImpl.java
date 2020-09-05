@@ -45,6 +45,7 @@ import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
+import com.rns.web.edo.service.domain.EdoSubject;
 import com.rns.web.edo.service.domain.EdoSuggestion;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
@@ -1632,6 +1633,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(request.getStudent().getId() != null) {
 				request.getStudent().setRollNo(null);
 			}
+			
+			if(StringUtils.equals(request.getRequestType(), "UPDATE_WATCH_TIME")) {
+				testsDao.updateActivityWatchTime(request);
+				return status;
+			}
+			
 
 			testsDao.saveVideoActiviy(request);
 			//Update activity summary
@@ -1868,6 +1875,31 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse getStudentSubjects(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			response.setSubjects(testsDao.getStudentSubjects(request));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+	
+	public EdoServiceResponse getStudentChapters(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			EdoSubject studentChapters = testsDao.getStudentChapters(request);
+			List<EdoSubject> subjects = new ArrayList<EdoSubject>();
+			subjects.add(studentChapters);
+			response.setSubjects(subjects);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
 	}
 
 }

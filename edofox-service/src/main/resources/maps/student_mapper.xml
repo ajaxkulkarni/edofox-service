@@ -393,6 +393,27 @@
 		
 	</update>
 	
+	<update id="updateActivityWatchTime" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		update activity_summary set
+		watch_time=watch_time + ${feedback.totalDuration}
+		where 
+		<if test="student.id != null">
+			student_id = ${student.id}  
+		</if>
+		<if test="student.rollNo != null">
+			student_ref = '${student.rollNo}'  
+		</if>
+		
+		AND
+		<if test="feedback.id != null">
+			session_id = ${feedback.id}
+		</if>
+		<if test="feedback.videoId != null">
+			video_id = ${feedback.videoId}
+		</if>
+		
+	</update>
+	
 	<select id="getDeeperRegistration" parameterType="String" resultMap="studentInfo">
 		SELECT concat(first_name, ' ', last_name) as name,email,mobile_no,application_id as roll_no, exams as package_name, student_id as id FROM `deeper_reg` 
 		left join student_login on student_login.username = deeper_reg.application_id
@@ -414,6 +435,23 @@
             WHERE student_institute.student_id=${student.id} AND student_institute.institute_id=${institute.id}
             AND test.status='Active' order by test.end_date desc;
 	
+	</select>
+	
+	<select id="getStudentSubjects" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="subjects">
+	
+		SELECT * FROM edo_prod.dlp_subjects_classroom_map 
+			join test_subjects on dlp_subjects_classroom_map.subject_id = test_subjects.subject_id
+			join packages on dlp_subjects_classroom_map.classroom_id = packages.id
+			where classroom_id in (select package_id from student_institute where student_id = ${student.id} AND institute_id = ${institute.id}) group by test_subjects.subject_id;
+			;
+	</select>
+	
+	<select id="getStudentChapters" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="chapters">
+	
+		SELECT * FROM dlp_chapters_classroom_map 
+			join chapters on dlp_chapters_classroom_map.chapter_id = chapters.id
+			join packages on dlp_chapters_classroom_map.classroom_id = packages.id
+			where classroom_id in (select package_id from student_institute where student_id = ${student.id} AND institute_id = ${institute.id}) group by chapters.id order by chapter_no asc
 	</select>
 
 </mapper>

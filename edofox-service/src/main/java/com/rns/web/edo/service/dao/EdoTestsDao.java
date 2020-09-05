@@ -69,6 +69,9 @@ public interface EdoTestsDao {
 	List<EdoFeedback> getStudentActivity(EdoServiceRequest request);
 	void saveActivitySummary(EdoServiceRequest request);
 	void updateActivitySummary(EdoServiceRequest request);
+	void updateActivityWatchTime(EdoServiceRequest request);
+	List<EdoSubject> getStudentSubjects(EdoServiceRequest request);
+	EdoSubject getStudentChapters(EdoServiceRequest request);
 	
 	
 	//Admin queries

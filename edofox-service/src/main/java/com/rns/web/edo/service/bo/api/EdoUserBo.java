@@ -45,5 +45,7 @@ public interface EdoUserBo {
 	EdoServiceResponse getStudentExams(EdoServiceRequest request);
 	EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request);
 	EdoApiStatus addDeviceId(EdoServiceRequest request);
+	EdoServiceResponse getStudentSubjects(EdoServiceRequest request);
+	EdoServiceResponse getStudentChapters(EdoServiceRequest request);
 	
 }

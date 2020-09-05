@@ -12,6 +12,7 @@ public class EdoSubject {
 	private String subjectName;
 	private Integer id;
 	private List<EdoChapter> chapters;
+	private String iconUrl;
 	
 	public String getSubjectName() {
 		return subjectName;
@@ -30,6 +31,12 @@ public class EdoSubject {
 	}
 	public void setChapters(List<EdoChapter> chapters) {
 		this.chapters = chapters;
+	}
+	public String getIconUrl() {
+		return iconUrl;
+	}
+	public void setIconUrl(String iconUrl) {
+		this.iconUrl = iconUrl;
 	}
 	
 }

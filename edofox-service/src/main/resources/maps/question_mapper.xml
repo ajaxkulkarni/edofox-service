@@ -4,8 +4,7 @@
 
 <mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
 	<!-- result maps -->
-	<resultMap type="com.rns.web.edo.service.domain.EdoSubject"
-		id="chapters">
+	<resultMap type="com.rns.web.edo.service.domain.EdoSubject" id="chapters">
 		<id property="id" column="subject_id" />
 		<result property="subjectName" column="subject" />
 
