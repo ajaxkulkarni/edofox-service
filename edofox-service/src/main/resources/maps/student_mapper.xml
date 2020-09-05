@@ -461,7 +461,13 @@
 		SELECT dlp_chp_cls_content_map.*, video_lectures.video_name, video_lectures.id as video_id, video_lectures.video_url, video_lectures.type, dlp_chp_cls_content_map.content_order FROM dlp_chp_cls_content_map
     INNER JOIN video_lectures
     ON dlp_chp_cls_content_map.content_id = video_lectures.id
-    and is_disabled=0 AND video_lectures.type = '${requestType}'
+    and is_disabled=0 AND 
+    <if test="requestType != null">
+    	video_lectures.type = '${requestType}'
+    </if>
+    <if test="requestType == null">
+    	video_lectures.type is NULL
+    </if>
     INNER JOIN chapters
     ON dlp_chp_cls_content_map.chapter_id = chapters.id
     WHERE dlp_chp_cls_content_map.chapter_id = ${subjectId} AND
