@@ -43,6 +43,9 @@ public class EdoVideoLecture {
 	private String keywords;
 	@Column(name = "question_img")
 	private String questionImg;
+	@Column(name = "type")
+	private String type;
+	
 	
 	
 	public Integer getTopicId() {
@@ -116,5 +119,11 @@ public class EdoVideoLecture {
 	}
 	public void setQuestionImg(String questionImg) {
 		this.questionImg = questionImg;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 }

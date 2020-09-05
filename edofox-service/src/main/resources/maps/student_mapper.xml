@@ -33,6 +33,7 @@
 		<result column="package_name" property="classroom.name"/>
 		<result column="keywords" property="lecture.keywords"/>
 		<result column="question_img" property="lecture.questionImg"/>
+		<result column="type" property="lecture.type"/>
 	</resultMap>
 
 	<select id="getInstituePackages" resultMap="packages"
@@ -442,7 +443,7 @@
 		SELECT * FROM edo_prod.dlp_subjects_classroom_map 
 			join test_subjects on dlp_subjects_classroom_map.subject_id = test_subjects.subject_id
 			join packages on dlp_subjects_classroom_map.classroom_id = packages.id
-			where classroom_id in (select package_id from student_institute where student_id = ${student.id} AND institute_id = ${institute.id}) group by test_subjects.subject_id;
+			where classroom_id in (select package_id from student_institute where student_id = ${student.id} AND institute_id = ${institute.id});
 			;
 	</select>
 	
@@ -451,7 +452,21 @@
 		SELECT * FROM dlp_chapters_classroom_map 
 			join chapters on dlp_chapters_classroom_map.chapter_id = chapters.id
 			join packages on dlp_chapters_classroom_map.classroom_id = packages.id
-			where classroom_id in (select package_id from student_institute where student_id = ${student.id} AND institute_id = ${institute.id}) group by chapters.id order by chapter_no asc
+			where classroom_id = ${student.currentPackage.id} AND chapters.subject = ${subjectId}
+            order by chapter_no asc;
+	</select>
+	
+	<select id="getChapterContent" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoLecture">
+	
+		SELECT dlp_chp_cls_content_map.*, video_lectures.video_name, video_lectures.id as video_id, video_lectures.video_url, video_lectures.type, dlp_chp_cls_content_map.content_order FROM dlp_chp_cls_content_map
+    INNER JOIN video_lectures
+    ON dlp_chp_cls_content_map.content_id = video_lectures.id
+    and is_disabled=0 AND video_lectures.type = '${requestType}'
+    INNER JOIN chapters
+    ON dlp_chp_cls_content_map.chapter_id = chapters.id
+    WHERE dlp_chp_cls_content_map.chapter_id = ${subjectId} AND
+    dlp_chp_cls_content_map.classroom_id = ${student.currentPackage.id}
+    ORDER BY dlp_chp_cls_content_map.content_order
 	</select>
 
 </mapper>

@@ -72,7 +72,7 @@ public interface EdoTestsDao {
 	void updateActivityWatchTime(EdoServiceRequest request);
 	List<EdoSubject> getStudentSubjects(EdoServiceRequest request);
 	EdoSubject getStudentChapters(EdoServiceRequest request);
-	
+	List<EdoVideoLectureMap> getChapterContent(EdoServiceRequest request);	
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);
@@ -114,6 +114,5 @@ public interface EdoTestsDao {
 	EDOPackage getLiveSession(Integer id);
 	void saveVideoActiviy(EdoServiceRequest request);
 	List<EdoQuestion> getQuestionBank(EdoQuestion request);
-	
 	
 }

@@ -96,6 +96,8 @@
 		<id property="id" column="subject_id" />
 		<result property="subjectName" column="subject" />
 		<result property="iconUrl" column="icon_url"/>
+		<result property="classroomId" column="classroom_id"/>
+		<result property="classroomName" column="package_name"/>
 	</resultMap>
 	
 	<resultMap type="com.rns.web.edo.service.domain.EdoFeedback" id="feedback">

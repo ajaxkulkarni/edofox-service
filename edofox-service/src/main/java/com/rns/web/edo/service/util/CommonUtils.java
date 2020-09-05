@@ -652,7 +652,7 @@ public class CommonUtils {
 				hostName = "http://reliancedlp.edofox.com/";
 			}
 			folderPath = StringUtils.replace(url, "/var/www/reliancedlp.edofox.com/public_html/", "");
-			LoggingUtil.logMessage("Setting image URL as " + hostName + folderPath);
+			//LoggingUtil.logMessage("Setting image URL as " + hostName + folderPath);
 		}
 		folderPath = hostName + folderPath;
 		return folderPath;

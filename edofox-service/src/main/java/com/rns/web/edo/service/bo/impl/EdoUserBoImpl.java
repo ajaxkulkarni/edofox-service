@@ -1901,5 +1901,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return response;
 	}
+	
+	public EdoServiceResponse getChapterContent(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			List<EdoVideoLectureMap> chapterContent = testsDao.getChapterContent(request);
+			if(CollectionUtils.isNotEmpty(chapterContent)) {
+				for(EdoVideoLectureMap map: chapterContent) {
+					if(map.getLecture() != null && StringUtils.equals("DOC", map.getLecture().getType())) {
+						map.getLecture().setVideo_url(CommonUtils.prepareUrl(map.getLecture().getVideo_url()));
+					}
+				}
+			}
+			response.setLectures(chapterContent);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
 
 }
