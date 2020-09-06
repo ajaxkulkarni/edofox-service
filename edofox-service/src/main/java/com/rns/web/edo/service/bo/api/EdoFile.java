@@ -8,6 +8,7 @@ public class EdoFile {
 	private InputStream content;
 	private String contentType;
 	private String downloadUrl;
+	private long size;
 	
 	public String getFileName() {
 		return fileName;
@@ -32,6 +33,12 @@ public class EdoFile {
 	}
 	public void setDownloadUrl(String downloadUrl) {
 		this.downloadUrl = downloadUrl;
+	}
+	public long getSize() {
+		return size;
+	}
+	public void setSize(long size) {
+		this.size = size;
 	}
 
 }

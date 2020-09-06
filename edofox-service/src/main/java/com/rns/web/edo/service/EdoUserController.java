@@ -159,6 +159,7 @@ public class EdoUserController {
 				if(file.getContentType() != null) {
 					response.header("Content-Type", file.getContentType());
 				}
+				response.header("size", file.getSize());
 				return response.build();
 			}
 

@@ -1840,7 +1840,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoClasswork classwork = (EdoClasswork) session.createCriteria(EdoClasswork.class).add(Restrictions.eq("id", docId)).uniqueResult();
 			if(classwork != null) {
 				file = new EdoFile();
-				file.setContent(new FileInputStream(classwork.getFileLoc()));
+				FileInputStream content = new FileInputStream(classwork.getFileLoc());
+				file.setContent(content);
+				file.setSize(new File(classwork.getFileLoc()).length());
 				String extension = StringUtils.substringAfterLast(classwork.getFileLoc(), ".");
 				file.setFileName(classwork.getTitle() + "." + extension);
 				if(extension != null) {
