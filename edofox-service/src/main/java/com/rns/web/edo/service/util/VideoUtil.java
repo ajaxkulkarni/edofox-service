@@ -10,6 +10,10 @@ import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -23,12 +27,12 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
 import com.clickntap.vimeo.VimeoResponse;
+import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -239,7 +243,9 @@ public class VideoUtil {
 	    return info;
 	}
 	
-	public static String getDownloadUrl(String url) {
+	public static EdoFile getDownloadUrl(String url, String fileName) {
+		EdoFile result = new EdoFile();
+		List<EdoFile> files = new ArrayList<EdoFile>();
 		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
 		try {
 			String videoId = StringUtils.replace(url, "https://vimeo.com/", "");
@@ -255,17 +261,57 @@ public class VideoUtil {
 					for(int i = 0; i < array.length(); i++) {
 						org.json.JSONObject jsonObject = array.getJSONObject(i);
 						if(StringUtils.isNotBlank(jsonObject.getString("link"))) {
+							EdoFile file = new EdoFile();
 							link = jsonObject.getString("link");
+							if(jsonObject.getDouble("height") > 0) {
+								file.setHeight(new Float(jsonObject.getDouble("height")));
+							}
+							file.setContentType("video/mp4");
+							file.setDownloadUrl(link);
+							files.add(file);
 						}
 					}
 				}
-				return link;
+				//Fetch HLS URL for adaptive streaming
+				org.json.JSONArray filesArray = resp.getJson().getJSONArray("files");
+				if( filesArray.length() > 0)  {
+					for(int i = 0; i < filesArray.length(); i++) {
+						org.json.JSONObject jsonObject = filesArray.getJSONObject(i);
+						if(StringUtils.isNotBlank(jsonObject.getString("link"))) {
+							String quality = jsonObject.getString("quality");
+							if(StringUtils.isNotBlank(quality) && StringUtils.equals("quality", "hls")) {
+								link = jsonObject.getString("link");
+								result.setHlsUrl(link);
+							}
+						}
+					}
+				}
+				//return link;
+				//Sort files based on size
+				Collections.sort(files, new Comparator<EdoFile>() {
+
+					public int compare(EdoFile o1, EdoFile o2) {
+						if(o1.getHeight() != null && o2.getHeight() != null) {
+							if(o1.getHeight() > o2.getHeight()) {
+								return -1;
+							} else if (o1.getHeight() < o2.getHeight()) {
+								return 1;
+							} else {
+								return 0;
+							}
+						}
+						return 1;
+					}
+				});
 			}
-			
+			result.setFileName(fileName);
+			result.setDownloadUrl(files.get(0).getDownloadUrl());
+			result.setVersions(files);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
 		}
-		return null;
+		return result;
 	}
 	
 	public static Float downloadRecordedFile(Integer channelId, Integer sessionId) {
@@ -431,5 +477,21 @@ public class VideoUtil {
 		
 		System.out.println("Response=>" + response);
 
+	}*/
+	
+	/*public static void uploadToStorage() {
+		Region region = Region.US_WEST_2;
+		s3 = S3Client.builder().region(region).build();
+
+
+		String bucket = "bucket" + System.currentTimeMillis();
+		String key = "key";
+
+		createBucket(s3,bucket, region);
+
+		// Put Object
+		s3.putObject(PutObjectRequest.builder().bucket(bucket).key(key)
+		                .build(),
+		        RequestBody.fromByteBuffer(getRandomByteBuffer(10_000)));
 	}*/
 }
