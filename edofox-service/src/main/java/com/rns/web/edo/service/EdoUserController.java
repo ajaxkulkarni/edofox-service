@@ -634,7 +634,7 @@ public class EdoUserController {
 	}
 	
 
-
+	@POST
 	@Path("/getChapterContent")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
