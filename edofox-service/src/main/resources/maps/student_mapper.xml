@@ -474,5 +474,17 @@
     dlp_chp_cls_content_map.classroom_id = ${student.currentPackage.id}
     ORDER BY dlp_chp_cls_content_map.content_order
 	</select>
+	
+	<select id="getChapterExams" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="test">
+	
+	SELECT dlp_chp_cls_content_map.*, test.* FROM dlp_chp_cls_content_map
+    INNER JOIN test
+    ON dlp_chp_cls_content_map.test_id = test.test_id AND test.status='Active'
+    INNER JOIN chapters
+    ON dlp_chp_cls_content_map.chapter_id = chapters.id
+    WHERE dlp_chp_cls_content_map.chapter_id = ${subjectId} AND
+    dlp_chp_cls_content_map.classroom_id = ${student.currentPackage.id}
+    ORDER BY dlp_chp_cls_content_map.content_order
+	</select>
 
 </mapper>

@@ -73,6 +73,7 @@ public interface EdoTestsDao {
 	List<EdoSubject> getStudentSubjects(EdoServiceRequest request);
 	EdoSubject getStudentChapters(EdoServiceRequest request);
 	List<EdoVideoLectureMap> getChapterContent(EdoServiceRequest request);	
+	List<EdoTest> getChapterExams(EdoServiceRequest request);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);

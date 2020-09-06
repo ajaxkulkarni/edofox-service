@@ -1818,25 +1818,29 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
 			List<EdoTest> studentExams = testsDao.getStudentExams(request);
-			if(CollectionUtils.isNotEmpty(studentExams)) {
-				for(EdoTest studentExam: studentExams) {
-					if(studentExam.getStartDate() != null && studentExam.getEndDate() != null) {
-						if(new Date().compareTo(studentExam.getStartDate()) < 0) {
-							studentExam.setStatus("PENDING");
-						} else if (new Date().compareTo(studentExam.getEndDate()) > 0) {
-							studentExam.setStatus("EXPIRED");
-						} else {
-							studentExam.setStatus("ACTIVE");
-						}
-					}
-				}
-			}
+			setExams(studentExams);
 			response.setExams(studentExams);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	private void setExams(List<EdoTest> studentExams) {
+		if(CollectionUtils.isNotEmpty(studentExams)) {
+			for(EdoTest studentExam: studentExams) {
+				if(studentExam.getStartDate() != null && studentExam.getEndDate() != null) {
+					if(new Date().compareTo(studentExam.getStartDate()) < 0) {
+						studentExam.setStatus("PENDING");
+					} else if (new Date().compareTo(studentExam.getEndDate()) > 0) {
+						studentExam.setStatus("EXPIRED");
+					} else {
+						studentExam.setStatus("ACTIVE");
+					}
+				}
+			}
+		}
 	}
 
 	public EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request) {
@@ -1914,6 +1918,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			response.setLectures(chapterContent);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getChapterExams(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			List<EdoTest> studentExams = testsDao.getChapterExams(request);
+			setExams(studentExams);
+			response.setExams(studentExams);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
