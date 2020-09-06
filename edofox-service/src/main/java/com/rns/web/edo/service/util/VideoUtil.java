@@ -263,7 +263,7 @@ public class VideoUtil {
 						if(StringUtils.isNotBlank(jsonObject.getString("link"))) {
 							EdoFile file = new EdoFile();
 							link = jsonObject.getString("link");
-							if(jsonObject.getDouble("height") > 0) {
+							if(jsonObject.get("height") != null && jsonObject.getDouble("height") > 0) {
 								file.setHeight(new Float(jsonObject.getDouble("height")));
 							}
 							file.setContentType("video/mp4");
@@ -279,7 +279,7 @@ public class VideoUtil {
 						org.json.JSONObject jsonObject = filesArray.getJSONObject(i);
 						if(StringUtils.isNotBlank(jsonObject.getString("link"))) {
 							String quality = jsonObject.getString("quality");
-							if(StringUtils.isNotBlank(quality) && StringUtils.equals("quality", "hls")) {
+							if(StringUtils.isNotBlank(quality) && StringUtils.equals(quality, "hls")) {
 								link = jsonObject.getString("link");
 								result.setHlsUrl(link);
 							}
