@@ -458,7 +458,7 @@
 	
 	<select id="getChapterContent" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoLecture">
 	
-		SELECT dlp_chp_cls_content_map.*, video_lectures.video_name, video_lectures.id as id, video_lectures.video_url, video_lectures.type, dlp_chp_cls_content_map.content_order FROM dlp_chp_cls_content_map
+		SELECT video_lectures.video_name, video_lectures.id as id, video_lectures.video_url, video_lectures.type, dlp_chp_cls_content_map.content_order FROM dlp_chp_cls_content_map
     INNER JOIN video_lectures
     ON dlp_chp_cls_content_map.content_id = video_lectures.id
     and is_disabled=0 AND 
