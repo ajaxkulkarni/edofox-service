@@ -1415,7 +1415,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	public EdoServiceResponse uploadVideo(InputStream videoData, String title, Integer instituteId, Integer subjectId, Integer packageId, Integer topicId, 
-			String keywords, InputStream questionFile, String questionFileName, String classrooms) {
+			String keywords, InputStream questionFile, String questionFileName, String classrooms, String type) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		//EdoApiStatus status = new EdoApiStatus();
 		Session session = null;
@@ -1470,6 +1470,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					lectures.setInstituteId(instituteId);
 					lectures.setCreatedDate(new Date());
 					lectures.setClassroomId(packageId);
+					lectures.setType(type);
 					//lectures.setTopicId(topicId);
 					if(StringUtils.isNotBlank(keywords)) {
 						lectures.setKeywords(StringUtils.removeEnd(keywords, ","));
