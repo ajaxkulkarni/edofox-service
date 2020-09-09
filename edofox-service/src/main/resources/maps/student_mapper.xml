@@ -466,7 +466,7 @@
     	video_lectures.type = '${requestType}'
     </if>
     <if test="requestType == null">
-    	video_lectures.type is NULL
+    	video_lectures.type = 'DLPVIDEO'
     </if>
     INNER JOIN chapters
     ON dlp_chp_cls_content_map.chapter_id = chapters.id
