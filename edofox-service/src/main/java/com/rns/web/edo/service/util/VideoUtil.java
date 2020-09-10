@@ -294,10 +294,10 @@ public class VideoUtil {
 				Collections.sort(files, new Comparator<EdoFile>() {
 
 					public int compare(EdoFile o1, EdoFile o2) {
-						if(o1.getHeight() != null && o2.getHeight() != null) {
-							if(o1.getHeight() > o2.getHeight()) {
+						if(o1.getSize() != null && o2.getSize() != null) {
+							if(o1.getSize() > o2.getSize()) {
 								return -1;
-							} else if (o1.getHeight() < o2.getHeight()) {
+							} else if (o1.getSize() < o2.getSize()) {
 								return 1;
 							} else {
 								return 0;
