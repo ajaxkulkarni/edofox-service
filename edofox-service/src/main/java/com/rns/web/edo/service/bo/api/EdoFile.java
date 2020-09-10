@@ -22,6 +22,7 @@ public class EdoFile {
 	private String quality;
 	private List<EdoFile> versions;
 	private String hlsUrl;
+	private Float size;
 	
 	public String getFileName() {
 		return fileName;
@@ -70,6 +71,12 @@ public class EdoFile {
 	}
 	public void setHlsUrl(String hlsUrl) {
 		this.hlsUrl = hlsUrl;
+	}
+	public Float getSize() {
+		return size;
+	}
+	public void setSize(Float size) {
+		this.size = size;
 	}
 
 }

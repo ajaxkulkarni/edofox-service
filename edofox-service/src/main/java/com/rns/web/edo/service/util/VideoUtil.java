@@ -266,6 +266,9 @@ public class VideoUtil {
 							if(jsonObject.get("height") != null && jsonObject.getDouble("height") > 0) {
 								file.setHeight(new Float(jsonObject.getDouble("height")));
 							}
+							if(jsonObject.get("size") != null  && jsonObject.getDouble("size") > 0) {
+								file.setSize(new Float(jsonObject.getDouble("size")));
+							}
 							file.setContentType("video/mp4");
 							file.setDownloadUrl(link);
 							files.add(file);
@@ -305,7 +308,7 @@ public class VideoUtil {
 				});
 			}
 			result.setFileName(fileName);
-			result.setDownloadUrl(files.get(0).getDownloadUrl());
+			result.setDownloadUrl(files.get(files.size() - 1).getDownloadUrl());
 			result.setVersions(files);
 		} catch (IOException e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
