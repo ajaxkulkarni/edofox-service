@@ -2,13 +2,19 @@ package com.rns.web.edo.service.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,9 +27,6 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.apache.pdfbox.text.TextPosition;
-import org.apache.pdfbox.tools.imageio.ImageIOUtil;
-import org.dom4j.DocumentException;
-import org.xml.sax.SAXException;
 
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.ext.EdoPDFCoordinate;
@@ -170,25 +173,29 @@ public class EdoPDFUtil {
 						continue;
 					}
 					for(int i =0; i < list.size(); i ++) {
-						if(i == 0) {
+						if(i == 0 && list.size() > 1) {
 							continue;
 						}
 						EdoPDFCoordinate edoPDFCoordinate = list.get(i);
-						// suffix in filename will be used as the file format
-					    Integer questionNumber = list.get(i - 1).getQuestionNumber();
-					    if(!withinRange(from, to, questionNumber)) {
-					    	continue;
-					    }
-					    //int buffer = 10;
-						float y = edoPDFCoordinate.getY() + edoPDFCoordinate.getHeight() + buffer;
-						float width = edoPDFCoordinate.getWidth();
-						float height = list.get(i - 1).getY() - edoPDFCoordinate.getY() + buffer;
-						Float x = edoPDFCoordinate.getX();
-						cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber, x);
-						EdoQuestion question = new EdoQuestion();
-						question.setQuestionNumber(questionNumber);
-						question.setQuestionImageUrl(getQuestionUrl(testId, questionNumber));
-						parsedQuestions.add(question);
+						
+						if(i > 0) {
+							// suffix in filename will be used as the file format
+						    Integer questionNumber = list.get(i - 1).getQuestionNumber();
+						    if(!withinRange(from, to, questionNumber)) {
+						    	continue;
+						    }
+						    //int buffer = 10;
+							float y = edoPDFCoordinate.getY() + edoPDFCoordinate.getHeight() + buffer;
+							float width = edoPDFCoordinate.getWidth();
+							float height = list.get(i - 1).getY() - edoPDFCoordinate.getY() + buffer;
+							Float x = edoPDFCoordinate.getX();
+							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber, x);
+							EdoQuestion question = new EdoQuestion();
+							question.setQuestionNumber(questionNumber);
+							question.setQuestionImageUrl(getQuestionUrl(testId, questionNumber));
+							parsedQuestions.add(question);	
+						}
+						
 						if(i == list.size() - 1) {
 							if(!withinRange(from, to, list.get(i).getQuestionNumber())) {
 								continue;
@@ -199,11 +206,11 @@ public class EdoPDFUtil {
 								startY = edoPDFCoordinate.getWhiteSpaceY();
 							}
 							//for last item
-							height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + buffer;
+							float height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + buffer;
 							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, startY, edoPDFCoordinate.getWidth(), height, list.get(i).getQuestionNumber(), list.get(i).getX());
 							EdoQuestion lastQuestion = new EdoQuestion();
 							lastQuestion.setQuestionNumber(list.get(i).getQuestionNumber());
-							lastQuestion.setQuestionImageUrl(getQuestionUrl(testId, questionNumber));
+							lastQuestion.setQuestionImageUrl(getQuestionUrl(testId, list.get(i).getQuestionNumber()));
 							parsedQuestions.add(lastQuestion);
 							
 							/*page.setCropBox(new PDRectangle(0, 0, , ));
@@ -284,25 +291,58 @@ public class EdoPDFUtil {
 		return EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "getTempImage/" + testId + "/" + questionNumber;
 	}
 
-
 	private static BufferedImage cropQuestion(String outputFolder, PDFRenderer pdfRenderer, int pgNo, PDPage page, List<EdoPDFCoordinate> list, int i,
 			float y, float width, float height, Integer questionNumber, Float x) throws IOException {
-		float xCoord = 0;
-		if(x != null) {
-			xCoord = x;
-		}
-		page.setCropBox(new PDRectangle(xCoord, y, width, height));
-		//document.save(OUT + "Test_new.pdf");
-		BufferedImage bim = pdfRenderer.renderImageWithDPI(pgNo, 300, ImageType.RGB);
-		File output = new File(outputFolder);
-		if(!output.exists()) {
-			output.mkdirs();
-		}
-		ImageIOUtil.writeImage(bim, outputFolder + QUESTION_PREFIX + questionNumber + ".png", 300);
-		System.out.println("Added question number " + questionNumber + " with crop matrix ==> origin " + y + " height " + height);
-		return bim;
-	}
+		
+		FileOutputStream fos = null;
+		ImageOutputStream ios = null;
+		try {
+			float xCoord = 0;
+			if(x != null) {
+				xCoord = x;
+			}
+			page.setCropBox(new PDRectangle(xCoord, y, width, height));
+			//document.save(OUT + "Test_new.pdf");
+			BufferedImage bim = pdfRenderer.renderImageWithDPI(pgNo, 300, ImageType.RGB);
+			File output = new File(outputFolder);
+			if(!output.exists()) {
+				output.mkdirs();
+			}
+			
+			//ImageIOUtil.writeImage(bim, outputFolder + QUESTION_PREFIX + questionNumber + ".png", 300);
+		
+			//Compress image before saving
+			ImageWriter writer =  ImageIO.getImageWritersByFormatName("jpg").next();
+	        fos = new FileOutputStream(outputFolder + QUESTION_PREFIX + questionNumber + ".png");
+			ios = ImageIO.createImageOutputStream(fos);
+	        writer.setOutput(ios);
 
+	        ImageWriteParam param = writer.getDefaultWriteParam();
+	        if (param.canWriteCompressed()){
+	            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+	            param.setCompressionQuality(0.05f);
+	        }
+
+	        writer.write(null, new IIOImage(bim, null, null), param);
+			
+			System.out.println("Added question number " + questionNumber + " with crop matrix ==> origin " + y + " height " + height);
+			return bim;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(ios != null) {
+				ios.close();
+			}
+			if(fos != null) {
+				fos.close();
+			}
+			
+		}
+		
+		return null;
+	}
+	
+	
 	/*public static void poiPdf() throws IOException, SAXException, TikaException {
 		BodyContentHandler handler = new BodyContentHandler();
 		Metadata metadata = new Metadata();
