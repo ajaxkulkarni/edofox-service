@@ -307,6 +307,26 @@ public class VideoUtil {
 					}
 				});
 			}
+			
+			if(files.size() > 3) {
+				//Pick best 3 options from the list of versions
+				List<EdoFile> bestVersions = new ArrayList<EdoFile>();
+				int i = 0;
+				int middleValue = (files.size() / 2);
+				if(middleValue <= 0) {
+					middleValue = 1;
+				}
+				for(EdoFile file: files) {
+					if(i == 0 || i == (files.size() - 1)) {
+						bestVersions.add(file);
+					}
+					if(middleValue == i) {
+						bestVersions.add(file);
+					}
+					i++;
+				}
+				files = bestVersions;
+			}
 			result.setFileName(fileName);
 			result.setDownloadUrl(files.get(files.size() - 1).getDownloadUrl());
 			result.setVersions(files);
@@ -316,6 +336,7 @@ public class VideoUtil {
 		}
 		return result;
 	}
+	
 	
 	public static Float downloadRecordedFile(Integer channelId, Integer sessionId) {
 		FileOutputStream fileOutputStream = null;
