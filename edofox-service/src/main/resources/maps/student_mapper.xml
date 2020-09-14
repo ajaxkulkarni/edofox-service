@@ -453,6 +453,7 @@
 			join chapters on dlp_chapters_classroom_map.chapter_id = chapters.id
 			join packages on dlp_chapters_classroom_map.classroom_id = packages.id
 			where classroom_id = ${student.currentPackage.id} AND chapters.subject = ${subjectId}
+			AND dlp_chapters_classroom_map.status = 1
             order by chapter_no asc;
 	</select>
 	
