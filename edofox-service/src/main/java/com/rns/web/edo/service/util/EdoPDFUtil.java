@@ -192,7 +192,8 @@ public class EdoPDFUtil {
 							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber, x);
 							EdoQuestion question = new EdoQuestion();
 							question.setQuestionNumber(questionNumber);
-							question.setQuestionImageUrl(getQuestionUrl(testId, questionNumber));
+							//Timestamp added to avoid caching
+							question.setQuestionImageUrl(getQuestionUrl(testId, questionNumber) + "?" + System.currentTimeMillis());
 							parsedQuestions.add(question);	
 						}
 						

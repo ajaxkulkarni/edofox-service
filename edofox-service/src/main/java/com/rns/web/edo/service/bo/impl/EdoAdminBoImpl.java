@@ -1400,7 +1400,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						EdoQuestion question = new EdoQuestion();
 						Integer questionNumber = new Integer(StringUtils.removeEnd(values[1], ".png"));
 						question.setQuestionNumber(questionNumber);
-						question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber));
+						//Timestamp added to avoid caching
+						question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber) + "?" + System.currentTimeMillis());
 						questions.add(question);
 					}
 				}
