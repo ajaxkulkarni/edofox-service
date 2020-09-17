@@ -100,6 +100,7 @@
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>
 		<result column="option_selected" property="question.answer"/>
+		<result column="flagged" property="question.flagged"/>
 		<result column="question_img_url" property="question.questionImageUrl" />
 		<result column="solution_img_url" property="question.solutionImageUrl" />
 		<result column="option1_img_url" property="question.option1ImageUrl" />
