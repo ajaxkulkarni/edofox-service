@@ -100,7 +100,7 @@
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>
 		<result column="option_selected" property="question.answer"/>
-		<result column="flagged" property="question.flagged"/>
+		<result column="reviewed" property="question.flagged"/>
 		<result column="question_img_url" property="question.questionImageUrl" />
 		<result column="solution_img_url" property="question.solutionImageUrl" />
 		<result column="option1_img_url" property="question.option1ImageUrl" />
@@ -133,7 +133,7 @@
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		SELECT *,test_result.id as mapId,test_questions.status as questionStatus FROM test 
+		SELECT *,test_result.id as mapId,test_result.flagged as reviewed, test_questions.status as questionStatus FROM test 
 		join test_questions_map on test.test_id = test_questions_map.test_id
 		join test_questions on test_questions_map.question_id = test_questions.id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
