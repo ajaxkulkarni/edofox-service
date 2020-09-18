@@ -73,7 +73,9 @@ public class EdoPDFUtil {
 					int questionCount = 1;
 
 					PDPage pg;
-
+					EdoPDFCoordinate coord = null;
+					
+					
 					@Override
 					protected void startPage(PDPage page) throws IOException {
 						startOfLine = true;
@@ -127,7 +129,7 @@ public class EdoPDFUtil {
 									//float width = lastCharacter.getEndX() - firstProsition.getEndX();
 									float width = firstProsition.getPageWidth();
 									
-									EdoPDFCoordinate coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), width, questionCount);
+									coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), width, questionCount);
 									//coord.setHeight(firstProsition.getHeight());
 									List<EdoPDFCoordinate> coordList = coordinates.get(pg);
 									if(coordList == null) {
@@ -139,6 +141,8 @@ public class EdoPDFUtil {
 									System.out.println(questionCount + ":" + coord.getX() + " - " + coord.getY() + " width " + coord.getHeight() + " pg w " + coord.getWidth() +  " for " + text);
 								//}
 								questionCount++;
+							} else if (coord != null) {
+								coord.setLastTextY(firstProsition.getEndY());
 							}
 							//writeString(String.format("[%s]", firstProsition.getXDirAdj()));
 							startOfLine = false;
@@ -205,6 +209,8 @@ public class EdoPDFUtil {
 							float startY = 0;
 							if(edoPDFCoordinate.getWhiteSpaceY() != null) {
 								startY = edoPDFCoordinate.getWhiteSpaceY();
+							} else if (edoPDFCoordinate.getLastTextY() != null) {
+								startY = edoPDFCoordinate.getLastTextY();
 							}
 							//for last item
 							float height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + buffer;
