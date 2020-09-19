@@ -600,7 +600,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					saveAnswerRequest.setTest(test);
 					saveAnswerRequest.setStudent(request.getStudent());
 					saveAnswerRequest.setQuestion(question);
-					saveAnswer(saveAnswerRequest, session);
+					if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, request.getQuestion().getType()) || StringUtils.isNotBlank(question.getAnswer())) {
+						saveAnswer(saveAnswerRequest, session);
+					}
 				}
 			}
 			
