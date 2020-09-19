@@ -629,7 +629,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					saveAnswerRequest.setTest(test);
 					saveAnswerRequest.setStudent(request.getStudent());
 					saveAnswerRequest.setQuestion(question);
-					saveAnswer(saveAnswerRequest, session);
+					//To avoid blank submissions
+					if(StringUtils.isNotBlank(question.getAnswer())) {
+						saveAnswer(saveAnswerRequest, session);
+					}
 				}
 			}
 			

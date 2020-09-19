@@ -28,6 +28,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.apache.pdfbox.text.TextPosition;
 
+import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.ext.EdoPDFCoordinate;
 
@@ -52,7 +53,7 @@ public class EdoPDFUtil {
 	//95.621284 - 759.48
 	//95.621284 - 685.54
 	
-	public static List<EdoQuestion> pdfBox(final String questionNumberSuffix, final String questionNumberPrefix, InputStream is, String outputFolder, int buffer, int testId, final Integer from, final Integer to) {
+	public static List<EdoQuestion> pdfBox(final EdoAdminRequest request, InputStream is, String outputFolder/*, int buffer, int testId, final Integer from, final Integer to*/) {
 		try {
 			//String questionNumberSuffix = ".";
 			List<EdoQuestion> parsedQuestions = new ArrayList<EdoQuestion>();
@@ -104,13 +105,13 @@ public class EdoPDFUtil {
 										System.out.println("Setting white space as " + firstProsition.getEndY());
 									}
 								}
-							} else if (StringUtils.contains(text, questionNumberPrefix + questionCount + questionNumberSuffix)) {
+							} else if (StringUtils.contains(text, request.getQuestionPrefix() + questionCount + request.getQuestionSuffix())) {
 								//if(withinRange()) {
 									
 									//Find start X based on question suffix/prefix
-									if(StringUtils.isNotBlank(questionNumberSuffix)) {
+									if(StringUtils.isNotBlank(request.getQuestionSuffix())) {
 										for(TextPosition position: textPositions) {
-											if(position.toString().equals(questionNumberSuffix)) {
+											if(position.toString().equals(request.getQuestionSuffix())) {
 												firstProsition = position;
 												break;
 											}
@@ -124,10 +125,14 @@ public class EdoPDFUtil {
 										}
 									}
 								
-									//Width of the line is last character X of the first line - first X
-									//TextPosition lastCharacter = textPositions.get(textPositions.size() - 1);
-									//float width = lastCharacter.getEndX() - firstProsition.getEndX();
 									float width = firstProsition.getPageWidth();
+									//If width cropping option is selected
+									if(StringUtils.equals("true", request.getCropWidth())) {
+										//Width of the line is last character X of the first line - first X
+										TextPosition lastCharacter = textPositions.get(textPositions.size() - 1);
+										width = (lastCharacter.getEndX() + lastCharacter.getWidth()) - firstProsition.getEndX();
+										
+									}
 									
 									coord = new EdoPDFCoordinate(firstProsition.getEndX(), firstProsition.getEndY(), firstProsition.getHeight(), width, questionCount);
 									//coord.setHeight(firstProsition.getHeight());
@@ -143,6 +148,12 @@ public class EdoPDFUtil {
 								questionCount++;
 							} else if (coord != null) {
 								coord.setLastTextY(firstProsition.getEndY());
+								//Update width if it's greater than current width
+								TextPosition lastCharacter = textPositions.get(textPositions.size() - 1);
+								float width = lastCharacter.getEndX() - firstProsition.getEndX();
+								if(coord.getWidth() < width) {
+									coord.setWidth(width);
+								}
 							}
 							//writeString(String.format("[%s]", firstProsition.getXDirAdj()));
 							startOfLine = false;
@@ -185,24 +196,24 @@ public class EdoPDFUtil {
 						if(i > 0) {
 							// suffix in filename will be used as the file format
 						    Integer questionNumber = list.get(i - 1).getQuestionNumber();
-						    if(!withinRange(from, to, questionNumber)) {
+						    if(!withinRange(request.getFromQuestion(), request.getToQuestion(), questionNumber)) {
 						    	continue;
 						    }
 						    //int buffer = 10;
-							float y = edoPDFCoordinate.getY() + edoPDFCoordinate.getHeight() + buffer;
-							float width = edoPDFCoordinate.getWidth();
-							float height = list.get(i - 1).getY() - edoPDFCoordinate.getY() + buffer;
+							float y = edoPDFCoordinate.getY() + edoPDFCoordinate.getHeight() + request.getBuffer();
+							float width = list.get(i-1).getWidth();
+							float height = list.get(i - 1).getY() - edoPDFCoordinate.getY() + request.getBuffer();
 							Float x = edoPDFCoordinate.getX();
 							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber, x);
 							EdoQuestion question = new EdoQuestion();
 							question.setQuestionNumber(questionNumber);
 							//Timestamp added to avoid caching
-							question.setQuestionImageUrl(getQuestionUrl(testId, questionNumber) + "?" + System.currentTimeMillis());
+							question.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), questionNumber) + "?" + System.currentTimeMillis());
 							parsedQuestions.add(question);	
 						}
 						
 						if(i == list.size() - 1) {
-							if(!withinRange(from, to, list.get(i).getQuestionNumber())) {
+							if(!withinRange(request.getFromQuestion(), request.getToQuestion(), list.get(i).getQuestionNumber())) {
 								continue;
 							}
 							
@@ -213,11 +224,11 @@ public class EdoPDFUtil {
 								startY = edoPDFCoordinate.getLastTextY();
 							}
 							//for last item
-							float height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + buffer;
+							float height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + request.getBuffer();
 							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, startY, edoPDFCoordinate.getWidth(), height, list.get(i).getQuestionNumber(), list.get(i).getX());
 							EdoQuestion lastQuestion = new EdoQuestion();
 							lastQuestion.setQuestionNumber(list.get(i).getQuestionNumber());
-							lastQuestion.setQuestionImageUrl(getQuestionUrl(testId, list.get(i).getQuestionNumber()));
+							lastQuestion.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), list.get(i).getQuestionNumber()));
 							parsedQuestions.add(lastQuestion);
 							
 							/*page.setCropBox(new PDRectangle(0, 0, , ));

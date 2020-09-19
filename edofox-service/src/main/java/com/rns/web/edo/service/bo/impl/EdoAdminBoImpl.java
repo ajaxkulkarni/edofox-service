@@ -1378,7 +1378,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(request.getQuestionSuffix() == null) {
 				request.setQuestionSuffix("");
 			}
-			request.getTest().setTest(EdoPDFUtil.pdfBox(request.getQuestionSuffix(), request.getQuestionPrefix(), fileData, folderPath , request.getBuffer(), request.getTest().getId(), request.getFromQuestion(), request.getToQuestion()));
+			request.getTest().setTest(EdoPDFUtil.pdfBox(request, fileData, folderPath));
 			response.setTest(request.getTest()); 
 		} catch (Exception e) {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
