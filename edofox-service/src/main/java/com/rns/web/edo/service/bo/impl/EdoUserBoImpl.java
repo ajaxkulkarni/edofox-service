@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -20,6 +19,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -51,15 +51,18 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoContentMap;
 import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
+import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
@@ -1176,9 +1179,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			 								.list();
 			 if(CollectionUtils.isEmpty(sessions)) {
 				 //Create new
-				 EdoLiveSession live = createLiveSession(classroomId, "Live session_" + new Date().getTime());
+				 /*EdoLiveSession live = createLiveSession(classroomId, "Live session_" + new Date().getTime());
 				 session.persist(live);
-				 sessionId = live.getId();
+				 sessionId = live.getId();*/
 			 } else {
 				 EdoLiveSession live = sessions.get(0);
 				 if(!StringUtils.equals("Active", live.getStatus())) {
@@ -1252,10 +1255,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	private EdoLiveSession createLiveSession(Integer classroomId, String sessionName) {
+	private EdoLiveSession createLiveSession(EDOPackage channel, EdoServiceRequest request, EdoStudent host) {
 		EdoLiveSession live = new EdoLiveSession();
-		live.setSessionName(sessionName);
-		live.setClassroomId(classroomId);
+		live.setSessionName(channel.getName());
+		live.setClassroomId(channel.getId());
+		live.setStartDate(CommonUtils.parseDate("yyyy-MM-dd HH:mm", request.getStartTime()));
+		live.setEndDate(CommonUtils.parseDate("yyyy-MM-dd HH:mm", request.getEndTime()));
+		if(request.getStudent() != null && host != null) {
+			live.setCreatedBy(request.getStudent().getId());
+		}
 		live.setCreatedDate(new Date());
 		live.setLastUpdated(new Date());
 		live.setStatus("Active");
@@ -1273,12 +1281,78 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			session = this.sessionFactory.openSession();
 			Transaction tx = session.beginTransaction();
 			EDOPackage channel = request.getStudent().getCurrentPackage();
-			EdoLiveSession live = createLiveSession(channel.getId(), channel.getName());
+			//Get presenter
+			EdoStudent host = testsDao.getStudentById(request.getStudent().getId());
+			EdoLiveSession live = createLiveSession(channel, request, host);
+			//Call Impartus API
+			List<EdoLiveToken> tokens = session.createCriteria(EdoLiveToken.class).addOrder(org.hibernate.criterion.Order.desc("id")).setMaxResults(1).list();
+			String tokenString = null;
+			if(CollectionUtils.isEmpty(tokens)) {
+				EdoImpartusResponse tokenResponse = EdoLiveUtil.adminLogin();
+				if(tokenResponse == null) {
+					response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+					LoggingUtil.logMessage("Could not generate token for live classroom .. " + live.getSessionName());
+					return response;
+				}
+				EdoLiveToken token = new EdoLiveToken();
+				token.setLastUpdated(new Date());
+				token.setToken(tokenResponse.getToken());
+				tokenString = tokenResponse.getToken();
+				session.persist(token);
+			} else {
+				tokenString = tokens.get(0).getToken();
+			}
+			
+			EDOPackage pkg = testsDao.getPackage(channel.getId());
+			//Create course
+			EdoImpartusResponse impartusResponse = EdoLiveUtil.createCourse(tokenString, pkg);
+			if(!impartusResponse.isSuccess()) {
+				LoggingUtil.logMessage("Could not create course for live classroom .. " + live.getSessionName());
+				return response;
+			}
+			
+			if(host == null) {
+				host = new EdoStudent();
+				host.setId(request.getStudent().getId());
+				if(request.getStudent().getName() == null) {
+					host.setName("Admin");
+				}
+			}
+			impartusResponse = EdoLiveUtil.createUser(tokenString, host, 2);
+			if(!impartusResponse.isSuccess()) {
+				LoggingUtil.logMessage("Could not create presenter for live classroom .. " + live.getSessionName());
+				return response;
+			}
+			
+			impartusResponse = EdoLiveUtil.createLiveSession(tokenString, live, host);
+			if(!impartusResponse.isSuccess() || StringUtils.isBlank(impartusResponse.getLiveStreamUrl2())) {
+				LoggingUtil.logMessage("Could not create live schedule for live classroom .. " + live.getSessionName());
+				return response;
+			}
+			
+			live.setLiveUrl(impartusResponse.getLiveStreamUrl2());
+			live.setScheduleId(impartusResponse.getScheduleId());
+			live.setHlsUrl(impartusResponse.getPlaybackUrl2());
+			
+			impartusResponse = EdoLiveUtil.join(tokenString, channel.getId(), request.getStudent().getId());
+			if(!impartusResponse.isSuccess()) {
+				LoggingUtil.logMessage("Could not join course .. " + live.getSessionName());
+				return response;
+			}
+			
+			impartusResponse = EdoLiveUtil.ssoToken(request.getStudent().getId());
+			if(!impartusResponse.isSuccess()) {
+				LoggingUtil.logMessage("Could not get SSO token .. " + live.getSessionName());
+				return response;
+			}
+			
 			session.persist(live);
 			List<EDOPackage> packages = new ArrayList<EDOPackage>();
 			channel.setId(live.getId());
+			channel.setVideoUrl(live.getLiveUrl() + "&token=" + impartusResponse.getToken());
 			packages.add(channel);
 			response.setPackages(packages);
+			
 			tx.commit();
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
@@ -1934,6 +2008,90 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+
+	public EdoServiceResponse joinSession(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		EDOPackage channel = request.getStudent().getCurrentPackage();
+		if(request.getStudent() == null || channel == null) {
+			response.setStatus(new EdoApiStatus(-111, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			Integer sessionId = channel.getId();
+			List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", sessionId))
+						.list();
+			EdoLiveSession live = null;
+			if(CollectionUtils.isEmpty(sessions)) {
+				response.setStatus(new EdoApiStatus(-111, "No such live session found"));
+				return response;
+			} 
+			live = sessions.get(0);
+			//Call Impartus API
+			List<EdoLiveToken> tokens = session.createCriteria(EdoLiveToken.class)
+					.addOrder(org.hibernate.criterion.Order.desc("id"))
+					.add(Restrictions.ge("lastUpdated", DateUtils.addHours(new Date(), -2)))
+					.setMaxResults(1).list();
+			String tokenString = null;
+			if(CollectionUtils.isEmpty(tokens)) {
+				EdoImpartusResponse tokenResponse = EdoLiveUtil.adminLogin();
+				if(tokenResponse == null) {
+					response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+					LoggingUtil.logMessage("Could not generate token for live classroom .. " + live.getSessionName());
+					return response;
+				}
+				EdoLiveToken token = new EdoLiveToken();
+				token.setLastUpdated(new Date());
+				token.setToken(tokenResponse.getToken());
+				tokenString = tokenResponse.getToken();
+				session.persist(token);
+			} else {
+				tokenString = tokens.get(0).getToken();
+			}
+			
+			//Create user if not present
+			EdoStudent host = testsDao.getStudentById(request.getStudent().getId());
+			Integer userType = 2;
+			if(StringUtils.isBlank(host.getAccessType())) {
+				userType = 6;
+			}
+			EdoImpartusResponse impartusResponse = EdoLiveUtil.createUser(tokenString, host, userType);
+			if(!impartusResponse.isSuccess()) {
+				LoggingUtil.logMessage("Could not create user for live classroom .. " + live.getSessionName());
+				return response;
+			}
+			
+			
+			impartusResponse = EdoLiveUtil.join(tokenString, live.getClassroomId(), request.getStudent().getId());
+			if(!impartusResponse.isSuccess()) {
+				LoggingUtil.logMessage("Could not join course .. " + live.getSessionName());
+				return response;
+			}
+			
+			impartusResponse = EdoLiveUtil.ssoToken(request.getStudent().getId());
+			if(!impartusResponse.isSuccess()) {
+				LoggingUtil.logMessage("Could not get SSO token .. " + live.getSessionName());
+				return response;
+			}
+			
+			session.persist(live);
+			List<EDOPackage> packages = new ArrayList<EDOPackage>();
+			channel.setId(live.getId());
+			channel.setVideoUrl(live.getLiveUrl() + "&token=" + impartusResponse.getToken());
+			packages.add(channel);
+			response.setPackages(packages);
+			
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return response;
 	}

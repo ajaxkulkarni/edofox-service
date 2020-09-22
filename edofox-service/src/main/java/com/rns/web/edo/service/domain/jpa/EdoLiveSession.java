@@ -35,8 +35,38 @@ public class EdoLiveSession {
 	private String recording_url;
 	@Column(name = "file_size")
 	private Float fileSize;
+	@Column(name = "start_date")
+	private Date startDate;
+	@Column(name = "end_date")
+	private Date endDate;
+	@Column(name = "created_by")
+	private Integer createdBy;
+	@Column(name = "schedule_id")
+	private String scheduleId;
+	@Column(name = "live_url")
+	private String liveUrl;
+	@Column(name = "hls_url")
+	private String hlsUrl;
 	
 	
+	public String getScheduleId() {
+		return scheduleId;
+	}
+	public void setScheduleId(String scheduleId) {
+		this.scheduleId = scheduleId;
+	}
+	public String getLiveUrl() {
+		return liveUrl;
+	}
+	public void setLiveUrl(String liveUrl) {
+		this.liveUrl = liveUrl;
+	}
+	public String getHlsUrl() {
+		return hlsUrl;
+	}
+	public void setHlsUrl(String hlsUrl) {
+		this.hlsUrl = hlsUrl;
+	}
 	public Integer getId() {
 		return id;
 	}
@@ -84,5 +114,23 @@ public class EdoLiveSession {
 	}
 	public void setFileSize(Float fileSize) {
 		this.fileSize = fileSize;
+	}
+	public Date getStartDate() {
+		return startDate;
+	}
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+	public Date getEndDate() {
+		return endDate;
+	}
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+	public Integer getCreatedBy() {
+		return createdBy;
+	}
+	public void setCreatedBy(Integer createdBy) {
+		this.createdBy = createdBy;
 	}
 }

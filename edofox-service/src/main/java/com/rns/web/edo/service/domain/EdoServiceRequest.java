@@ -39,6 +39,8 @@ public class EdoServiceRequest {
 	private Integer startIndex;
 	private String searchFilter;
 	private EdoDeviceId deviceId;
+	private String startTime;
+	private String endTime;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -197,6 +199,22 @@ public class EdoServiceRequest {
 
 	public void setDeviceId(EdoDeviceId deviceId) {
 		this.deviceId = deviceId;
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
 	}
 	
 }

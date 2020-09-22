@@ -407,6 +407,16 @@ public class EdoUserController {
 	}
 	
 	@POST
+	@Path("/joinSession")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse joinSession(EdoServiceRequest request) {
+		//LoggingUtil.logMessage("Start live session request :" + request, LoggingUtil.videoLogger);
+		EdoServiceResponse response = userBo.joinSession(request);
+		return response;
+	}
+	
+	@POST
 	@Path("/getLiveSessions")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)

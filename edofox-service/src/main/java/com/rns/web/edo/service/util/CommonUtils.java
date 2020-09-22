@@ -24,8 +24,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Session;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
@@ -39,6 +42,13 @@ import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 public class CommonUtils {
 
@@ -52,6 +62,23 @@ public class CommonUtils {
 		try {
 			return new SimpleDateFormat("yyyy-MM-dd").format(date);
 		} catch (Exception e) {
+		}
+		return null;
+	}
+	
+	public static String convertDate(Date date, String format) {
+		try {
+			return new SimpleDateFormat(format).format(date);
+		} catch (Exception e) {
+		}
+		return null;
+	}
+	
+	public static Date parseDate(String format, String date) {
+		try {
+			return new SimpleDateFormat(format).parse(date);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -757,5 +784,40 @@ public class CommonUtils {
 				}
 			}
 		}
+	}
+	
+	public static String callExternalApi(String url, JSONObject request, String methodType, String authKey) {
+		try {
+			ClientConfig config = new DefaultClientConfig();
+			config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+			Client client = Client.create(config);
+
+			WebResource webResource = client.resource(url);
+			LoggingUtil.logMessage("Calling API URL :" + url + " with request:" + request, LoggingUtil.videoLogger);
+
+			
+			Builder builder = webResource.type("application/json");
+			if(authKey != null) {
+				builder.header("Authorization", authKey);
+			}
+			if(methodType != null && methodType.equals("PUT")) {
+				//“X-HTTP-Method-Override”: “PUT”
+				builder.header("X-HTTP-Method-Override", methodType);
+			}
+			
+			ClientResponse response = builder.post(ClientResponse.class, request);
+
+			if (response.getStatus() != 200) {
+				LoggingUtil.logMessage("Failed in API URL " + url + ": HTTP error code : " + response.getStatus(), LoggingUtil.videoLogger);
+			}
+			String output = response.getEntity(String.class);
+			LoggingUtil.logMessage("Output from " + url + " URL : " + response.getStatus() + ".... \n " + output, LoggingUtil.videoLogger);
+			return output;
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		
+		return null;
+	
 	}
 }
