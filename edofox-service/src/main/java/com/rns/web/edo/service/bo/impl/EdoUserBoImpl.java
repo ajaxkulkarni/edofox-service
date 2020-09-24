@@ -1281,11 +1281,25 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			session = this.sessionFactory.openSession();
 			Transaction tx = session.beginTransaction();
 			EDOPackage channel = request.getStudent().getCurrentPackage();
+			if(request.getStartTime() == null || request.getStartTime() == null) {
+				response.setStatus(new EdoApiStatus(-111, "Start and end time is mandatory"));
+				return response;
+			}
+			/*if(DateUtils.isSameDay(channel.getFromDate(), channel.getToDate())) {
+				response.setStatus(new EdoApiStatus(-111, "Start and end time cannot be of different dates"));
+				return response;
+			}*/
+			/*if(channel.getFromDate().getTime() >= channel.getToDate().getTime()) {
+				response.setStatus(new EdoApiStatus(-111, "Start time cannot be more than end time"));
+				return response;
+			}*/
 			//Get presenter
 			EdoStudent host = testsDao.getStudentById(request.getStudent().getId());
 			EdoLiveSession live = createLiveSession(channel, request, host);
 			//Call Impartus API
-			List<EdoLiveToken> tokens = session.createCriteria(EdoLiveToken.class).addOrder(org.hibernate.criterion.Order.desc("id")).setMaxResults(1).list();
+			List<EdoLiveToken> tokens = session.createCriteria(EdoLiveToken.class).addOrder(org.hibernate.criterion.Order.desc("id"))
+					.add(Restrictions.ge("lastUpdated", DateUtils.addHours(new Date(), -2)))
+					.setMaxResults(1).list();
 			String tokenString = null;
 			if(CollectionUtils.isEmpty(tokens)) {
 				EdoImpartusResponse tokenResponse = EdoLiveUtil.adminLogin();
@@ -1332,7 +1346,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			live.setLiveUrl(impartusResponse.getLiveStreamUrl2());
 			live.setScheduleId(impartusResponse.getScheduleId());
-			live.setHlsUrl(impartusResponse.getPlaybackUrl2());
+			live.setRecording_url(impartusResponse.getPlaybackUrl2());
+			live.setHlsUrl(impartusResponse.getHlsPlaybackUrl());
+			live.setPptUrl(impartusResponse.getPptUrl());
 			
 			impartusResponse = EdoLiveUtil.join(tokenString, channel.getId(), request.getStudent().getId());
 			if(!impartusResponse.isSuccess()) {
@@ -1370,7 +1386,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return response;
 		}
 		try {
-			response.setPackages(testsDao.getLiveSessions(request.getStudent().getCurrentPackage()));
+			List<EDOPackage> liveSessions = testsDao.getLiveSessions(request.getStudent().getCurrentPackage());
+			if(CollectionUtils.isNotEmpty(liveSessions)) {
+				for(EDOPackage liveSession: liveSessions) {
+					if(liveSession.getFromDate() != null && liveSession.getFromDate().compareTo(new Date()) > 0) {
+						liveSession.setStatus("Pending");
+					} else if (liveSession.getToDate() != null && liveSession.getToDate().compareTo(new Date()) >= 0) {
+						liveSession.setStatus("Active");
+					} else {
+						liveSession.setStatus("Completed");
+					}
+				}
+			}
+			response.setPackages(liveSessions);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
@@ -2082,7 +2110,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			session.persist(live);
 			List<EDOPackage> packages = new ArrayList<EDOPackage>();
 			channel.setId(live.getId());
-			channel.setVideoUrl(live.getLiveUrl() + "&token=" + impartusResponse.getToken());
+			if(live.getEndDate() != null && live.getEndDate().compareTo(new Date()) > 0) {
+				channel.setVideoUrl(live.getLiveUrl() + "&token=" + impartusResponse.getToken());
+			} else {
+				channel.setVideoUrl(live.getRecording_url() + "&token=" + impartusResponse.getToken());
+			}
+			
 			packages.add(channel);
 			response.setPackages(packages);
 			

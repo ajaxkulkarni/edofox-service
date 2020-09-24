@@ -47,7 +47,8 @@ public class EdoLiveSession {
 	private String liveUrl;
 	@Column(name = "hls_url")
 	private String hlsUrl;
-	
+	@Column(name = "ppt_url")
+	private String pptUrl;
 	
 	public String getScheduleId() {
 		return scheduleId;
@@ -60,12 +61,6 @@ public class EdoLiveSession {
 	}
 	public void setLiveUrl(String liveUrl) {
 		this.liveUrl = liveUrl;
-	}
-	public String getHlsUrl() {
-		return hlsUrl;
-	}
-	public void setHlsUrl(String hlsUrl) {
-		this.hlsUrl = hlsUrl;
 	}
 	public Integer getId() {
 		return id;
@@ -132,5 +127,17 @@ public class EdoLiveSession {
 	}
 	public void setCreatedBy(Integer createdBy) {
 		this.createdBy = createdBy;
+	}
+	public String getHlsUrl() {
+		return hlsUrl;
+	}
+	public void setHlsUrl(String hlsUrl) {
+		this.hlsUrl = hlsUrl;
+	}
+	public String getPptUrl() {
+		return pptUrl;
+	}
+	public void setPptUrl(String pptUrl) {
+		this.pptUrl = pptUrl;
 	}
 }

@@ -19,6 +19,8 @@ public class EDOPackage {
 	private String status;
 	private Date createdDate;
 	private String videoUrl;
+	private Date fromDate;
+	private Date toDate;
 	
 	public Integer getId() {
 		return id;
@@ -73,6 +75,18 @@ public class EDOPackage {
 	}
 	public void setVideoUrl(String videoUrl) {
 		this.videoUrl = videoUrl;
+	}
+	public Date getFromDate() {
+		return fromDate;
+	}
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+	public Date getToDate() {
+		return toDate;
+	}
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
 	}
 	
 }
