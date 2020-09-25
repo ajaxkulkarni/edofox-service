@@ -45,6 +45,7 @@ public class EdoTest {
 	private String status;
 	private String studentStatus;
 	private Integer rank;
+	private Date createdDate;
 	
 	public EdoTest() {
 		
@@ -293,6 +294,14 @@ public class EdoTest {
 
 	public void setRank(Integer rank) {
 		this.rank = rank;
+	}
+
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
 	}
 	
 }

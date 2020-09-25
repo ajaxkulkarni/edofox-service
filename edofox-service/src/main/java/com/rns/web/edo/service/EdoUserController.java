@@ -661,4 +661,15 @@ public class EdoUserController {
 		//LoggingUtil.logMessage("Update device id request :" + request);
 		return userBo.getChapterExams(request);
 	}
+	
+	@POST
+	@Path("/getStudentPerformance")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getStudentPerformance(EdoServiceRequest request) {
+		//LoggingUtil.logMessage("Get Test result Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response =  userBo.getStudentPerformance(request);
+		return response;
+	}
 }

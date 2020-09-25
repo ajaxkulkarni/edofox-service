@@ -66,6 +66,7 @@
 		<result column="correct" property="correctCount"/>
 		<result column="flagged" property="flaggedCount"/>
 		<result column="rank" property="rank"/>
+		<result column="created_date" property="createdDate"/>
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">
