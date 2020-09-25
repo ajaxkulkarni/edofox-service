@@ -4,14 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.Calendar;
+import java.util.Calendar;import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -32,11 +34,17 @@ import com.clickntap.vimeo.VimeoException;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
+import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
+import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
+import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.VideoUtil;
@@ -69,8 +77,10 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 		// Add session clean up task
 		taskRegistrar.addTriggerTask(new Runnable() {
 			public void run() {
-				videoExportJob();
+				//videoExportJob();
+				analysisExportJob();
 			}
+
 
 		}, new Trigger() {
 			public Date nextExecutionTime(TriggerContext arg0) {
@@ -93,6 +103,111 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 			CommonUtils.closeSession(session);
 		}
 		LoggingUtil.logMessage("... End of video export job ..", LoggingUtil.schedulerLogger);
+	}
+	
+
+	private void analysisExportJob() {
+		Session session = null;
+		try {
+			LoggingUtil.logMessage("... Start of analysis export job ..", LoggingUtil.schedulerLogger);
+			session = this.sessionFactory.openSession();
+			List<EdoLiveSession> liveSessions = session.createCriteria(EdoLiveSession.class)
+					.add(Restrictions.le("endDate", new Date()))
+					.add(Restrictions.eq("status", "Active")).list();
+			if (CollectionUtils.isNotEmpty(liveSessions)) {
+				LoggingUtil.logMessage("... Found " + liveSessions.size() + " sessions ..", LoggingUtil.schedulerLogger);
+				
+				//Call Impartus API to generate token
+				List<EdoLiveToken> tokens = session.createCriteria(EdoLiveToken.class)
+						.addOrder(org.hibernate.criterion.Order.desc("id"))
+						.add(Restrictions.ge("lastUpdated", DateUtils.addHours(new Date(), -2)))
+						.setMaxResults(1).list();
+				String tokenString = null;
+				if(CollectionUtils.isEmpty(tokens)) {
+					EdoImpartusResponse tokenResponse = EdoLiveUtil.adminLogin();
+					if(tokenResponse == null) {
+						LoggingUtil.logMessage("... Could not get token ..", LoggingUtil.schedulerLogger);
+						return;
+					}
+					EdoLiveToken token = new EdoLiveToken();
+					token.setLastUpdated(new Date());
+					token.setToken(tokenResponse.getToken());
+					tokenString = tokenResponse.getToken();
+					session.persist(token);
+				} else {
+					tokenString = tokens.get(0).getToken();
+				}
+				
+				Transaction tx = session.beginTransaction();
+				for(EdoLiveSession liveSession: liveSessions) {
+					if(liveSession.getScheduleId() != null) {
+						List<LinkedHashMap<String, Object>> resp = EdoLiveUtil.getUsage(new Integer(liveSession.getScheduleId()), tokenString);
+						if(CollectionUtils.isNotEmpty(resp)) {
+							for(LinkedHashMap<String, Object> student: resp) {
+								EdoServiceRequest request = new EdoServiceRequest();
+								EdoFeedback feedback = new EdoFeedback();
+								feedback.setActivityCount(1);
+								feedback.setFrequency(1);
+								Float durationViewed = new Float(student.get("duration").toString());
+								feedback.setDurationViewed(durationViewed);
+								feedback.setTotalDuration(durationViewed.longValue());
+								feedback.setCreatedDateString(student.get("date").toString());
+								feedback.setId(liveSession.getId());
+								EdoStudent stu = new EdoStudent();
+								stu.setId(new Integer(student.get("externalId").toString()));
+								request.setStudent(stu);
+								request.setRequestType("LIVE_JOINED");
+								//feedback.setTotalDuration(durationViewed);
+								request.setFeedback(feedback);
+								testsDao.saveVideoActiviy(request);
+								//Update summary
+								Integer activityCount = 1;
+								Integer watchedTimes = 0;
+								if(StringUtils.equals(request.getRequestType(), "VIDEO_ENDED")) {
+									watchedTimes = 1;
+								}
+								Long watchDuration = durationViewed.longValue();
+								List<EdoFeedback> activiy = testsDao.getStudentActivity(request);
+								if(CollectionUtils.isNotEmpty(activiy)) {
+									EdoFeedback existing = activiy.get(0);
+									if(existing.getActivityCount() != null) {
+										activityCount = existing.getActivityCount() + 1;
+									}
+									if(existing.getFrequency() != null) {
+										watchedTimes = existing.getFrequency() + watchedTimes;
+									}
+									if(existing.getTotalDuration() != null && durationViewed != null) {
+										watchDuration = existing.getTotalDuration() + durationViewed.longValue();
+									}
+									if(StringUtils.equals(existing.getType(), "VIDEO_ENDED")) {
+										request.setRequestType(existing.getType());
+									}
+									feedback.setActivityCount(activityCount);
+									feedback.setTotalDuration(watchDuration);
+									feedback.setFrequency(watchedTimes);
+									testsDao.updateActivitySummary(request);
+								} else {
+									feedback.setActivityCount(activityCount);
+									feedback.setTotalDuration(watchDuration);
+									feedback.setFrequency(watchedTimes);
+									testsDao.saveActivitySummary(request);
+								}
+								
+							}
+						}
+					}
+					liveSession.setStatus("Completed");
+				}
+				tx.commit();
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		LoggingUtil.logMessage("... End of analysis export job ..", LoggingUtil.schedulerLogger);
+		
 	}
 
 	public void exportVideos(Session session) throws IOException, InterruptedException, VimeoException {

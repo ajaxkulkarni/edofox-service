@@ -52,8 +52,10 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
+import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
 import com.rns.web.edo.service.domain.jpa.EdoSalesDetails;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -62,6 +64,7 @@ import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
+import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
@@ -1852,5 +1855,45 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse getLiveAnalysis(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		Session session = null;
+		try {
+			if (request.getLecture() != null && request.getLecture().getId() != null) {
+				List<EdoLiveSession> sessions = session.createCriteria(EdoLiveSession.class).add(Restrictions.eq("id", request.getLecture().getId())).list();
+				EdoLiveSession live = null;
+				if (CollectionUtils.isEmpty(sessions)) {
+					response.setStatus(new EdoApiStatus(-111, "No such live session found"));
+					return response;
+				}
+				live = sessions.get(0);
+				// Call Impartus API
+				List<EdoLiveToken> tokens = session.createCriteria(EdoLiveToken.class).addOrder(org.hibernate.criterion.Order.desc("id"))
+						.add(Restrictions.ge("lastUpdated", DateUtils.addHours(new Date(), -2))).setMaxResults(1).list();
+				String tokenString = null;
+				if (CollectionUtils.isEmpty(tokens)) {
+					EdoImpartusResponse tokenResponse = EdoLiveUtil.adminLogin();
+					if (tokenResponse == null) {
+						response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+						LoggingUtil.logMessage("Could not generate token for live classroom .. " + live.getSessionName());
+						return response;
+					}
+					EdoLiveToken token = new EdoLiveToken();
+					token.setLastUpdated(new Date());
+					token.setToken(tokenResponse.getToken());
+					tokenString = tokenResponse.getToken();
+					session.persist(token);
+				} else {
+					tokenString = tokens.get(0).getToken();
+				}
+			}
+		} catch (Exception e) {
+
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return null;
 	}
 }

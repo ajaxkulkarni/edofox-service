@@ -62,6 +62,10 @@
 		<result column="end_date" property="endDate" />
 		<result column="institute_id" property="currentQuestion.instituteId"/> 
 		<result column="studentStatus" property="studentStatus"/>
+		<result column="solved" property="solvedCount"/>
+		<result column="correct" property="correctCount"/>
+		<result column="flagged" property="flaggedCount"/>
+		<result column="rank" property="rank"/>
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">

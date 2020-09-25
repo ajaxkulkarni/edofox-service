@@ -1391,6 +1391,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				for(EDOPackage liveSession: liveSessions) {
 					if(liveSession.getFromDate() != null && liveSession.getFromDate().compareTo(new Date()) > 0) {
 						liveSession.setStatus("Pending");
+						liveSession.setTimeLeft(liveSession.getFromDate().getTime() -  new Date().getTime());
 					} else if (liveSession.getToDate() != null && liveSession.getToDate().compareTo(new Date()) >= 0) {
 						liveSession.setStatus("Active");
 					} else {
@@ -2085,9 +2086,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//Create user if not present
 			EdoStudent host = testsDao.getStudentById(request.getStudent().getId());
 			Integer userType = 2;
-			if(StringUtils.isBlank(host.getAccessType())) {
-				userType = 6;
+			if(host != null) {
+				if(StringUtils.isBlank(host.getAccessType())) {
+					userType = 6;
+				}
+			} else {
+				host = request.getStudent();
+				host.setName("Admin");
 			}
+			
 			EdoImpartusResponse impartusResponse = EdoLiveUtil.createUser(tokenString, host, userType);
 			if(!impartusResponse.isSuccess()) {
 				LoggingUtil.logMessage("Could not create user for live classroom .. " + live.getSessionName());
@@ -2125,6 +2132,38 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		} finally {
 			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
+
+	public EdoServiceResponse getStudentPerformance(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			if(request.getStudent() != null && request.getStudent().getId() != null) {
+				List<EdoTest> tests = testsDao.getStudentPerformance(request.getStudent().getId());
+				List<EdoTestStudentMap> subjectPerformance = testsDao.getSubjectwisePerformanceStudent(request.getStudent().getId());
+				if(CollectionUtils.isNotEmpty(tests)) {
+					for(EdoTest test: tests) {
+						if(CollectionUtils.isNotEmpty(subjectPerformance)) {
+							for(EdoTestStudentMap sa: subjectPerformance) {
+								if(test.getId().intValue() == sa.getTest().getId().intValue()) {
+									if(test.getAnalysis() == null) {
+										EDOTestAnalysis analysis = new EDOTestAnalysis();
+										analysis.setSubjectAnalysis(new ArrayList<EdoStudentSubjectAnalysis>());
+										test.setAnalysis(analysis);
+									}
+									EdoStudentSubjectAnalysis subjectAnalysis = sa.getSubjectScore();
+									test.getAnalysis().getSubjectAnalysis().add(subjectAnalysis);
+								}
+							}
+						}
+					}
+				}
+				response.setExams(tests);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
 	}

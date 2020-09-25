@@ -453,4 +453,15 @@ public class EdoAdminController {
 		EdoServiceResponse response = new EdoServiceResponse(adminBo.fixRecordedLectures(request));
 		return response;
 	}
+	
+	@POST
+	@Path("/getLiveAnalysis")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getLiveAnalysis(EdoServiceRequest request) {
+		//LoggingUtil.logMessage("Get Test Analysis Request :" + request);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response =  adminBo.getLiveAnalysis(request);
+		return response;
+	}
 }

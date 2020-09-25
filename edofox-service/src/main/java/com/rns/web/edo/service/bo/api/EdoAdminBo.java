@@ -45,5 +45,6 @@ public interface EdoAdminBo {
 	EdoApiStatus updateClientSales(EdoServiceRequest request);
 	EdoServiceResponse fixRecordedFile(EdoServiceRequest request);
 	EdoApiStatus fixRecordedLectures(EdoServiceRequest request);
+	EdoServiceResponse getLiveAnalysis(EdoServiceRequest request);
 	
 }

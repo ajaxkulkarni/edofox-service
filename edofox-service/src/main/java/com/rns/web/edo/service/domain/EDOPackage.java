@@ -21,6 +21,7 @@ public class EDOPackage {
 	private String videoUrl;
 	private Date fromDate;
 	private Date toDate;
+	private Long timeLeft;
 	
 	public Integer getId() {
 		return id;
@@ -87,6 +88,12 @@ public class EDOPackage {
 	}
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
+	}
+	public Long getTimeLeft() {
+		return timeLeft;
+	}
+	public void setTimeLeft(Long timeLeft) {
+		this.timeLeft = timeLeft;
 	}
 	
 }

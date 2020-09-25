@@ -51,5 +51,6 @@ public interface EdoUserBo {
 	EdoServiceResponse getChapterContent(EdoServiceRequest request);
 	EdoServiceResponse getChapterExams(EdoServiceRequest request);
 	EdoServiceResponse joinSession(EdoServiceRequest request);
+	EdoServiceResponse getStudentPerformance(EdoServiceRequest request);
 	
 }

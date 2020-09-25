@@ -1,11 +1,13 @@
 package com.rns.web.edo.service.util;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.google.gson.JsonObject;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
@@ -98,6 +100,7 @@ public class EdoLiveUtil {
 			request.put("classroom", "VIRTUAL_CLASSROOM");
 			request.put("scheduleType", 3);
 			request.put("topic", live.getSessionName());
+			request.put("returnURL", EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "live_sessions.php?channelId=" + live.getClassroomId());
 			//request.put
 			String response = CommonUtils.callExternalApi(url, request, null, "adminBearer " + token);
 			if(response != null) {
@@ -138,6 +141,23 @@ public class EdoLiveUtil {
 			String response = CommonUtils.callExternalApi(url, request, null, null);
 			if(response != null) {
 				return new ObjectMapper().readValue(response, EdoImpartusResponse.class);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return null;
+	}
+	
+	public static List<LinkedHashMap<String, Object>> getUsage(Integer scheduledId, String token) {
+		String url = BASE_URL + "usage-data/" + scheduledId;
+		JSONObject request = new JSONObject();
+		try {
+			//request.put("secretKey", EdoPropertyUtil.getProperty(EdoPropertyUtil.IMPARTUS_KEY));
+			//request.put("externalUserId", userId);
+			
+			String response = CommonUtils.callExternalApi(url, request, "GET", "adminBearer " + token);
+			if(response != null) {
+				return new ObjectMapper().readValue(response, List.class);
 			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));

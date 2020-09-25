@@ -27,6 +27,7 @@ public class EdoFeedback {
 	private Integer foundationId;
 	private Integer activityCount;
 	private Long totalDuration;
+	private String createdDateString;
 	
 	public String getFeedback() {
 		return feedback;
@@ -135,6 +136,12 @@ public class EdoFeedback {
 	}
 	public void setTotalDuration(Long totalDuration) {
 		this.totalDuration = totalDuration;
+	}
+	public String getCreatedDateString() {
+		return createdDateString;
+	}
+	public void setCreatedDateString(String createdDateString) {
+		this.createdDateString = createdDateString;
 	}
 	
 

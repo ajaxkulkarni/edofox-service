@@ -805,8 +805,13 @@ public class CommonUtils {
 				builder.header("X-HTTP-Method-Override", methodType);
 			}
 			
-			ClientResponse response = builder.post(ClientResponse.class, request);
-
+			ClientResponse response = null;
+			if (StringUtils.equals("GET", methodType)) {
+				response = builder.get(ClientResponse.class);
+			} else {
+				response = builder.post(ClientResponse.class, request);
+			}
+				
 			if (response.getStatus() != 200) {
 				LoggingUtil.logMessage("Failed in API URL " + url + ": HTTP error code : " + response.getStatus(), LoggingUtil.videoLogger);
 			}

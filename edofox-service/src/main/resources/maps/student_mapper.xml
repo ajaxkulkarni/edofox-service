@@ -261,7 +261,13 @@
 			,course_id 
 		</if>
 		,watch_status)
-		values('${requestType}', CURRENT_TIMESTAMP, 
+		values('${requestType}', 
+		<if test="feedback.createdDate == null">
+			CURRENT_TIMESTAMP,
+		</if>
+		<if test="feedback.createdDate != null">
+			'${feedback.createdDateString}',
+		</if>
 		<if test="feedback.id != null">
 			${feedback.id}, 
 		</if>
@@ -321,7 +327,13 @@
 		,watched_times
 		,watched_activity
 		,watch_status)
-		values('${requestType}', CURRENT_TIMESTAMP, 
+		values('${requestType}', 
+		<if test="feedback.createdDate == null">
+			last_watched = CURRENT_TIMESTAMP,
+		</if>
+		<if test="feedback.createdDate != null">
+			last_watched = '${feedback.createdDateString}',
+		</if>
 		<if test="feedback.id != null">
 			${feedback.id}, 
 		</if>
@@ -366,7 +378,12 @@
 		watched_times=${feedback.frequency},
 		watched_activity=${feedback.activityCount},
 		watch_time=${feedback.totalDuration},
-		last_watched = CURRENT_TIMESTAMP,
+		<if test="feedback.createdDate == null">
+			last_watched = CURRENT_TIMESTAMP,
+		</if>
+		<if test="feedback.createdDate != null">
+			last_watched = '${feedback.createdDateString}',
+		</if>
 		status= '${requestType}',
 		watch_status =
 		<if test="requestType == 'LIVE_JOINED'">
@@ -491,5 +508,6 @@
     dlp_chp_cls_content_map.classroom_id = ${student.currentPackage.id}
     ORDER BY dlp_chp_cls_content_map.content_order
 	</select>
+	
 
 </mapper>
