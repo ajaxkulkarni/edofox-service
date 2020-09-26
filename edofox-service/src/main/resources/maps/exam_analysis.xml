@@ -107,7 +107,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="totalDeductions" property="subjectScore.deductionsCount" />
 		<result column="incorrects" property="subjectScore.incorrectCount" />
 		<result column="test_id" property="test.id"/>
-		<result column="weightage" property="totalMarks"/>
+		<result column="weightage" property="subjectScore.totalMarks"/>
 		
 	</resultMap>
 	
