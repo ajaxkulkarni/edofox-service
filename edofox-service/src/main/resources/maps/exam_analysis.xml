@@ -107,6 +107,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="totalDeductions" property="subjectScore.deductionsCount" />
 		<result column="incorrects" property="subjectScore.incorrectCount" />
 		<result column="test_id" property="test.id"/>
+		<result column="weightage" property="totalMarks"/>
 		
 	</resultMap>
 	
@@ -143,7 +144,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	</select>
 	
 	<select id="getStudentPerformance" parameterType="Integer" resultMap="test">
-	select test.test_id,test_name,ranks.rank,ranks.score,ranks.solved,ranks.correct,ranks.flagged,ranks.created_date from test join 
+	select test.test_id,test_name,ranks.rank,ranks.score,ranks.solved,ranks.correct,ranks.flagged,ranks.created_date,test.total_marks from test join 
 	( SELECT a.student_id, a.score, a.test_id, a.solved, a.correct, a.flagged, count(b.score)+1 as rank,a.created_date FROM test_status a 
 	left join test_status b on a.score&lt;b.score and a.test_id=b.test_id where a.test_id in 
 	(select test_id from test_status where student_id = ${value}) AND a.student_id = ${value} 
@@ -151,7 +152,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	</select>
 
 	<select id="getSubjectwisePerformanceStudent" resultMap="subjectScore" parameterType="Integer">
-		SELECT sum(marks) as score, test_subjects.subject, student_id, test_id FROM `test_result` 
+		SELECT sum(marks) as score, test_subjects.subject, student_id, test_id, sum(weightage) as weightage FROM `test_result` 
 		join test_questions on test_result.question_id = test_questions.id join test_subjects 
 		on test_questions.subject_id = test_subjects.subject_id where student_id = ${value} 
 		GROUP BY test_result.student_id,test_result.test_id, test_questions.subject_id

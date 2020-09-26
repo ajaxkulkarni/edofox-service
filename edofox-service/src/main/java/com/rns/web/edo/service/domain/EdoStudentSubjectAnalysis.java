@@ -11,7 +11,7 @@ public class EdoStudentSubjectAnalysis {
 	private Integer solvedCount;
 	private Integer deductionsCount; //only negatives
 	private Integer incorrectCount; //not neccessarily negative
-	
+	private Integer totalMarks;
 	
 	public String getSubject() {
 		return subject;
@@ -54,6 +54,12 @@ public class EdoStudentSubjectAnalysis {
 	}
 	public void setTotalQuestions(Integer totalQuestions) {
 		this.totalQuestions = totalQuestions;
+	}
+	public Integer getTotalMarks() {
+		return totalMarks;
+	}
+	public void setTotalMarks(Integer totalMarks) {
+		this.totalMarks = totalMarks;
 	}
 	
 	
