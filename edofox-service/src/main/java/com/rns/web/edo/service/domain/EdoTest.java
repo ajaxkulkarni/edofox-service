@@ -48,6 +48,7 @@ public class EdoTest {
 	private Date createdDate;
 	private String showQuestionPaper;
 	private Integer pauseTimeout;
+	private Integer maxStarts;
 	
 	public EdoTest() {
 		
@@ -320,6 +321,14 @@ public class EdoTest {
 
 	public void setPauseTimeout(Integer pauseTimeout) {
 		this.pauseTimeout = pauseTimeout;
+	}
+
+	public Integer getMaxStarts() {
+		return maxStarts;
+	}
+
+	public void setMaxStarts(Integer maxStarts) {
+		this.maxStarts = maxStarts;
 	}
 	
 }

@@ -233,6 +233,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					return response;
 				}
 				
+				if(studentMap != null && studentMap.getStartedCount() != null && studentMap.getTest() != null && studentMap.getTest().getMaxStarts() != null) {
+					if(studentMap.getTest().getMaxStarts() <= studentMap.getStartedCount()) {
+						response.setStatus(new EdoApiStatus(STATUS_ERROR, "You have reached maximum no of test attempts. Please contact your admin for more info."));
+						return response;
+					}
+				}
+				
 				
 				if(studentMap != null) {
 					startedDate = studentMap.getCreatedDate();
@@ -254,6 +261,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setFlaggedCount(0);
 					test.setScore(BigDecimal.ZERO);
 					testsDao.saveTestStatus(request);
+				} else {
+					//Update test status for timestamp and exam started count
+					EdoServiceRequest request = new EdoServiceRequest();
+					EdoStudent student = new EdoStudent();
+					student.setId(studenId);
+					request.setStudent(student);
+					EdoTest test = new EdoTest();
+					test.setId(testId);
+					request.setTest(test);
+					testsDao.updateTestStatus(request);
 				}
 				//Added on 11/12/19
 				

@@ -28,12 +28,22 @@
 	</insert>
 	
 	<insert id="saveTestStatus" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		insert into test_status (test_id, student_id, status, solved, correct, flagged, score, updated_date) 
-		values(${test.id}, ${student.id}, '${requestType}', ${test.solvedCount}, ${test.correctCount}, ${test.flaggedCount}, ${test.score}, CURRENT_TIMESTAMP);
+		insert into test_status (test_id, student_id, status, solved, correct, flagged, score, updated_date, exam_started_count) 
+		values(${test.id}, ${student.id}, '${requestType}', ${test.solvedCount}, ${test.correctCount}, ${test.flaggedCount}, ${test.score}, CURRENT_TIMESTAMP, 1);
 	</insert>
 	
 	<update id="updateTestStatus" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		update test_status set solved = ${test.solvedCount}, correct = ${test.correctCount}, score = ${test.score} 
+		update test_status set 
+		<if test="test.solvedCount != null">
+		solved = ${test.solvedCount}, 
+		</if>
+		<if test="test.correctCount != null">
+		correct = ${test.correctCount},
+		</if>
+		<if test="test.score != null">
+		score = ${test.score}, 
+		</if>
+		updated_date = CURRENT_TIMESTAMP, exam_started_count = exam_started_count + 1
 		where test_id = ${test.id} AND student_id = ${student.id}
 	</update>
 	

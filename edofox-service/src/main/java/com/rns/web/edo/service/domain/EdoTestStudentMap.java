@@ -14,6 +14,8 @@ public class EdoTestStudentMap {
 	private String testEndDateString;
 	private String teacherName;
 	private Date createdDate;
+	private Integer startedCount;
+	
 	
 	public EdoTest getTest() {
 		return test;
@@ -74,6 +76,12 @@ public class EdoTestStudentMap {
 	}
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
+	}
+	public Integer getStartedCount() {
+		return startedCount;
+	}
+	public void setStartedCount(Integer startedCount) {
+		this.startedCount = startedCount;
 	}
 	
 }

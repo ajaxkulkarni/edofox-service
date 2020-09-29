@@ -75,6 +75,9 @@
 		<result column="registerDate" property="registerDate"/>
 		<result column="student_access" property="studentAccess"/>
 		<result column="test_ui" property="test.testUi"/>
+		<result column="max_allowed_test_starts" property="test.maxStarts"/>
+		<result column="exam_started_count" property="startedCount"/>
+		
 	</resultMap>
 
 	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
