@@ -67,6 +67,8 @@
 		<result column="flagged" property="flaggedCount"/>
 		<result column="rank" property="rank"/>
 		<result column="created_date" property="createdDate"/>
+		<result column="show_question_paper" property="showQuestionPaper"/>
+		<result column="pause_timeout_seconds" property="pauseTimeout"/>
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">

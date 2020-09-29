@@ -46,6 +46,8 @@ public class EdoTest {
 	private String studentStatus;
 	private Integer rank;
 	private Date createdDate;
+	private String showQuestionPaper;
+	private Integer pauseTimeout;
 	
 	public EdoTest() {
 		
@@ -302,6 +304,22 @@ public class EdoTest {
 
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
+	}
+
+	public String getShowQuestionPaper() {
+		return showQuestionPaper;
+	}
+
+	public void setShowQuestionPaper(String showQuestionPaper) {
+		this.showQuestionPaper = showQuestionPaper;
+	}
+
+	public Integer getPauseTimeout() {
+		return pauseTimeout;
+	}
+
+	public void setPauseTimeout(Integer pauseTimeout) {
+		this.pauseTimeout = pauseTimeout;
 	}
 	
 }
