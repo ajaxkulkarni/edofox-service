@@ -221,10 +221,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
 			Date startedDate = null;
+			EdoTestStudentMap studentMap = null;
 			if(studenId != null) {
 				inputMap.setStudent(new EdoStudent(studenId));
 				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
-				EdoTestStudentMap studentMap = null;
 				if(CollectionUtils.isNotEmpty(studentMaps)) {
 					studentMap = studentMaps.get(0);
 				}
@@ -233,18 +233,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					return response;
 				}
 				
-				if(studentMap != null && studentMap.getStartedCount() != null && studentMap.getTest() != null && studentMap.getTest().getMaxStarts() != null) {
-					if(studentMap.getTest().getMaxStarts() <= studentMap.getStartedCount()) {
-						response.setStatus(new EdoApiStatus(STATUS_ERROR, "You have reached maximum no of test attempts. Please contact your admin for more info."));
-						return response;
-					}
-				}
-				
-				
 				if(studentMap != null) {
 					startedDate = studentMap.getCreatedDate();
 				}
-				
+				Integer startedCount = 0;
 				//Added on 11/12/19
 				if(studentMap == null) {
 					//Add test status as 'STARTED' to track students who logged in
@@ -271,7 +263,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setId(testId);
 					request.setTest(test);
 					testsDao.updateTestStatus(request);
+					if(studentMap.getStartedCount() != null) {
+						startedCount = studentMap.getStartedCount();
+					}
 				}
+				addTestActivity(testId, studenId, "STARTED");
 				//Added on 11/12/19
 				
 				studentMaps = testsDao.getStudentActivePackage(inputMap);
@@ -287,6 +283,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_PAID, ERROR_TEST_NOT_PAID));
 					return response;
 				}
+				
+				studentMap.setStartedCount(startedCount);
 				
 				if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
 					if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
@@ -315,6 +313,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			if(CollectionUtils.isNotEmpty(map)) {
 				EdoTest result = map.get(0).getTest();
+				//Check for max allowed start attempts
+				if(studentMap != null && studentMap.getStartedCount() != null && result.getMaxStarts() != null) {
+					if(result.getMaxStarts() <= studentMap.getStartedCount()) {
+						response.setStatus(new EdoApiStatus(STATUS_ERROR, "You have reached maximum no of test attempts. Please contact your admin for more info."));
+						return response;
+					}
+				}
+				
 				//Check if time constraint is present
 				if(StringUtils.equals("1", result.getTimeConstraint())) {
 					Date startTime = result.getStartDate();
@@ -380,6 +386,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		return response;
+	}
+
+	private void addTestActivity(Integer testId, Integer studenId, String type) {
+		EdoServiceRequest req = new EdoServiceRequest();
+		EdoStudent stu = new EdoStudent();
+		stu.setId(studenId);
+		req.setStudent(stu);
+		EdoTest tst = new EdoTest();
+		tst.setId(testId);
+		req.setTest(tst);
+		req.setRequestType(type);
+		testsDao.saveStudentTestActivity(req);
 	}
 
 	private void calculateTimeLeft(EdoTest result, Date startTime) {
@@ -639,6 +657,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//txManager.commit(txStatus);
 			tx.commit();
 			LoggingUtil.logMessage("Submitted the test " + test.getId() +  " for .. " + request.getStudent().getId(), LoggingUtil.saveTestLogger);
+			addTestActivity(currentTest, request.getStudent().getId(), "COMPLETED");
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
@@ -2183,6 +2202,25 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	public EdoApiStatus updateStudentTestActivity(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		if(StringUtils.isBlank(request.getRequestType()) || request.getStudent() == null || request.getTest() == null) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		if(request.getTest().getId() == null && request.getStudent().getId() == null) {
+			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		
+		try {
+			testsDao.saveStudentTestActivity(request);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.activityLogger);
+		}
+		return status;
 	}
 
 }

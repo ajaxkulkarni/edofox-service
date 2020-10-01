@@ -509,5 +509,8 @@
     ORDER BY dlp_chp_cls_content_map.content_order
 	</select>
 	
+	<insert id="saveStudentTestActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		insert into test_activity (test_id,student_id,activity_type,created_date) values(${test.id}, ${student.id}, '${requestType}', CURRENT_TIMESTAMP)
+	</insert>
 
 </mapper>
