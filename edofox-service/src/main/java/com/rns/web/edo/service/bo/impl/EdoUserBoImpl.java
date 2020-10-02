@@ -657,7 +657,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//txManager.commit(txStatus);
 			tx.commit();
 			LoggingUtil.logMessage("Submitted the test " + test.getId() +  " for .. " + request.getStudent().getId(), LoggingUtil.saveTestLogger);
-			addTestActivity(currentTest, request.getStudent().getId(), "COMPLETED");
+			addTestActivity(test.getId(), request.getStudent().getId(), "COMPLETED");
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);
