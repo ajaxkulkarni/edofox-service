@@ -69,6 +69,9 @@
 		<result column="created_date" property="createdDate"/>
 		<result column="show_question_paper" property="showQuestionPaper"/>
 		<result column="pause_timeout_seconds" property="pauseTimeout"/>
+		<result column="topScore" property="analysis.topScore"/>
+		<result column="totalStudents" property="analysis.studentsAppeared"/>
+		
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">

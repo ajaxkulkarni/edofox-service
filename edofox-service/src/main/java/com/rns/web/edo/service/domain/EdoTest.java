@@ -50,6 +50,7 @@ public class EdoTest {
 	private Integer pauseTimeout;
 	private Integer maxStarts;
 	
+	
 	public EdoTest() {
 		
 	}

@@ -48,6 +48,9 @@ public interface EdoTestsDao {
 	List<EdoQuestion> getQuestionCorrectness(Integer value);
 	List<EdoTestStudentMap> getSubjectwisePerformanceStudent(Integer integer);
 	List<EdoTest> getStudentPerformance(Integer value);
+	List<EdoTest> getStudentRank(EdoServiceRequest request);
+	List<EdoTest> getTopperScore(Integer value);
+	
 	
 	//Student queries
 	List<EDOPackage> getInstituePackages(Integer instituteId);

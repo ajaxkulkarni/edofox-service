@@ -10,6 +10,7 @@ public class EDOTestAnalysis {
 	private BigDecimal averageCorrect;
 	private BigDecimal averageAttempted;
 	private List<EdoStudentSubjectAnalysis> subjectAnalysis;
+	private Integer topScore;
 	
 	public Integer getStudentsAppeared() {
 		return studentsAppeared;
@@ -40,6 +41,12 @@ public class EDOTestAnalysis {
 	}
 	public List<EdoStudentSubjectAnalysis> getSubjectAnalysis() {
 		return subjectAnalysis;
+	}
+	public Integer getTopScore() {
+		return topScore;
+	}
+	public void setTopScore(Integer topScore) {
+		this.topScore = topScore;
 	}
 	
 }

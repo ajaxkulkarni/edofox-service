@@ -151,6 +151,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				questionCorrectness = testsDao.getQuestionCorrectness(test.getId());
 			}*/
 			
+			//If show result is enabled, show rank and topper score
+			if(StringUtils.equals(test.getShowResult(), "Y")) {
+				List<EdoTest> rankResponse = testsDao.getStudentRank(request);
+				if(CollectionUtils.isNotEmpty(rankResponse)) {
+					test.setRank(rankResponse.get(0).getRank());
+				}
+				List<EdoTest> topScoreResponse = testsDao.getTopperScore(test.getId());
+				if(CollectionUtils.isNotEmpty(topScoreResponse) && topScoreResponse.get(0).getAnalysis() != null) {
+					if(test.getAnalysis() == null) {
+						test.setAnalysis(new EDOTestAnalysis());
+					}
+					test.getAnalysis().setTopScore(topScoreResponse.get(0).getAnalysis().getTopScore());
+					test.getAnalysis().setStudentsAppeared(topScoreResponse.get(0).getAnalysis().getStudentsAppeared());
+				}
+			}
+			
 			test.setSections(new ArrayList<String>());
 
 			for(EdoTestQuestionMap mapper: map) {
