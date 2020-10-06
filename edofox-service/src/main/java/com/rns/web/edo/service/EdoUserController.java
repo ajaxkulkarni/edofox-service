@@ -684,4 +684,15 @@ public class EdoUserController {
 		response =  userBo.getStudentPerformance(request);
 		return response;
 	}
+	
+	@POST
+	@Path("/updateVideoProgress")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateVideoProgress(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Update video progress :" + request, LoggingUtil.videoLogger);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		//response =  userBo.getStudentPerformance(request);
+		return response;
+	}
 }
