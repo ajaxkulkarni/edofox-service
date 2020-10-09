@@ -1852,33 +1852,36 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			session = this.sessionFactory.openSession();
 			Transaction tx = session.beginTransaction();
-			List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", request.getLecture().getId())).list();
-			if(CollectionUtils.isEmpty(lectures)) {
-				status.setStatus(-111, ERROR_IN_PROCESSING);
-				return status;
-			}
-			EdoVideoLecture lecture = lectures.get(0);
-			if(request.getLecture().getDisabled() == 1) {
-				lecture.setDisabled(1);
-				//Add quota
-				EDOInstitute edoInstitute = new EDOInstitute();
-				edoInstitute.setId(lecture.getInstituteId());
-				if(lecture.getSize() != null) {
-					BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(lecture.getSize()));
-					edoInstitute.setStorageQuota(bd.doubleValue());
-					//Deduct quota from institute
-					LoggingUtil.logMessage("Adding quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
-					testsDao.addQuota(edoInstitute);
+			
+				List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", request.getLecture().getId())).list();
+				if(CollectionUtils.isEmpty(lectures)) {
+					status.setStatus(-111, ERROR_IN_PROCESSING);
+					return status;
 				}
-			} else {
-				lecture.setVideoName(request.getLecture().getVideoName());
-				lecture.setClassroomId(request.getLecture().getClassroomId());
-				lecture.setSubjectId(request.getLecture().getSubjectId());
-				if(StringUtils.isNotBlank(request.getLecture().getKeywords())) {
-					lecture.setKeywords(StringUtils.removeEnd(request.getLecture().getKeywords(), ","));
-					updateKeywords(lecture.getInstituteId(), request.getLecture().getKeywords(), session);
+				EdoVideoLecture lecture = lectures.get(0);
+				if(request.getLecture().getDisabled() == 1) {
+					lecture.setDisabled(1);
+					//Add quota
+					EDOInstitute edoInstitute = new EDOInstitute();
+					edoInstitute.setId(lecture.getInstituteId());
+					if(lecture.getSize() != null) {
+						BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(lecture.getSize()));
+						edoInstitute.setStorageQuota(bd.doubleValue());
+						//Deduct quota from institute
+						LoggingUtil.logMessage("Adding quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
+						testsDao.addQuota(edoInstitute);
+					}
+				}/* else if (request.getLecture()) */
+				else {
+					lecture.setVideoName(request.getLecture().getVideoName());
+					lecture.setClassroomId(request.getLecture().getClassroomId());
+					lecture.setSubjectId(request.getLecture().getSubjectId());
+					if(StringUtils.isNotBlank(request.getLecture().getKeywords())) {
+						lecture.setKeywords(StringUtils.removeEnd(request.getLecture().getKeywords(), ","));
+						updateKeywords(lecture.getInstituteId(), request.getLecture().getKeywords(), session);
+					}
 				}
-			}
+			
 			tx.commit();
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
@@ -2237,6 +2240,72 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.activityLogger);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse createVideoLecture(EdoServiceRequest request) {
+		Session session = null;
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			EdoVideoLecture lectures = request.getLecture();
+			lectures.setCreatedDate(new Date());
+			lectures.setStatus("Uploading");
+			// lectures.setType
+			// lectures.setTopicId(topicId);
+			/*
+			 * if(StringUtils.isNotBlank(keywords)) {
+			 * lectures.setKeywords(StringUtils.removeEnd(keywords, ",")); }
+			 */
+			// String vimeoLink = vimeoResponse.getJson().getString("link");
+			// Prepare embed link
+			// lectures.setSize(length);
+			session.persist(lectures);
+
+			lectures.setVideo_url(StringUtils.replace(VIDEO_BASE_URL, "{fileName}", lectures.getId() + ".mp4"));
+			// Save question file if present
+			/*
+			 * if(questionFile != null) { CommonUtils.saveFile(questionFile,
+			 * EdoConstants.VIDEO_QUESTION_FILE_PATH + lectures.getId() + "/",
+			 * questionFileName);
+			 * lectures.setQuestionImg(EdoConstants.VIDEO_QUESTION_FILE_PATH +
+			 * lectures.getId() + "/" + questionFileName); }
+			 */
+			// Add keywords to repo
+			/*
+			 * if(StringUtils.isNotBlank(keywords)) {
+			 * updateKeywords(instituteId, keywords, session); }
+			 */
+
+			// Add multiple classrroms (if any)
+			if (StringUtils.isNotBlank(request.getClassrooms())) {
+				String[] classroomArray = StringUtils.split(request.getClassrooms(), ",");
+				if (ArrayUtils.isNotEmpty(classroomArray)) {
+					for (String classroom : classroomArray) {
+						if (StringUtils.isNotBlank(classroom)) {
+							EdoContentMap map = new EdoContentMap();
+							map.setContentId(lectures.getId());
+							map.setClassroomId(new Integer(classroom));
+							map.setChapterId(request.getLecture().getTopicId());
+							map.setCreatedDate(new Date());
+							session.persist(map);
+						}
+					}
+				}
+			}
+			tx.commit();
+			List<EdoVideoLectureMap> lectureArray = new ArrayList<EdoVideoLectureMap>();
+			EdoVideoLectureMap map = new EdoVideoLectureMap();
+			map.setLecture(lectures);
+			lectureArray.add(map);
+			response.setLectures(lectureArray);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return response;
 	}
 
 }

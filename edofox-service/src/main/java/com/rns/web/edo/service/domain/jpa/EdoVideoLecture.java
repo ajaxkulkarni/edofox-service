@@ -45,7 +45,10 @@ public class EdoVideoLecture {
 	private String questionImg;
 	@Column(name = "type")
 	private String type;
-	
+	@Column(name = "status")
+	private String status;
+	@Column(name = "progress")
+	private Integer progress;
 	
 	
 	public Integer getTopicId() {
@@ -125,5 +128,11 @@ public class EdoVideoLecture {
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

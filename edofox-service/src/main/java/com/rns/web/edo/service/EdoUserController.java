@@ -531,6 +531,18 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/createVideoLecture")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse createVideoLecture(EdoServiceRequest request) {
+		//LoggingUtil.logMessage("Update video request :" + request);
+		EdoServiceResponse response = new EdoServiceResponse();
+		response = userBo.createVideoLecture(request);
+		//LoggingUtil.logObject("Update video response ", response);
+		return response;
+	}
+	
 	@GET
 	@Path("/getTags/{instituteId}")
 	//@Produces(MediaType.MULTIPART_FORM_DATA)
@@ -692,7 +704,7 @@ public class EdoUserController {
 	public EdoServiceResponse updateVideoProgress(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Update video progress :" + request, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
-		//response =  userBo.getStudentPerformance(request);
+		//response.setStatus(userBo.updateVideoLecture(request));
 		return response;
 	}
 }

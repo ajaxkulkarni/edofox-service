@@ -41,6 +41,7 @@ public class EdoServiceRequest {
 	private EdoDeviceId deviceId;
 	private String startTime;
 	private String endTime;
+	private String classrooms;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -215,6 +216,14 @@ public class EdoServiceRequest {
 
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
+	}
+
+	public String getClassrooms() {
+		return classrooms;
+	}
+
+	public void setClassrooms(String classrooms) {
+		this.classrooms = classrooms;
 	}
 	
 }
