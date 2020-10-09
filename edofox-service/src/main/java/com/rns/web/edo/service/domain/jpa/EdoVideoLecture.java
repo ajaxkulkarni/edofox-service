@@ -135,4 +135,10 @@ public class EdoVideoLecture {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	public void setProgress(Integer progress) {
+		this.progress = progress;
+	}
+	public Integer getProgress() {
+		return progress;
+	}
 }
