@@ -1871,8 +1871,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						LoggingUtil.logMessage("Adding quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
 						testsDao.addQuota(edoInstitute);
 					}
-				}/* else if (request.getLecture()) */
-				else {
+				} else if (request.getLecture().getProgress() != null)  {
+					//Update only progress
+					if(StringUtils.isNotBlank(request.getLecture().getStatus())) {
+						lecture.setStatus(request.getLecture().getStatus());
+					}
+					if(request.getLecture().getProgress() == 100) {
+						lecture.setStatus("Completed");
+					}
+					lecture.setProgress(request.getLecture().getProgress());
+				} else {
 					lecture.setVideoName(request.getLecture().getVideoName());
 					lecture.setClassroomId(request.getLecture().getClassroomId());
 					lecture.setSubjectId(request.getLecture().getSubjectId());

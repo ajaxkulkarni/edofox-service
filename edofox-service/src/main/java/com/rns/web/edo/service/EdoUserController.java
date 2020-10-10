@@ -704,7 +704,7 @@ public class EdoUserController {
 	public EdoServiceResponse updateVideoProgress(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Update video progress :" + request, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
-		//response.setStatus(userBo.updateVideoLecture(request));
+		response.setStatus(userBo.updateVideoLecture(request));
 		return response;
 	}
 }
