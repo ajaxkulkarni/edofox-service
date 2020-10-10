@@ -16,6 +16,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -697,6 +698,7 @@ public class EdoUserController {
 		return response;
 	}
 	
+	//105_360px.mp4
 	@POST
 	@Path("/updateVideoProgress")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -704,7 +706,20 @@ public class EdoUserController {
 	public EdoServiceResponse updateVideoProgress(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Update video progress :" + request, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
-		response.setStatus(userBo.updateVideoLecture(request));
+		try {
+			if(request.getLecture() != null && request.getLecture().getId() == null) {
+				if(StringUtils.isNotBlank(request.getLecture().getVideoName())) {
+					String[] values = StringUtils.split(request.getLecture().getVideoName(), "_");
+					if(ArrayUtils.isNotEmpty(values)) {
+						request.getLecture().setId(new Integer(values[0]));
+					}
+					
+				}
+			}
+			response.setStatus(userBo.updateVideoLecture(request));
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
 		return response;
 	}
 }
