@@ -1879,7 +1879,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(request.getLecture().getProgress() == 100) {
 						lecture.setStatus("Completed");
 					}
-					if(request.getLecture().getProgress() != null && request.getLecture().getProgress() > lecture.getProgress()) {
+					if(request.getLecture().getProgress() != null && (lecture.getProgress() == null || request.getLecture().getProgress() > lecture.getProgress())) {
 						lecture.setProgress(request.getLecture().getProgress());
 					}
 				} else {
