@@ -36,6 +36,8 @@
 		<result column="keywords" property="lecture.keywords"/>
 		<result column="question_img" property="lecture.questionImg"/>
 		<result column="type" property="lecture.type"/>
+		<result column="status" property="lecture.status"/>
+		<result column="progress" property="lecture.progress"/>
 	</resultMap>
 
 	<select id="getInstituePackages" resultMap="packages"
