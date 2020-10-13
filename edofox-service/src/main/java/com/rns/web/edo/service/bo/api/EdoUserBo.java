@@ -42,7 +42,7 @@ public interface EdoUserBo {
 	EdoApiStatus updateVideoLecture(EdoServiceRequest request);
 	EdoServiceResponse getTags(Integer instituteId, String query);
 	EdoServiceResponse getDeeperRegistration(String rollNo);
-	EdoFile getVideo(Integer videoId);
+	EdoFile getVideo(Integer videoId, String requestType);
 	EdoServiceResponse getStudentExams(EdoServiceRequest request);
 	EdoServiceResponse getQuestionAnalysis(EdoServiceRequest request);
 	EdoApiStatus addDeviceId(EdoServiceRequest request);

@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -25,21 +26,16 @@ import org.springframework.stereotype.Component;
 
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
-import com.rns.web.edo.service.domain.EDOInstitute;
-import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
-import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
-import com.rns.web.edo.service.util.EdoExcelUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
-import com.rns.web.edo.service.util.VideoTokenGenerator;
-import com.rns.web.edo.service.util.VideoUtil;
 import com.rns.web.edo.service.util.RtcTokenBuilder.Role;
+import com.rns.web.edo.service.util.VideoTokenGenerator;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 
@@ -208,10 +204,10 @@ public class EdoUserController {
 	@Path("/getVideo/{docId}")
 	//@Produces(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
-	public EdoFile getVideo(@PathParam("docId") Integer videoId) {
+	public EdoFile getVideo(@PathParam("docId") Integer videoId, @QueryParam("type") String requestType) {
 		//LoggingUtil.logMessage("Video request:" + videoId);
 		try {
-			return userBo.getVideo(videoId);
+			return userBo.getVideo(videoId, requestType);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}

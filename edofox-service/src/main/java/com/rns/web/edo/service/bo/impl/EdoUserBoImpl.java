@@ -1668,14 +1668,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					boolean delete = savedFile.delete();
 					LoggingUtil.logMessage("Deleted the saved file " + delete + " at " + filePath, LoggingUtil.videoLogger);
 					tx.commit();
-					//Update quota
-					EDOInstitute edoInstitute = new EDOInstitute();
-					edoInstitute.setId(instituteId);
-					BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(length));
-					edoInstitute.setStorageQuota(bd.doubleValue());
-					//Deduct quota from institute
-					LoggingUtil.logMessage("Deducting quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
-					testsDao.deductQuota(edoInstitute);
+					updateQuota(instituteId, length);
 				}
 				
 			} 
@@ -1687,6 +1680,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return response;
+	}
+
+	private void updateQuota(Integer instituteId, double length) {
+		try {
+			//Update quota
+			EDOInstitute edoInstitute = new EDOInstitute();
+			edoInstitute.setId(instituteId);
+			BigDecimal bd = CommonUtils.calculateStorageUsed(new Float(length));
+			edoInstitute.setStorageQuota(bd.doubleValue());
+			//Deduct quota from institute
+			LoggingUtil.logMessage("Deducting quota " + edoInstitute.getStorageQuota() + " GBs from " + edoInstitute.getId(), LoggingUtil.videoLogger);
+			testsDao.deductQuota(edoInstitute);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
 	}
 
 	private void updateKeywords(Integer instituteId, String keywords, Session session) {
@@ -1960,7 +1968,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	public EdoFile getVideo(Integer videoId) {
+	public EdoFile getVideo(Integer videoId, String requestType) {
 		if(videoId == null) {
 			return null;
 		}
@@ -1972,6 +1980,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(classwork != null) {
 				if(StringUtils.contains(classwork.getVideo_url(), "vimeo")) {
 					return VideoUtil.getDownloadUrl(classwork.getVideo_url(), classwork.getVideoName() + ".mp4");
+				} else if (StringUtils.contains(classwork.getVideo_url(), "streaming.edofox.com")) {
+					return VideoUtil.getStreamingUrls(classwork.getVideo_url(), requestType);
 				}
 			}
 		} catch (Exception e) {
@@ -2304,6 +2314,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			tx.commit();
+			updateQuota(lectures.getInstituteId(), lectures.getSize());
 			List<EdoVideoLectureMap> lectureArray = new ArrayList<EdoVideoLectureMap>();
 			EdoVideoLectureMap map = new EdoVideoLectureMap();
 			map.setLecture(lectures);

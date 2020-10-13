@@ -490,6 +490,7 @@
     <if test="requestType == null">
     	video_lectures.type = 'DLPVIDEO'
     </if>
+    AND (status = 'Completed' OR status is null)
     INNER JOIN chapters
     ON dlp_chp_cls_content_map.chapter_id = chapters.id
     WHERE dlp_chp_cls_content_map.chapter_id = ${subjectId} AND

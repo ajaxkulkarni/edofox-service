@@ -13,11 +13,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.Header;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -32,6 +34,10 @@ import org.codehaus.jettison.json.JSONObject;
 import com.clickntap.vimeo.Vimeo;
 import com.clickntap.vimeo.VimeoException;
 import com.clickntap.vimeo.VimeoResponse;
+import com.jcraft.jsch.Channel;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.sun.jersey.api.client.Client;
@@ -45,6 +51,9 @@ import com.sun.jersey.api.json.JSONConfiguration;
 public class VideoUtil {
 
 	public static String FFMPEG_BIN = "F:\\Resoneuronance\\Setups\\ffmpeg-20200403-52523b6-win64-static\\bin\\";
+	private static final int SESSION_TIMEOUT = 10000;
+    private static final int CHANNEL_TIMEOUT = 5000;
+
 
 
 	// ffmpeg -i F:\home\service\videos\1\v1.mp4 -c copy -bsf:v h264_mp4toannexb
@@ -356,33 +365,7 @@ public class VideoUtil {
 	        fileOutputStream.close();
 	        rbc.close();*/
 			
-			HttpHead get = new HttpHead(urlStr);
-			 
-			//Get http client
-			CloseableHttpClient httpClient = getCloseableHttpClient();
-			 
-			//Execute HTTP method
-			CloseableHttpResponse res = httpClient.execute(get);
-			 
-			LoggingUtil.logMessage("Response from url " + res.getStatusLine().getStatusCode(), LoggingUtil.videoLogger);
-			//Verify response
-			if(res.getStatusLine().getStatusCode() == 200) {
-				Header lengthHeader = res.getFirstHeader("Content-Length");
-				if(lengthHeader != null && lengthHeader.getValue() != null) {
-					return new Float(lengthHeader.getValue());
-				}
-				/*InputStream content = res.getEntity().getContent();
-				if(content != null) {
-				    int read;
-					byte[] bytes = new byte[1024];
-					
-					while ((read = content.read(bytes)) != -1) {
-						fileOutputStream.write(bytes, 0, read);
-					}
-					fileOutputStream.close();
-				}
-				return outputFile;*/
-			} 
+			return getFileLength(urlStr); 
 			
 		} catch (Exception e) {
 			LoggingUtil.logError("Could not download file  for " + sessionId, LoggingUtil.videoLogger);
@@ -397,6 +380,26 @@ public class VideoUtil {
 		}
 		
 		return null;
+	}
+
+	private static Float getFileLength(String urlStr) throws IOException, ClientProtocolException {
+		HttpHead get = new HttpHead(urlStr);
+		 
+		//Get http client
+		CloseableHttpClient httpClient = getCloseableHttpClient();
+		 
+		//Execute HTTP method
+		CloseableHttpResponse res = httpClient.execute(get);
+		 
+		LoggingUtil.logMessage("Response from url " + res.getStatusLine().getStatusCode(), LoggingUtil.videoLogger);
+		//Verify response
+		if(res.getStatusLine().getStatusCode() == 200) {
+			Header lengthHeader = res.getFirstHeader("Content-Length");
+			if(lengthHeader != null && lengthHeader.getValue() != null) {
+				return new Float(lengthHeader.getValue());
+			}
+		}
+		return 0f;
 	}
 
 	private static CloseableHttpClient getCloseableHttpClient() {
@@ -518,4 +521,106 @@ public class VideoUtil {
 		                .build(),
 		        RequestBody.fromByteBuffer(getRandomByteBuffer(10_000)));
 	}*/
+	
+	public static void uploadSftp(String path, String fileName) {
+		//String localFile = "/home/mkyong/local/random.txt";
+        //String remoteFile = "/usr/local/WowzaStreamingEngine-4.8.5/content/" + fileName;
+        String remoteFile = "/opt/mediamanager/movies/" + fileName;
+        Date date = new Date();
+        Session jschSession = null;
+
+        try {
+
+            JSch jsch = new JSch();
+            jsch.setKnownHosts("C:\\Users\\Admin\\.ssh\\known_hosts");
+            jschSession = jsch.getSession("root", "89.47.165.216", 22);
+
+            // authenticate using private key
+            jsch.addIdentity("C:\\Users\\Admin\\.ssh\\id_rsa");
+
+            // authenticate using password
+            jschSession.setPassword("4iDI9v7eE4Vd");
+
+            // 10 seconds session timeout
+            jschSession.connect(SESSION_TIMEOUT);
+
+            Channel sftp = jschSession.openChannel("sftp");
+
+            // 5 seconds timeout
+            sftp.connect(CHANNEL_TIMEOUT);
+
+            ChannelSftp channelSftp = (ChannelSftp) sftp;
+
+            // transfer file from local to remote server
+            channelSftp.put(path, remoteFile);
+
+            // download file from remote server to local
+            // channelSftp.get(remoteFile, localFile);
+
+            channelSftp.exit();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        } finally {
+            if (jschSession != null) {
+                jschSession.disconnect();
+            }
+            LoggingUtil.logMessage("Time taken for upload " + ((date.getTime() - new Date().getTime()) / 1000), LoggingUtil.videoLogger);
+        }
+
+        System.out.println("Done");
+	}
+
+	public static EdoFile getStreamingUrls(String video_url, String requestType) throws ClientProtocolException, IOException {
+		if(StringUtils.isBlank(video_url)) {
+			return null;
+		}
+		EdoFile file = new EdoFile();
+		file.setVersions(new ArrayList<EdoFile>());
+		file.setDownloadUrl(video_url);
+		if(!StringUtils.equals(requestType, "player")) {
+			//Prepare download URLs
+			String lowQ = StringUtils.replace(video_url, ":8443/vod", "/mediamanager/cdn");
+			lowQ = StringUtils.replace(lowQ, ".smil/playlist.m3u8", "");
+			lowQ = StringUtils.replace(lowQ, ".mp4", "_240px.mp4");
+			EdoFile lowFile = new EdoFile();
+			lowFile.setDownloadUrl(lowQ);
+			lowFile.setHeight(240f);
+			lowFile.setSize(getFileLength(lowQ));
+			file.getVersions().add(lowFile);
+			String medQ = StringUtils.replace(lowQ, "240px", "360px");
+			EdoFile medFile = new EdoFile();
+			medFile.setDownloadUrl(medQ);
+			medFile.setHeight(360f);
+			medFile.setSize(getFileLength(medQ));
+			file.getVersions().add(medFile);
+			String highQ = StringUtils.replace(lowQ, "240px", "720px");
+			EdoFile highFile = new EdoFile();
+			highFile.setDownloadUrl(highQ);
+			highFile.setHeight(720f);
+			highFile.setSize(getFileLength(highQ));
+			file.getVersions().add(highFile);
+		} else {
+			//Prepare player URLs
+			String lowQ = StringUtils.replace(video_url, ".smil", "");
+			lowQ = StringUtils.replace(lowQ, ".mp4", "_240px.mp4");
+			EdoFile lowFile = new EdoFile();
+			lowFile.setDownloadUrl(lowQ);
+			lowFile.setHeight(240f);
+			file.getVersions().add(lowFile);
+			String medQ = StringUtils.replace(lowQ, "240px", "360px");
+			EdoFile medFile = new EdoFile();
+			medFile.setDownloadUrl(medQ);
+			medFile.setHeight(360f);
+			file.getVersions().add(medFile);
+			String highQ = StringUtils.replace(lowQ, "240px", "720px");
+			EdoFile highFile = new EdoFile();
+			highFile.setDownloadUrl(highQ);
+			highFile.setHeight(720f);
+			file.getVersions().add(highFile);
+		}
+		return file;
+	}
 }
