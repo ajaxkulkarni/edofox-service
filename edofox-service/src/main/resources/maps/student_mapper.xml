@@ -194,6 +194,9 @@
     AND 
     (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
     </if>
+    <if test="requestType == null || requestType != 'Teacher'">
+    AND ( video_lectures.status is null OR video_lectures.status = 'Completed')
+    </if>
     <if test="lecture != null &amp;&amp; lecture.topicId != null">
     AND video_lectures.topic_id = ${lecture.topicId}
     </if>
