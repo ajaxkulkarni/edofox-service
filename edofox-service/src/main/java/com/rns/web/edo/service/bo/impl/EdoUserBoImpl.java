@@ -2271,6 +2271,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoVideoLecture lectures = request.getLecture();
 			lectures.setCreatedDate(new Date());
 			lectures.setStatus("Uploading");
+			Integer topicId = lectures.getTopicId();
 			lectures.setTopicId(null);
 			// lectures.setType
 			// lectures.setTopicId(topicId);
@@ -2307,7 +2308,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							EdoContentMap map = new EdoContentMap();
 							map.setContentId(lectures.getId());
 							map.setClassroomId(new Integer(classroom));
-							map.setChapterId(request.getLecture().getTopicId());
+							map.setChapterId(topicId);
 							map.setCreatedDate(new Date());
 							session.persist(map);
 						}
