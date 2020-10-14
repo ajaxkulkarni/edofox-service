@@ -965,7 +965,6 @@ agent-platform-version: 4
 			question.setOption5(StringUtils.replace(question.getOption5(), "$$", "$"));
 			question.setSolution(StringUtils.replace(question.getSolution(), "$$", "$"));
 			
-			LoggingUtil.logMessage("Skipping the parse check after replacing next line for " + question.getId());
 			return;
 		}
 		boolean isLatex = false;

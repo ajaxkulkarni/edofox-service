@@ -54,7 +54,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		select * from test_questions_map
 		join test_questions on test_questions.id = test_questions_map.question_id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
-		left join (select count(*) as optionCount,test_id, question_id, option_selected from test_result group by option_selected, test_id, question_id) as result
+		left join (select count(*) as optionCount,test_id, question_id, option_selected from test_result where test_id = 3158 group by option_selected, test_id, question_id) as result
 		on result.question_id = test_questions_map.question_id where test_questions_map.test_id = ${value};
 	</select>
 	
