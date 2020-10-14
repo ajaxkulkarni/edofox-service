@@ -8,7 +8,7 @@
 	<packaging>war</packaging>
 
 	<properties>
-		<spring.version>4.1.0.RELEASE</spring.version>
+		<spring.version>5.2.9.RELEASE</spring.version>
 		<jersey.version>2.14</jersey.version>
 		<hibernate.version>4.3.6.Final</hibernate.version>
 	</properties>
