@@ -2271,6 +2271,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoVideoLecture lectures = request.getLecture();
 			lectures.setCreatedDate(new Date());
 			lectures.setStatus("Uploading");
+			lectures.setTopicId(null);
 			// lectures.setType
 			// lectures.setTopicId(topicId);
 			/*
