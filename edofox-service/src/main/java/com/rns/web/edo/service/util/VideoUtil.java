@@ -589,19 +589,20 @@ public class VideoUtil {
 			lowFile.setDownloadUrl(lowQ);
 			lowFile.setHeight(240f);
 			lowFile.setSize(getFileLength(lowQ));
-			file.getVersions().add(lowFile);
 			String medQ = StringUtils.replace(lowQ, "240px", "360px");
 			EdoFile medFile = new EdoFile();
 			medFile.setDownloadUrl(medQ);
 			medFile.setHeight(360f);
 			medFile.setSize(getFileLength(medQ));
-			file.getVersions().add(medFile);
 			String highQ = StringUtils.replace(lowQ, "240px", "720px");
 			EdoFile highFile = new EdoFile();
 			highFile.setDownloadUrl(highQ);
 			highFile.setHeight(720f);
 			highFile.setSize(getFileLength(highQ));
+			
 			file.getVersions().add(highFile);
+			file.getVersions().add(medFile);
+			file.getVersions().add(lowFile);
 		} else {
 			//Prepare player URLs
 			String lowQ = StringUtils.replace(video_url, ".smil", "");
@@ -609,17 +610,20 @@ public class VideoUtil {
 			EdoFile lowFile = new EdoFile();
 			lowFile.setDownloadUrl(lowQ);
 			lowFile.setHeight(240f);
-			file.getVersions().add(lowFile);
+			
 			String medQ = StringUtils.replace(lowQ, "240px", "360px");
 			EdoFile medFile = new EdoFile();
 			medFile.setDownloadUrl(medQ);
 			medFile.setHeight(360f);
-			file.getVersions().add(medFile);
+			
 			String highQ = StringUtils.replace(lowQ, "240px", "720px");
 			EdoFile highFile = new EdoFile();
 			highFile.setDownloadUrl(highQ);
 			highFile.setHeight(720f);
+			
 			file.getVersions().add(highFile);
+			file.getVersions().add(medFile);
+			file.getVersions().add(lowFile);
 		}
 		return file;
 	}
