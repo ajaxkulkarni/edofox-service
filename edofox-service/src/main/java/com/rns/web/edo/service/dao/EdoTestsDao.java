@@ -30,6 +30,7 @@ public interface EdoTestsDao {
 	EDOInstitute getInstituteById(Integer id);
 	List<EdoTestStudentMap> getSubjectwiseScoreStudent(Map<String,Object> value);
 	List<EdoVideoLectureMap> getVideoLectures(EdoServiceRequest request);
+	List<EdoSubject> getVideoSubjects(EdoServiceRequest request);
 	
 	//Save queries
 	Integer saveTestResult(EdoServiceRequest request);

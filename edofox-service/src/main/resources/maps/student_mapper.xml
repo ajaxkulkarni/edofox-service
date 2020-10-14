@@ -185,6 +185,18 @@
 		select * from live_session where id = ${value};
 	</select>
 	
+	<select id="getVideoSubjects" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="subjects">
+	
+	SELECT subject,video_lectures.subject_id as subject_id FROM `video_lectures` join test_subjects on video_lectures.subject_id = test_subjects.subject_id 
+	where video_lectures.institute_id = ${institute.id} 
+	<if test="student != null">
+    AND 
+    (video_lectures.classroom_id IN (select package_id from student_institute where student_id = ${student.id}) OR video_lectures.classroom_id IS NULL)
+    </if>
+	group by video_lectures.subject_id
+	
+	</select>
+	
 	<select id="getVideoLectures" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoLecture">
 	SELECT video_lectures.*, test_subjects.subject,packages.package_name FROM video_lectures
     LEFT JOIN test_subjects ON video_lectures.subject_id = test_subjects.subject_id
@@ -202,6 +214,9 @@
     </if>
     <if test="searchFilter != null">
     AND (video_name like '%${searchFilter}%' OR subject like '%${searchFilter}%' OR package_name like '%${searchFilter}%')
+    </if>
+    <if test="subjectId != null">
+    AND video_lectures.subject_id = ${subjectId}
     </if>
     ORDER BY created_date DESC
     <if test = "startIndex != null">

@@ -1743,6 +1743,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			response.setLectures(videoLectures);
+			response.setSubjects(testsDao.getVideoSubjects(request));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
