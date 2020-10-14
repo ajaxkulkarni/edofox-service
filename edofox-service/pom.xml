@@ -278,11 +278,8 @@
 		<!-- <dependency> <groupId>io.agora.rtc</groupId> <artifactId>full-sdk</artifactId> 
 			<version>2.0.0</version> </dependency> -->
 
-		<!-- <dependency>
-			<groupId>io.agora</groupId>
-			<artifactId>authentication</artifactId>
-			<version>1.6.1</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>io.agora</groupId> <artifactId>authentication</artifactId> 
+			<version>1.6.1</version> </dependency> -->
 
 		<dependency>
 			<groupId>net.bramp.ffmpeg</groupId>
@@ -309,7 +306,11 @@
 			<version>1.10</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.55</version>
+		</dependency>
 
 
 	</dependencies>
