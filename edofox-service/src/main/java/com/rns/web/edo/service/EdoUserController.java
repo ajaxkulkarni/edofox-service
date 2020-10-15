@@ -3,6 +3,7 @@ package com.rns.web.edo.service;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -25,23 +26,18 @@ import org.springframework.stereotype.Component;
 
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
-import com.rns.web.edo.service.domain.EDOInstitute;
-import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
-import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
-import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
-import com.rns.web.edo.service.util.EdoExcelUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
-import com.rns.web.edo.service.util.VideoTokenGenerator;
-import com.rns.web.edo.service.util.VideoUtil;
 import com.rns.web.edo.service.util.RtcTokenBuilder.Role;
+import com.rns.web.edo.service.util.VideoTokenGenerator;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
 @Component
@@ -582,4 +578,15 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@Path("/uploadAnswers")
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoApiStatus uploadFiles2(@FormDataParam("tags") String tags,
+			@FormDataParam("files") List<FormDataBodyPart> bodyParts,
+			@FormDataParam("files") FormDataContentDisposition fileDispositions,
+			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId) {
+
+		return userBo.uploadAnswers(bodyParts, testId, studentId);
+	}
 }

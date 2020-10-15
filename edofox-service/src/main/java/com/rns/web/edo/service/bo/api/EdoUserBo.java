@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.bo.api;
 
 import java.io.InputStream;
+import java.util.List;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -10,6 +11,7 @@ import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.sun.jersey.multipart.FormDataBodyPart;
 
 public interface EdoUserBo {
 
@@ -28,6 +30,7 @@ public interface EdoUserBo {
 	EdoServiceResponse submitAnswer(EdoServiceRequest request);
 	EdoServiceResponse raiseDoubt(EdoServiceRequest request);
 	EdoApiStatus saveAnswer(EdoServiceRequest request);
+	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId);
 	EdoServiceResponse getSolved(EdoServiceRequest request);
 	EdoServiceResponse uploadRecording(Integer sessionId, InputStream data, Integer packageId);
 	EdoServiceResponse startLiveSession(EdoServiceRequest request);

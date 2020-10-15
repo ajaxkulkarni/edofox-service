@@ -50,6 +50,7 @@ public interface EdoConstants {
 	String ATTR_META_DATA = "meta";
 	String ATTR_SOLUTION = "solution";
 	String ATTR_VIDEO_QUESTION = "videoQuestion";
+	String ATTR_ANSWER = "answer";
 	
 	String MAIL_TYPE_SUBSCRIPTION = "SubscriptionMail";
 	String MAIL_TYPE_ACTIVATED = "PackageActivated";
@@ -77,6 +78,7 @@ public interface EdoConstants {
 	String TEMP_QUESTION_PATH = "/home/service/tempQuestions/erp/";
 	String TEST_QUESTION_PATH = "/home/service/testQuestionData/erp/";
 	String VIDEOS_PATH = "/home/service/classwork/";
+	String ANSWERS_PATH = "/home/service/answersData/";
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";

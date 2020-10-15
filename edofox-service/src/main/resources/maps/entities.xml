@@ -95,4 +95,10 @@
 
 	</resultMap>
 	
+	<resultMap type="com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity" id="answerFiles">
+		<id property="id" column="id" />
+		<result property="fileUrl" column="file_url" />
+
+	</resultMap>
+	
 </mapper>

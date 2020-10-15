@@ -670,6 +670,11 @@ public class CommonUtils {
 		
 	}
 	
+	public static String prepareAnswerURLs(Integer answerId) {
+		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
+		return hostUrl + "getImage/" + answerId + "/" + EdoConstants.ATTR_ANSWER;
+	}
+	
 
 	public static String prepareUrl(String url) {
 		/*if(EdoConstants.ABSOLUTE_IMAGE_URLS) {

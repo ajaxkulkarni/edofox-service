@@ -90,6 +90,7 @@
 		<result column="correct_ans" property="test.correctCount"/>
 		<result column="flagged" property="test.flaggedCount"/>
 		<result column="show_result" property="test.showResult" />
+		<result column="test_ui" property="test.testUi" />
 		<result column="time_taken" property="question.timeSpent" />
 		<result column="status" property="question.status"/>
 		<result column="question_disabled" property="question.disabled"/>
@@ -170,5 +171,8 @@
 		SELECT question_number FROM test_questions_map where test_id = ${value} order by question_number desc limit 1;
 	</select>
 
+	<select id="getAnswerFiles" resultMap="answerFiles" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		SELECT * from exam_answer_files where  exam_id = ${test.id} AND student_id = ${student.id} 
+	</select>
 
 </mapper>

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
@@ -53,6 +54,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoActivityLogs;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkActivity;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
@@ -73,6 +75,8 @@ import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
 import com.rns.web.edo.service.util.QuestionParser;
 import com.rns.web.edo.service.util.VideoUtil;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.FormDataBodyPart;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -206,6 +210,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//Fetch video lectures for test (if any)
 			//TODO later if needed response.setLectures(testsDao.getTestVideoLectures(test.getId()));
+			
+			//Fetch answer files if descriptive test
+			if(StringUtils.equals(test.getTestUi(), "DESCRIPTIVE")) {
+				test.setAnswerFiles(testsDao.getAnswerFiles(request));
+			}
 			
 			response.setTest(test);
 
@@ -699,6 +708,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				List<EdoVideoLecture> lecs = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", questionId)).list();
 				if(CollectionUtils.isNotEmpty(lecs) && StringUtils.isNotBlank(lecs.get(0).getQuestionImg())) {
 					path = lecs.get(0).getQuestionImg();
+				}
+			} else if (StringUtils.equals(imageType, ATTR_ANSWER)) {
+				session = this.sessionFactory.openSession();
+				List<EdoAnswerFileEntity> answers = session.createCriteria(EdoAnswerFileEntity.class).add(Restrictions.eq("id", questionId)).list();
+				if(CollectionUtils.isNotEmpty(answers) && StringUtils.isNotBlank(answers.get(0).getFilePath())) {
+					path = answers.get(0).getFilePath();
 				}
 			}
 			
@@ -1207,14 +1222,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 			//IOUtils.copy(data, fileOutputStream);
 			
-			int read;
-			byte[] bytes = new byte[1024];
-
-			while ((read = data.read(bytes)) != -1) {
-				fileOutputStream.write(bytes, 0, read);
-			}
-			
-			fileOutputStream.close();
+			writeFile(data, fileOutputStream);
 			//Check size of file saved
 			File savedFile = new File(filePath);
 			if(savedFile.exists()) {
@@ -1481,14 +1489,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				FileOutputStream fileOutputStream = new FileOutputStream(filePath);
 				// IOUtils.copy(data, fileOutputStream);
 
-				int read;
-				byte[] bytes = new byte[1024];
-
-				while ((read = videoData.read(bytes)) != -1) {
-					fileOutputStream.write(bytes, 0, read);
-				}
-
-				fileOutputStream.close();
+				writeFile(videoData, fileOutputStream);
 				
 				session = this.sessionFactory.openSession();
 				
@@ -1612,6 +1613,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return response;
+	}
+
+	private void writeFile(InputStream inputStream, FileOutputStream fileOutputStream) throws IOException {
+		int read;
+		byte[] bytes = new byte[1024];
+
+		while ((read = inputStream.read(bytes)) != -1) {
+			fileOutputStream.write(bytes, 0, read);
+		}
+
+		fileOutputStream.close();
 	}
 
 
@@ -1963,6 +1975,51 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
+	}
+
+	public EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId) {
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			if(CollectionUtils.isNotEmpty(bodyParts)) {
+				session = this.sessionFactory.openSession();
+				Transaction tx = session.beginTransaction();
+				for (FormDataBodyPart bodyPart: bodyParts) {
+					/*
+					 * Casting FormDataBodyPart to BodyPartEntity, which can give us
+					 * InputStream for uploaded file
+					 */
+					BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+					//String fileName = bodyParts.get(i).getContentDisposition().getFileName();
+					String answersPath = ANSWERS_PATH + testId + "/";
+					File folder = new File(answersPath);
+					if(!folder.exists()) {
+						folder.mkdirs();
+					}
+					EdoAnswerFileEntity answerFileEntity = new EdoAnswerFileEntity();
+					answerFileEntity.setTestId(testId);
+					answerFileEntity.setStudentId(studentId);
+					answerFileEntity.setCreatedDate(new Date());
+					session.persist(answerFileEntity);
+					String filePath = answersPath + answerFileEntity.getId() +  "_" + bodyPart.getContentDisposition().getFileName();
+					//answersPath = answersPath
+					writeFile(bodyPartEntity.getInputStream(), new FileOutputStream(filePath));
+					answerFileEntity.setFilePath(filePath);
+					answerFileEntity.setFileUrl(CommonUtils.prepareAnswerURLs(answerFileEntity.getId()));
+					
+				}
+				tx.commit();
+			}
+			
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveAnswerErrorLogger);
+			e.printStackTrace();
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return status;
 	}

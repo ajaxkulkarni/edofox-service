@@ -8,6 +8,8 @@ import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
+
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EdoTest {
@@ -38,6 +40,7 @@ public class EdoTest {
 	private Long minLeft;
 	private Long secLeft;
 	private String solutionUrl;
+	private List<EdoAnswerFileEntity> answerFiles;
 	
 	public EdoTest() {
 		
@@ -262,6 +265,14 @@ public class EdoTest {
 
 	public void setStudentTimeConstraint(String studentTimeConstraint) {
 		this.studentTimeConstraint = studentTimeConstraint;
+	}
+
+	public List<EdoAnswerFileEntity> getAnswerFiles() {
+		return answerFiles;
+	}
+
+	public void setAnswerFiles(List<EdoAnswerFileEntity> answerFiles) {
+		this.answerFiles = answerFiles;
 	}
 	
 }

@@ -15,6 +15,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 
 public interface EdoTestsDao {
 
@@ -107,6 +108,9 @@ public interface EdoTestsDao {
 	
 	//ERP
 	List<EdoStudent> getStudentDevices(Map<String,Object> value);
+	
+	//New
+	List<EdoAnswerFileEntity> getAnswerFiles(EdoServiceRequest request);
 	
 	
 }
