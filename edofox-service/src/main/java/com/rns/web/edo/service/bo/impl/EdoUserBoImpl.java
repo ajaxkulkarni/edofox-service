@@ -2024,4 +2024,20 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return status;
 	}
 
+	public EdoServiceResponse getUploadedAnswers(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if (request.getStudent() == null || request.getStudent().getId() == null || request.getTest() == null || request.getTest().getId() == null) {
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		try {
+			EdoTest test = new EdoTest();
+			test.setAnswerFiles(testsDao.getAnswerFiles(request));
+			response.setTest(test);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
 }

@@ -31,6 +31,7 @@ public interface EdoUserBo {
 	EdoServiceResponse raiseDoubt(EdoServiceRequest request);
 	EdoApiStatus saveAnswer(EdoServiceRequest request);
 	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId);
+	EdoServiceResponse getUploadedAnswers(EdoServiceRequest request);
 	EdoServiceResponse getSolved(EdoServiceRequest request);
 	EdoServiceResponse uploadRecording(Integer sessionId, InputStream data, Integer packageId);
 	EdoServiceResponse startLiveSession(EdoServiceRequest request);

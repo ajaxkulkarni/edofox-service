@@ -444,4 +444,14 @@ public class EdoAdminController {
 		response.setStatus(adminBo.updateClientSales(request));
 		return response;
 	}
+	
+	@POST
+	@Path("/updateScore")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateScore(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.updateStudentScore(request));
+		return response;
+	}
 }

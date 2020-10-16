@@ -589,4 +589,14 @@ public class EdoUserController {
 
 		return userBo.uploadAnswers(bodyParts, testId, studentId);
 	}
+	
+	@POST
+	@Path("/getUploadedAnswers")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getUploadedAnswers(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		response = userBo.getUploadedAnswers(request);
+		return response;
+	}
 }
