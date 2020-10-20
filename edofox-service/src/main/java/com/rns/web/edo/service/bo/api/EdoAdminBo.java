@@ -31,6 +31,7 @@ public interface EdoAdminBo {
 	EdoServiceResponse loadParsedQuestions(EdoServiceRequest request);
 	EdoApiStatus saveParsedQuestions(EdoServiceRequest request);
 	EdoServiceResponse loadQuestionBank(EdoServiceRequest request);
+	EdoApiStatus sendNotification(EdoServiceRequest request);
 	
 	
 	//Super admin

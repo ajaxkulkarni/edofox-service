@@ -464,4 +464,14 @@ public class EdoAdminController {
 		response =  adminBo.getLiveAnalysis(request);
 		return response;
 	}
+	
+	@POST
+	@Path("/sendNotification")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse sendNotification(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.sendNotification(request));
+		return response;
+	}
 }

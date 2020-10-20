@@ -15,6 +15,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 
 public interface EdoTestsDao {
 
@@ -99,6 +100,9 @@ public interface EdoTestsDao {
 	EDOPackage getPackage(Integer packageId);
 	EDOInstitute getStudentStats(Integer instituteId);
 	void upgradeInstitute(EDOInstitute institute);
+	List<EdoStudent> getStudentDevicesForPackage(Integer packageId);
+	List<EdoStudent> getStudentDevicesForVideo(EdoVideoLecture lec);
+	List<EdoStudent> getStudentDevicesForExam(EdoTest exam);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects(Integer instituteId);
@@ -122,5 +126,6 @@ public interface EdoTestsDao {
 	EDOPackage getLiveSession(Integer id);
 	void saveVideoActiviy(EdoServiceRequest request);
 	List<EdoQuestion> getQuestionBank(EdoQuestion request);
+	
 	
 }

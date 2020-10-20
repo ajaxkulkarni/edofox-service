@@ -40,6 +40,10 @@ public class EdoPropertyUtil {
 	public static final String VIDEO_IDLE_TIME = "video.idle.time";
 	public static final String RECORDED_URL = "video.recorded.url";
 	public static final String IMPARTUS_KEY = "impartus.key";
+	public static final String FCM_URL = "fcm.url";
+	public static final String FCM_SERVER_KEY = "fcm.key";
+	public static final String FCM_VIDEO_DELAY = "fcm.video.delay";
+	
 	
 
 	public static String getProperty(String name) {

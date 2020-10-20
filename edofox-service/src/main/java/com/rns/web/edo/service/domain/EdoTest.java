@@ -49,7 +49,7 @@ public class EdoTest {
 	private String showQuestionPaper;
 	private Integer pauseTimeout;
 	private Integer maxStarts;
-	
+	private Integer packageId;
 	
 	public EdoTest() {
 		
@@ -330,6 +330,14 @@ public class EdoTest {
 
 	public void setMaxStarts(Integer maxStarts) {
 		this.maxStarts = maxStarts;
+	}
+
+	public Integer getPackageId() {
+		return packageId;
+	}
+
+	public void setPackageId(Integer packageId) {
+		this.packageId = packageId;
 	}
 	
 }

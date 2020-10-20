@@ -533,5 +533,26 @@
 	<insert id="saveStudentTestActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		insert into test_activity (test_id,student_id,activity_type,created_date) values(${test.id}, ${student.id}, '${requestType}', CURRENT_TIMESTAMP)
 	</insert>
+	
+	
+	<select id="getStudentDevicesForPackage" parameterType="Integer" resultMap="studentInfo">
+		select * from device_id join student on device_id.student_id = student.id 
+		where student_id in (select distinct student_id from student_institute where package_id in 
+			(${value})
+		)
+	</select>
+	
+	<select id="getStudentDevicesForVideo" parameterType="com.rns.web.edo.service.domain.jpa.EdoVideoLecture" resultMap="studentInfo">
+		select * from device_id join student on device_id.student_id = student.id where student_id in (select distinct student_id from student_institute where package_id in 
+			( SELECT classroom_id FROM dlp_chp_cls_content_map where content_id = ${id})
+		)
+	</select>
+	
+	<select id="getStudentDevicesForExam" parameterType="com.rns.web.edo.service.domain.EdoTest" resultMap="studentInfo">
+		select * from device_id join student on device_id.student_id = student.id where student_id in 
+		(select distinct student_id from student_institute where package_id in 
+			( SELECT classroom_id FROM dlp_chp_cls_content_map where test_id = ${id} AND test_id != ${packageId})
+		)
+	</select>
 
 </mapper>

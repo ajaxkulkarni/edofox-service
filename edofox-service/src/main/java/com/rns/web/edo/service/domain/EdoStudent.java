@@ -31,7 +31,8 @@ public class EdoStudent {
 	private String accessType;
 	private String previousMarks;
 	private String referrer;
-
+	private String token;
+	
 	public EdoStudent() {
 
 	}
@@ -214,6 +215,14 @@ public class EdoStudent {
 
 	public void setReferrer(String referrer) {
 		this.referrer = referrer;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 	
 }

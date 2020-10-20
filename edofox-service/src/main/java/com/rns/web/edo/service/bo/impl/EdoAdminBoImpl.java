@@ -11,6 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
@@ -40,7 +43,6 @@ import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
-import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -65,6 +67,7 @@ import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
+import com.rns.web.edo.service.util.EdoNotificationsManager;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
@@ -1895,5 +1898,36 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return null;
+	}
+	
+	public EdoApiStatus sendNotification(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			EdoNotificationsManager mgr = new EdoNotificationsManager(this.sessionFactory);
+			mgr.setNotificationType(request.getRequestType());
+			mgr.setClasswork(request.getLecture());
+			mgr.setExam(request.getTest());
+			mgr.setTestsDao(testsDao);
+			LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
+			if(request.getLecture() != null) {
+				//Schedule video notification at a delay since vimeo will take some time to reflect
+				ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+				String videoDelay = EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_VIDEO_DELAY);
+				int delay = 15; //Default 15 mins delay
+				if(StringUtils.isNotBlank(videoDelay)) {
+					delay = new Integer(videoDelay);
+				}
+				LoggingUtil.logMessage("Executing with delay " + delay, LoggingUtil.emailLogger);
+				scheduler.schedule(mgr, delay, TimeUnit.MINUTES);
+				scheduler.shutdown();
+			} else {
+				executor.execute(mgr);
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
 	}
 }

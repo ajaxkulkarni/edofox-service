@@ -24,6 +24,7 @@
 		<result column="institute_id" property="currentPackage.institute.id"/>	
 		<result column="paymentStatus" property="currentPackage.status"/>
 		<result column="roll_no" property="rollNo"/>		
+		<result column="token" property="token"/>
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">
@@ -71,6 +72,7 @@
 		<result column="pause_timeout_seconds" property="pauseTimeout"/>
 		<result column="topScore" property="analysis.topScore"/>
 		<result column="totalStudents" property="analysis.studentsAppeared"/>
+		<result column="package_id" property="packageId"/>
 		
 	</resultMap>
 	
@@ -118,5 +120,11 @@
 		<result property="type" column="status" />
 		
 	</resultMap>
+	
+	<!-- <resultMap type="com.rns.web.edo.service.domain.jpa.EdoDeviceId" id="deviceId">
+		<id property="id" column="id" />
+		<result property="token" column="token" />
+		<result property="studentId" column="student_id"/>
+	</resultMap> -->
 	
 </mapper>
