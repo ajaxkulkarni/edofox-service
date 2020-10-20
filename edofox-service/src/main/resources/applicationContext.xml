@@ -43,6 +43,12 @@
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
 	</bean>
+	
+	<bean id="notificationTask" class="com.rns.web.edo.service.NotificationTask">
+		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
+		<property name="executor" ref="executor" />
+		<property name="testsDao" ref="testsDao" />
+	</bean>
 
 
 	<bean id="executor"

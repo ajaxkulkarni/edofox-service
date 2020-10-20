@@ -43,6 +43,7 @@ public class EdoPropertyUtil {
 	public static final String FCM_URL = "fcm.url";
 	public static final String FCM_SERVER_KEY = "fcm.key";
 	public static final String FCM_VIDEO_DELAY = "fcm.video.delay";
+	public static final String NOTIFICATIONS_JOB = "notifications.job";
 	
 	
 

@@ -174,4 +174,7 @@
 		SELECT question_number FROM test_questions_map where test_id = ${value} order by question_number desc limit 1;
 	</select>
 
+	<select id="getExamsForDate" resultMap="test" parameterType="String">
+		SELECT * FROM test where start_date like '%${value}%'
+	</select>
 </mapper>

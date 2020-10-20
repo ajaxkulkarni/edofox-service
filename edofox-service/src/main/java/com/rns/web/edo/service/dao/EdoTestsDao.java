@@ -103,6 +103,7 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentDevicesForPackage(Integer packageId);
 	List<EdoStudent> getStudentDevicesForVideo(EdoVideoLecture lec);
 	List<EdoStudent> getStudentDevicesForExam(EdoTest exam);
+	List<EdoTest> getExamsForDate(String value);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects(Integer instituteId);
