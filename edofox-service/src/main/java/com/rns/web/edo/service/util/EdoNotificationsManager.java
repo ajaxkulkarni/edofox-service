@@ -290,7 +290,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			// this bill now - {offersUrl}");
 			put(MAIL_TYPE_NEW_CLASSWORK, "New video added");
 			//put(MAIL_TYPE_GENERIC, "{message}");
-			put(MAIL_TYPE_NEW_EXAM, "New exam for you {testName}");
+			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName}");
 		}
 	});
 
