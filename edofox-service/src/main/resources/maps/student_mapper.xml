@@ -473,7 +473,17 @@
             LEFT JOIN test_status
             on test.test_id = test_status.test_id AND test_status.student_id = ${student.id}
             WHERE student_institute.student_id=${student.id} AND student_institute.institute_id=${institute.id}
-            AND test.status='Active' order by test.end_date desc;
+            AND test.status='Active' 
+            <if test="requestType != null &amp;&amp; requestType == 'Active'">
+            AND test.end_date > CURRENT_TIMESTAMP
+            </if>
+            <if test="requestType != null &amp;&amp; requestType == 'Upcoming'">
+            AND test.start_date > CURRENT_TIMESTAMP
+            </if>
+            <if test="requestType != null &amp;&amp; requestType == 'Past'">
+            AND test.end_date &lt;= CURRENT_TIMESTAMP
+            </if>
+            order by test.end_date desc;
 	
 	</select>
 	
