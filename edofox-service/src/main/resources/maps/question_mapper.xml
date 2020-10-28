@@ -306,6 +306,7 @@
 		<result column="feedback" property="feedback.feedback"/>
 		<result column="feedbackId" property="feedback.id"/>
 		<result column="attachment_link" property="feedback.attachment"/>
+		<result column="askedBy" property="feedback.askedBy"/>
  	</resultMap>
 	
 	<resultMap id="videoFeedbackData" type="com.rns.web.edo.service.domain.EdoQuestion">
@@ -324,7 +325,6 @@
 		<result column="subject" property="subject"/>
 		<result column="chapter_name" property="chapter.chapterName"/>
 		<result column="answeredBy" property="feedback.answeredBy"/>
-		<result column="feedback_resolution_image_url" property="feedback.feedbackResolutionImageUrl"/>
 		<result column="feedback" property="feedback.feedback"/>
 		<result column="feedbackId" property="feedback.id"/>
 		<result column="attachment_link" property="feedback.attachment"/>
@@ -335,7 +335,8 @@
 		<if test="student == null  || student.id == null || student.accessType == 'Teacher'">
 			count(*) as frequency, 
 		</if>
-		question, question_img_url,resolution,test_questions.id,feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id, exam_feedback.created_date,feedback_resolution_text,
+		question, question_img_url,resolution,test_questions.id,
+		feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id, exam_feedback.created_date,feedback_resolution_text,
 		test_subjects.subject,chapter_name, updated_date, feedback_resolution_image_url, feedback
 		<if test="student != null &amp;&amp; student.id != null &amp;&amp; student.accessType == null" >
 			,student.name as answeredBy,exam_feedback.id as feedbackId,attachment_link
@@ -409,6 +410,36 @@
 		
 		order by exam_feedback.created_date desc;
 	
+	</select>
+	
+	<select id="getGeneralFeedback" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
+		SELECT 
+		feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id, exam_feedback.created_date,feedback_resolution_text,
+		test_subjects.subject,chapter_name, updated_date, feedback_resolution_image_url, feedback ,student.name as answeredBy,
+		exam_feedback.id as feedbackId,exam_feedback.id as id,attachment_link,askedBy.name as askedBy,resolution
+		FROM exam_feedback 
+		join student as askedBy on exam_feedback.student_id = askedBy.id 
+		left join test_subjects on test_subjects.subject_id = exam_feedback.subject_id
+		left join chapters on exam_feedback.chapter_id = chapters.id
+		left join student on exam_feedback.answered_by = student.id
+		where 1 
+		<if test="requestType == 'Unresolved'">
+			AND resolution is NULL
+		</if>
+		<if test="requestType == 'Resolved'">
+			AND resolution is NOT NULL
+		</if>
+		<if test="fromDate != null &amp;&amp; toDate != null">
+			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		</if>
+		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
+			AND student_id = ${student.id}
+		</if>
+		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
+			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
+		</if>
+		AND exam_feedback.institute_id = ${institute.id} AND video_id is null AND question_id is NULL
+		order by exam_feedback.created_date desc;
 	</select>
 	
 	

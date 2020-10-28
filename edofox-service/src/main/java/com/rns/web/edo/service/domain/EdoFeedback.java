@@ -31,6 +31,7 @@ public class EdoFeedback {
 	private String createdDateString;
 	private String attachment;
 	private String answeredBy;
+	private String askedBy;
 	private Date lastUpdated;
 	
 	public String getFeedback() {
@@ -170,6 +171,12 @@ public class EdoFeedback {
 	}
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+	public String getAskedBy() {
+		return askedBy;
+	}
+	public void setAskedBy(String askedBy) {
+		this.askedBy = askedBy;
 	}
 	
 

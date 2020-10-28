@@ -148,7 +148,11 @@
 		left join test_status on test.test_id = test_status.test_id
 		left join test_result on test.test_id = test_result.test_id AND test_status.student_id = test_result.student_id AND test_questions.id = test_result.question_id
 		where
-		test.test_id = ${test.id} AND test_status.student_id = ${student.id} AND test_status.student_id AND question_disabled = 0 order by test_questions_map.id asc
+		test.test_id = ${test.id} 
+		<if test="requestType != 'Solution'">
+			AND test_status.student_id = ${student.id} AND test_status.student_id 
+		</if>
+		AND question_disabled = 0 order by test_questions_map.id asc
 
 	</select>
 	

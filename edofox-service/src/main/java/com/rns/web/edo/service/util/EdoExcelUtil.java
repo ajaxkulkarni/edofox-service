@@ -4,13 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.mail.Session;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +18,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
@@ -167,7 +163,14 @@ public class EdoExcelUtil {
 		if(colNumber == null || row.getCell(colNumber) == null) {
 			return "";
 		}
-		return row.getCell(colNumber).getStringCellValue();
+		try {
+			return row.getCell(colNumber).getStringCellValue();
+		} catch (Exception e) {
+			Double numericCellValue = row.getCell(colNumber).getNumericCellValue();
+			DecimalFormat df = new DecimalFormat("###");
+			return df.format(numericCellValue);
+		}
+		
 	}
 
 	public static void main(String[] args) throws IOException, InvalidFormatException {

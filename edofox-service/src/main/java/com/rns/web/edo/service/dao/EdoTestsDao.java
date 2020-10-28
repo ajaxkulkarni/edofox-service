@@ -125,6 +125,7 @@ public interface EdoTestsDao {
 	EdoFeedback getFeedback(Integer id);
 	List<EdoQuestion> getFeedbackData(EdoServiceRequest request);
 	List<EdoQuestion> getVideoFeedback(EdoServiceRequest request);
+	List<EdoQuestion> getGeneralFeedback(EdoServiceRequest request);
 	List<EdoTestStudentMap> getQuestionFeedbacks(EdoFeedback feedback);
 	EDOPackage getLiveSession(Integer id);
 	void saveVideoActiviy(EdoServiceRequest request);

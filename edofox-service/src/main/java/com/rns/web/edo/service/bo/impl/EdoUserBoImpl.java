@@ -128,6 +128,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 		Map<String, BigDecimal> subjectWiseScore = new HashMap<String, BigDecimal>();
 		
+		if(CollectionUtils.isEmpty(map)) {
+			//If the exam is expired..show the solutions anyway
+			EdoTest test = testsDao.getTest(request.getTest().getId());
+			if(test != null && test.getEndDate() != null && test.getEndDate().getTime() < new Date().getTime() && StringUtils.equals(test.getShowResult(), "Y")) {
+				request.setRequestType("Solution");
+				map = testsDao.getExamResult(request);
+			}
+		}
+		
+		
 		if(CollectionUtils.isNotEmpty(map)) {
 			EdoTest test = map.get(0).getTest();
 			
@@ -1126,17 +1136,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				EdoQuestion currentQuestion = request.getTest().getCurrentQuestion();
 				if(currentQuestion != null) {
 					if(currentQuestion.getChapter() == null || currentQuestion.getChapter().getChapterId() == null || currentQuestion.getSubjectId() == null) {
-						List<EdoQuestion> question = testsDao.getNextQuestion(currentQuestion);
-						if(CollectionUtils.isNotEmpty(question)) {
-							currentQuestion.setSubjectId(question.get(0).getSubjectId());
-							currentQuestion.setChapter(question.get(0).getChapter());
+						if(currentQuestion.getId() != null) {
+							List<EdoQuestion> question = testsDao.getNextQuestion(currentQuestion);
+							if(CollectionUtils.isNotEmpty(question)) {
+								currentQuestion.setSubjectId(question.get(0).getSubjectId());
+								currentQuestion.setChapter(question.get(0).getChapter());
+							}
 						}
 					}
-						EdoTestStudentMap map = new EdoTestStudentMap();
-						map.setTest(request.getTest());
-						map.setStudent(request.getStudent());
-						testsDao.addQuestionQuery(map);
-						addDoubtFile(data, fileDataDetails, map);
+					EdoTestStudentMap map = new EdoTestStudentMap();
+					map.setTest(request.getTest());
+					map.setStudent(request.getStudent());
+					testsDao.addQuestionQuery(map);
+					addDoubtFile(data, fileDataDetails, map);
 				} 
 			} else {
 				//Video doubt

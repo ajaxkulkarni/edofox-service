@@ -880,6 +880,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					}
 				}
 				test.setTest(videoFeedback);
+			} else if (StringUtils.equals(request.getSearchFilter(), "General")) { 
+				List<EdoQuestion> videoFeedback = testsDao.getGeneralFeedback(request);
+				if(CollectionUtils.isNotEmpty(videoFeedback)) {
+					for(EdoQuestion edoFeedback: videoFeedback) {
+						setupFeedbackAttachment(edoFeedback);
+					}
+				}
+				test.setTest(videoFeedback);
 			} else {
 				List<EdoQuestion> feedbackData = testsDao.getFeedbackData(request);
 				if(CollectionUtils.isNotEmpty(feedbackData)) {
