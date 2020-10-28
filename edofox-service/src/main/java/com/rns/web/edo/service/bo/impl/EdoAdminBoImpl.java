@@ -43,6 +43,7 @@ import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -871,41 +872,41 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			EdoTest test = new EdoTest();
 			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
 			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
-			List<EdoQuestion> feedbackData = testsDao.getFeedbackData(request);
-			if(CollectionUtils.isNotEmpty(feedbackData)) {
-				for(EdoQuestion edoFeedback: feedbackData) {
-					CommonUtils.setQuestionURLs(edoFeedback);
-					QuestionParser.fixQuestion(edoFeedback);
-				}
-			}
-			List<EdoQuestion> videoFeedback = testsDao.getVideoFeedback(request);
-			if(CollectionUtils.isNotEmpty(videoFeedback)) {
-				feedbackData.addAll(videoFeedback);
-				Collections.sort(feedbackData, new Comparator<EdoQuestion>() {
-
-					public int compare(EdoQuestion o1, EdoQuestion o2) {
-						if(o1.getFeedback() != null && o2.getFeedback() != null) {
-							if(o1.getFeedback().getCreatedDate().getTime() < o2.getFeedback().getCreatedDate().getTime()) {
-								return -1;
-							} 
-							if(o1.getFeedback().getCreatedDate().getTime() > o2.getFeedback().getCreatedDate().getTime()) {
-								return 1;
-							}
-							if(o1.getFeedback().getCreatedDate().getTime() == o2.getFeedback().getCreatedDate().getTime()) {
-								return 0;
-							}
-						}
-						return 0;
+			if(StringUtils.equals(request.getSearchFilter(), "Videos")) {
+				List<EdoQuestion> videoFeedback = testsDao.getVideoFeedback(request);
+				if(CollectionUtils.isNotEmpty(videoFeedback)) {
+					for(EdoQuestion edoFeedback: videoFeedback) {
+						setupFeedbackAttachment(edoFeedback);
 					}
-				});;
+				}
+				test.setTest(videoFeedback);
+			} else {
+				List<EdoQuestion> feedbackData = testsDao.getFeedbackData(request);
+				if(CollectionUtils.isNotEmpty(feedbackData)) {
+					for(EdoQuestion edoFeedback: feedbackData) {
+						CommonUtils.setQuestionURLs(edoFeedback);
+						QuestionParser.fixQuestion(edoFeedback);
+						setupFeedbackAttachment(edoFeedback);
+					}
+				}
+				test.setTest(feedbackData);
 			}
-			test.setTest(feedbackData);
 			response.setTest(test); 
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	private void setupFeedbackAttachment(EdoQuestion edoFeedback) {
+		EdoFeedback feedback = edoFeedback.getFeedback();
+		if(feedback != null && StringUtils.isNotBlank(feedback.getAttachment()) && feedback.getId() != null) {
+			String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
+			feedback.setAttachment(hostUrl + "getImage/" +  feedback.getId() + "/" + ATTR_DOUBT_IMAGE);
+		} else {
+			feedback.setAttachment(null);
+		}
 	}
 
 	public EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request) {

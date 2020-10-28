@@ -19,6 +19,7 @@ public class EdoFeedback {
 	private Integer frequency;
 	private String feedbackResolutionText;
 	private String feedbackVideoUrl;
+	private String feedbackResolutionImageUrl;
 	private String sourceVideoUrl;
 	private String sourceVideoName;
 	private Integer videoId;
@@ -28,6 +29,9 @@ public class EdoFeedback {
 	private Integer activityCount;
 	private Long totalDuration;
 	private String createdDateString;
+	private String attachment;
+	private String answeredBy;
+	private Date lastUpdated;
 	
 	public String getFeedback() {
 		return feedback;
@@ -142,6 +146,30 @@ public class EdoFeedback {
 	}
 	public void setCreatedDateString(String createdDateString) {
 		this.createdDateString = createdDateString;
+	}
+	public String getAttachment() {
+		return attachment;
+	}
+	public void setAttachment(String attachment) {
+		this.attachment = attachment;
+	}
+	public String getAnsweredBy() {
+		return answeredBy;
+	}
+	public void setAnsweredBy(String answeredBy) {
+		this.answeredBy = answeredBy;
+	}
+	public String getFeedbackResolutionImageUrl() {
+		return feedbackResolutionImageUrl;
+	}
+	public void setFeedbackResolutionImageUrl(String feedbackResolutionImageUrl) {
+		this.feedbackResolutionImageUrl = feedbackResolutionImageUrl;
+	}
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 	
 

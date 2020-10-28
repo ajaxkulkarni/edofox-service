@@ -71,6 +71,7 @@ import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
 import com.rns.web.edo.service.util.QuestionParser;
 import com.rns.web.edo.service.util.VideoUtil;
+import com.sun.jersey.core.header.FormDataContentDisposition;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -725,6 +726,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(CollectionUtils.isNotEmpty(lecs) && StringUtils.isNotBlank(lecs.get(0).getQuestionImg())) {
 					path = lecs.get(0).getQuestionImg();
 				}
+			} else if (StringUtils.equals(imageType, ATTR_DOUBT_IMAGE)) {
+				EdoFeedback feedback = testsDao.getFeedback(questionId);
+				if(feedback != null) {
+					path = feedback.getAttachment();
+				}
 			}
 			
 			if(path != null) {
@@ -1112,7 +1118,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	public EdoServiceResponse raiseDoubt(EdoServiceRequest request) {
+	public EdoServiceResponse raiseDoubt(EdoServiceRequest request, InputStream data, FormDataContentDisposition fileDataDetails) {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		Session session = null;
 		try {
@@ -1125,11 +1131,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							currentQuestion.setSubjectId(question.get(0).getSubjectId());
 							currentQuestion.setChapter(question.get(0).getChapter());
 						}
+					}
 						EdoTestStudentMap map = new EdoTestStudentMap();
 						map.setTest(request.getTest());
 						map.setStudent(request.getStudent());
 						testsDao.addQuestionQuery(map);
-					}
+						addDoubtFile(data, fileDataDetails, map);
 				} 
 			} else {
 				//Video doubt
@@ -1148,6 +1155,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					map.setTest(test);
 					map.setStudent(request.getStudent());
 					testsDao.addQuestionQuery(map);
+					if(map.getMapId() != null && data != null) {
+						addDoubtFile(data, fileDataDetails, map);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -1157,6 +1167,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return response;
+	}
+
+	private void addDoubtFile(InputStream data, FormDataContentDisposition fileDataDetails, EdoTestStudentMap map) {
+		if(map.getMapId() != null && data != null) {
+			LoggingUtil.logMessage("Adding file attachment to doubt " + map.getMapId());
+			CommonUtils.saveFile(data, DOUBTS_PATH, map.getMapId() + "_" + fileDataDetails.getFileName());
+			EdoFeedback feedback = new EdoFeedback();
+			feedback.setId(map.getMapId());
+			feedback.setAttachment(DOUBTS_PATH + map.getMapId() + "_" + fileDataDetails.getFileName());
+			testsDao.updateDoubtFile(feedback);
+		}
 	}
 
 	public EdoServiceResponse getSolved(EdoServiceRequest request) {

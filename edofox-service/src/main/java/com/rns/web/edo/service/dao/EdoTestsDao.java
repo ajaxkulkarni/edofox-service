@@ -120,7 +120,9 @@ public interface EdoTestsDao {
 	void createExam(EdoServiceRequest request);
 	List<EdoQuestion> getQuestionsByExam(EdoQuestion question);
 	void addQuestionQuery(EdoTestStudentMap map);
+	void updateDoubtFile(EdoFeedback feedback);
 	void addResolution(EdoFeedback feedback);
+	EdoFeedback getFeedback(Integer id);
 	List<EdoQuestion> getFeedbackData(EdoServiceRequest request);
 	List<EdoQuestion> getVideoFeedback(EdoServiceRequest request);
 	List<EdoTestStudentMap> getQuestionFeedbacks(EdoFeedback feedback);

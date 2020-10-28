@@ -10,6 +10,7 @@ import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.sun.jersey.core.header.FormDataContentDisposition;
 
 public interface EdoUserBo {
 
@@ -26,7 +27,7 @@ public interface EdoUserBo {
 	EdoServiceResponse getAllSubjects(EdoServiceRequest request);
 	EdoServiceResponse getNextQuestion(EdoServiceRequest request);
 	EdoServiceResponse submitAnswer(EdoServiceRequest request);
-	EdoServiceResponse raiseDoubt(EdoServiceRequest request);
+	EdoServiceResponse raiseDoubt(EdoServiceRequest request, InputStream fileData, FormDataContentDisposition fileDataDetails);
 	EdoApiStatus saveAnswer(EdoServiceRequest request);
 	EdoServiceResponse getSolved(EdoServiceRequest request);
 	EdoServiceResponse uploadRecording(Integer sessionId, InputStream data, Integer packageId);

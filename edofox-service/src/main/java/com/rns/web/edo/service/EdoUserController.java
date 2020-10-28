@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -322,12 +323,31 @@ public class EdoUserController {
 	}
 	
 	@POST
+	@Path("/raiseDoubtWithFile")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse raiseDoubtWithFile(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition fileDataDetails,
+			@FormDataParam("request") String requestJson) {
+		LoggingUtil.logMessage("Doubt Request with file :" + requestJson, LoggingUtil.doubtsLogger);
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			EdoServiceRequest request = new ObjectMapper().readValue(requestJson, EdoServiceRequest.class);
+			response = userBo.raiseDoubt(request, fileData, fileDataDetails);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.doubtsLogger);
+			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));
+		}
+		//LoggingUtil.logMessage("Doubt Response");
+		return response;
+	}
+	
+	@POST
 	@Path("/raiseDoubt")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse raiseDoubt(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Doubt Request :" + request, LoggingUtil.doubtsLogger);
-		EdoServiceResponse response = userBo.raiseDoubt(request);
+		EdoServiceResponse response = userBo.raiseDoubt(request, null, null);
 		//LoggingUtil.logMessage("Doubt Response");
 		return response;
 	}
