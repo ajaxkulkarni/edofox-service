@@ -735,6 +735,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				InputStream is = new FileInputStream(path);
 				file.setContent(is);
 				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));
+				LoggingUtil.logMessage("Found path as " + path);
+			} else {
+				LoggingUtil.logMessage("Path not found for " + questionId);
 			}
 			return file;
 		} catch (Exception e) {
