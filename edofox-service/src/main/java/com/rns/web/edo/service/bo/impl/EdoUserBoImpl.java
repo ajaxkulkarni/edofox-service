@@ -684,22 +684,27 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		Session session = null;
 		try {
 			EdoFile file = new EdoFile();
-			EdoQuestion question = testsDao.getQuestion(questionId);
-			if(question == null && !StringUtils.equals(imageType, "TEMP")) {
+			/*if(question == null && !StringUtils.equals(imageType, "TEMP") && !StringUtils.equals(imageType, ATTR_ANSWER)) {
 				return null;
-			}
+			}*/
 			String path = null;
 			if(StringUtils.equals(imageType, ATTR_QUESTION)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
 				path = question.getQuestionImageUrl();
 			} else if (StringUtils.equals(imageType, ATTR_OPTION1)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
 				path = question.getOption1ImageUrl();
 			} else if (StringUtils.equals(imageType, ATTR_OPTION2)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
 				path = question.getOption2ImageUrl();
 			} else if (StringUtils.equals(imageType, ATTR_OPTION3)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
 				path = question.getOption3ImageUrl();
 			} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
 				path = question.getOption4ImageUrl();
 			} else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
 				path = question.getMetaDataImageUrl();
 			} else if (StringUtils.equals(imageType, "TEMP")) {
 				path = TEMP_QUESTION_PATH + testId + "/" + EdoPDFUtil.QUESTION_PREFIX + questionId + ".png";
@@ -735,9 +740,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				InputStream is = new FileInputStream(path);
 				file.setContent(is);
 				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));
-				LoggingUtil.logMessage("Found path as " + path);
 			} else {
-				LoggingUtil.logMessage("Path not found for " + questionId);
 			}
 			return file;
 		} catch (Exception e) {
