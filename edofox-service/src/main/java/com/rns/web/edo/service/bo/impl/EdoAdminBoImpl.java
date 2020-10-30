@@ -906,6 +906,20 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		return response;
 	}
+	
+	public EdoServiceResponse getFeedbackSummary(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
+			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
+			EdoQuestion feedbackData = testsDao.getFeedbackSummary(request);
+			response.setQuestion(feedbackData);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
 
 	private void setupFeedbackAttachment(EdoQuestion edoFeedback) {
 		EdoFeedback feedback = edoFeedback.getFeedback();
@@ -926,6 +940,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				if(StringUtils.isNotBlank(map.getTest().getCurrentQuestion().getQuestion())) {
 					QuestionParser.fixQuestion(map.getTest().getCurrentQuestion());
 				}
+				setupFeedbackAttachment(map.getTest().getCurrentQuestion());
 			}
 			response.setMaps(questionFeedbacks);
 		} catch (Exception e) {

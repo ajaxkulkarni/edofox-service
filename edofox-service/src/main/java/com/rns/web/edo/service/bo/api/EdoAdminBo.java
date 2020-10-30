@@ -24,6 +24,7 @@ public interface EdoAdminBo {
 	EdoServiceResponse automateTest(EdoServiceRequest request);
 	EdoServiceResponse addFeedbackResolution(EdoServiceRequest request);
 	EdoServiceResponse getFeedbackData(EdoServiceRequest request);
+	EdoServiceResponse getFeedbackSummary(EdoServiceRequest request);
 	EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request);
 	void fixQuestions();
 	EdoApiStatus cropQuestionImage(EdoServiceRequest request, InputStream fileData);
