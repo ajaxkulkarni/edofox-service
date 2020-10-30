@@ -2249,7 +2249,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
 			if(request.getStudent() != null && request.getStudent().getId() != null) {
-				List<EdoTest> tests = testsDao.getStudentPerformance(request.getStudent().getId());
+				List<EdoTest> tests = testsDao.getStudentPerformance(request.getStudent());
 				List<EdoTestStudentMap> subjectPerformance = testsDao.getSubjectwisePerformanceStudent(request.getStudent().getId());
 				if(CollectionUtils.isNotEmpty(tests)) {
 					for(EdoTest test: tests) {
