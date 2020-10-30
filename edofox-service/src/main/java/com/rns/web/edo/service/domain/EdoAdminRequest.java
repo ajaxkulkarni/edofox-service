@@ -30,6 +30,7 @@ public class EdoAdminRequest {
 	private EdoStudent student;
 	private Integer fromQuestion;
 	private Integer toQuestion;
+	private String cropWidth;
 	
 	public List<EdoTestQuestionMap> getTestQuestionMaps() {
 		return testQuestionMaps;
@@ -120,6 +121,12 @@ public class EdoAdminRequest {
 	}
 	public void setToQuestion(Integer toQuestion) {
 		this.toQuestion = toQuestion;
+	}
+	public String getCropWidth() {
+		return cropWidth;
+	}
+	public void setCropWidth(String cropWidth) {
+		this.cropWidth = cropWidth;
 	}
 
 }

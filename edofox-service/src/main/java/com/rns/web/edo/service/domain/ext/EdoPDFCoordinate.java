@@ -11,6 +11,7 @@ public class EdoPDFCoordinate {
 	private float height;
 	private PDPage page;
 	private Float whiteSpaceY;
+	private Float lastTextY;
 	
 	public EdoPDFCoordinate() {
 
@@ -70,6 +71,14 @@ public class EdoPDFCoordinate {
 
 	public void setWhiteSpaceY(Float whiteSpaceY) {
 		this.whiteSpaceY = whiteSpaceY;
+	}
+
+	public Float getLastTextY() {
+		return lastTextY;
+	}
+
+	public void setLastTextY(Float lastTextY) {
+		this.lastTextY = lastTextY;
 	}
 	
 	

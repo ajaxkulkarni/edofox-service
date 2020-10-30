@@ -47,7 +47,7 @@
 		packages.institute_id
 		where institute.status
 		= 'Active' AND
-		institute.id =${value};
+		institute.id =${value} AND packages.is_disabled = 0;
 
 	</select>
 
@@ -57,7 +57,7 @@
 		student_institute on student_institute.package_id =
 		packages.id
 		where
-		student_institute.student_id = ${value};
+		student_institute.student_id = ${value} AND packages.is_disabled = 0;
 
 	</select>
 
