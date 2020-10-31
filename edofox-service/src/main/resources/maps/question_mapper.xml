@@ -250,7 +250,7 @@
 			${test.id},
 		</if>
 		
-		<if test="test.currentQuestion.chapter != null">
+		<if test="test.currentQuestion.chapter != null  &amp;&amp; test.currentQuestion.chapter.chapterId != null">
 			${test.currentQuestion.chapter.chapterId}, 
 		</if>
 		<if test="test.currentQuestion.subjectId != null">
