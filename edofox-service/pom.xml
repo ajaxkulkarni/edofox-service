@@ -175,7 +175,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
-			<version>2.5.4</version>
+			<version>2.6.7</version>
 		</dependency>
 
 		<!-- Jersey + Spring -->
@@ -306,11 +306,25 @@
 			<version>1.10</version>
 		</dependency>
 
-		<!-- <dependency>
-			<groupId>com.matter.nlp</groupId>
-			<artifactId>rake</artifactId>
-			<version>1.0.0</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.matter.nlp</groupId> <artifactId>rake</artifactId> 
+			<version>1.0.0</version> </dependency> -->
+
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
+		<!-- <dependency> <groupId>com.amazonaws</groupId> <artifactId>aws-java-sdk</artifactId> 
+			<version>1.4.0</version> </dependency> -->
+
+		<!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-s3 -->
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>1.11.892</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
 
 

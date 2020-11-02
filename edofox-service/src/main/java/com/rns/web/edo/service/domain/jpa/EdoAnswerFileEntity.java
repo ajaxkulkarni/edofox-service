@@ -33,6 +33,8 @@ public class EdoAnswerFileEntity {
 	private Date createdDate;
 	@Column(name = "file_url", unique = true)
 	private String fileUrl;
+	@Column(name = "aws_url")
+	private String awsUrl;
 	
 	
 	public Date getCreatedDate() {
@@ -76,5 +78,11 @@ public class EdoAnswerFileEntity {
 	}
 	public void setFileUrl(String fileUrl) {
 		this.fileUrl = fileUrl;
+	}
+	public String getAwsUrl() {
+		return awsUrl;
+	}
+	public void setAwsUrl(String awsUrl) {
+		this.awsUrl = awsUrl;
 	}
 }

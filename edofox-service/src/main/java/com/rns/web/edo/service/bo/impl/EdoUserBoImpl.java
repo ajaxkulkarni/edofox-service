@@ -65,6 +65,7 @@ import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
+import com.rns.web.edo.service.util.EdoAwsUtil;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoNotificationsManager;
@@ -2009,9 +2010,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					answerFileEntity.setStudentId(studentId);
 					answerFileEntity.setCreatedDate(new Date());
 					session.persist(answerFileEntity);
-					String filePath = answersPath + answerFileEntity.getId() +  "_" + bodyPart.getContentDisposition().getFileName();
+					String fileName = answerFileEntity.getId() +  "_" + bodyPart.getContentDisposition().getFileName();
+					String filePath = answersPath + fileName;
 					//answersPath = answersPath
 					writeFile(bodyPartEntity.getInputStream(), new FileOutputStream(filePath));
+					answerFileEntity.setAwsUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyPart.getContentDisposition().getType(), "answerFiles"));
 					answerFileEntity.setFilePath(filePath);
 					answerFileEntity.setFileUrl(CommonUtils.prepareAnswerURLs(answerFileEntity.getId()));
 					
@@ -2038,7 +2041,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		try {
 			EdoTest test = new EdoTest();
-			test.setAnswerFiles(testsDao.getAnswerFiles(request));
+			List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
+			if(CollectionUtils.isNotEmpty(answerFiles)) {
+				for(EdoAnswerFileEntity answerFile: answerFiles) {
+					if(StringUtils.isNotBlank(answerFile.getAwsUrl())) {
+						answerFile.setFileUrl(answerFile.getAwsUrl());
+					}
+				}
+			}
+			test.setAnswerFiles(answerFiles);
 			response.setTest(test);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
