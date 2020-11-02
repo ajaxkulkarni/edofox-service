@@ -364,6 +364,9 @@
 		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
 			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
 		</if>
+		<if test="subjectId != null">
+			AND exam_feedback.subject_id = ${subjectId}
+		</if>
 		AND exam_feedback.institute_id = ${institute.id}
 		<if test="student == null  || student.id == null || student.accessType == 'Teacher'">
 			group by question_id
@@ -403,6 +406,9 @@
 		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
 			AND student_id = ${student.id}
 		</if>
+		<if test="subjectId != null">
+			AND exam_feedback.subject_id = ${subjectId}
+		</if>
 		AND exam_feedback.institute_id = ${institute.id}
 		<if test="student == null  || student.id == null || student.accessType == 'Teacher'">
 			group by video_id
@@ -438,6 +444,9 @@
 		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
 			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
 		</if>
+		<if test="subjectId != null">
+			AND exam_feedback.subject_id = ${subjectId}
+		</if>
 		AND exam_feedback.institute_id = ${institute.id} AND video_id is null AND question_id is NULL
 		order by exam_feedback.created_date desc;
 	</select>
@@ -459,6 +468,9 @@
 		</if>
 		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
 			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
+		</if>
+		<if test="subjectId != null">
+			AND exam_feedback.subject_id = ${subjectId}
 		</if>
 		AND exam_feedback.institute_id = ${institute.id} 
 		<if test="searchFilter == 'Exams' ">
