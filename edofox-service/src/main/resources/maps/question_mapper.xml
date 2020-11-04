@@ -367,6 +367,9 @@
 		<if test="subjectId != null">
 			AND exam_feedback.subject_id = ${subjectId}
 		</if>
+		<if test="question != null &amp;&amp; question.chapter != null &amp;&amp; question.chapter.chapterId != null">
+			AND exam_feedback.chapter_id = ${question.chapter.chapterId}
+		</if>
 		AND exam_feedback.institute_id = ${institute.id}
 		<if test="student == null  || student.id == null || student.accessType == 'Teacher'">
 			group by question_id
@@ -409,6 +412,9 @@
 		<if test="subjectId != null">
 			AND exam_feedback.subject_id = ${subjectId}
 		</if>
+		<if test="question != null &amp;&amp; question.chapter != null &amp;&amp; question.chapter.chapterId != null">
+			AND exam_feedback.chapter_id = ${question.chapter.chapterId}
+		</if>
 		AND exam_feedback.institute_id = ${institute.id}
 		<if test="student == null  || student.id == null || student.accessType == 'Teacher'">
 			group by video_id
@@ -447,6 +453,9 @@
 		<if test="subjectId != null">
 			AND exam_feedback.subject_id = ${subjectId}
 		</if>
+		<if test="question != null &amp;&amp; question.chapter != null &amp;&amp; question.chapter.chapterId != null">
+			AND exam_feedback.chapter_id = ${question.chapter.chapterId}
+		</if>
 		AND exam_feedback.institute_id = ${institute.id} AND video_id is null AND question_id is NULL
 		order by exam_feedback.created_date desc;
 	</select>
@@ -471,6 +480,9 @@
 		</if>
 		<if test="subjectId != null">
 			AND exam_feedback.subject_id = ${subjectId}
+		</if>
+		<if test="question != null &amp;&amp; question.chapter != null &amp;&amp; question.chapter.chapterId != null">
+			AND exam_feedback.chapter_id = ${question.chapter.chapterId}
 		</if>
 		AND exam_feedback.institute_id = ${institute.id} 
 		<if test="searchFilter == 'Exams' ">
