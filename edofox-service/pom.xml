@@ -312,6 +312,13 @@
 			<version>0.1.55</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.5</version>
+			<scope>test</scope>
+		</dependency>
+
 
 	</dependencies>
 
