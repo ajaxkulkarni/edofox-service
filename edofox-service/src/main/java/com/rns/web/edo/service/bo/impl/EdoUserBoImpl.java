@@ -740,6 +740,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				EdoFeedback feedback = testsDao.getFeedback(questionId);
 				if(feedback != null) {
 					path = feedback.getAttachment();
+					LoggingUtil.logMessage("Loading doubt image from " + path, LoggingUtil.doubtsLogger);
 				}
 			}
 			
