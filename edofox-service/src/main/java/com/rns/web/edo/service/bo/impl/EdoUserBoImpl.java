@@ -707,58 +707,57 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 	
 	public EdoFile getQuestionImage(Integer questionId, String imageType, Integer testId) {
-		
+
 		Session session = null;
 		try {
 			EdoFile file = new EdoFile();
-			EdoQuestion question = testsDao.getQuestion(questionId);
-			if(question == null && !StringUtils.equals(imageType, "TEMP")) {
-				return null;
-			}
 			String path = null;
-			if(StringUtils.equals(imageType, ATTR_QUESTION)) {
-				path = question.getQuestionImageUrl();
+			if (StringUtils.equals(imageType, ATTR_QUESTION)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getQuestionImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION1)) {
-				path = question.getOption1ImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption1ImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION2)) {
-				path = question.getOption2ImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption2ImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION3)) {
-				path = question.getOption3ImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption3ImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
-				path = question.getOption4ImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption4ImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
-				path = question.getMetaDataImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getMetaDataImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, "TEMP")) {
 				path = TEMP_QUESTION_PATH + testId + "/" + EdoPDFUtil.QUESTION_PREFIX + questionId + ".png";
 			} else if (StringUtils.equals(imageType, ATTR_VIDEO_QUESTION)) {
 				session = this.sessionFactory.openSession();
 				List<EdoVideoLecture> lecs = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", questionId)).list();
-				if(CollectionUtils.isNotEmpty(lecs) && StringUtils.isNotBlank(lecs.get(0).getQuestionImg())) {
+				if (CollectionUtils.isNotEmpty(lecs) && StringUtils.isNotBlank(lecs.get(0).getQuestionImg())) {
 					path = lecs.get(0).getQuestionImg();
 				}
 			} else if (StringUtils.equals(imageType, ATTR_DOUBT_IMAGE)) {
 				EdoFeedback feedback = testsDao.getFeedback(questionId);
-				if(feedback != null) {
+				if (feedback != null) {
 					path = feedback.getAttachment();
-					LoggingUtil.logMessage("Loading doubt image from " + path, LoggingUtil.doubtsLogger);
 				}
 			}
-			
-			if(path != null) {
-				/*if(StringUtils.contains(path, "http")) {
-					path = QuestionParser.downloadFile(path, imageType, questionId);
-					if(StringUtils.equals(imageType, ATTR_OPTION1)) {
-						question.setOption1ImageUrl(path);
-					} else if (StringUtils.equals(imageType, ATTR_OPTION2)) {
-						question.setOption2ImageUrl(path);
-					} else if (StringUtils.equals(imageType, ATTR_OPTION3)) {
-						question.setOption3ImageUrl(path);
-					} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
-						question.setOption4ImageUrl(path);
-					}
-					testsDao.updateQuestion(question);
-				}*/
-				
+
+			if (path != null) {
 				InputStream is = new FileInputStream(path);
 				file.setContent(is);
 				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));

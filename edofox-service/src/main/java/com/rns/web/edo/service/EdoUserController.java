@@ -150,7 +150,6 @@ public class EdoUserController {
 		try {
 			EdoFile file = userBo.getQuestionImage(questionId, imageType, null);
 			if(file != null) {
-				LoggingUtil.logMessage("Loading image " + file.getContent() + " for " + questionId);
 				ResponseBuilder response = Response.ok(file.getContent());
 				//response.header("Content-Disposition", "filename=" + file.getFileName());
 				return response.build();
