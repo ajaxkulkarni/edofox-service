@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -1132,6 +1133,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		Session session = null;
 		try {
+			if(request.getTest() != null && request.getTest().getCurrentQuestion() != null && request.getTest().getCurrentQuestion().getFeedback() != null) {
+				request.getTest().getCurrentQuestion().getFeedback().setFeedback(CommonUtils.escapeQuotes(request.getTest().getCurrentQuestion().getFeedback().getFeedback()));
+			}
+			
 			if(!StringUtils.equals("video", request.getRequestType())) {
 				EdoQuestion currentQuestion = request.getTest().getCurrentQuestion();
 				if(currentQuestion != null) {

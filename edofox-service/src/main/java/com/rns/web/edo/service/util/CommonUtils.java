@@ -837,4 +837,13 @@ public class CommonUtils {
 		return result;
 	}
 	
+	public static String escapeQuotes(String value) {
+		try {
+			return StringUtils.replace(value, "'", "");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return value;
+	}
+	
 }
