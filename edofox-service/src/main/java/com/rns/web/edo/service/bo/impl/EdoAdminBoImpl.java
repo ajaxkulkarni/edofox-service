@@ -913,6 +913,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
 			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
 			EdoQuestion feedbackData = testsDao.getFeedbackSummary(request);
+			response.setSubjects(testsDao.getDoubtSubjects(request));
 			response.setQuestion(feedbackData);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
