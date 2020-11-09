@@ -2018,7 +2018,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoVideoLecture classwork = (EdoVideoLecture) session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", videoId)).uniqueResult();
 			if(classwork != null) {
 				if(StringUtils.contains(classwork.getVideo_url(), "vimeo")) {
-					return VideoUtil.getDownloadUrl(classwork.getVideo_url(), classwork.getVideoName() + ".mp4");
+					return VideoUtil.getDownloadUrl(classwork.getVideo_url(), classwork.getVideoName() + ".mp4", classwork.getInstituteId());
 				} else if (StringUtils.contains(classwork.getVideo_url(), "streaming.edofox.com")) {
 					return VideoUtil.getStreamingUrls(classwork.getVideo_url(), requestType);
 				}
