@@ -463,7 +463,17 @@
 	</select>
 	
 	<select id="getFeedbackSummary" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
-		select count(*) as frequency from exam_feedback 
+		select count(
+		<if test="searchFilter == 'Exams' ">
+			distinct question_id
+		</if>
+		<if test="searchFilter == 'Videos' ">
+			distinct video_id
+		</if>
+		<if test="searchFilter == 'General' ">
+			id
+		</if>
+		) as frequency from exam_feedback 
 		where 1
 		<if test="requestType == 'Unresolved'">
 			AND resolution is NULL
@@ -508,6 +518,15 @@
 		</if>
 		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
 			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
+		</if>
+		<if test="searchFilter == 'Exams' ">
+			AND question_id is NOT NULL
+		</if>
+		<if test="searchFilter == 'Videos' ">
+			AND video_id is NOT NULL
+		</if>
+		<if test="searchFilter == 'General' ">
+			AND video_id is null AND question_id is NULL
 		</if>
 	</select>
 	
