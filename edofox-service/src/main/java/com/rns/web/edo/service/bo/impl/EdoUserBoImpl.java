@@ -1135,7 +1135,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		Session session = null;
 		try {
 			if(request.getTest() != null && request.getTest().getCurrentQuestion() != null && request.getTest().getCurrentQuestion().getFeedback() != null) {
-				request.getTest().getCurrentQuestion().getFeedback().setFeedback(CommonUtils.escapeQuotes(request.getTest().getCurrentQuestion().getFeedback().getFeedback()));
+				EdoQuestion currQ = request.getTest().getCurrentQuestion();
+				currQ.getFeedback().setFeedback(CommonUtils.escapeQuotes(currQ.getFeedback().getFeedback()));
+				if(StringUtils.isBlank(request.getRequestType())) {
+					if(currQ.getId() == null) {
+						request.setRequestType("video");
+					}
+				}
 			}
 			
 			if(!StringUtils.equals("video", request.getRequestType())) {
@@ -1159,15 +1165,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			} else {
 				//Video doubt
 				session = this.sessionFactory.openSession();
-				List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", request.getFeedback().getId())).list();
+				EdoFeedback feedback = request.getFeedback();
+				if(feedback == null) {
+					feedback = request.getTest().getCurrentQuestion().getFeedback();
+				}
+				List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", feedback.getId())).list();
 				if(CollectionUtils.isNotEmpty(lectures)) {
 					EdoVideoLecture lecture = lectures.get(0);
 					EdoTestStudentMap map = new EdoTestStudentMap();
 					EdoTest test = new EdoTest();
 					EdoQuestion currentQuestion = new EdoQuestion();
-					if(lecture.getSubjectId() != null) {
-						currentQuestion.setSubjectId(lecture.getSubjectId());
-					} else if (StringUtils.equalsIgnoreCase("DLPVIDEO", lecture.getType())) {
+					if (StringUtils.equalsIgnoreCase("DLPVIDEO", lecture.getType())) {
 						List<EdoSubject> subjects = testsDao.getDlpContentSubject(lecture.getId());
 						if(CollectionUtils.isNotEmpty(subjects)) {
 							EdoSubject edoSubject = subjects.get(0);
@@ -1180,8 +1188,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 								}
 							}
 						}
+					} else if(lecture.getSubjectId() != null) {
+						currentQuestion.setSubjectId(lecture.getSubjectId());
 					}
-					EdoFeedback feedback = request.getFeedback();
 					feedback.setId(lecture.getId());
 					currentQuestion.setFeedback(feedback);
 					test.setCurrentQuestion(currentQuestion);
