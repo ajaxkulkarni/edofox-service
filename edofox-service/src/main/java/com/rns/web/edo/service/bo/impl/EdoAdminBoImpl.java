@@ -914,6 +914,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
 			EdoQuestion feedbackData = testsDao.getFeedbackSummary(request);
 			response.setQuestion(feedbackData);
+			response.setSubjects(testsDao.getDoubtSubjects(request));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));

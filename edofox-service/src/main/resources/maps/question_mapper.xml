@@ -497,6 +497,18 @@
 		
 	</select>
 	
+	<select id="getDoubtSubjects" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="subjects">
+		SELECT distinct exam_feedback.subject_id,subject FROM exam_feedback 
+		join test_subjects on exam_feedback.subject_id = test_subjects.subject_id
+		where 1
+		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
+			AND student_id = ${student.id}
+		</if>
+		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
+			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
+		</if>
+	</select>
+	
 	
 	<resultMap id="feedbacks" type="com.rns.web.edo.service.domain.EdoFeedback">
 		<result column="feedback" property="feedback" />
