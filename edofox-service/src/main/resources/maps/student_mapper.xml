@@ -542,6 +542,13 @@
     ORDER BY dlp_chp_cls_content_map.content_order
 	</select>
 	
+	<select id="getDlpContentSubject" parameterType="Integer" resultMap="subjects">
+		SELECT test_subjects.subject_id,test_subjects.subject,chapters.id as chapter_id FROM dlp_chp_cls_content_map 
+		join chapters on chapters.id = dlp_chp_cls_content_map.chapter_id
+		join test_subjects on chapters.subject = test_subjects.subject_id
+		where content_id = ${value}
+	</select>
+	
 	<insert id="saveStudentTestActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		insert into test_activity (test_id,student_id,activity_type,created_date) values(${test.id}, ${student.id}, '${requestType}', CURRENT_TIMESTAMP)
 	</insert>

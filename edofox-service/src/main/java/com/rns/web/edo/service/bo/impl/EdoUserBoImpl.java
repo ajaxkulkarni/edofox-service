@@ -38,6 +38,7 @@ import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoChapter;
 import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
@@ -1164,7 +1165,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					EdoTestStudentMap map = new EdoTestStudentMap();
 					EdoTest test = new EdoTest();
 					EdoQuestion currentQuestion = new EdoQuestion();
-					currentQuestion.setSubjectId(lecture.getSubjectId());
+					if(lecture.getSubjectId() != null) {
+						currentQuestion.setSubjectId(lecture.getSubjectId());
+					} else if (StringUtils.equalsIgnoreCase("DLPVIDEO", lecture.getType())) {
+						List<EdoSubject> subjects = testsDao.getDlpContentSubject(lecture.getId());
+						if(CollectionUtils.isNotEmpty(subjects)) {
+							EdoSubject edoSubject = subjects.get(0);
+							if(edoSubject != null) {
+								currentQuestion.setSubjectId(edoSubject.getId());
+								if(edoSubject.getChapterId() != null) {
+									EdoChapter chapter = new EdoChapter();
+									chapter.setChapterId(edoSubject.getChapterId());
+									currentQuestion.setChapter(chapter);
+								}
+							}
+						}
+					}
 					EdoFeedback feedback = request.getFeedback();
 					feedback.setId(lecture.getId());
 					currentQuestion.setFeedback(feedback);
