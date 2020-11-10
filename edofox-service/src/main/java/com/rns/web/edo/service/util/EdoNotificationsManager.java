@@ -30,6 +30,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import com.rns.web.edo.service.dao.EdoTestsDao;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.ext.EdoGoogleNotification;
@@ -53,6 +54,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 	private EdoVideoLecture classwork;
 	private EdoTestsDao testsDao;
 	private EdoTest exam;
+	private EdoFeedback feedback;
 	
 	static {
 		
@@ -109,6 +111,10 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 		this.notificationType = notificationType;
 	}
 
+	public void setFeedback(EdoFeedback feedback) {
+		this.feedback = feedback;
+	}
+	
 	public void broadcastNotification() {
 
 		Session session = null;
@@ -162,6 +168,10 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 						devices.addAll(devices2);
 					}
 				}
+			} else if (feedback != null) {
+				bodyText = CommonUtils.prepareFeedbackNotification(bodyText, feedback, null, "");
+				//titleText = CommonUtils.prepareFeedbackNotification(titleText, feedback, null, "");
+				devices = testsDao.getStudentDevicesForDoubt(feedback);
 			}
 			
 			if(CollectionUtils.isNotEmpty(devices)) {
@@ -278,6 +288,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			put(MAIL_TYPE_NEW_CLASSWORK, "New video lecture {title} added for you");
 			//put(MAIL_TYPE_GENERIC, "{message}");
 			put(MAIL_TYPE_NEW_EXAM, "Exam will be available from {startDate} onwards");
+			put(MAIL_TYPE_DOUBT_RESOLVED, "Your doubt {doubtFor} is resolved. Check your doubts section for more info.");
 			
 		}
 	});
@@ -291,6 +302,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			put(MAIL_TYPE_NEW_CLASSWORK, "New video added");
 			//put(MAIL_TYPE_GENERIC, "{message}");
 			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName}");
+			put(MAIL_TYPE_DOUBT_RESOLVED, "Doubt resolved");
 		}
 	});
 

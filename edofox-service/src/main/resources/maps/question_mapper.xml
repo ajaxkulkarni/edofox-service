@@ -539,10 +539,33 @@
 		<result column="feedback_resolution_text" property="feedbackResolutionText"/>
 		<result column="feedback_resolution_video_url" property="feedbackVideoUrl"/>
 		<result column="attachment_link" property="attachment"/>
+		<result column="answered_by" property="answeredBy"/>
 	</resultMap>
 	
 	<select id="getFeedback" parameterType="Integer" resultMap="feedbacks">
 		select * from exam_feedback where id = ${value}
+	</select>
+	
+	<select id="getFeedbackDetails" parameterType="com.rns.web.edo.service.domain.EdoFeedback" resultMap="feedbacks">
+		select * from exam_feedback 
+		left join student on student.id = exam_feedback.answered_by
+		where 1
+		<if test="questionId != null">
+			AND question_id = ${questionId}
+		</if>
+		<if test="videoId != null">
+			AND video_id = ${videoId}
+		</if>
+		<if test="id != null">
+			AND id = ${id}
+		</if>
+		<if test="resolution != null">
+			AND resolution = '${resolution}'
+		</if>
+		<if test="resolution == null">
+			AND (resolution IS NULL or resolution = 'Unresolved')
+		</if>
+		LIMIT 1
 	</select>
 	
 	<resultMap id="feedbackDetails" type="com.rns.web.edo.service.domain.EdoTestStudentMap">

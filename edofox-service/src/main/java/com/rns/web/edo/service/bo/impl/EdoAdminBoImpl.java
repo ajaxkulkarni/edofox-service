@@ -1932,10 +1932,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			mgr.setNotificationType(request.getRequestType());
 			mgr.setClasswork(request.getLecture());
 			mgr.setExam(request.getTest());
+			mgr.setFeedback(request.getFeedback());
 			mgr.setTestsDao(testsDao);
 			LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
 			if(request.getLecture() != null) {
-				//Schedule video notification at a delay since vimeo will take some time to reflect
+				//Schedule video notification at a delay since Vimeo will take some time to reflect
 				ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 				String videoDelay = EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_VIDEO_DELAY);
 				int delay = 15; //Default 15 mins delay

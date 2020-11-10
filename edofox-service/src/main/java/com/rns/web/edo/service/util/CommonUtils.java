@@ -35,6 +35,7 @@ import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoComplexOption;
+import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
@@ -844,6 +845,23 @@ public class CommonUtils {
 			e.printStackTrace();
 		}
 		return value;
+	}
+
+	public static String prepareFeedbackNotification(String result, EdoFeedback feedback, Object object, String string) {
+		if (feedback != null) {
+			if(StringUtils.isBlank(feedback.getAnsweredBy())) {
+				feedback.setAnsweredBy("Admin");
+			}
+			//result = StringUtils.replace(result, "{answeredBy}", CommonUtils.getStringValue(feedback.getAnsweredBy()));
+			if(feedback.getQuestionId() != null) {
+				result = StringUtils.replace(result, "{doubtFor}", "for question");
+			} else if (feedback.getVideoId() != null) {
+				result = StringUtils.replace(result, "{doubtFor}", "for video");
+			} else {
+				result = StringUtils.replace(result, "{doubtFor}", "");
+			}
+		}
+		return result;
 	}
 	
 }
