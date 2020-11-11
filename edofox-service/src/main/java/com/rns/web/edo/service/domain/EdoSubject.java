@@ -15,6 +15,7 @@ public class EdoSubject {
 	private String iconUrl;
 	private Integer classroomId;
 	private String classroomName;
+	private Integer chapterId;
 	
 	public String getSubjectName() {
 		return subjectName;
@@ -51,6 +52,12 @@ public class EdoSubject {
 	}
 	public void setClassroomName(String classroomName) {
 		this.classroomName = classroomName;
+	}
+	public Integer getChapterId() {
+		return chapterId;
+	}
+	public void setChapterId(Integer chapterId) {
+		this.chapterId = chapterId;
 	}
 	
 }

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -37,6 +38,7 @@ import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoChapter;
 import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
@@ -707,57 +709,66 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 	
 	public EdoFile getQuestionImage(Integer questionId, String imageType, Integer testId) {
-		
+
 		Session session = null;
 		try {
 			EdoFile file = new EdoFile();
-			EdoQuestion question = testsDao.getQuestion(questionId);
-			if(question == null && !StringUtils.equals(imageType, "TEMP")) {
-				return null;
-			}
 			String path = null;
-			if(StringUtils.equals(imageType, ATTR_QUESTION)) {
-				path = question.getQuestionImageUrl();
+			if (StringUtils.equals(imageType, ATTR_QUESTION)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getQuestionImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION1)) {
-				path = question.getOption1ImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption1ImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION2)) {
-				path = question.getOption2ImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption2ImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION3)) {
-				path = question.getOption3ImageUrl();
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption3ImageUrl();
+				}
 			} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
-				path = question.getOption4ImageUrl();
-			} else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
-				path = question.getMetaDataImageUrl();
-			} else if (StringUtils.equals(imageType, "TEMP")) {
-				path = TEMP_QUESTION_PATH + testId + "/" + EdoPDFUtil.QUESTION_PREFIX + questionId + ".png";
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getOption4ImageUrl();
+				}
+			} else if (StringUtils.equals(imageType, ATTR_SOLUTION)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getSolutionImageUrl();
+				}
+			}  else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getMetaDataImageUrl();
+				}
+			} else if (StringUtils.contains(imageType, "TEMP")) {
+				String prefix = EdoPDFUtil.QUESTION_PREFIX;
+				if(StringUtils.equals(imageType, ATTR_TEMP_SOLUTION)) {
+					prefix = EdoPDFUtil.SOLUTION_PREFIX;
+				}
+				path = TEMP_QUESTION_PATH + testId + "/" + prefix + questionId + ".png";
 			} else if (StringUtils.equals(imageType, ATTR_VIDEO_QUESTION)) {
 				session = this.sessionFactory.openSession();
 				List<EdoVideoLecture> lecs = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", questionId)).list();
-				if(CollectionUtils.isNotEmpty(lecs) && StringUtils.isNotBlank(lecs.get(0).getQuestionImg())) {
+				if (CollectionUtils.isNotEmpty(lecs) && StringUtils.isNotBlank(lecs.get(0).getQuestionImg())) {
 					path = lecs.get(0).getQuestionImg();
 				}
 			} else if (StringUtils.equals(imageType, ATTR_DOUBT_IMAGE)) {
 				EdoFeedback feedback = testsDao.getFeedback(questionId);
-				if(feedback != null) {
+				if (feedback != null) {
 					path = feedback.getAttachment();
 				}
 			}
-			
-			if(path != null) {
-				/*if(StringUtils.contains(path, "http")) {
-					path = QuestionParser.downloadFile(path, imageType, questionId);
-					if(StringUtils.equals(imageType, ATTR_OPTION1)) {
-						question.setOption1ImageUrl(path);
-					} else if (StringUtils.equals(imageType, ATTR_OPTION2)) {
-						question.setOption2ImageUrl(path);
-					} else if (StringUtils.equals(imageType, ATTR_OPTION3)) {
-						question.setOption3ImageUrl(path);
-					} else if (StringUtils.equals(imageType, ATTR_OPTION4)) {
-						question.setOption4ImageUrl(path);
-					}
-					testsDao.updateQuestion(question);
-				}*/
-				
+
+			if (path != null) {
 				InputStream is = new FileInputStream(path);
 				file.setContent(is);
 				file.setFileName(imageType + "." + CommonUtils.getFileExtension(path));
@@ -1132,6 +1143,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		Session session = null;
 		try {
+			if(request.getTest() != null && request.getTest().getCurrentQuestion() != null && request.getTest().getCurrentQuestion().getFeedback() != null) {
+				EdoQuestion currQ = request.getTest().getCurrentQuestion();
+				currQ.getFeedback().setFeedback(CommonUtils.escapeQuotes(currQ.getFeedback().getFeedback()));
+				if(StringUtils.isBlank(request.getRequestType())) {
+					if(currQ.getId() == null) {
+						request.setRequestType("video");
+					}
+				}
+			}
+			
 			if(!StringUtils.equals("video", request.getRequestType())) {
 				EdoQuestion currentQuestion = request.getTest().getCurrentQuestion();
 				if(currentQuestion != null) {
@@ -1153,14 +1174,32 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			} else {
 				//Video doubt
 				session = this.sessionFactory.openSession();
-				List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", request.getFeedback().getId())).list();
+				EdoFeedback feedback = request.getFeedback();
+				if(feedback == null) {
+					feedback = request.getTest().getCurrentQuestion().getFeedback();
+				}
+				List<EdoVideoLecture> lectures = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", feedback.getId())).list();
 				if(CollectionUtils.isNotEmpty(lectures)) {
 					EdoVideoLecture lecture = lectures.get(0);
 					EdoTestStudentMap map = new EdoTestStudentMap();
 					EdoTest test = new EdoTest();
 					EdoQuestion currentQuestion = new EdoQuestion();
-					currentQuestion.setSubjectId(lecture.getSubjectId());
-					EdoFeedback feedback = request.getFeedback();
+					if (StringUtils.equalsIgnoreCase("DLPVIDEO", lecture.getType())) {
+						List<EdoSubject> subjects = testsDao.getDlpContentSubject(lecture.getId());
+						if(CollectionUtils.isNotEmpty(subjects)) {
+							EdoSubject edoSubject = subjects.get(0);
+							if(edoSubject != null) {
+								currentQuestion.setSubjectId(edoSubject.getId());
+								if(edoSubject.getChapterId() != null) {
+									EdoChapter chapter = new EdoChapter();
+									chapter.setChapterId(edoSubject.getChapterId());
+									currentQuestion.setChapter(chapter);
+								}
+							}
+						}
+					} else if(lecture.getSubjectId() != null) {
+						currentQuestion.setSubjectId(lecture.getSubjectId());
+					}
 					feedback.setId(lecture.getId());
 					currentQuestion.setFeedback(feedback);
 					test.setCurrentQuestion(currentQuestion);
@@ -2013,7 +2052,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoVideoLecture classwork = (EdoVideoLecture) session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", videoId)).uniqueResult();
 			if(classwork != null) {
 				if(StringUtils.contains(classwork.getVideo_url(), "vimeo")) {
-					return VideoUtil.getDownloadUrl(classwork.getVideo_url(), classwork.getVideoName() + ".mp4");
+					return VideoUtil.getDownloadUrl(classwork.getVideo_url(), classwork.getVideoName() + ".mp4", classwork.getInstituteId());
 				} else if (StringUtils.contains(classwork.getVideo_url(), "streaming.edofox.com")) {
 					return VideoUtil.getStreamingUrls(classwork.getVideo_url(), requestType);
 				}

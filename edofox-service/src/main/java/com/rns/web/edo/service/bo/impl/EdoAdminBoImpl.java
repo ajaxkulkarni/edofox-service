@@ -913,6 +913,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
 			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
 			EdoQuestion feedbackData = testsDao.getFeedbackSummary(request);
+			response.setSubjects(testsDao.getDoubtSubjects(request));
 			response.setQuestion(feedbackData);
 			response.setSubjects(testsDao.getDoubtSubjects(request));
 		} catch (Exception e) {
@@ -1432,11 +1433,25 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				for(File file: folder.listFiles()) {
 					String[] values = StringUtils.split(file.getName(), "-");
 					if(ArrayUtils.isNotEmpty(values) && values.length > 1) {
-						EdoQuestion question = new EdoQuestion();
+						String type = ATTR_TEMP_QUESTION;
 						Integer questionNumber = new Integer(StringUtils.removeEnd(values[1], ".png"));
-						question.setQuestionNumber(questionNumber);
-						question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber));
-						questions.add(question);
+						if(values[0].equalsIgnoreCase("S")) {
+							type = ATTR_TEMP_SOLUTION;
+							//Add solution image to existing question
+							if(CollectionUtils.isNotEmpty(questions)) {
+								for(EdoQuestion question: questions) {
+									if(questionNumber != null && question.getQuestionNumber() != null && question.getQuestionNumber().intValue() == questionNumber.intValue()) {
+										question.setSolutionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber, type));
+										break;
+									}
+								}
+							}
+						} else {
+							EdoQuestion question = new EdoQuestion();
+							question.setQuestionNumber(questionNumber);
+							question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber, type));
+							questions.add(question);
+						}
 					}
 				}
 				Collections.sort(questions, new Comparator<EdoQuestion>() {
@@ -1493,6 +1508,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				
 				for(EdoQuestion question: request.getTest().getTest()) {
 					question.setQuestionImageUrl(destinationDir + "/" + EdoPDFUtil.QUESTION_PREFIX + question.getQuestionNumber() + ".png");
+					if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
+						question.setSolutionImageUrl(destinationDir + "/" + EdoPDFUtil.SOLUTION_PREFIX + question.getQuestionNumber() + ".png");
+					}
 					if(StringUtils.isBlank(question.getType())) {
 						question.setType("SINGLE");
 					}
@@ -1936,10 +1954,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			mgr.setNotificationType(request.getRequestType());
 			mgr.setClasswork(request.getLecture());
 			mgr.setExam(request.getTest());
+			mgr.setFeedback(request.getFeedback());
 			mgr.setTestsDao(testsDao);
 			LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
 			if(request.getLecture() != null) {
-				//Schedule video notification at a delay since vimeo will take some time to reflect
+				//Schedule video notification at a delay since Vimeo will take some time to reflect
 				ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 				String videoDelay = EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_VIDEO_DELAY);
 				int delay = 15; //Default 15 mins delay

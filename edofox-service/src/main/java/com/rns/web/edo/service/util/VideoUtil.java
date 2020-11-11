@@ -252,10 +252,15 @@ public class VideoUtil {
 	    return info;
 	}
 	
-	public static EdoFile getDownloadUrl(String url, String fileName) {
+	public static EdoFile getDownloadUrl(String url, String fileName, Integer instituteId) {
 		EdoFile result = new EdoFile();
 		List<EdoFile> files = new ArrayList<EdoFile>();
-		Vimeo vimeo = new Vimeo(EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY)); 
+		String vimeoKey = EdoPropertyUtil.getProperty(EdoPropertyUtil.VIDEO_UPLOAD_KEY);
+		if(instituteId == 9) {
+			//For reliance
+			vimeoKey = EdoPropertyUtil.getProperty("reliance.video.key");
+		}
+		Vimeo vimeo = new Vimeo(vimeoKey); 
 		try {
 			String videoId = StringUtils.replace(url, "https://vimeo.com/", "");
 			if(StringUtils.contains(videoId, "vimeo")) {

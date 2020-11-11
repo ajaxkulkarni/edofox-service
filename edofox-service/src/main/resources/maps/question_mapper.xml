@@ -23,11 +23,13 @@
 		test_subjects left join chapters on test_subjects.subject_id =
 		chapters.subject 
 		<if test="value != null">
-		where test_subjects.institute_id is null OR test_subjects.institute_id = ${value}
+		where (test_subjects.institute_id is null OR test_subjects.institute_id = ${value})
+		AND (chapters.institute_id = ${value} OR chapters.institute_id IS NULL)
+		AND (chapters.status != 'D' OR chapters.status is null)
 		</if>
 		;
 	</select>
-
+	
 	<insert id="addQuestion" parameterType="com.rns.web.edo.service.domain.EdoQuestion"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		<!-- <foreach collection="test.test" item="question" index="index"> insert 
@@ -36,7 +38,7 @@
 			</foreach> -->
 		insert into test_questions
 		(subject_id,question,option1,option2,option3,option4,correct_answer,question_img_url,
-		solution,weightage,negative_marks,created_date,question_type,exam_type,
+		solution,solution_img_url,weightage,negative_marks,created_date,question_type,exam_type,
 		<if test="chapter != null &amp;&amp; chapter.chapterId != null">
 			chapter,
 		</if>
@@ -46,7 +48,7 @@
 		level, ref_id)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
-		'${solution}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
+		'${solution}','${solutionImageUrl}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
 		<if test="chapter != null &amp;&amp; chapter.chapterId != null">
 		${chapter.chapterId},
 		</if>
@@ -461,7 +463,17 @@
 	</select>
 	
 	<select id="getFeedbackSummary" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
-		select count(*) as frequency from exam_feedback 
+		select count(
+		<if test="searchFilter == 'Exams' ">
+			distinct question_id
+		</if>
+		<if test="searchFilter == 'Videos' ">
+			distinct video_id
+		</if>
+		<if test="searchFilter == 'General' ">
+			id
+		</if>
+		) as frequency from exam_feedback 
 		where 1
 		<if test="requestType == 'Unresolved'">
 			AND resolution is NULL
@@ -507,6 +519,17 @@
 		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
 			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
 		</if>
+
+		<if test="searchFilter == 'Exams' ">
+			AND question_id is NOT NULL
+		</if>
+		<if test="searchFilter == 'Videos' ">
+			AND video_id is NOT NULL
+		</if>
+		<if test="searchFilter == 'General' ">
+			AND video_id is null AND question_id is NULL
+		</if>
+
 	</select>
 	
 	
@@ -518,10 +541,33 @@
 		<result column="feedback_resolution_text" property="feedbackResolutionText"/>
 		<result column="feedback_resolution_video_url" property="feedbackVideoUrl"/>
 		<result column="attachment_link" property="attachment"/>
+		<result column="answered_by" property="answeredBy"/>
 	</resultMap>
 	
 	<select id="getFeedback" parameterType="Integer" resultMap="feedbacks">
 		select * from exam_feedback where id = ${value}
+	</select>
+	
+	<select id="getFeedbackDetails" parameterType="com.rns.web.edo.service.domain.EdoFeedback" resultMap="feedbacks">
+		select * from exam_feedback 
+		left join student on student.id = exam_feedback.answered_by
+		where 1
+		<if test="questionId != null">
+			AND question_id = ${questionId}
+		</if>
+		<if test="videoId != null">
+			AND video_id = ${videoId}
+		</if>
+		<if test="id != null">
+			AND id = ${id}
+		</if>
+		<if test="resolution != null">
+			AND resolution = '${resolution}'
+		</if>
+		<if test="resolution == null">
+			AND (resolution IS NULL or resolution = 'Unresolved')
+		</if>
+		LIMIT 1
 	</select>
 	
 	<resultMap id="feedbackDetails" type="com.rns.web.edo.service.domain.EdoTestStudentMap">

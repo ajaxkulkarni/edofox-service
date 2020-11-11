@@ -508,7 +508,9 @@
 	
 	<select id="getChapterContent" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoLecture">
 	
-		SELECT video_lectures.video_name, video_lectures.id as id, video_lectures.video_url, video_lectures.type, dlp_chp_cls_content_map.content_order FROM dlp_chp_cls_content_map
+		SELECT video_lectures.video_name, video_lectures.id as id, video_lectures.video_url, video_lectures.type, dlp_chp_cls_content_map.content_order,
+		video_lectures.created_date 
+		FROM dlp_chp_cls_content_map
     INNER JOIN video_lectures
     ON dlp_chp_cls_content_map.content_id = video_lectures.id
     and is_disabled=0 AND 
@@ -540,6 +542,13 @@
     ORDER BY dlp_chp_cls_content_map.content_order
 	</select>
 	
+	<select id="getDlpContentSubject" parameterType="Integer" resultMap="subjects">
+		SELECT test_subjects.subject_id,test_subjects.subject,chapters.id as chapter_id FROM dlp_chp_cls_content_map 
+		join chapters on chapters.id = dlp_chp_cls_content_map.chapter_id
+		join test_subjects on chapters.subject = test_subjects.subject_id
+		where content_id = ${value}
+	</select>
+	
 	<insert id="saveStudentTestActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		insert into test_activity (test_id,student_id,activity_type,created_date) values(${test.id}, ${student.id}, '${requestType}', CURRENT_TIMESTAMP)
 	</insert>
@@ -564,5 +573,20 @@
 			( SELECT classroom_id FROM dlp_chp_cls_content_map where test_id = ${id} AND test_id != ${packageId})
 		)
 	</select>
-
+	
+	<select id="getStudentDevicesForDoubt" parameterType="com.rns.web.edo.service.domain.EdoFeedback" resultMap="studentInfo">
+	select distinct exam_feedback.student_id as id, device_id.token from exam_feedback 
+	join student on exam_feedback.student_id = student.id
+	join device_id on device_id.student_id = student.id
+	<if test="questionId != null">
+		where question_id = ${questionId}
+	</if>
+	<if test="videoId != null">
+		where video_id = ${videoId}
+	</if>
+	<if test="id != null">
+		where id = ${id}
+	</if>
+	
+	</select>
 </mapper>

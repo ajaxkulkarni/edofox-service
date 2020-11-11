@@ -92,6 +92,7 @@
 		<result column="option2_img_url" property="option2ImageUrl" />
 		<result column="option3_img_url" property="option3ImageUrl" />
 		<result column="option4_img_url" property="option4ImageUrl" />
+		<result column="solution_img_url" property="solutionImageUrl" />
 		<result column="subject_id" property="subjectId"/>
 		<result column="chapter" property="chapter.chapterId"/>
 		<result column="question_number" property="questionNumber"/>
@@ -110,6 +111,7 @@
 		<result property="iconUrl" column="icon_url"/>
 		<result property="classroomId" column="classroom_id"/>
 		<result property="classroomName" column="package_name"/>
+		<result property="chapterId" column="chapter_id"/>
 	</resultMap>
 	
 	<resultMap type="com.rns.web.edo.service.domain.EdoFeedback" id="feedback">
