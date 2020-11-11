@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.rns.web.edo.service</groupId>
-	<artifactId>edofox</artifactId>
+	<artifactId>deeper</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>ERP Project</name>
+	<name>Deeper ERP</name>
 	<packaging>war</packaging>
 
 	<properties>
@@ -319,11 +319,18 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
+		<!-- <dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0-m09</version>
+		</dependency> -->
+
 
 	</dependencies>
 
 	<build>
-		<finalName>edofox</finalName>
+		<finalName>deeper</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>

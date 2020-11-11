@@ -915,6 +915,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			EdoQuestion feedbackData = testsDao.getFeedbackSummary(request);
 			response.setSubjects(testsDao.getDoubtSubjects(request));
 			response.setQuestion(feedbackData);
+			response.setSubjects(testsDao.getDoubtSubjects(request));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
@@ -1534,10 +1535,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					if(question.getQn_id() == null) {
 						question.setQn_id(question.getQuestionNumber());
 					}
-					question.setInstituteId(test.getCurrentQuestion().getInstituteId());
+					if(test != null) {
+						question.setInstituteId(test.getCurrentQuestion().getInstituteId());
+					}
 					testsDao.addQuestion(question);
 				}
-				testsDao.createExam(request);
+				if(StringUtils.equals(request.getRequestType(), "CREATE_EXAM")) {
+					testsDao.createExam(request);
+				}
 				txManager.commit(txStatus);
 				FileUtils.deleteDirectory(source);
 			}

@@ -519,6 +519,7 @@
 		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
 			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
 		</if>
+
 		<if test="searchFilter == 'Exams' ">
 			AND question_id is NOT NULL
 		</if>
@@ -528,6 +529,7 @@
 		<if test="searchFilter == 'General' ">
 			AND video_id is null AND question_id is NULL
 		</if>
+
 	</select>
 	
 	
