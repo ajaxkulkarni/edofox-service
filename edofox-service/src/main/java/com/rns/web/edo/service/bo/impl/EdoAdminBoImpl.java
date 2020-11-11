@@ -1432,11 +1432,25 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				for(File file: folder.listFiles()) {
 					String[] values = StringUtils.split(file.getName(), "-");
 					if(ArrayUtils.isNotEmpty(values) && values.length > 1) {
-						EdoQuestion question = new EdoQuestion();
+						String type = ATTR_TEMP_QUESTION;
 						Integer questionNumber = new Integer(StringUtils.removeEnd(values[1], ".png"));
-						question.setQuestionNumber(questionNumber);
-						question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber));
-						questions.add(question);
+						if(values[0].equalsIgnoreCase("S")) {
+							type = ATTR_TEMP_SOLUTION;
+							//Add solution image to existing question
+							if(CollectionUtils.isNotEmpty(questions)) {
+								for(EdoQuestion question: questions) {
+									if(questionNumber != null && question.getQuestionNumber() != null && question.getQuestionNumber().intValue() == questionNumber.intValue()) {
+										question.setSolutionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber, type));
+										break;
+									}
+								}
+							}
+						} else {
+							EdoQuestion question = new EdoQuestion();
+							question.setQuestionNumber(questionNumber);
+							question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber, type));
+							questions.add(question);
+						}
 					}
 				}
 				Collections.sort(questions, new Comparator<EdoQuestion>() {
@@ -1493,6 +1507,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				
 				for(EdoQuestion question: request.getTest().getTest()) {
 					question.setQuestionImageUrl(destinationDir + "/" + EdoPDFUtil.QUESTION_PREFIX + question.getQuestionNumber() + ".png");
+					if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
+						question.setSolutionImageUrl(destinationDir + "/" + EdoPDFUtil.SOLUTION_PREFIX + question.getQuestionNumber() + ".png");
+					}
 					if(StringUtils.isBlank(question.getType())) {
 						question.setType("SINGLE");
 					}

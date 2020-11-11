@@ -739,13 +739,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if (question != null) {
 					path = question.getOption4ImageUrl();
 				}
-			} else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
+			} else if (StringUtils.equals(imageType, ATTR_SOLUTION)) {
+				EdoQuestion question = testsDao.getQuestion(questionId);
+				if (question != null) {
+					path = question.getSolutionImageUrl();
+				}
+			}  else if (StringUtils.equals(imageType, ATTR_META_DATA)) {
 				EdoQuestion question = testsDao.getQuestion(questionId);
 				if (question != null) {
 					path = question.getMetaDataImageUrl();
 				}
-			} else if (StringUtils.equals(imageType, "TEMP")) {
-				path = TEMP_QUESTION_PATH + testId + "/" + EdoPDFUtil.QUESTION_PREFIX + questionId + ".png";
+			} else if (StringUtils.contains(imageType, "TEMP")) {
+				String prefix = EdoPDFUtil.QUESTION_PREFIX;
+				if(StringUtils.equals(imageType, ATTR_TEMP_SOLUTION)) {
+					prefix = EdoPDFUtil.SOLUTION_PREFIX;
+				}
+				path = TEMP_QUESTION_PATH + testId + "/" + prefix + questionId + ".png";
 			} else if (StringUtils.equals(imageType, ATTR_VIDEO_QUESTION)) {
 				session = this.sessionFactory.openSession();
 				List<EdoVideoLecture> lecs = session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", questionId)).list();

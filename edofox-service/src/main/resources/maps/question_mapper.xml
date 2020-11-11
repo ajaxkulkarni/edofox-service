@@ -38,7 +38,7 @@
 			</foreach> -->
 		insert into test_questions
 		(subject_id,question,option1,option2,option3,option4,correct_answer,question_img_url,
-		solution,weightage,negative_marks,created_date,question_type,exam_type,
+		solution,solution_img_url,weightage,negative_marks,created_date,question_type,exam_type,
 		<if test="chapter != null &amp;&amp; chapter.chapterId != null">
 			chapter,
 		</if>
@@ -48,7 +48,7 @@
 		level, ref_id)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
-		'${solution}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
+		'${solution}','${solutionImageUrl}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
 		<if test="chapter != null &amp;&amp; chapter.chapterId != null">
 		${chapter.chapterId},
 		</if>

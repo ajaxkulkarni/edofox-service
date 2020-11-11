@@ -35,6 +35,7 @@ import com.rns.web.edo.service.domain.ext.EdoPDFCoordinate;
 public class EdoPDFUtil {
 
 	public static final String QUESTION_PREFIX = "Q-";
+	public static final String SOLUTION_PREFIX = "S-";
 	private static final String PATH = "F:\\Resoneuronance\\Edofox\\Document\\Customers\\Athavale classes\\12 Jan\\12th.pdf";
 	private static final String OUT = "F:\\Resoneuronance\\Edofox\\Document\\Customers\\Athavale classes\\12 Jan\\12th\\";
 	//public static List<Float> yPositions = new ArrayList<Float>();
@@ -146,6 +147,9 @@ public class EdoPDFUtil {
 									System.out.println(questionCount + ":" + coord.getX() + " - " + coord.getY() + " width " + coord.getHeight() + " pg w " + coord.getWidth() +  " for " + text);
 								//}
 								questionCount++;
+							} else if (StringUtils.contains(text, ":Solution:")) {
+								coord.setSolutionY(firstProsition.getEndY());
+								System.out.println("Solution found at " + firstProsition.getEndY());
 							} else if (coord != null) {
 								coord.setLastTextY(firstProsition.getEndY());
 								//Update width if it's greater than current width
@@ -195,20 +199,35 @@ public class EdoPDFUtil {
 						
 						if(i > 0) {
 							// suffix in filename will be used as the file format
-						    Integer questionNumber = list.get(i - 1).getQuestionNumber();
+						    EdoPDFCoordinate prevCoordinate = list.get(i - 1);
+							Integer questionNumber = prevCoordinate.getQuestionNumber();
 						    if(!withinRange(request.getFromQuestion(), request.getToQuestion(), questionNumber)) {
 						    	continue;
 						    }
 						    //int buffer = 10;
 							float y = edoPDFCoordinate.getY() + edoPDFCoordinate.getHeight() + request.getBuffer();
-							float width = list.get(i-1).getWidth();
-							float height = list.get(i - 1).getY() - edoPDFCoordinate.getY() + request.getBuffer();
+							float width = prevCoordinate.getWidth();
+							float height = prevCoordinate.getY() - edoPDFCoordinate.getY() + request.getBuffer();
 							Float x = edoPDFCoordinate.getX();
-							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber, x);
+							Float solutionY = prevCoordinate.getSolutionY();
+							//If solution is present at the bottom of the question
+							if(solutionY != null) {
+								height = prevCoordinate.getY() - solutionY + request.getBuffer();
+								solutionY = solutionY + edoPDFCoordinate.getHeight() + request.getBuffer();
+								float solutionHeight = solutionY - edoPDFCoordinate.getY() + request.getBuffer();
+								cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, solutionHeight, questionNumber, x, SOLUTION_PREFIX);
+								cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, solutionY, width, height, questionNumber, x, QUESTION_PREFIX);
+							} else {
+								cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, y, width, height, questionNumber, x, QUESTION_PREFIX);
+							}
+							
 							EdoQuestion question = new EdoQuestion();
 							question.setQuestionNumber(questionNumber);
 							//Timestamp added to avoid caching
-							question.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), questionNumber) + "?" + System.currentTimeMillis());
+							question.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), questionNumber, EdoConstants.ATTR_TEMP_QUESTION) + "?" + System.currentTimeMillis());
+							if(solutionY != null) {
+								question.setSolutionImageUrl(getQuestionUrl(request.getTest().getId(), questionNumber, EdoConstants.ATTR_TEMP_SOLUTION) + "?" + System.currentTimeMillis());
+							}
 							parsedQuestions.add(question);	
 						}
 						
@@ -225,10 +244,29 @@ public class EdoPDFUtil {
 							}
 							//for last item
 							float height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + request.getBuffer();
-							cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, startY, edoPDFCoordinate.getWidth(), height, list.get(i).getQuestionNumber(), list.get(i).getX());
+							
+							//If solution is present at the bottom of the question
+							Float solutionY = edoPDFCoordinate.getSolutionY();
+							if(solutionY != null) {
+								if(solutionY < startY) {
+									startY = 0;
+								}
+								height = edoPDFCoordinate.getY() - solutionY + edoPDFCoordinate.getHeight() + request.getBuffer();
+								solutionY = solutionY + edoPDFCoordinate.getHeight() + request.getBuffer();
+								float solutionHeight = solutionY - startY + request.getBuffer();
+								cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, startY, edoPDFCoordinate.getWidth(), solutionHeight, list.get(i).getQuestionNumber(), list.get(i).getX(), SOLUTION_PREFIX);
+								cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, solutionY, edoPDFCoordinate.getWidth(), height, list.get(i).getQuestionNumber(), list.get(i).getX(), QUESTION_PREFIX);
+							} else {
+								cropQuestion(outputFolder, pdfRenderer, pgNo, page, list, i, startY, edoPDFCoordinate.getWidth(), height, list.get(i).getQuestionNumber(), list.get(i).getX(), QUESTION_PREFIX);
+								
+							}
+							
 							EdoQuestion lastQuestion = new EdoQuestion();
 							lastQuestion.setQuestionNumber(list.get(i).getQuestionNumber());
-							lastQuestion.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), list.get(i).getQuestionNumber()));
+							lastQuestion.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), lastQuestion.getQuestionNumber(), EdoConstants.ATTR_TEMP_QUESTION) + "?" + System.currentTimeMillis());
+							if(solutionY != null) {
+								lastQuestion.setSolutionImageUrl(getQuestionUrl(request.getTest().getId(), lastQuestion.getQuestionNumber(), EdoConstants.ATTR_TEMP_SOLUTION) + "?" + System.currentTimeMillis());
+							}
 							parsedQuestions.add(lastQuestion);
 							
 							/*page.setCropBox(new PDRectangle(0, 0, , ));
@@ -305,12 +343,12 @@ public class EdoPDFUtil {
 	}
 
 
-	public static String getQuestionUrl(int testId, Integer questionNumber) {
-		return EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "getTempImage/" + testId + "/" + questionNumber;
+	public static String getQuestionUrl(int testId, Integer questionNumber, String type) {
+		return EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "getTempImage/" + testId + "/" + questionNumber + "/" + type;
 	}
 
 	private static BufferedImage cropQuestion(String outputFolder, PDFRenderer pdfRenderer, int pgNo, PDPage page, List<EdoPDFCoordinate> list, int i,
-			float y, float width, float height, Integer questionNumber, Float x) throws IOException {
+			float y, float width, float height, Integer questionNumber, Float x, String type) throws IOException {
 		
 		FileOutputStream fos = null;
 		ImageOutputStream ios = null;
@@ -331,7 +369,7 @@ public class EdoPDFUtil {
 		
 			//Compress image before saving
 			ImageWriter writer =  ImageIO.getImageWritersByFormatName("jpg").next();
-	        fos = new FileOutputStream(outputFolder + QUESTION_PREFIX + questionNumber + ".png");
+	        fos = new FileOutputStream(outputFolder + type + questionNumber + ".png");
 			ios = ImageIO.createImageOutputStream(fos);
 	        writer.setOutput(ios);
 

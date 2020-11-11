@@ -51,6 +51,8 @@ public interface EdoConstants {
 	String ATTR_SOLUTION = "solution";
 	String ATTR_VIDEO_QUESTION = "videoQuestion";
 	String ATTR_DOUBT_IMAGE = "doubtImage";
+	String ATTR_TEMP_QUESTION = "TEMPQ";
+	String ATTR_TEMP_SOLUTION = "TEMPS";
 	
 	String MAIL_TYPE_SUBSCRIPTION = "SubscriptionMail";
 	String MAIL_TYPE_ACTIVATED = "PackageActivated";
