@@ -110,6 +110,7 @@ public interface EdoTestsDao {
 	//Question queries
 	List<EdoSubject> getAllSubjects(Integer instituteId);
 	int addQuestion(EdoQuestion question);
+	void addQuestionDetails(EdoQuestion question);
 	int getNoOfQuestionsByChapter(Integer chapterId);
 	int getNoOfQuestionsByDate(String date);
 	List<EdoQuestion> getQuestionsByRefId(String refId);

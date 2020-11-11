@@ -56,6 +56,7 @@ public class EdoQuestion {
 	private Integer disabled;
 	private Integer instituteId;
 	private Integer lastIndex;
+	private EdoQuestionDetails details;
 	
 	public String getOption1() {
 		return option1;
@@ -336,6 +337,12 @@ public class EdoQuestion {
 	}
 	public void setLastIndex(Integer lastIndex) {
 		this.lastIndex = lastIndex;
+	}
+	public EdoQuestionDetails getDetails() {
+		return details;
+	}
+	public void setDetails(EdoQuestionDetails details) {
+		this.details = details;
 	}
 
 }

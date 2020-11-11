@@ -63,6 +63,11 @@
 		</if>
 		'${referenceId}')
 	</insert>
+	
+	<insert id="addQuestionDetails" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
+	insert into questions_details (question_id, name_of_publication, page_number, paragraph_number,line_no)
+	values (${id}, '${details.name_of_publication}', '${details.page_number}', '${details.paragraph_number}', '${details.line_no}')
+	</insert>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"
 		parameterType="Integer">
