@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class EdoPropertyUtil {
 	
-	private static final String PROPERTIES_PATH = "/home/service/properties/edofox.properties";
+	private static final String PROPERTIES_PATH = "/home/service/properties/deeper.properties";
 	public static final String FIREBASE_PROJECT = "firebase.project";
 	public static final String FIREBASE_CREDENTIALS = "firebase.credentials.path";
 	public static final String HOST_URL = "host.url";

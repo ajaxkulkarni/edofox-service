@@ -45,7 +45,7 @@
 		<if test="instituteId != null">
 			institute_id,
 		</if>
-		level, ref_id)
+		level, ref_id, que_status)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
 		'${solution}','${solutionImageUrl}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
@@ -61,7 +61,7 @@
 		<if test="level == null">
 			NULL, 
 		</if>
-		'${referenceId}')
+		'${referenceId}', '${status}')
 	</insert>
 	
 	<insert id="addQuestionDetails" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
