@@ -69,7 +69,7 @@
 	neet_no_of_ques, jee_no_of_ques, setter_id, board_id, mht_cet_no_of_ques)
 	values (${id}, '${details.name_of_publication}', '${details.page_number}', '${details.paragraph_number}', '${details.line_no}',
 	'${details.topics}', ${details.self_created}, ${details.neet_no_of_ques}, ${details.jee_no_of_ques}, ${details.setter_id}, 
-	${details.board_id}, ${mht_cet_no_of_ques})
+	${details.board_id}, ${details.mht_cet_no_of_ques})
 	</insert>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"
