@@ -52,7 +52,7 @@
 			board_id,
 		</if>
 		<if test="class_id != null">
-			${class_id},
+			class_id,
 		</if>
 		level, ref_id, que_status)
 		values
