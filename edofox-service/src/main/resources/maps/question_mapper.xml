@@ -66,9 +66,10 @@
 	
 	<insert id="addQuestionDetails" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
 	insert into questions_details (question_id, name_of_publication, page_number, paragraph_number,line_no, topics, self_created,
-	neet_no_of_ques, jee_no_of_ques, setter_id, board_id)
+	neet_no_of_ques, jee_no_of_ques, setter_id, board_id, mht_cet_no_of_ques)
 	values (${id}, '${details.name_of_publication}', '${details.page_number}', '${details.paragraph_number}', '${details.line_no}',
-	'${details.topics}', ${details.self_created}, ${details.neet_no_of_ques}, ${details.jee_no_of_ques}, ${details.setter_id}, ${details.board_id})
+	'${details.topics}', ${details.self_created}, ${details.neet_no_of_ques}, ${details.jee_no_of_ques}, ${details.setter_id}, 
+	${details.board_id}, ${mht_cet_no_of_ques})
 	</insert>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"

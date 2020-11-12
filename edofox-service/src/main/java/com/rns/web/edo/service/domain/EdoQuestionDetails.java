@@ -14,6 +14,7 @@ public class EdoQuestionDetails {
 	private Integer jee_no_of_ques;
 	private Integer setter_id;
 	private Integer board_id;
+	private Integer mht_cet_no_of_ques;
 
 	
 	public String getTopics() {
@@ -87,6 +88,12 @@ public class EdoQuestionDetails {
 	}
 	public void setShort_explanation(String short_explanation) {
 		this.short_explanation = short_explanation;
+	}
+	public Integer getMht_cet_no_of_ques() {
+		return mht_cet_no_of_ques;
+	}
+	public void setMht_cet_no_of_ques(Integer mht_cet_no_of_ques) {
+		this.mht_cet_no_of_ques = mht_cet_no_of_ques;
 	}
 	
 	
