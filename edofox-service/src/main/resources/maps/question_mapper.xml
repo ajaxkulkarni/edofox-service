@@ -48,6 +48,12 @@
 		<if test="topicId != null">
 			topic_id,
 		</if>
+		<if test="board_id != null">
+			board_id,
+		</if>
+		<if test="class_id != null">
+			${class_id},
+		</if>
 		level, ref_id, que_status)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
@@ -67,15 +73,21 @@
 		<if test="level == null">
 			NULL, 
 		</if>
+		<if test="board_id != null">
+			${board_id},
+		</if>
+		<if test="class_id != null">
+			${class_id},
+		</if>
 		'${referenceId}', '${status}')
 	</insert>
 	
 	<insert id="addQuestionDetails" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
 	insert into questions_details (question_id, name_of_publication, page_number, paragraph_number,line_no, self_created,
-	neet_no_of_ques, jee_no_of_ques, setter_id, board_id, mht_cet_no_of_ques)
+	neet_no_of_ques, jee_no_of_ques, setter_id, mht_cet_no_of_ques)
 	values (${id}, '${details.name_of_publication}', '${details.page_number}', '${details.paragraph_number}', '${details.line_no}',
 	${details.self_created}, ${details.neet_no_of_ques}, ${details.jee_no_of_ques}, ${details.setter_id}, 
-	${details.board_id}, ${details.mht_cet_no_of_ques})
+	${details.mht_cet_no_of_ques})
 	</insert>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"

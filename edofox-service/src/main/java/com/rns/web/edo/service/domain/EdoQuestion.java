@@ -58,6 +58,8 @@ public class EdoQuestion {
 	private Integer lastIndex;
 	private EdoQuestionDetails details;
 	private Integer topicId;
+	private Integer board_id;
+	private Integer class_id;
 	
 	public String getOption1() {
 		return option1;
@@ -350,6 +352,18 @@ public class EdoQuestion {
 	}
 	public void setTopicId(Integer topicId) {
 		this.topicId = topicId;
+	}
+	public Integer getBoard_id() {
+		return board_id;
+	}
+	public void setBoard_id(Integer board_id) {
+		this.board_id = board_id;
+	}
+	public Integer getClass_id() {
+		return class_id;
+	}
+	public void setClass_id(Integer class_id) {
+		this.class_id = class_id;
 	}
 
 }
