@@ -1539,7 +1539,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						question.setInstituteId(test.getCurrentQuestion().getInstituteId());
 					}
 					testsDao.addQuestion(question);
-					testsDao.addQuestionDetails(question);
+					if(question.getDetails() != null) {
+						testsDao.addQuestionDetails(question);
+					}
 				}
 				if(StringUtils.equals(request.getRequestType(), "CREATE_EXAM")) {
 					testsDao.createExam(request);
