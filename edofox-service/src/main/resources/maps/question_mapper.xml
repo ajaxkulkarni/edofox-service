@@ -54,7 +54,10 @@
 		<if test="class_id != null">
 			class_id,
 		</if>
-		level, ref_id, que_status)
+		<if test="level != null">
+			level,
+		</if>
+		ref_id, que_status)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
 		'${solution}','${solutionImageUrl}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
@@ -70,9 +73,9 @@
 		<if test="level != null">
 			${level}, 
 		</if>
-		<if test="level == null">
+		<!-- <if test="level == null">
 			NULL, 
-		</if>
+		</if> -->
 		<if test="board_id != null">
 			${board_id},
 		</if>
