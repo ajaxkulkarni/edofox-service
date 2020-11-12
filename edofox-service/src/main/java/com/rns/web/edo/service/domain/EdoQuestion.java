@@ -60,6 +60,7 @@ public class EdoQuestion {
 	private Integer topicId;
 	private Integer board_id;
 	private Integer class_id;
+	private String short_explanation;
 	
 	public String getOption1() {
 		return option1;
@@ -364,6 +365,12 @@ public class EdoQuestion {
 	}
 	public void setClass_id(Integer class_id) {
 		this.class_id = class_id;
+	}
+	public String getShort_explanation() {
+		return short_explanation;
+	}
+	public void setShort_explanation(String short_explanation) {
+		this.short_explanation = short_explanation;
 	}
 
 }

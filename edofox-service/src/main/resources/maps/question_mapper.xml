@@ -57,6 +57,7 @@
 		<if test="level != null">
 			level,
 		</if>
+		short explanation,
 		ref_id, que_status)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
@@ -82,6 +83,7 @@
 		<if test="class_id != null">
 			${class_id},
 		</if>
+		'${short explanation}',
 		'${referenceId}', '${status}')
 	</insert>
 	
