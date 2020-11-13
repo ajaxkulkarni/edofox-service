@@ -299,7 +299,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				addTestActivity(testId, studenId, "STARTED");
 				//Added on 11/12/19
 				
-				studentMaps = testsDao.getStudentActivePackage(inputMap);
+				/*studentMaps = testsDao.getStudentActivePackage(inputMap);
 				
 				if(CollectionUtils.isNotEmpty(studentMaps)) {
 					studentMap = studentMaps.get(0);
@@ -311,11 +311,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					//Test or package not active
 					response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_PAID, ERROR_TEST_NOT_PAID));
 					return response;
-				}
+				}*/
 				
 				studentMap.setStartedCount(startedCount);
 				
-				if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
+				/*if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
 					if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
 						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
 						return response;
@@ -334,7 +334,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							}
 						}
 					}
-				}
+				}*/
 				
 			}
 			
