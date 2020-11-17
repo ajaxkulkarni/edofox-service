@@ -1530,6 +1530,16 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						question.setOption2("2)");
 						question.setOption3("3)");
 						question.setOption4("4)");
+					} else if (StringUtils.equals(question.getOption1(), "A)")) {
+						question.setOption1("A)");
+						question.setOption2("B)");
+						question.setOption3("C)");
+						question.setOption4("D)");
+					} else if (StringUtils.equals(question.getOption1(), "NA")) {
+						question.setOption1("");
+						question.setOption2("");
+						question.setOption3("");
+						question.setOption4("");
 					}
 					if(question.getQn_id() == null) {
 						question.setQn_id(question.getQuestionNumber());

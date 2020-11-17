@@ -259,6 +259,9 @@ public class VideoUtil {
 		if(instituteId == 9) {
 			//For reliance
 			vimeoKey = EdoPropertyUtil.getProperty("reliance.video.key");
+		} else if  (instituteId == 4) {
+			//For shahu
+			vimeoKey = EdoPropertyUtil.getProperty("shahu.video.key");
 		}
 		Vimeo vimeo = new Vimeo(vimeoKey); 
 		try {
@@ -270,6 +273,13 @@ public class VideoUtil {
 			if(resp != null && resp.getJson() != null) {
 				System.out.println(resp);
 				String link = "";
+				if(!resp.getJson().has("download")) {
+					if(instituteId == 9 || instituteId == 4) {
+						LoggingUtil.logMessage("Not found! recursion..", LoggingUtil.videoLogger);
+						return getDownloadUrl(url, fileName, 0);
+					}
+					return null;
+				}
 				org.json.JSONArray array = resp.getJson().getJSONArray("download");
 				if( array.length() > 0)  {
 					for(int i = 0; i < array.length(); i++) {
@@ -344,7 +354,7 @@ public class VideoUtil {
 			result.setFileName(fileName);
 			result.setDownloadUrl(files.get(files.size() - 1).getDownloadUrl());
 			result.setVersions(files);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
 		}
