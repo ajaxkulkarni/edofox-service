@@ -67,7 +67,7 @@ public class EdoUserController {
 		try {
 			response =  userBo.getTestResult(request);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		//LoggingUtil.logMessage("Get Test result Response");
 		return response;
