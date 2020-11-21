@@ -613,7 +613,7 @@ public class CommonUtils {
 			return;
 		}
 		
-		if(/*EdoConstants.ABSOLUTE_IMAGE_URLS || */StringUtils.contains(question.getQuestionImageUrl(), "public_html")) {
+		if(StringUtils.contains(question.getQuestionImageUrl(), "public_html") || StringUtils.contains(question.getQuestionImageUrl(), "uploads")) {
 			if(StringUtils.isNotBlank(question.getQuestionImageUrl())) {
 				question.setQuestionImageUrl(prepareUrl(question.getQuestionImageUrl()));
 			}
