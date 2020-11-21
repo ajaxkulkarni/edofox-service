@@ -282,6 +282,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setFlaggedCount(0);
 					test.setScore(BigDecimal.ZERO);
 					testsDao.saveTestStatus(request);
+					studentMap = new EdoTestStudentMap();
 				} else {
 					//Update test status for timestamp and exam started count
 					EdoServiceRequest request = new EdoServiceRequest();
@@ -313,7 +314,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					return response;
 				}*/
 				
-				studentMap.setStartedCount(startedCount);
+				if(studentMap != null) {
+					studentMap.setStartedCount(startedCount);	
+				}
 				
 				/*if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
 					if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, studentMap.getStatus())) {
