@@ -376,9 +376,12 @@
 		<if test="student == null  || student.id == null || student.accessType == 'Teacher'">
 			group by question_id
 		</if>
-		
-		
-		order by exam_feedback.created_date desc;
+		order by exam_feedback.created_date desc
+		<if test = "startIndex != null">
+    		LIMIT ${startIndex}, ${startIndex + 20}
+    	</if>
+	
+		;
 	</select>
 	
 	<select id="getVideoFeedback" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="videoFeedbackData">
@@ -411,6 +414,9 @@
 		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
 			AND student_id = ${student.id}
 		</if>
+		<if test="student != null  &amp;&amp; student.accessType == 'Teacher'">
+			AND student_id in (select student_id from student_institute where institute_id =  ${institute.id} AND package_id in ( select package_id from student_institute where student_id = ${student.id}))
+		</if>
 		<if test="subjectId != null">
 			AND exam_feedback.subject_id = ${subjectId}
 		</if>
@@ -424,6 +430,9 @@
 		
 		order by exam_feedback.created_date desc;
 	
+		<if test = "startIndex != null">
+    		LIMIT ${startIndex}, ${startIndex + 20}
+    	</if>
 	</select>
 	
 	<select id="getGeneralFeedback" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
@@ -459,7 +468,11 @@
 			AND exam_feedback.chapter_id = ${question.chapter.chapterId}
 		</if>
 		AND exam_feedback.institute_id = ${institute.id} AND video_id is null AND question_id is NULL
-		order by exam_feedback.created_date desc;
+		order by exam_feedback.created_date desc
+		<if test = "startIndex != null">
+    		LIMIT ${startIndex}, ${startIndex + 20}
+    	</if>
+		;
 	</select>
 	
 	<select id="getFeedbackSummary" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
