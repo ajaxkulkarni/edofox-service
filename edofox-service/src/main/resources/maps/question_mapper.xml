@@ -470,7 +470,7 @@
 		AND exam_feedback.institute_id = ${institute.id} AND video_id is null AND question_id is NULL
 		order by exam_feedback.created_date desc
 		<if test = "startIndex != null">
-    		LIMIT ${startIndex}, ${startIndex + 20}
+    		LIMIT ${startIndex}, 20
     	</if>
 		;
 	</select>
