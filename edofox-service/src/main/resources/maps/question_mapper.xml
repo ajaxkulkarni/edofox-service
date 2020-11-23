@@ -357,8 +357,11 @@
 		<if test="requestType == 'Resolved'">
 			AND resolution is NOT NULL
 		</if>
-		<if test="fromDate != null &amp;&amp; toDate != null">
-			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		<if test="startTime != null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date between '${startTime}' AND '${endTime}'
+		</if>
+		<if test="startTime == null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date &lt; '${endTime}'
 		</if>
 		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
 			AND student_id = ${student.id}
@@ -378,7 +381,7 @@
 		</if>
 		order by exam_feedback.created_date desc
 		<if test = "startIndex != null">
-    		LIMIT ${startIndex}, ${startIndex + 20}
+    		LIMIT ${startIndex},  20
     	</if>
 	
 		;
@@ -408,8 +411,11 @@
 		<if test="requestType == 'Resolved'">
 			AND resolution is NOT NULL
 		</if>
-		<if test="fromDate != null &amp;&amp; toDate != null">
-			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		<if test="startTime != null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date between '${startTime}' AND '${endTime}'
+		</if>
+		<if test="startTime == null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date &lt; '${endTime}'
 		</if>
 		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
 			AND student_id = ${student.id}
@@ -431,7 +437,7 @@
 		order by exam_feedback.created_date desc;
 	
 		<if test = "startIndex != null">
-    		LIMIT ${startIndex}, ${startIndex + 20}
+    		LIMIT ${startIndex}, 20
     	</if>
 	</select>
 	
@@ -452,8 +458,11 @@
 		<if test="requestType == 'Resolved'">
 			AND resolution is NOT NULL
 		</if>
-		<if test="fromDate != null &amp;&amp; toDate != null">
-			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		<if test="startTime != null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date between '${startTime}' AND '${endTime}'
+		</if>
+		<if test="startTime == null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date &lt; '${endTime}'
 		</if>
 		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
 			AND student_id = ${student.id}
@@ -494,8 +503,11 @@
 		<if test="requestType == 'Resolved'">
 			AND resolution is NOT NULL
 		</if>
-		<if test="fromDate != null &amp;&amp; toDate != null">
-			AND exam_feedback.created_date between '${fromDate}' AND '${toDate}'
+		<if test="startTime != null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date between '${startTime}' AND '${endTime}'
+		</if>
+		<if test="startTime == null &amp;&amp; endTime != null">
+			AND exam_feedback.created_date &lt; '${endTime}'
 		</if>
 		<if test="student != null  &amp;&amp; student.id != null &amp;&amp; student.accessType == null">
 			AND student_id = ${student.id}

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -870,8 +871,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			EdoTest test = new EdoTest();
-			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
-			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
+			setDates(request);
+			//request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
+			//request.setToDate(CommonUtils.getEndDate(request.getToDate()));
 			if(StringUtils.equals(request.getSearchFilter(), "Videos")) {
 				List<EdoQuestion> videoFeedback = testsDao.getVideoFeedback(request);
 				if(CollectionUtils.isNotEmpty(videoFeedback)) {
@@ -906,14 +908,41 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		return response;
 	}
+
+	private void setDates(EdoServiceRequest request) {
+		String startTime = request.getStartTime();
+		if(StringUtils.isNotBlank(startTime)) {
+			//Set start and end times
+			if(StringUtils.contains(startTime, "last")) {
+				String days = StringUtils.removeStart(startTime, "last");
+				if(StringUtils.isNotBlank(days)) {
+					request.setEndTime(CommonUtils.convertDate(CommonUtils.getEndDate(new Date())));
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.DATE, - new Integer(days));
+					request.setStartTime(CommonUtils.convertDate(CommonUtils.getStartDate(cal.getTime())));
+				}
+			} else if (StringUtils.contains(startTime, "old")) {
+				String days = StringUtils.removeStart(startTime, "old");
+				if(StringUtils.isNotBlank(days)) {
+					Calendar cal = Calendar.getInstance();
+					cal.add(Calendar.DATE, - new Integer(days));
+					request.setEndTime(CommonUtils.convertDate(CommonUtils.getEndDate(cal.getTime())));
+				}
+			}
+		}
+	}
 	
 	public EdoServiceResponse getFeedbackSummary(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
-			request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
-			request.setToDate(CommonUtils.getEndDate(request.getToDate()));
+			setDates(request);
+			//request.setFromDate(CommonUtils.getStartDate(request.getFromDate()));
+			//request.setToDate(CommonUtils.getEndDate(request.getToDate()));
 			EdoQuestion feedbackData = testsDao.getFeedbackSummary(request);
+			request.setRequestType(null);
+			EdoQuestion total = testsDao.getFeedbackSummary(request);
 			response.setSubjects(testsDao.getDoubtSubjects(request));
+			feedbackData.setResult(total.getFeedback().getFrequency());
 			response.setQuestion(feedbackData);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
