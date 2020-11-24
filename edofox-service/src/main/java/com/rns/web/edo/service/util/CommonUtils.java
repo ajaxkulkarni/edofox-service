@@ -556,30 +556,40 @@ public class CommonUtils {
 			}
 			
 		}
-		//Look for subject now found
-		for(String subject: existing.getSubjects()) {
+		
+		setupSubjectAnalysis(existing, subjectAnalysis);
+		
+		return subjectAnalysis;
+	}
+
+	public static void setupSubjectAnalysis(EdoTest existing, List<EdoStudentSubjectAnalysis> subjectAnalysis) {
+		
+		if(existing == null || CollectionUtils.isEmpty(existing.getSubjects())) {
+			return;
+		}
+
+		// Look for subject now found
+		for (String subject : existing.getSubjects()) {
 			boolean found = false;
-			for(EdoStudentSubjectAnalysis map: subjectAnalysis) {
-				if(subject.equals(map.getSubject())) {
+			for (EdoStudentSubjectAnalysis map : subjectAnalysis) {
+				if (subject.equals(map.getSubject())) {
 					found = true;
 					break;
 				}
 			}
-			if(!found) {
+			if (!found) {
 				EdoStudentSubjectAnalysis analysis = new EdoStudentSubjectAnalysis();
 				analysis.setSubject(subject);
 				subjectAnalysis.add(analysis);
 			}
 		}
-		
+
 		Collections.sort(subjectAnalysis, new Comparator<EdoStudentSubjectAnalysis>() {
 
 			public int compare(EdoStudentSubjectAnalysis o1, EdoStudentSubjectAnalysis o2) {
 				return o1.getSubject().compareTo(o2.getSubject());
 			}
 		});
-		
-		return subjectAnalysis;
 	}
 
 	public static void main(String[] args) {

@@ -42,6 +42,7 @@ import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
+import com.rns.web.edo.service.domain.EDOStudentAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoFeedback;
@@ -243,7 +244,12 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				existing.setSubjects(subjectsList);
 			}
 			
-			List<EdoStudent> students = testsDao.getStudentResults(test.getId());
+			List<EdoStudent> students = null;
+			if(StringUtils.equals(request.getRequestType(), "SHOW_ABSENT")) {
+				students = testsDao.getStudentResultsWithAbsent(test.getId());
+			} else {
+				students = testsDao.getStudentResults(test.getId());
+			}
 			
 			if(CollectionUtils.isNotEmpty(students)) {
 				List<EdoTestStudentMap> subjectScores = testsDao.getSubjectwiseScore(test.getId());
@@ -251,6 +257,12 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					Integer rank = 0;
 					for(EdoStudent student: students) {
 						if(student.getAnalysis() == null) {
+							List<EdoStudentSubjectAnalysis> subjectAnalysis = new ArrayList<EdoStudentSubjectAnalysis>();
+							CommonUtils.setupSubjectAnalysis(existing, subjectAnalysis);
+							EDOStudentAnalysis studentAnalysis = new EDOStudentAnalysis();
+							studentAnalysis.setSubjectScores(subjectAnalysis);
+							studentAnalysis.setStatus("Absent");
+							student.setAnalysis(studentAnalysis);
 							continue;
 						}
 						rank++;

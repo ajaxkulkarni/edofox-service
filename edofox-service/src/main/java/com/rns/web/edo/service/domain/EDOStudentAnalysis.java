@@ -12,6 +12,7 @@ public class EDOStudentAnalysis {
 	private List<EdoStudentSubjectAnalysis> subjectScores;
 	private Integer rank;
 	private Integer totalStudents;
+	private String status;
 	
 	public Integer getSolvedCount() {
 		return solvedCount;
@@ -54,6 +55,12 @@ public class EDOStudentAnalysis {
 	}
 	public void setTotalStudents(Integer totalStudents) {
 		this.totalStudents = totalStudents;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

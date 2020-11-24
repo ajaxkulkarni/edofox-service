@@ -96,6 +96,12 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		select *,student.id as studentId from test_status join student on test_status.student_id = student.id where test_status.test_id = ${value} order by test_status.score desc
 	</select>
 	
+	<select id="getStudentResultsWithAbsent" resultMap="students" parameterType="Integer">
+		select *,student.id as studentId from student join student_institute on student.id = student_institute.student_id left join test_status on test_status.student_id = student.id AND test_status.test_id = ${value} 
+		where student_institute.package_id = (select package_id from test where test_id = ${value}) 
+		order by test_status.score desc
+	</select>
+	
 	<resultMap id="subjectScore" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
 
 		<result column="student_id" property="student.id" />
