@@ -43,6 +43,7 @@ import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
+import com.rns.web.edo.service.domain.EdoQuestionCriteria;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
@@ -181,6 +182,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			test.setSections(new ArrayList<String>());
+			
+			//Get criterias
+			List<EdoQuestionCriteria> criterias = testsDao.getCriterias();
 
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
@@ -207,6 +211,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(StringUtils.isNotBlank(question.getSection())) {
 					if(!test.getSections().contains(question.getSection())) {
 						test.getSections().add(question.getSection());
+					}
+				}
+				
+				//Set criteria
+				if(CollectionUtils.isNotEmpty(criterias)) {
+					question.getDetails().setCriterias(new ArrayList<EdoQuestionCriteria>());
+					for(EdoQuestionCriteria criteria: criterias) {
+						if(question.getDetails() != null && StringUtils.contains(question.getDetails().getSetter_criteria(), criteria.getId())) {
+							question.getDetails().getCriterias().add(criteria);
+						}
 					}
 				}
 				

@@ -123,6 +123,12 @@
 		
 	</resultMap>
 	
+	<resultMap type="com.rns.web.edo.service.domain.EdoQuestionCriteria" id="criteria">
+		<id property="id" column="id" />
+		<result property="criteria" column="criteria" />
+		
+	</resultMap>
+	
 	<!-- <resultMap type="com.rns.web.edo.service.domain.jpa.EdoDeviceId" id="deviceId">
 		<id property="id" column="id" />
 		<result property="token" column="token" />

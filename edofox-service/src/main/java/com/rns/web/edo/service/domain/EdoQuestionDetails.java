@@ -1,5 +1,7 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.List;
+
 public class EdoQuestionDetails {
 	
 	private String name_of_publication;//": "dddd", "
@@ -15,7 +17,11 @@ public class EdoQuestionDetails {
 	private Integer setter_id;
 	private Integer board_id;
 	private Integer mht_cet_no_of_ques;
-
+	private String setter_question_type;
+	private String setter_criteria;
+	private String setter_difficulty_level;
+	private List<EdoQuestionCriteria> criterias;
+	
 	
 	public String getTopics() {
 		return topics;
@@ -95,7 +101,30 @@ public class EdoQuestionDetails {
 	public void setMht_cet_no_of_ques(Integer mht_cet_no_of_ques) {
 		this.mht_cet_no_of_ques = mht_cet_no_of_ques;
 	}
-	
+	public String getSetter_question_type() {
+		return setter_question_type;
+	}
+	public void setSetter_question_type(String setter_question_type) {
+		this.setter_question_type = setter_question_type;
+	}
+	public String getSetter_criteria() {
+		return setter_criteria;
+	}
+	public void setSetter_criteria(String setter_criteria) {
+		this.setter_criteria = setter_criteria;
+	}
+	public String getSetter_difficulty_level() {
+		return setter_difficulty_level;
+	}
+	public void setSetter_difficulty_level(String setter_difficulty_level) {
+		this.setter_difficulty_level = setter_difficulty_level;
+	}
+	public List<EdoQuestionCriteria> getCriterias() {
+		return criterias;
+	}
+	public void setCriterias(List<EdoQuestionCriteria> criterias) {
+		this.criterias = criterias;
+	}
 	
 
 }

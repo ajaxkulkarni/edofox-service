@@ -89,11 +89,15 @@
 	
 	<insert id="addQuestionDetails" parameterType="com.rns.web.edo.service.domain.EdoQuestion">
 	insert into questions_details (question_id, name_of_publication, page_number, paragraph_number,line_no, self_created,
-	neet_no_of_ques, jee_no_of_ques, setter_id, mht_cet_no_of_ques)
+	neet_no_of_ques, jee_no_of_ques, setter_id, mht_cet_no_of_ques,setter_criteria, setter_question_type, setter_difficulty_level)
 	values (${id}, '${details.name_of_publication}', '${details.page_number}', '${details.paragraph_number}', '${details.line_no}',
 	${details.self_created}, ${details.neet_no_of_ques}, ${details.jee_no_of_ques}, ${details.setter_id}, 
-	${details.mht_cet_no_of_ques})
+	${details.mht_cet_no_of_ques}, '${details.setter_criteria}', '${details.setter_question_type}', '${details.setter_difficulty_level}')
 	</insert>
+	
+	<select id="getCriterias" resultMap="criteria">
+		SELECT * FROM question_criteria
+	</select>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"
 		parameterType="Integer">
