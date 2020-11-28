@@ -1415,6 +1415,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(request.getQuestionSuffix() == null) {
 				request.setQuestionSuffix("");
 			}
+			if(request.getTest() == null)  {
+				request.setTest(new EdoTest());
+			}
 			request.getTest().setTest(EdoPDFUtil.pdfBox(request, fileData, folderPath));
 			response.setTest(request.getTest()); 
 		} catch (Exception e) {
@@ -1490,6 +1493,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						return 0;
 					}
 				});
+				if(request.getTest() == null) {
+					request.setTest(new EdoTest());
+				}
 				request.getTest().setTest(questions);
 				response.setTest(request.getTest());
 			}
