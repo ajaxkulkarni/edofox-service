@@ -340,20 +340,24 @@ public class EdoAdminController {
 	public EdoServiceResponse parsePdf(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition fileDetails,
 			@FormDataParam("testId") Integer testId, @FormDataParam("buffer") Integer buffer, 
 			@FormDataParam("questionSuffix") String questionSuffix, @FormDataParam("questionPrefix") String questionPrefix,
-			@FormDataParam("fromQuestion") Integer fromQuestion, @FormDataParam("toQuestion") Integer toQuestion
+			@FormDataParam("fromQuestion") Integer fromQuestion, @FormDataParam("toQuestion") Integer toQuestion, 
+			@FormDataParam("filePath") String filePath
 			) {
 		LoggingUtil.logMessage("Parse PDF request :" + testId + " for " + fileDetails.getFileName(), LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			EdoAdminRequest request = new EdoAdminRequest();
-			EdoTest test = new EdoTest();
-			test.setId(testId);
-			request.setTest(test);
+			if(testId != null) {
+				EdoTest test = new EdoTest();
+				test.setId(testId);
+				request.setTest(test);
+			}
 			request.setBuffer(buffer);
 			request.setQuestionPrefix(questionPrefix);
 			request.setQuestionSuffix(questionSuffix);
 			request.setFromQuestion(fromQuestion);
 			request.setToQuestion(toQuestion);
+			request.setFilePath(filePath);
 			response = adminBo.parsePdf(request, fileData);
 			LoggingUtil.logMessage("Parsing PDF for " + testId + " completed ..", LoggingUtil.requestLogger);
 		} catch (Exception e) {
