@@ -48,6 +48,7 @@
 		<result column="chapter" property="question.chapter.chapterId" />
 		<result column="chapter_name" property="question.chapter.chapterName" />
 		<result column="level" property="question.level" />
+		<result column="moderator_difficulty_level" property="question.details.moderator_difficulty_level"/>
 	</resultMap>
 
 
@@ -61,6 +62,8 @@
 		on test_questions.subject_id = test_subjects.subject_id
 		left join chapters
 		on test_questions.chapter = chapters.id
+		left join questions_details
+		on test_questions.id = questions_details.question_id
 		where
 		test.test_id = ${value} 
 		AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)

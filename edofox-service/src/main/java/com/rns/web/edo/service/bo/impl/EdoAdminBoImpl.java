@@ -1400,7 +1400,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	public EdoServiceResponse parsePdf(EdoAdminRequest request, InputStream fileData) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			String folderPath = TEMP_QUESTION_PATH + request.getTest().getId() + "/";
+			String folderName = getFolderName(request);
+			String folderPath = TEMP_QUESTION_PATH + folderName + "/";
 			File dir = new File(folderPath);
 			if(dir.exists()) {
 				FileUtils.cleanDirectory(dir);
@@ -1423,10 +1424,30 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
+	private String getFolderName(Object object) {
+		if(object instanceof EdoAdminRequest) {
+			EdoAdminRequest request = (EdoAdminRequest) object;
+			String folderName = request.getFilePath();
+			if(request.getTest() != null && request.getTest().getId() != null) {
+				folderName = request.getTest().getId().toString();
+			}
+			return folderName;
+		} else {
+			EdoServiceRequest request = (EdoServiceRequest) object;
+			String folderName = request.getFilePath();
+			if(request.getTest() != null && request.getTest().getId() != null) {
+				folderName = request.getTest().getId().toString();
+			}
+			return folderName;
+		}
+		
+	}
+
 	public EdoServiceResponse loadParsedQuestions(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			String folderPath = TEMP_QUESTION_PATH + request.getTest().getId() + "/";
+			String folderName = getFolderName(request);
+			String folderPath = TEMP_QUESTION_PATH + folderName + "/";
 			File folder = new File(folderPath);
 			if(folder.exists()) {
 				List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
@@ -1486,10 +1507,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoApiStatus status = new EdoApiStatus();
 		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
-			EdoTest test = testsDao.getTest(request.getTest().getId());
-			String sourceDir = TEMP_QUESTION_PATH + request.getTest().getId();
+			String folderName = getFolderName(request);
+			EdoTest test = null;
+			if(request.getTest() != null && request.getTest().getId() != null) {
+				test = testsDao.getTest(request.getTest().getId());
+			}
+			String sourceDir = TEMP_QUESTION_PATH + folderName;
 			File source = new File(sourceDir);
-			String destinationDir = TEST_QUESTION_PATH + request.getTest().getId();
+			String destinationDir = TEST_QUESTION_PATH + folderName;
 			File destination = new File(destinationDir);
 			if(!destination.exists()) {
 				destination.mkdirs();

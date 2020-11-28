@@ -31,6 +31,7 @@ public class EdoAdminRequest {
 	private Integer fromQuestion;
 	private Integer toQuestion;
 	private String cropWidth;
+	private String filePath;
 	
 	public List<EdoTestQuestionMap> getTestQuestionMaps() {
 		return testQuestionMaps;
@@ -127,6 +128,12 @@ public class EdoAdminRequest {
 	}
 	public void setCropWidth(String cropWidth) {
 		this.cropWidth = cropWidth;
+	}
+	public String getFilePath() {
+		return filePath;
+	}
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
 	}
 
 }

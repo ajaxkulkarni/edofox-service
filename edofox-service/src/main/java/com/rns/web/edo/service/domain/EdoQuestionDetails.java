@@ -20,6 +20,7 @@ public class EdoQuestionDetails {
 	private String setter_question_type;
 	private String setter_criteria;
 	private String setter_difficulty_level;
+	private String moderator_difficulty_level;
 	private List<EdoQuestionCriteria> criterias;
 	
 	
@@ -124,6 +125,12 @@ public class EdoQuestionDetails {
 	}
 	public void setCriterias(List<EdoQuestionCriteria> criterias) {
 		this.criterias = criterias;
+	}
+	public String getModerator_difficulty_level() {
+		return moderator_difficulty_level;
+	}
+	public void setModerator_difficulty_level(String moderator_difficulty_level) {
+		this.moderator_difficulty_level = moderator_difficulty_level;
 	}
 	
 
