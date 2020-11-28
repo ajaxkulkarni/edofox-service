@@ -1400,7 +1400,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	public EdoServiceResponse parsePdf(EdoAdminRequest request, InputStream fileData) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			String folderName = getFolderName(request);
+			String folderName = CommonUtils.getFolderName(request);
 			String folderPath = TEMP_QUESTION_PATH + folderName + "/";
 			File dir = new File(folderPath);
 			if(dir.exists()) {
@@ -1427,29 +1427,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
-	private String getFolderName(Object object) {
-		if(object instanceof EdoAdminRequest) {
-			EdoAdminRequest request = (EdoAdminRequest) object;
-			String folderName = request.getFilePath();
-			if(request.getTest() != null && request.getTest().getId() != null) {
-				folderName = request.getTest().getId().toString();
-			}
-			return folderName;
-		} else {
-			EdoServiceRequest request = (EdoServiceRequest) object;
-			String folderName = request.getFilePath();
-			if(request.getTest() != null && request.getTest().getId() != null) {
-				folderName = request.getTest().getId().toString();
-			}
-			return folderName;
-		}
-		
-	}
-
 	public EdoServiceResponse loadParsedQuestions(EdoServiceRequest request) {
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			String folderName = getFolderName(request);
+			String folderName = CommonUtils.getFolderName(request);
 			String folderPath = TEMP_QUESTION_PATH + folderName + "/";
 			File folder = new File(folderPath);
 			if(folder.exists()) {
@@ -1465,7 +1446,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							if(CollectionUtils.isNotEmpty(questions)) {
 								for(EdoQuestion question: questions) {
 									if(questionNumber != null && question.getQuestionNumber() != null && question.getQuestionNumber().intValue() == questionNumber.intValue()) {
-										question.setSolutionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber, type));
+										question.setSolutionImageUrl(EdoPDFUtil.getQuestionUrl(CommonUtils.getFolderName(request), questionNumber, type));
 										break;
 									}
 								}
@@ -1473,7 +1454,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						} else {
 							EdoQuestion question = new EdoQuestion();
 							question.setQuestionNumber(questionNumber);
-							question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(request.getTest().getId(), questionNumber, type));
+							question.setQuestionImageUrl(EdoPDFUtil.getQuestionUrl(CommonUtils.getFolderName(request), questionNumber, type));
 							questions.add(question);
 						}
 					}
@@ -1513,7 +1494,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		EdoApiStatus status = new EdoApiStatus();
 		TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
 		try {
-			String folderName = getFolderName(request);
+			String folderName = CommonUtils.getFolderName(request);
 			EdoTest test = null;
 			if(request.getTest() != null && request.getTest().getId() != null) {
 				test = testsDao.getTest(request.getTest().getId());

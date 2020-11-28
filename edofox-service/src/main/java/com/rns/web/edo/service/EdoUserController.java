@@ -165,7 +165,7 @@ public class EdoUserController {
 	@Path("/getTempImage/{testId}/{questionId}/{type}")
 	//@Produces(MediaType.MULTIPART_FORM_DATA)
 	@Produces("image/png")
-	public Response geTempImage(@PathParam("questionId") Integer questionId, @PathParam("testId") Integer testId, @PathParam("type") String type) {
+	public Response geTempImage(@PathParam("questionId") Integer questionId, @PathParam("testId") String testId, @PathParam("type") String type) {
 		//LoggingUtil.logObject("Image request:", userId);
 		try {
 			if(StringUtils.isBlank(type)) {

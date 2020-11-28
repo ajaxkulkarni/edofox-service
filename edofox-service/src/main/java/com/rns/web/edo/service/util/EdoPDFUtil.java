@@ -224,9 +224,9 @@ public class EdoPDFUtil {
 							EdoQuestion question = new EdoQuestion();
 							question.setQuestionNumber(questionNumber);
 							//Timestamp added to avoid caching
-							question.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), questionNumber, EdoConstants.ATTR_TEMP_QUESTION) + "?" + System.currentTimeMillis());
+							question.setQuestionImageUrl(getQuestionUrl(CommonUtils.getFolderName(request), questionNumber, EdoConstants.ATTR_TEMP_QUESTION) + "?" + System.currentTimeMillis());
 							if(solutionY != null) {
-								question.setSolutionImageUrl(getQuestionUrl(request.getTest().getId(), questionNumber, EdoConstants.ATTR_TEMP_SOLUTION) + "?" + System.currentTimeMillis());
+								question.setSolutionImageUrl(getQuestionUrl(CommonUtils.getFolderName(request), questionNumber, EdoConstants.ATTR_TEMP_SOLUTION) + "?" + System.currentTimeMillis());
 							}
 							parsedQuestions.add(question);	
 						}
@@ -263,9 +263,9 @@ public class EdoPDFUtil {
 							
 							EdoQuestion lastQuestion = new EdoQuestion();
 							lastQuestion.setQuestionNumber(list.get(i).getQuestionNumber());
-							lastQuestion.setQuestionImageUrl(getQuestionUrl(request.getTest().getId(), lastQuestion.getQuestionNumber(), EdoConstants.ATTR_TEMP_QUESTION) + "?" + System.currentTimeMillis());
+							lastQuestion.setQuestionImageUrl(getQuestionUrl(CommonUtils.getFolderName(request), lastQuestion.getQuestionNumber(), EdoConstants.ATTR_TEMP_QUESTION) + "?" + System.currentTimeMillis());
 							if(solutionY != null) {
-								lastQuestion.setSolutionImageUrl(getQuestionUrl(request.getTest().getId(), lastQuestion.getQuestionNumber(), EdoConstants.ATTR_TEMP_SOLUTION) + "?" + System.currentTimeMillis());
+								lastQuestion.setSolutionImageUrl(getQuestionUrl(CommonUtils.getFolderName(request), lastQuestion.getQuestionNumber(), EdoConstants.ATTR_TEMP_SOLUTION) + "?" + System.currentTimeMillis());
 							}
 							parsedQuestions.add(lastQuestion);
 							
@@ -343,7 +343,7 @@ public class EdoPDFUtil {
 	}
 
 
-	public static String getQuestionUrl(int testId, Integer questionNumber, String type) {
+	public static String getQuestionUrl(String testId, Integer questionNumber, String type) {
 		return EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL) + "getTempImage/" + testId + "/" + questionNumber + "/" + type;
 	}
 

@@ -33,6 +33,7 @@ import org.hibernate.Session;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoFeedback;
@@ -862,6 +863,25 @@ public class CommonUtils {
 			}
 		}
 		return result;
+	}
+	
+	public static String getFolderName(Object object) {
+		if(object instanceof EdoAdminRequest) {
+			EdoAdminRequest request = (EdoAdminRequest) object;
+			String folderName = request.getFilePath();
+			if(request.getTest() != null && request.getTest().getId() != null) {
+				folderName = request.getTest().getId().toString();
+			}
+			return folderName;
+		} else {
+			EdoServiceRequest request = (EdoServiceRequest) object;
+			String folderName = request.getFilePath();
+			if(request.getTest() != null && request.getTest().getId() != null) {
+				folderName = request.getTest().getId().toString();
+			}
+			return folderName;
+		}
+		
 	}
 	
 }

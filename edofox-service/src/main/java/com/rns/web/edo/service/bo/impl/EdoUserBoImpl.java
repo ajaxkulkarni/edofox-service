@@ -725,7 +725,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return status;
 	}
 	
-	public EdoFile getQuestionImage(Integer questionId, String imageType, Integer testId) {
+	public EdoFile getQuestionImage(Integer questionId, String imageType, String testId) {
 
 		Session session = null;
 		try {
