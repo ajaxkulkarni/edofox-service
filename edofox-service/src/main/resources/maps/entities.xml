@@ -129,6 +129,12 @@
 		
 	</resultMap>
 	
+	<resultMap type="com.rns.web.edo.service.domain.EdoQuestionDifficulty" id="difficulty">
+		<id property="id" column="id" />
+		<result property="difficulty" column="level" />
+		
+	</resultMap>
+	
 	<!-- <resultMap type="com.rns.web.edo.service.domain.jpa.EdoDeviceId" id="deviceId">
 		<id property="id" column="id" />
 		<result property="token" column="token" />

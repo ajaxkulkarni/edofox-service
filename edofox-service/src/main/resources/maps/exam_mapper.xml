@@ -142,7 +142,9 @@
 		<result column="level" property="question.level"/>
 		<result column="question_type" property="question.type"/>
 		<result column="section" property="question.section" />
-		<result column="setter_criteria" property="question.details.setter_criteria"/>
+		<result column="moderator_criteria" property="question.details.moderator_criteria"/>
+		<result column="moderator_difficulty_level" property="question.details.moderator_difficulty_level"/>
+		
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">

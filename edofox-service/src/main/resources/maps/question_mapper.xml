@@ -98,6 +98,10 @@
 	<select id="getCriterias" resultMap="criteria">
 		SELECT * FROM question_criteria
 	</select>
+	
+	<select id="getDifficulties" resultMap="difficulty">
+		SELECT * FROM question_difficulty_level
+	</select>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"
 		parameterType="Integer">

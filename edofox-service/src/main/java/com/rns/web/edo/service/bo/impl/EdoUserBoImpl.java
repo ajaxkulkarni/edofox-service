@@ -44,6 +44,7 @@ import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoQuestionCriteria;
+import com.rns.web.edo.service.domain.EdoQuestionDifficulty;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
@@ -185,7 +186,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//Get criterias
 			List<EdoQuestionCriteria> criterias = testsDao.getCriterias();
-
+			//Get difficulties
+			List<EdoQuestionDifficulty> difficulties = testsDao.getDifficulties();
+			
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
 				CommonUtils.setQuestionURLs(question);
@@ -216,10 +219,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				
 				//Set criteria
 				if(CollectionUtils.isNotEmpty(criterias)) {
-					question.getDetails().setCriterias(new ArrayList<EdoQuestionCriteria>());
-					for(EdoQuestionCriteria criteria: criterias) {
-						if(question.getDetails() != null && StringUtils.contains(question.getDetails().getSetter_criteria(), criteria.getId())) {
-							question.getDetails().getCriterias().add(criteria);
+					if(question.getDetails() != null) {
+						question.getDetails().setCriterias(new ArrayList<EdoQuestionCriteria>());
+						for(EdoQuestionCriteria criteria: criterias) {
+							if(question.getDetails() != null && StringUtils.contains(question.getDetails().getModerator_criteria(), criteria.getId())) {
+								question.getDetails().getCriterias().add(criteria);
+							}
+						}
+					}
+				}
+				
+				//Set difficulty
+				if(CollectionUtils.isNotEmpty(difficulties)) {
+					if(question.getDetails() != null) {
+						for(EdoQuestionDifficulty diff: difficulties) {
+							if(question.getDetails() != null && StringUtils.equals(question.getDetails().getModerator_difficulty_level(), diff.getId().toString())) {
+								question.getDetails().setDifficulty(diff);
+							}
 						}
 					}
 				}

@@ -9,6 +9,7 @@ import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoQuestionCriteria;
+import com.rns.web.edo.service.domain.EdoQuestionDifficulty;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoSubject;
@@ -138,6 +139,6 @@ public interface EdoTestsDao {
 	void saveVideoActiviy(EdoServiceRequest request);
 	List<EdoQuestion> getQuestionBank(EdoQuestion request);
 	List<EdoQuestionCriteria> getCriterias();
-	
+	List<EdoQuestionDifficulty> getDifficulties();
 	
 }

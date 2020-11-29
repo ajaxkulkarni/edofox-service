@@ -19,10 +19,11 @@ public class EdoQuestionDetails {
 	private Integer mht_cet_no_of_ques;
 	private String setter_question_type;
 	private String setter_criteria;
+	private String moderator_criteria;
 	private String setter_difficulty_level;
 	private String moderator_difficulty_level;
 	private List<EdoQuestionCriteria> criterias;
-	
+	private EdoQuestionDifficulty difficulty;
 	
 	public String getTopics() {
 		return topics;
@@ -131,6 +132,18 @@ public class EdoQuestionDetails {
 	}
 	public void setModerator_difficulty_level(String moderator_difficulty_level) {
 		this.moderator_difficulty_level = moderator_difficulty_level;
+	}
+	public EdoQuestionDifficulty getDifficulty() {
+		return difficulty;
+	}
+	public void setDifficulty(EdoQuestionDifficulty difficulty) {
+		this.difficulty = difficulty;
+	}
+	public String getModerator_criteria() {
+		return moderator_criteria;
+	}
+	public void setModerator_criteria(String moderator_criteria) {
+		this.moderator_criteria = moderator_criteria;
 	}
 	
 
