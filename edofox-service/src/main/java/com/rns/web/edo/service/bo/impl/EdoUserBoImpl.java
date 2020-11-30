@@ -218,27 +218,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				
 				//Set criteria
-				if(CollectionUtils.isNotEmpty(criterias)) {
-					if(question.getDetails() != null) {
-						question.getDetails().setCriterias(new ArrayList<EdoQuestionCriteria>());
-						for(EdoQuestionCriteria criteria: criterias) {
-							if(question.getDetails() != null && StringUtils.contains(question.getDetails().getModerator_criteria(), criteria.getId())) {
-								question.getDetails().getCriterias().add(criteria);
-							}
-						}
-					}
-				}
+				setCriteria(criterias, question);
 				
 				//Set difficulty
-				if(CollectionUtils.isNotEmpty(difficulties)) {
-					if(question.getDetails() != null) {
-						for(EdoQuestionDifficulty diff: difficulties) {
-							if(question.getDetails() != null && StringUtils.equals(question.getDetails().getModerator_difficulty_level(), diff.getId().toString())) {
-								question.getDetails().setDifficulty(diff);
-							}
-						}
-					}
-				}
+				setDifficulty(difficulties, question);
 				
 				test.getTest().add(question);
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
@@ -267,6 +250,31 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		return response;
+	}
+
+	private void setDifficulty(List<EdoQuestionDifficulty> difficulties, EdoQuestion question) {
+		if(CollectionUtils.isNotEmpty(difficulties)) {
+			if(question.getDetails() != null) {
+				for(EdoQuestionDifficulty diff: difficulties) {
+					if(question.getDetails() != null && StringUtils.equals(question.getDetails().getModerator_difficulty_level(), diff.getId().toString())) {
+						question.getDetails().setDifficulty(diff);
+					}
+				}
+			}
+		}
+	}
+
+	private void setCriteria(List<EdoQuestionCriteria> criterias, EdoQuestion question) {
+		if(CollectionUtils.isNotEmpty(criterias)) {
+			if(question.getDetails() != null) {
+				question.getDetails().setCriterias(new ArrayList<EdoQuestionCriteria>());
+				for(EdoQuestionCriteria criteria: criterias) {
+					if(question.getDetails() != null && StringUtils.contains(question.getDetails().getModerator_criteria(), criteria.getId())) {
+						question.getDetails().getCriterias().add(criteria);
+					}
+				}
+			}
+		}
 	}
 
 	public EdoServiceResponse getTest(Integer testId, Integer studenId) {
@@ -398,6 +406,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				
 				Integer count = 1;
 				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
+				
+				//Get criterias
+				List<EdoQuestionCriteria> criterias = testsDao.getCriterias();
+				//Get difficulties
+				List<EdoQuestionDifficulty> difficulties = testsDao.getDifficulties();
+				
 				for(EdoTestQuestionMap mapper: map) {
 					EdoQuestion question = mapper.getQuestion();
 					if(question != null) {
@@ -431,6 +445,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 								sectionSets.put(question.getSection(), questionList);
 							}
 						}
+						
+						setCriteria(criterias, question);
+						setDifficulty(difficulties, question);
+						
 						result.getTest().add(question);
 						count++;
 					}
