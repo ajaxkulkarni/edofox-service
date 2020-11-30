@@ -269,7 +269,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(question.getDetails() != null) {
 				question.getDetails().setCriterias(new ArrayList<EdoQuestionCriteria>());
 				for(EdoQuestionCriteria criteria: criterias) {
-					if(question.getDetails() != null && StringUtils.contains(question.getDetails().getModerator_criteria(), criteria.getId())) {
+					if(question.getDetails() != null && StringUtils.contains(question.getDetails().getModerator_criteria(), criteria.getId().toString())) {
 						question.getDetails().getCriterias().add(criteria);
 					}
 				}
