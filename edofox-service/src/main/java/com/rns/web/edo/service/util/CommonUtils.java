@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -872,6 +873,17 @@ public class CommonUtils {
 			}
 		}
 		return result;
+	}
+
+	public static String createUniversalToken(EdoStudent student) {
+		if(student == null || student.getId() == null) {
+			return "";
+		}
+		if(StringUtils.isBlank(student.getName())) {
+			return "";
+		}
+		String firstLetter = StringUtils.substring(student.getName(), 0, 1);
+		return DigestUtils.sha256Hex(firstLetter + "_" + student.getId());
 	}
 	
 }

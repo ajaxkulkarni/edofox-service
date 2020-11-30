@@ -579,6 +579,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(student.getPackages())) {
 				if(!update) {
 					student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
+					student.setToken(CommonUtils.createUniversalToken(student));
 					LoggingUtil.logMessage("Adding student login for =>" + student.getId());
 					testsDao.saveLogin(student);
 				}

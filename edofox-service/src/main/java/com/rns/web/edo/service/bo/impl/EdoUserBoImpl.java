@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -865,6 +866,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(CollectionUtils.isNotEmpty(student.getPackages())) {
 						LoggingUtil.logMessage("Adding student login for =>" + student.getId(), LoggingUtil.paymentLogger);
 						student.setInstituteId(student.getPackages().get(0).getInstitute().getId().toString());
+						student.setToken(CommonUtils.createUniversalToken(student));
 						testsDao.saveLogin(student);
 					}
 				} else {
