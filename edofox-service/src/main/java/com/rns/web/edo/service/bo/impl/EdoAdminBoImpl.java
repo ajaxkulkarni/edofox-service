@@ -1043,6 +1043,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				status.setStatus(-111, result);
 				return status;
 			}
+			if(StringUtils.isNotBlank(student.getToken())) {
+				status.setResponseText(student.getToken());
+			}
 			//txManager.commit(txStatus);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
