@@ -571,6 +571,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return ERROR_STUDENT_NOT_FOUND;
 			}
 			student.setId(existingStudent.get(0).getId());
+			if(StringUtils.isNotBlank(student.getToken())) {
+				//Update student details also
+				testsDao.updateStudent(student);
+			}
 		}
 		
 		

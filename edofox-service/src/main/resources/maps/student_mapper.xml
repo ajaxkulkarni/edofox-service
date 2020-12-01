@@ -233,7 +233,10 @@
 		select * from student_login 
 		join institute on student_login.institute_id = institute.id 
 		join student on student_login.student_id = student.id 
-		where student_login.username = '${rollNo}'
+		where student_login.username = '${rollNo}' 
+		<if test="token != null">
+			OR student_login.universal_token = '${token}'		
+		</if>
 	</select>
 	
 	<select id="getStudentActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedback">
