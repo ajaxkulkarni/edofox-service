@@ -1017,12 +1017,12 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return status;
 			}
 			
-			if(StringUtils.isBlank(student.getPhone())) {
+			if(StringUtils.isBlank(student.getPhone()) ) {
 				status.setStatus(-111, "Please provide valid student phone number ..");
 				return status;
 			}
 			
-			if(StringUtils.isBlank(student.getRollNo())) {
+			if(StringUtils.isBlank(student.getRollNo()) && StringUtils.isBlank(student.getToken())) {
 				status.setStatus(-111, "Please provide valid student roll number/username ..");
 				return status;
 			}
@@ -2031,5 +2031,25 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			status.setStatus(-111, ERROR_IN_PROCESSING);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse savePackage(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			EDOPackage currentPackage = request.getStudent().getCurrentPackage();
+			if(currentPackage.getId() != null) {
+				if(currentPackage.getStatus().equals("D")) {
+					currentPackage.setDisabled(1);
+				}
+				testsDao.updatePackage(currentPackage);
+			} else {
+				testsDao.createPackage(currentPackage);
+				response.setStudent(request.getStudent());
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-11, ERROR_IN_PROCESSING));
+		}
+		return response;
 	}
 }

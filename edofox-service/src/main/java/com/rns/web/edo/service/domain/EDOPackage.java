@@ -22,6 +22,7 @@ public class EDOPackage {
 	private Date fromDate;
 	private Date toDate;
 	private Long timeLeft;
+	private Integer disabled;
 	
 	public Integer getId() {
 		return id;
@@ -94,6 +95,12 @@ public class EDOPackage {
 	}
 	public void setTimeLeft(Long timeLeft) {
 		this.timeLeft = timeLeft;
+	}
+	public Integer getDisabled() {
+		return disabled;
+	}
+	public void setDisabled(Integer disabled) {
+		this.disabled = disabled;
 	}
 	
 }

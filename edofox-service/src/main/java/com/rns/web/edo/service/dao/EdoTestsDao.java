@@ -95,6 +95,7 @@ public interface EdoTestsDao {
 	Integer saveInstitute(EDOInstitute institute);
 	void createAdminLogin(EDOInstitute institute);
 	Integer createPackage(EDOPackage pkg);
+	void updatePackage(EDOPackage pkg);
 	Integer addTest(EdoTestStudentMap map);
 	Integer isAdminLogin(EDOInstitute institute);
 	void deductQuota(EDOInstitute institute);

@@ -485,4 +485,13 @@ public class EdoAdminController {
 		response.setStatus(adminBo.sendNotification(request));
 		return response;
 	}
+	
+
+	@POST
+	@Path("/savePackage")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse savePackage(EdoServiceRequest request) {
+		return adminBo.savePackage(request);
+	}
 }

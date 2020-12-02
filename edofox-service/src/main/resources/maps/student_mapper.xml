@@ -233,9 +233,15 @@
 		select * from student_login 
 		join institute on student_login.institute_id = institute.id 
 		join student on student_login.student_id = student.id 
-		where student_login.username = '${rollNo}' 
+		where 
+		<if test="rollNo != null &amp;&amp; rollNo != ''">
+			student_login.username = '${rollNo}' 
+		</if>
 		<if test="token != null">
-			OR student_login.universal_token = '${token}'		
+			<if test="rollNo != null &amp;&amp; rollNo != ''">
+				OR 
+			</if>
+			student_login.universal_token = '${token}'		
 		</if>
 	</select>
 	

@@ -33,6 +33,17 @@
 		insert into packages (package_name, institute_id, created_date, price) values('${name}', ${institute.id}, CURRENT_TIMESTAMP, 0);
 	</insert>
 	
+	<update id="updatePackage" parameterType="com.rns.web.edo.service.domain.EDOPackage">
+		update packages set 
+		<if test="disabled == null">
+		package_name = '${name}' 
+		</if>
+		<if test="disabled != null">
+		is_disabled = ${disabled}
+		</if>
+		where id = ${id}
+	</update>
+	
 	<select id="isAdminLogin" parameterType="com.rns.web.edo.service.domain.EDOInstitute" resultType="Integer">
 		select count(*) from admin where username like '${username}';
 	</select>
