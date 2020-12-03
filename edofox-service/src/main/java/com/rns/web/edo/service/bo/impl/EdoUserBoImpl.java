@@ -1837,7 +1837,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				return response;
 			} else {
 				EdoStudent edoStudent = existing.get(0);
-				if (StringUtils.equals(student.getPassword(), edoStudent.getPassword())) {
+				if (StringUtils.equals(student.getPassword(), edoStudent.getPassword()) || StringUtils.isNotBlank(student.getToken())) {
 					response.setStudent(edoStudent);
 				} else {
 					response.setStatus(new EdoApiStatus(-111, "Username and password incorrect. Please try again."));
