@@ -62,6 +62,7 @@ public class EdoQuestion {
 	private Integer class_id;
 	private String short_explanation;
 	private String topicName;
+	private String subjectwise_question_number;
 	
 	public String getOption1() {
 		return option1;
@@ -378,6 +379,12 @@ public class EdoQuestion {
 	}
 	public void setTopicName(String topicName) {
 		this.topicName = topicName;
+	}
+	public String getSubjectwise_question_number() {
+		return subjectwise_question_number;
+	}
+	public void setSubjectwise_question_number(String subjectwise_question_number) {
+		this.subjectwise_question_number = subjectwise_question_number;
 	}
 
 }
