@@ -1507,6 +1507,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				destination.mkdirs();
 				//FileUtils.deleteDirectory(destination);
 			}
+			LoggingUtil.logMessage("Folder " + sourceDir + " has " + source.listFiles());
 			if(ArrayUtils.isNotEmpty(source.listFiles())) {
 			
 				LoggingUtil.logMessage("Moving all files from directory " + sourceDir + " to " + destinationDir);
