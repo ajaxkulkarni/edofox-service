@@ -67,6 +67,7 @@ public interface EdoTestsDao {
 	EDOPackage getTestPackage(Integer testId);
 	EdoStudent getStudentById(Integer id);
 	int updateStudent(EdoStudent student);
+	void deleteLogin(EdoStudent student);
 	List<EDOPackage> getLiveSessions(EDOPackage pkg);
 	List<EdoStudent> getStudentByRollNo(EdoStudent student);
 	List<EdoStudent> getStudentLogin(EdoStudent student);

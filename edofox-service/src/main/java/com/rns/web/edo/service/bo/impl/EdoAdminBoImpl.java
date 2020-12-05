@@ -536,7 +536,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}*/
 		
 		boolean update = false;
-		if(StringUtils.equals(request.getRequestType(), "ADD_PKG")) {
+		if(StringUtils.equals(request.getRequestType(), "ADD_PKG") || StringUtils.equals(request.getRequestType(), "REMOVE")) {
 			update = true;
 		}
 		
@@ -572,8 +572,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 			student.setId(existingStudent.get(0).getId());
 			if(StringUtils.isNotBlank(student.getToken())) {
-				//Update student details also
-				testsDao.updateStudent(student);
+				//If REMOVE request..remove student login from table
+				if(StringUtils.equals("REMOVE", request.getRequestType())) {
+					//Remove student login
+					testsDao.deleteLogin(student);
+				} else {
+					//Update student details also
+					testsDao.updateStudent(student);
+				}
 			}
 		}
 		
@@ -596,8 +602,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				//LoggingUtil.logMessage("Removing student package IF PRESENT for =>" + student.getId());
 				testsDao.deleteExistingPackages(student);
 				//}
-				LoggingUtil.logMessage("Adding student package for =>" + student.getId());
-				testsDao.createStudentPackage(student);
+				if(!StringUtils.equals("REMOVE", request.getRequestType())) {
+					LoggingUtil.logMessage("Adding student package for =>" + student.getId());
+					testsDao.createStudentPackage(student);
+				}
 			}
 		}
 		EDOInstitute currentInstitute = testsDao.getInstituteById(request.getInstitute().getId());
@@ -1011,25 +1019,27 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				status.setStatus(-111, "Please provide valid student information ..");
 				return status;
 			}
-			
-			if(StringUtils.isBlank(student.getName())) {
-				status.setStatus(-111, "Please provide valid student name ..");
-				return status;
-			}
-			
-			if(StringUtils.isBlank(student.getPhone()) ) {
-				status.setStatus(-111, "Please provide valid student phone number ..");
-				return status;
-			}
-			
-			if(StringUtils.isBlank(student.getRollNo()) && StringUtils.isBlank(student.getToken())) {
-				status.setStatus(-111, "Please provide valid student roll number/username ..");
-				return status;
-			}
-			
-			if(CollectionUtils.isEmpty(student.getPackages())) {
-				status.setStatus(-111, "Please provide atleast one valid package ..");
-				return status;
+			if(StringUtils.isBlank(student.getToken())) {
+				
+				if(StringUtils.isBlank(student.getName())) {
+					status.setStatus(-111, "Please provide valid student name ..");
+					return status;
+				}
+				
+				if(StringUtils.isBlank(student.getPhone()) ) {
+					status.setStatus(-111, "Please provide valid student phone number ..");
+					return status;
+				}
+				
+				if(StringUtils.isBlank(student.getRollNo())) {
+					status.setStatus(-111, "Please provide valid student roll number/username ..");
+					return status;
+				}
+				
+				if(CollectionUtils.isEmpty(student.getPackages())) {
+					status.setStatus(-111, "Please provide atleast one valid package ..");
+					return status;
+				}
 			}
 			
 			if(StringUtils.isBlank(student.getPassword())) {

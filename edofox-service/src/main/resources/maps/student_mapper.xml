@@ -94,6 +94,10 @@
 		'${casteCategory}'
 		where id = ${id}
 	</update>
+	
+	<update id="deleteLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent">
+		delete from student_login where student_id = ${id}
+	</update>
 
 	<insert id="createStudentPackage" parameterType="com.rns.web.edo.service.domain.EdoStudent"
 		useGeneratedKeys="true" keyProperty="transactionId" keyColumn="id">
