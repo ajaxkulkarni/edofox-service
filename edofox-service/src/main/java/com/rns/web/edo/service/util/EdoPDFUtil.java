@@ -239,7 +239,12 @@ public class EdoPDFUtil {
 							
 							float startY = 0;
 							if(edoPDFCoordinate.getWhiteSpaceY() != null) {
-								startY = edoPDFCoordinate.getWhiteSpaceY();
+								if(edoPDFCoordinate.getLastTextY() != null && edoPDFCoordinate.getLastTextY() < edoPDFCoordinate.getWhiteSpaceY()) {
+									startY = edoPDFCoordinate.getLastTextY();
+								} else {
+									startY = edoPDFCoordinate.getWhiteSpaceY();
+								}
+								
 							} else if (edoPDFCoordinate.getLastTextY() != null) {
 								startY = edoPDFCoordinate.getLastTextY();
 							}
