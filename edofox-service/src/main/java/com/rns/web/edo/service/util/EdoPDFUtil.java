@@ -149,6 +149,7 @@ public class EdoPDFUtil {
 								questionCount++;
 							} else if (StringUtils.contains(text, ":Solution:")) {
 								coord.setSolutionY(firstProsition.getEndY());
+								coord.setWhiteSpaceY(null);
 								System.out.println("Solution found at " + firstProsition.getEndY());
 							} else if (coord != null) {
 								coord.setLastTextY(firstProsition.getEndY());
@@ -244,6 +245,11 @@ public class EdoPDFUtil {
 							}
 							//for last item
 							float height = edoPDFCoordinate.getY() - startY + edoPDFCoordinate.getHeight() + request.getBuffer();
+							
+							if(startY > request.getBuffer()) {
+								startY = startY - request.getBuffer(); //Add some buffer to starting Y as its last line of PDF
+								height = height + request.getBuffer();
+							}
 							
 							//If solution is present at the bottom of the question
 							Float solutionY = edoPDFCoordinate.getSolutionY();
