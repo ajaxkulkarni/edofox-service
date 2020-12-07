@@ -1059,7 +1059,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			// byte[] buffer = new byte[fileData.available()];
 			// fileData.read(buffer);
 			String folderName = CommonUtils.getFolderName(request);
-			FileOutputStream fileOutputStream = new FileOutputStream(TEMP_QUESTION_PATH + folderName + "/" + request.getRequestType());
+			String fullPath = TEMP_QUESTION_PATH + folderName + "/" + request.getRequestType();
+			FileOutputStream fileOutputStream = new FileOutputStream(fullPath);
 			//IOUtils.copy(fileData, fileOutputStream);
 			//FileOutputStream out = new FileOutputStream(new File(fileLocation));
 			int read = 0;
@@ -1069,6 +1070,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 			fileOutputStream.flush();
 			fileOutputStream.close();
+			
+			LoggingUtil.logMessage("Cropped file written to " + fullPath);
 
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));

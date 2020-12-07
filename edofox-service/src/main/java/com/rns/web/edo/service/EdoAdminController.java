@@ -21,6 +21,7 @@ import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
+import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoExcelUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.sun.jersey.core.header.FormDataContentDisposition;
@@ -279,7 +280,7 @@ public class EdoAdminController {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse cropQuestionImage(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
 			@FormDataParam("testId") Integer testId, @FormDataParam("fileName") String fileName, @FormDataParam("filePath") String filePath) {
-		//LoggingUtil.logMessage("Crop image request :" + testId + " for " + fileName);
+		LoggingUtil.logMessage("Crop image request :" + filePath + " for " + fileName);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			EdoServiceRequest request = new EdoServiceRequest();
@@ -292,6 +293,7 @@ public class EdoAdminController {
 			//LoggingUtil.logMessage("Crop image completed ..");
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));
 		}
 		return response;
 	}
