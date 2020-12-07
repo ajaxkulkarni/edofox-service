@@ -581,6 +581,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		answer.setMarks(request.getQuestion().getMarks());
 		answer.setUpdatedDate(new Date());
 		
+		//Save random question number
+		if(request.getQuestion().getId() != null) {
+			answer.setQuestionNumber(request.getQuestion().getId());
+		}
+		
 		if(answer.getId() == null) {
 			session.persist(answer);
 		}

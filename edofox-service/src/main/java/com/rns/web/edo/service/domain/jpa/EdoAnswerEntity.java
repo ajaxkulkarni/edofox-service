@@ -40,6 +40,8 @@ public class EdoAnswerEntity {
 	private Date createdDate;
 	@Column(name = "updated_date", unique = true)
 	private Date updatedDate;
+	@Column(name = "question_number", unique = true)
+	private Integer questionNumber;
 	
 	
 	public Date getCreatedDate() {
@@ -101,6 +103,12 @@ public class EdoAnswerEntity {
 	}
 	public Date getUpdatedDate() {
 		return updatedDate;
+	}
+	public void setQuestionNumber(Integer questionNumber) {
+		this.questionNumber = questionNumber;
+	}
+	public Integer getQuestionNumber() {
+		return questionNumber;
 	}
 	
 }
