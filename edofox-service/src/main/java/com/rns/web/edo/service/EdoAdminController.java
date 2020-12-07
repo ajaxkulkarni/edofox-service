@@ -494,4 +494,12 @@ public class EdoAdminController {
 	public EdoServiceResponse savePackage(EdoServiceRequest request) {
 		return adminBo.savePackage(request);
 	}
+	
+	@POST
+	@Path("/updateEdofoxTokens")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateEdofoxTokens(EdoServiceRequest request) {
+		return adminBo.updateEdofoxTokens(request);
+	}
 }

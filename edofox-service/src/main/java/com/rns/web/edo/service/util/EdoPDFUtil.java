@@ -56,6 +56,8 @@ public class EdoPDFUtil {
 	
 	public static List<EdoQuestion> pdfBox(final EdoAdminRequest request, InputStream is, String outputFolder/*, int buffer, int testId, final Integer from, final Integer to*/) {
 		try {
+			//request.setCropWidth("true");
+			
 			//String questionNumberSuffix = ".";
 			List<EdoQuestion> parsedQuestions = new ArrayList<EdoQuestion>();
 			PDDocument document = PDDocument.load(is);

@@ -75,7 +75,14 @@
 	<insert id="saveLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent">
 		insert into student_login
 		(username, password, student_id, institute_id, created_date, student_access, universal_token)
-		values('${rollNo}','${password}', ${id}, ${instituteId}, CURRENT_TIMESTAMP, '${accessType}', '${token}');
+		values('${rollNo}','${password}', ${id}, ${instituteId}, CURRENT_TIMESTAMP, 		
+		<if test="accessType != null">
+			'${accessType}', 
+		</if>
+		<if test="accessType == null">
+			NULL, 
+		</if>
+		'${token}');
 	</insert>
 
 	<update id="updateStudent" parameterType="com.rns.web.edo.service.domain.EdoStudent">
@@ -93,6 +100,10 @@
 		school_district = '${schoolDistrict}', date_of_birth = '${dob}', caste_category =
 		'${casteCategory}'
 		where id = ${id}
+	</update>
+	
+	<update id="updateStudentToken" parameterType="com.rns.web.edo.service.domain.EdoStudent">
+		update student_login SET universal_token = '${token}' where student_id = ${id}
 	</update>
 	
 	<update id="deleteLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent">

@@ -2062,4 +2062,21 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		return response;
 	}
+	
+	public EdoServiceResponse updateEdofoxTokens(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			List<EdoStudent> students = testsDao.getAllStudents(request.getInstitute().getId());
+			if(CollectionUtils.isNotEmpty(students)) {
+				for(EdoStudent student: students) {
+					student.setToken(CommonUtils.createUniversalToken(student));
+					testsDao.updateStudentToken(student);
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-11, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
 }
