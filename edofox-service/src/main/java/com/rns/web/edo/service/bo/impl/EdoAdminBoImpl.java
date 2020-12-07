@@ -1051,10 +1051,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 
 	public EdoApiStatus cropQuestionImage(EdoServiceRequest request, InputStream fileData) {
 		EdoApiStatus status = new EdoApiStatus();
-		if (request.getTest() == null || request.getTest().getId() == null || StringUtils.isBlank(request.getFilePath())) {
+		/*if (request.getTest() == null || request.getTest().getId() == null || StringUtils.isBlank(request.getFilePath())) {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
 			return status;
-		}
+		}*/
 		try {
 			// byte[] buffer = new byte[fileData.available()];
 			// fileData.read(buffer);
