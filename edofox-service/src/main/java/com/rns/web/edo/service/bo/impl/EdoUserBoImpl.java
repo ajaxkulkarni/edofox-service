@@ -1965,7 +1965,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				} else {
 					lecture.setVideoName(request.getLecture().getVideoName());
-					lecture.setClassroomId(request.getLecture().getClassroomId());
+					if(request.getLecture().getClassroomId() == 0) {
+						lecture.setClassroomId(null);
+					} else {
+						lecture.setClassroomId(request.getLecture().getClassroomId());
+					}
 					lecture.setSubjectId(request.getLecture().getSubjectId());
 					if(StringUtils.isNotBlank(request.getLecture().getKeywords())) {
 						lecture.setKeywords(StringUtils.removeEnd(request.getLecture().getKeywords(), ","));
