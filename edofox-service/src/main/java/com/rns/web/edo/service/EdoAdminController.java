@@ -278,14 +278,15 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public EdoServiceResponse cropQuestionImage(@FormDataParam("data") InputStream fileData, @FormDataParam("data") FormDataContentDisposition customerDataDetails,
-			@FormDataParam("testId") Integer testId, @FormDataParam("fileName") String fileName) {
+			@FormDataParam("testId") Integer testId, @FormDataParam("fileName") String fileName, @FormDataParam("filePath") String filePath) {
 		//LoggingUtil.logMessage("Crop image request :" + testId + " for " + fileName);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			EdoServiceRequest request = new EdoServiceRequest();
 			EdoTest test = new EdoTest();
 			test.setId(testId);
-			request.setFilePath(fileName);
+			request.setFilePath(filePath);
+			request.setRequestType(fileName);
 			request.setTest(test);
 			adminBo.cropQuestionImage(request, fileData);
 			//LoggingUtil.logMessage("Crop image completed ..");

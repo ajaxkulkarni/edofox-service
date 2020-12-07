@@ -1058,7 +1058,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		try {
 			// byte[] buffer = new byte[fileData.available()];
 			// fileData.read(buffer);
-			FileOutputStream fileOutputStream = new FileOutputStream(TEMP_QUESTION_PATH + request.getTest().getId() + "/" + request.getFilePath());
+			String folderName = CommonUtils.getFolderName(request);
+			FileOutputStream fileOutputStream = new FileOutputStream(TEMP_QUESTION_PATH + folderName + "/" + request.getRequestType());
 			//IOUtils.copy(fileData, fileOutputStream);
 			//FileOutputStream out = new FileOutputStream(new File(fileLocation));
 			int read = 0;
