@@ -582,8 +582,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		answer.setUpdatedDate(new Date());
 		
 		//Save random question number
-		if(request.getQuestion().getId() != null) {
-			answer.setQuestionNumber(request.getQuestion().getId());
+		if(request.getQuestion().getQuestionNumber() != null) {
+			answer.setQuestionNumber(request.getQuestion().getQuestionNumber());
 		}
 		
 		if(answer.getId() == null) {

@@ -137,12 +137,16 @@
 		<result column="level" property="question.level"/>
 		<result column="question_type" property="question.type"/>
 		<result column="section" property="question.section" />
+		<result column="solved_sequence" property="question.questionNumber"/>
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		SELECT *,
 		<if test="requestType != 'Solution'">
 		test_result.id as mapId,test_result.flagged as reviewed, 
+		</if>
+		<if test="requestType != 'Solution'">
+		 test_result.question_number as solved_sequence,
 		</if>
 		test_questions.status as questionStatus FROM test 
 		join test_questions_map on test.test_id = test_questions_map.test_id
@@ -159,7 +163,7 @@
 			AND test_status.student_id = ${student.id} AND test_status.student_id 
 		</if>
 		AND question_disabled = 0 order by test_questions_map.id asc
-
+		
 	</select>
 	
 	
