@@ -33,6 +33,7 @@ public class EdoFeedback {
 	private String answeredBy;
 	private String askedBy;
 	private Date lastUpdated;
+	private String questionText;
 	
 	public String getFeedback() {
 		return feedback;
@@ -177,6 +178,12 @@ public class EdoFeedback {
 	}
 	public void setAskedBy(String askedBy) {
 		this.askedBy = askedBy;
+	}
+	public String getQuestionText() {
+		return questionText;
+	}
+	public void setQuestionText(String questionText) {
+		this.questionText = questionText;
 	}
 	
 

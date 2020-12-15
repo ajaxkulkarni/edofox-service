@@ -741,4 +741,14 @@ public class EdoUserController {
 		}
 		return response;
 	}
+	
+	@POST
+	@Path("/getFeedbackDetails")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getFeedbackDetails(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response =  userBo.getFeedbackDetails(request);
+		return response;
+	}
 }

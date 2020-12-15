@@ -19,6 +19,7 @@ public class EdoVideoLectureMap {
 	private EdoSubject subject;
 	private EDOPackage classroom;
 	private List<EdoKeyword> keywords;
+	private EdoChapter chapter;
 	
 	public EdoVideoLecture getLecture() {
 		return lecture;
@@ -43,6 +44,12 @@ public class EdoVideoLectureMap {
 	}
 	public void setKeywords(List<EdoKeyword> keywords) {
 		this.keywords = keywords;
+	}
+	public EdoChapter getChapter() {
+		return chapter;
+	}
+	public void setChapter(EdoChapter chapter) {
+		this.chapter = chapter;
 	}
 	
 	

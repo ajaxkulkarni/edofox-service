@@ -1,12 +1,13 @@
 package com.rns.web.edo.service.util;
 
-
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -18,36 +19,37 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
-import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoStudent;
-
+import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 
 public class EdoMailUtil implements Runnable, EdoConstants {
 
-	
-	//private static final String MAIL_HOST = "smtp.gmail.com";
-	//private static final String MAIL_ID = "visionlaturpattern@gmail.com";
-	//private static final String MAIL_PASSWORD = "Vision2018!";
-	
+	// private static final String MAIL_HOST = "smtp.gmail.com";
+	// private static final String MAIL_ID = "visionlaturpattern@gmail.com";
+	// private static final String MAIL_PASSWORD = "Vision2018!";
+
 	private static final String MAIL_AUTH = "true";
-	//private static final String MAIL_HOST = "smtp.zoho.com";
-	
-	
+	// private static final String MAIL_HOST = "smtp.zoho.com";
+
 	private static final String MAIL_HOST = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_HOST);
 	private static final String MAIL_ID = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_ID);
 	private static final String MAIL_PASSWORD = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_PASSWORD);
 	private static final String MAIL_PORT = EdoPropertyUtil.getProperty(EdoPropertyUtil.MAIL_PORT);
-	
-	
 
 	private String type;
 	private String mailSubject;
 	private EdoStudent student;
 	private EDOInstitute institute;
-	
-	
+	private EdoTest exam;
+	private List<EdoStudent> students;
+	private EdoVideoLectureMap classwork;
+	private EdoQuestion feedbackData;
+
 	public void setInstitute(EDOInstitute institute) {
 		this.institute = institute;
 	}
@@ -61,7 +63,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	}
 
 	public EdoMailUtil() {
-		
+
 	}
 
 	public void sendMail() {
@@ -70,32 +72,56 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 		try {
 			Message message = new MimeMessage(session);
-			if(institute != null) {
+			if (institute != null) {
 				message.setFrom(new InternetAddress(MAIL_ID, institute.getName()));
 			} else {
 				message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
 			}
-			prepareMailContent(message);
-			Transport.send(message);
-			LoggingUtil.logMessage("Sent email to .." + student.getEmail());
-			
-		} catch (MessagingException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			if (CollectionUtils.isNotEmpty(students)) {
+				for (EdoStudent stu : students) {
+					student = stu;
+					sendMail(message);
+				}
+			} else {
+				sendMail(message);
+			}
+
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.emailLogger);
 		}
+	}
+
+	private boolean isValid(String email) {
+		String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." + "[a-zA-Z0-9_+&*-]+)*@" + "(?:[a-zA-Z0-9-]+\\.)+[a-z" + "A-Z]{2,7}$";
+
+		Pattern pat = Pattern.compile(emailRegex);
+		if (StringUtils.isBlank(email)) {
+			return false;
+		}
+		return pat.matcher(email).matches();
+	}
+
+	private void sendMail(Message message) throws MessagingException {
+		if (student == null || StringUtils.isBlank(student.getEmail())) {
+			return;
+		}
+		if(!isValid(student.getEmail())) {
+			return;
+		}
+		prepareMailContent(message);
+		Transport.send(message);
+		LoggingUtil.logMessage("Sent email " + type + " to .." + student.getEmail(), LoggingUtil.emailLogger);
 	}
 
 	private static Session prepareMailSession() {
 		Properties props = new Properties();
 
 		props.put("mail.smtp.auth", MAIL_AUTH);
-		props.put("mail.smtp.socketFactory.port", "465"); //PROD
-		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); //PROD
+		props.put("mail.smtp.socketFactory.port", "465"); // PROD
+		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); // PROD
 		props.put("mail.smtp.starttls.enable", "true");
 		props.put("mail.smtp.host", MAIL_HOST);
 		props.put("mail.smtp.port", MAIL_PORT);
-		
 
 		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -108,20 +134,27 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private String prepareMailContent(Message message) {
 
 		try {
-			//boolean attachCv = false;
+			// boolean attachCv = false;
 			String result = readMailContent(message);
 			result = CommonUtils.prepareStudentNotification(result, student);
 			result = CommonUtils.prepareInstituteNotification(result, institute);
+			result = CommonUtils.prepareTestNotification(result, exam, institute, "");
+			result = CommonUtils.prepareClassworkNotification(result, classwork);
+			result = CommonUtils.prepareFeedbackNotification(result, feedbackData, student);
 			
-			//message.setContent(result, "text/html");
+			//Set action URL depending on notification type
+			result = StringUtils.replace(result, "{actionUrl}", "test.edofox.com");
+
+			// message.setContent(result, "text/html");
 			message.setContent(result, "text/html; charset=utf-8");
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(student.getEmail()));
-			
-			//Format subject
-			if(message.getSubject() != null) {
-				if(institute != null) {
-					message.setSubject(StringUtils.replace(message.getSubject(), "{instituteName}", institute.getName()));
-				}
+
+			// Format subject
+			if (message.getSubject() != null) {
+				String subjectText = CommonUtils.prepareInstituteNotification(message.getSubject(), institute);
+				subjectText = CommonUtils.prepareTestNotification(subjectText, exam, institute, "");
+				subjectText = CommonUtils.prepareClassworkNotification(subjectText, classwork);
+				message.setSubject(subjectText);
 			}
 			return result;
 
@@ -147,7 +180,6 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		return CommonUtils.readFile(contentPath);
 	}
 
-	
 	public String getMailSubject() {
 		return mailSubject;
 	}
@@ -160,6 +192,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "subscription_mail.html");
 			put(MAIL_TYPE_ACTIVATED, "package_active.html");
+			put(MAIL_TYPE_NEW_EXAM, "exam_notification.html");
+			put(MAIL_TYPE_DOUBT_RESOLVED, "doubt_notification.html");
 		}
 	});
 
@@ -167,6 +201,9 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "Thank you for registering to {instituteName}");
 			put(MAIL_TYPE_ACTIVATED, "Your course for {instituteName} is now active");
+			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName}");
+			put(MAIL_TYPE_NEW_CLASSWORK, "New {contentType} {title} added for you");
+			put(MAIL_TYPE_DOUBT_RESOLVED, "Doubt resolved by teacher");
 		}
 	});
 
@@ -174,9 +211,32 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		EdoMailUtil edoMailUtil = new EdoMailUtil(MAIL_TYPE_SUBSCRIPTION);
 		EdoStudent s = new EdoStudent();
 		s.setEmail("ajinkyashiva@gmail.com");
-		edoMailUtil.setStudent(s);;
+		edoMailUtil.setStudent(s);
+		;
 		edoMailUtil.sendMail();
 	}
+
+	public EdoTest getExam() {
+		return exam;
+	}
+
+	public void setExam(EdoTest exam) {
+		this.exam = exam;
+	}
+
+	public List<EdoStudent> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<EdoStudent> students) {
+		this.students = students;
+	}
+
+	public void setClasswork(EdoVideoLectureMap map) {
+		this.classwork = map;
+	}
+
+	public void setFeedbackData(EdoQuestion feedbackData) {
+		this.feedbackData = feedbackData;
+	}
 }
-
-

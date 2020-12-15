@@ -30,6 +30,7 @@
 		<result column="created_date" property="lecture.createdDate"/>
 		<result column="subject_id" property="subject.id"/>
 		<result column="classroom_id" property="classroom.id"/>
+		<result column="classroom_id" property="lecture.classroomId"/>
 		<result column="institute_id" property="lecture.instituteId"/>
 		<result column="subject" property="subject.subjectName"/>
 		<result column="package_name" property="classroom.name"/>
@@ -38,6 +39,7 @@
 		<result column="type" property="lecture.type"/>
 		<result column="status" property="lecture.status"/>
 		<result column="progress" property="lecture.progress"/>
+		<result column="chapter_name" property="chapter.chapterName"/>
 	</resultMap>
 
 	<select id="getInstituePackages" resultMap="packages"
@@ -238,6 +240,15 @@
     	LIMIT ${startIndex}, ${startIndex + 10}
     </if>
 	
+	</select>
+	
+	<select id="getVideoLecture" parameterType="Integer" resultMap="videoLecture">
+	SELECT video_lectures.*, test_subjects.subject,packages.package_name,chapters.chapter_name FROM video_lectures
+    LEFT JOIN test_subjects ON video_lectures.subject_id = test_subjects.subject_id
+    LEFT JOIN packages on video_lectures.classroom_id = packages.id
+    LEFT JOIN dlp_chp_cls_content_map on dlp_chp_cls_content_map.content_id = video_lectures.id
+    LEFT JOIN chapters on dlp_chp_cls_content_map.chapter_id = chapters.id
+    where video_lectures.id = ${value}
 	</select>
 	
 	<select id="getTestVideoLectures" parameterType="Integer" resultMap="videoLecture">
@@ -594,7 +605,26 @@
 	<select id="getStudentDevicesForExam" parameterType="com.rns.web.edo.service.domain.EdoTest" resultMap="studentInfo">
 		select * from device_id join student on device_id.student_id = student.id where student_id in 
 		(select distinct student_id from student_institute where package_id in 
-			( SELECT classroom_id FROM dlp_chp_cls_content_map where test_id = ${id} AND test_id != ${packageId})
+			( SELECT classroom_id FROM dlp_chp_cls_content_map where test_id = ${id} AND classroom_id != ${packageId})
+		)
+	</select>
+	
+	<select id="getStudentContactsForExam" parameterType="com.rns.web.edo.service.domain.EdoTest" resultMap="studentInfo">
+		select * from student where id in 
+		(select distinct student_id from student_institute where package_id in 
+			( SELECT classroom_id FROM dlp_chp_cls_content_map where test_id = ${id} AND classroom_id != ${packageId})
+		)
+	</select>
+	
+	<select id="getStudentContactsForPackage" parameterType="Integer" resultMap="studentInfo">
+		select * from student where id in (select distinct student_id from student_institute where package_id in 
+			(${value})
+		)
+	</select>
+	
+	<select id="getStudentContactsForVideo" parameterType="com.rns.web.edo.service.domain.jpa.EdoVideoLecture" resultMap="studentInfo">
+		select * from student where id in (select distinct student_id from student_institute where package_id in 
+			( SELECT classroom_id FROM dlp_chp_cls_content_map where content_id = ${id})
 		)
 	</select>
 	
@@ -603,13 +633,28 @@
 	join student on exam_feedback.student_id = student.id
 	join device_id on device_id.student_id = student.id
 	<if test="questionId != null">
-		where question_id = ${questionId}
+		where exam_feedback.question_id = ${questionId}
 	</if>
 	<if test="videoId != null">
-		where video_id = ${videoId}
+		where exam_feedback.video_id = ${videoId}
 	</if>
 	<if test="id != null">
-		where id = ${id}
+		where exam_feedback.id = ${id}
+	</if>
+	
+	</select>
+	
+	<select id="getStudentContactsForDoubt" parameterType="com.rns.web.edo.service.domain.EdoFeedback" resultMap="studentInfo">
+	select distinct exam_feedback.student_id as id,student.* from exam_feedback 
+	join student on exam_feedback.student_id = student.id
+	<if test="questionId != null">
+		where exam_feedback.question_id = ${questionId}
+	</if>
+	<if test="videoId != null">
+		where exam_feedback.video_id = ${videoId}
+	</if>
+	<if test="id != null">
+		where exam_feedback.id = ${id}
 	</if>
 	
 	</select>

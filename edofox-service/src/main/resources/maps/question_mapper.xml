@@ -309,6 +309,7 @@
 		<result column="feedbackId" property="feedback.id"/>
 		<result column="attachment_link" property="feedback.attachment"/>
 		<result column="askedBy" property="feedback.askedBy"/>
+		<result column="video_name" property="feedback.sourceVideoName"/>
  	</resultMap>
 	
 	<resultMap id="videoFeedbackData" type="com.rns.web.edo.service.domain.EdoQuestion">
@@ -571,25 +572,35 @@
 		select * from exam_feedback where id = ${value}
 	</select>
 	
-	<select id="getFeedbackDetails" parameterType="com.rns.web.edo.service.domain.EdoFeedback" resultMap="feedbacks">
-		select * from exam_feedback 
+	<select id="getFeedbackDetails" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
+		select 
+		question, question_img_url,resolution,test_questions.id,
+		feedback_resolution_text,feedback_resolution_video_url, exam_feedback.subject_Id, exam_feedback.created_date,feedback_resolution_text,
+		updated_date, feedback_resolution_image_url, feedback,video_id,video_url,video_name,
+		student.name as answeredBy,exam_feedback.id as feedbackId,attachment_link
+		from exam_feedback 
 		left join student on student.id = exam_feedback.answered_by
+		left join test_questions on test_questions.id = exam_feedback.question_id
+		left join video_lectures on video_lectures.id = exam_feedback.video_id
 		where 1
-		<if test="questionId != null">
-			AND question_id = ${questionId}
+		<if test="feedback.questionId != null">
+			AND exam_feedback.question_id = ${feedback.questionId}
 		</if>
-		<if test="videoId != null">
-			AND video_id = ${videoId}
+		<if test="feedback.videoId != null">
+			AND exam_feedback.video_id = ${feedback.videoId}
 		</if>
-		<if test="id != null">
-			AND id = ${id}
+		<if test="feedback.id != null">
+			AND exam_feedback.id = ${feedback.id}
 		</if>
-		<if test="resolution != null">
+		<if test="feedback.resolution != null">
 			AND resolution = '${resolution}'
 		</if>
-		<if test="resolution == null">
-			AND (resolution IS NULL or resolution = 'Unresolved')
+		<if test="student != null">
+			AND student_id = ${student.id}
 		</if>
+		<!-- <if test="resolution == null">
+			AND (resolution IS NULL or resolution = 'Unresolved')
+		</if> -->
 		LIMIT 1
 	</select>
 	

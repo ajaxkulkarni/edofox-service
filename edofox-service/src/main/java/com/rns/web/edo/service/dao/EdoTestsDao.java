@@ -31,6 +31,7 @@ public interface EdoTestsDao {
 	EDOInstitute getInstituteById(Integer id);
 	List<EdoTestStudentMap> getSubjectwiseScoreStudent(Map<String,Object> value);
 	List<EdoVideoLectureMap> getVideoLectures(EdoServiceRequest request);
+	List<EdoVideoLectureMap> getVideoLecture(Integer id);
 	List<EdoSubject> getVideoSubjects(EdoServiceRequest request);
 	
 	//Save queries
@@ -109,6 +110,10 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentDevicesForVideo(EdoVideoLecture lec);
 	List<EdoStudent> getStudentDevicesForExam(EdoTest exam);
 	List<EdoStudent> getStudentDevicesForDoubt(EdoFeedback feedback);
+	List<EdoStudent> getStudentContactsForDoubt(EdoFeedback feedback);
+	List<EdoStudent> getStudentContactsForExam(EdoTest exam);
+	List<EdoStudent> getStudentContactsForPackage(Integer packageId);
+	List<EdoStudent> getStudentContactsForVideo(EdoVideoLecture classworkInfo);
 	List<EdoTest> getExamsForDate(String value);
 	
 	//Question queries
@@ -129,7 +134,7 @@ public interface EdoTestsDao {
 	void updateDoubtFile(EdoFeedback feedback);
 	void addResolution(EdoFeedback feedback);
 	EdoFeedback getFeedback(Integer id);
-	EdoFeedback getFeedbackDetails(EdoFeedback feedback);
+	EdoQuestion getFeedbackDetails(EdoServiceRequest feedback);
 	List<EdoQuestion> getFeedbackData(EdoServiceRequest request);
 	List<EdoQuestion> getVideoFeedback(EdoServiceRequest request);
 	List<EdoQuestion> getGeneralFeedback(EdoServiceRequest request);

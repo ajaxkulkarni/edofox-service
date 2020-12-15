@@ -44,6 +44,7 @@ import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
+import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -674,6 +675,17 @@ public class CommonUtils {
 		
 	}
 	
+	public static String setUrl(String url) {
+		if(StringUtils.contains(url, "http")) {
+			return url;
+		}
+		String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
+		if(StringUtils.isNotBlank(hostUrl)) {
+			return hostUrl + url;
+		}
+		return url;
+	}
+	
 
 	public static String prepareUrl(String url) {
 		/*if(EdoConstants.ABSOLUTE_IMAGE_URLS) {
@@ -845,6 +857,24 @@ public class CommonUtils {
 	public static String prepareClassworkNotification(String result, EdoVideoLecture classwork) {
 		if(classwork != null) {
 			result = StringUtils.replace(result, "{title}", CommonUtils.getStringValue(classwork.getVideoName()));
+			String type = "video";
+			if(StringUtils.equals("DOC", classwork.getType())) {
+				type = "document";
+			}
+			result = StringUtils.replace(result, "{contentType}", type);
+		}
+		return result;
+	}
+	
+	public static String prepareClassworkNotification(String result, EdoVideoLectureMap classwork) {
+		if(classwork != null) {
+			result = prepareClassworkNotification(result, classwork.getLecture());
+			if(classwork.getSubject() != null) {
+				result = StringUtils.replace(result, "{subject}", CommonUtils.getStringValue(classwork.getSubject().getSubjectName()));
+				if(classwork.getChapter() != null) {
+					result = StringUtils.replace(result, "{chapter}", CommonUtils.getStringValue(classwork.getChapter().getChapterName()));
+				}
+			}
 		}
 		return result;
 	}
@@ -858,21 +888,87 @@ public class CommonUtils {
 		return value;
 	}
 
-	public static String prepareFeedbackNotification(String result, EdoFeedback feedback, Object object, String string) {
+	public static String prepareFeedbackNotification(String result, EdoQuestion feedbackData, EdoStudent student) {
+		if(feedbackData == null){
+			return result;
+		}
+		EdoFeedback feedback = feedbackData.getFeedback();
 		if (feedback != null) {
+			
+			//Fix URLs
+			CommonUtils.setQuestionURLs(feedbackData);
+			QuestionParser.fixQuestion(feedbackData);
+			setupFeedbackAttachment(feedbackData);
+			
 			if(StringUtils.isBlank(feedback.getAnsweredBy())) {
 				feedback.setAnsweredBy("Admin");
 			}
 			//result = StringUtils.replace(result, "{answeredBy}", CommonUtils.getStringValue(feedback.getAnsweredBy()));
+			String doubtType = "individual";
+			String detailsUrl = "specific_doubt.php?";
 			if(feedback.getQuestionId() != null) {
 				result = StringUtils.replace(result, "{doubtFor}", "for question");
+				doubtType = "question";
+				result = StringUtils.replace(result, "{doubtText}", CommonUtils.getStringValue(feedback.getFeedback()));
+				result = StringUtils.replace(result, "{doubtImage}", "");
+				detailsUrl = detailsUrl + "doubtId=" + feedback.getQuestionId();
 			} else if (feedback.getVideoId() != null) {
 				result = StringUtils.replace(result, "{doubtFor}", "for video");
+				doubtType = "video";
+				result = StringUtils.replace(result, "{doubtText}", CommonUtils.getStringValue(feedback.getFeedback()));
+				result = StringUtils.replace(result, "{doubtImage}", "");
+				detailsUrl = detailsUrl + "doubtId=" + feedback.getVideoId();
 			} else {
 				result = StringUtils.replace(result, "{doubtFor}", "");
+				result = StringUtils.replace(result, "{doubtText}", CommonUtils.getStringValue(feedback.getFeedback()));
+				//Doubt attachment by student
+				String doubtImageUrl = CommonUtils.getStringValue(feedback.getAttachment());
+				if(StringUtils.isNotBlank(doubtImageUrl)) {
+					result = StringUtils.replace(result, "{doubtImage}", "<a href='" + doubtImageUrl + "'> View attachment </a>");
+				} else {
+					result = StringUtils.replace(result, "{doubtImage}", "");
+				}
+				detailsUrl = detailsUrl + "doubtId=" + feedback.getId();
+			}
+			if(student != null) {
+				detailsUrl = detailsUrl + "&doubtType=" + doubtType + "&studentId=" + student.getId();
+			}
+			//Question text or video title
+			/*if(StringUtils.isNotBlank(feedbackData.getQuestion())) {
+				result = StringUtils.replace(result, "{questionText}", CommonUtils.getStringValue(feedbackData.getQuestion()));
+			} else {*/
+				result = StringUtils.replace(result, "{questionText}", CommonUtils.getStringValue(feedback.getSourceVideoName()));
+			//}
+			//Question image
+			if(StringUtils.isNotBlank(feedbackData.getQuestionImageUrl())) {
+				result = StringUtils.replace(result, "{questionImage}", "<img src='" + feedbackData.getQuestionImageUrl() + "' style='max-height:250px;max-width:400px;' />");
+			} else {
+				result = StringUtils.replace(result, "{questionImage}", "");
+			}
+			//Resolution
+			result = StringUtils.replace(result, "{resolutionText}", CommonUtils.getStringValue(feedback.getFeedbackResolutionText()));
+			if(StringUtils.isNotBlank(feedback.getFeedbackResolutionImageUrl())) {
+				result = StringUtils.replace(result, "{resolutionLink}", "<a href='" + CommonUtils.setUrl(CommonUtils.getStringValue(feedback.getFeedbackResolutionImageUrl())) + "' >View resolution attachment</a>");
+			} else {
+				result = StringUtils.replace(result, "{resolutionLink}",  "");
+			}
+			if(student != null) {
+				result = StringUtils.replace(result, "{actionUrl}", CommonUtils.setUrl(detailsUrl));
+			} else {
+				result = StringUtils.replace(result, "{actionUrl}", "test.edofox.com");
 			}
 		}
 		return result;
+	}
+	
+	public static void setupFeedbackAttachment(EdoQuestion edoFeedback) {
+		EdoFeedback feedback = edoFeedback.getFeedback();
+		if(feedback != null && StringUtils.isNotBlank(feedback.getAttachment()) && feedback.getId() != null) {
+			String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
+			feedback.setAttachment(hostUrl + "getImage/" +  feedback.getId() + "/" + EdoConstants.ATTR_DOUBT_IMAGE);
+		} else {
+			feedback.setAttachment(null);
+		}
 	}
 
 	public static String createUniversalToken(EdoStudent student) {
@@ -885,5 +981,6 @@ public class CommonUtils {
 		String firstLetter = StringUtils.substring(student.getName(), 0, 1);
 		return DigestUtils.sha256Hex(firstLetter + "_" + student.getId());
 	}
+
 	
 }

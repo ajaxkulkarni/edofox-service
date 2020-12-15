@@ -164,7 +164,7 @@ public class EdoExcelUtil {
 			return "";
 		}
 		try {
-			return row.getCell(colNumber).getStringCellValue();
+			return StringUtils.trimToEmpty(row.getCell(colNumber).getStringCellValue());
 		} catch (Exception e) {
 			Double numericCellValue = row.getCell(colNumber).getNumericCellValue();
 			DecimalFormat df = new DecimalFormat("###");

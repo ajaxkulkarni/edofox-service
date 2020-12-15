@@ -2413,4 +2413,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
+	public EdoServiceResponse getFeedbackDetails(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			EdoTest test = new EdoTest();
+			ArrayList<EdoQuestion> questions = new ArrayList<EdoQuestion>();
+			EdoQuestion feedbackDetails = testsDao.getFeedbackDetails(request);
+			CommonUtils.setQuestionURLs(feedbackDetails);
+			QuestionParser.fixQuestion(feedbackDetails);
+			CommonUtils.setupFeedbackAttachment(feedbackDetails);
+			questions.add(feedbackDetails);
+			test.setTest(questions);
+			response.setTest(test);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
 }

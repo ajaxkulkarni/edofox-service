@@ -70,6 +70,7 @@ import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
+import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoNotificationsManager;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
@@ -86,6 +87,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
 	private ThreadPoolTaskExecutor executor;
+	private ThreadPoolTaskExecutor mailExecutor;
 	private EdoTestsDao testsDao;
 	private SessionFactory sessionFactory;
 	private DataSourceTransactionManager txManager;
@@ -903,7 +905,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				List<EdoQuestion> videoFeedback = testsDao.getVideoFeedback(request);
 				if(CollectionUtils.isNotEmpty(videoFeedback)) {
 					for(EdoQuestion edoFeedback: videoFeedback) {
-						setupFeedbackAttachment(edoFeedback);
+						CommonUtils.setupFeedbackAttachment(edoFeedback);
 					}
 				}
 				test.setTest(videoFeedback);
@@ -911,7 +913,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				List<EdoQuestion> videoFeedback = testsDao.getGeneralFeedback(request);
 				if(CollectionUtils.isNotEmpty(videoFeedback)) {
 					for(EdoQuestion edoFeedback: videoFeedback) {
-						setupFeedbackAttachment(edoFeedback);
+						CommonUtils.setupFeedbackAttachment(edoFeedback);
 					}
 				}
 				test.setTest(videoFeedback);
@@ -921,7 +923,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					for(EdoQuestion edoFeedback: feedbackData) {
 						CommonUtils.setQuestionURLs(edoFeedback);
 						QuestionParser.fixQuestion(edoFeedback);
-						setupFeedbackAttachment(edoFeedback);
+						CommonUtils.setupFeedbackAttachment(edoFeedback);
 					}
 				}
 				test.setTest(feedbackData);
@@ -976,15 +978,6 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		return response;
 	}
 
-	private void setupFeedbackAttachment(EdoQuestion edoFeedback) {
-		EdoFeedback feedback = edoFeedback.getFeedback();
-		if(feedback != null && StringUtils.isNotBlank(feedback.getAttachment()) && feedback.getId() != null) {
-			String hostUrl = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_URL);
-			feedback.setAttachment(hostUrl + "getImage/" +  feedback.getId() + "/" + ATTR_DOUBT_IMAGE);
-		} else {
-			feedback.setAttachment(null);
-		}
-	}
 
 	public EdoServiceResponse getQuestionFeedbacks(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
@@ -995,7 +988,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				if(StringUtils.isNotBlank(map.getTest().getCurrentQuestion().getQuestion())) {
 					QuestionParser.fixQuestion(map.getTest().getCurrentQuestion());
 				}
-				setupFeedbackAttachment(map.getTest().getCurrentQuestion());
+				CommonUtils.setupFeedbackAttachment(map.getTest().getCurrentQuestion());
 			}
 			response.setMaps(questionFeedbacks);
 		} catch (Exception e) {
@@ -2014,13 +2007,15 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	public EdoApiStatus sendNotification(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();
 		try {
+			
 			EdoNotificationsManager mgr = new EdoNotificationsManager(this.sessionFactory);
 			mgr.setNotificationType(request.getRequestType());
 			mgr.setClasswork(request.getLecture());
 			mgr.setExam(request.getTest());
+			mgr.setMailExecutor(mailExecutor);
 			mgr.setFeedback(request.getFeedback());
 			mgr.setTestsDao(testsDao);
-			LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
+			
 			if(request.getLecture() != null) {
 				//Schedule video notification at a delay since Vimeo will take some time to reflect
 				ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -2029,16 +2024,19 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				if(StringUtils.isNotBlank(videoDelay)) {
 					delay = new Integer(videoDelay);
 				}
-				LoggingUtil.logMessage("Executing with delay " + delay, LoggingUtil.emailLogger);
+				LoggingUtil.logMessage("Executing task with delay " + delay, LoggingUtil.emailLogger);
 				scheduler.schedule(mgr, delay, TimeUnit.MINUTES);
 				scheduler.shutdown();
 			} else {
+				LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
 				executor.execute(mgr);
 			}
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			//CommonUtils.closeSession(session);
 		}
 		return status;
 	}
@@ -2078,5 +2076,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-11, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	public ThreadPoolTaskExecutor getMailExecutor() {
+		return mailExecutor;
+	}
+
+	public void setMailExecutor(ThreadPoolTaskExecutor mailExecutor) {
+		this.mailExecutor = mailExecutor;
 	}
 }

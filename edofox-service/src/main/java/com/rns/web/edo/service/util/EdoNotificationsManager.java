@@ -19,6 +19,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -31,8 +32,11 @@ import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EdoFeedback;
+import com.rns.web.edo.service.domain.EdoQuestion;
+import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.ext.EdoGoogleNotification;
 import com.rns.web.edo.service.domain.ext.EdoGoogleNotificationData;
 import com.rns.web.edo.service.domain.ext.EdoGoogleNotificationRequest;
@@ -55,6 +59,8 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 	private EdoTestsDao testsDao;
 	private EdoTest exam;
 	private EdoFeedback feedback;
+	private String medium;
+	private ThreadPoolTaskExecutor mailExecutor;
 	
 	static {
 		
@@ -128,13 +134,23 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 				return;
 			}
 			List<EdoStudent> devices = null;
+			List<EdoStudent> mailers = null;
+			
+			EdoMailUtil mailUtil = new EdoMailUtil(notificationType);
+			EdoVideoLectureMap map = null;
+			EdoQuestion feedbackData = null;
 			
 			if (classwork != null) {
 				classworkInfo = classwork;
 				if (classworkInfo.getVideoName() == null) {
-					classworkInfo = (EdoVideoLecture) session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", classwork.getId())).uniqueResult();
+					//classworkInfo = (EdoVideoLecture) session.createCriteria(EdoVideoLecture.class).add(Restrictions.eq("id", classwork.getId())).uniqueResult();
+					List<EdoVideoLectureMap> maps = testsDao.getVideoLecture(classworkInfo.getId());
+					if(CollectionUtils.isNotEmpty(maps)) {
+						 map = maps.get(0);
+					}
 				}
-				if (classworkInfo != null) {
+				if (map != null) {
+					classworkInfo = map.getLecture();
 					/*List<EdoClassworkMap> maps = session.createCriteria(EdoClassworkMap.class).add(Restrictions.eq("classwork", classwork.getId())).list();
 					if (CollectionUtils.isNotEmpty(maps)) {
 						for (EdoClassworkMap clsMap : maps) {
@@ -148,30 +164,48 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 					//Fetch relevant students
 					if(StringUtils.isBlank(classworkInfo.getType())) {
 						devices = testsDao.getStudentDevicesForPackage(classworkInfo.getClassroomId());
+						mailers = testsDao.getStudentContactsForPackage(classworkInfo.getClassroomId());
 					} else {
 						devices = testsDao.getStudentDevicesForVideo(classworkInfo);
+						mailers = testsDao.getStudentContactsForVideo(classworkInfo);
 					}
 					
 					bodyText = CommonUtils.prepareClassworkNotification(bodyText, classworkInfo);
 				}
 			} else if (exam != null) {
 				exam = testsDao.getTest(exam.getId());
-				if (exam != null) {
-					if(!DateUtils.isSameDay(exam.getStartDate(), new Date())) {
-						return;
-					}
-					bodyText = CommonUtils.prepareTestNotification(bodyText, exam, null, "");
-					titleText = CommonUtils.prepareTestNotification(titleText, exam, null, "");
-					devices = testsDao.getStudentDevicesForPackage(exam.getPackageId());
-					List<EdoStudent> devices2 = testsDao.getStudentDevicesForExam(exam);
-					if(CollectionUtils.isNotEmpty(devices2)) {
-						devices.addAll(devices2);
-					}
+				if (!DateUtils.isSameDay(exam.getStartDate(), new Date())) {
+					return;
 				}
+				bodyText = CommonUtils.prepareTestNotification(bodyText, exam, null, "");
+				titleText = CommonUtils.prepareTestNotification(titleText, exam, null, "");
+				devices = testsDao.getStudentDevicesForPackage(exam.getPackageId());
+				List<EdoStudent> devices2 = testsDao.getStudentDevicesForExam(exam);
+				if (CollectionUtils.isNotEmpty(devices2)) {
+					devices.addAll(devices2);
+				}
+				//Fetch mailing list
+				mailers = testsDao.getStudentContactsForExam(exam);
+				if(mailers == null) {
+					mailers = new ArrayList<EdoStudent>();
+				}
+				List<EdoStudent> mailers2 = testsDao.getStudentContactsForPackage(exam.getPackageId());
+				if(CollectionUtils.isNotEmpty(mailers2)) {
+					mailers.addAll(mailers2);
+				}
+				mailUtil.setExam(exam);
 			} else if (feedback != null) {
-				bodyText = CommonUtils.prepareFeedbackNotification(bodyText, feedback, null, "");
-				//titleText = CommonUtils.prepareFeedbackNotification(titleText, feedback, null, "");
-				devices = testsDao.getStudentDevicesForDoubt(feedback);
+				EdoServiceRequest req = new EdoServiceRequest();
+				req.setFeedback(feedback);
+				feedbackData = testsDao.getFeedbackDetails(req);
+				if(feedbackData != null && feedbackData.getFeedback() != null) {
+					feedbackData.getFeedback().setVideoId(feedback.getVideoId());
+					feedbackData.getFeedback().setQuestionId(feedback.getQuestionId());
+					feedbackData.getFeedback().setId(feedback.getId());
+					bodyText = CommonUtils.prepareFeedbackNotification(bodyText, feedbackData, null);
+					devices = testsDao.getStudentDevicesForDoubt(feedback);
+					mailers = testsDao.getStudentContactsForDoubt(feedback);
+				}
 			}
 			
 			if(CollectionUtils.isNotEmpty(devices)) {
@@ -180,6 +214,14 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 				request.setRegistration_ids(registrationIds);
 				notify(request, bodyText, titleText);
 				//send(titleText, bodyText, registrationIds);
+			}
+			
+			//Send mails
+			if(CollectionUtils.isNotEmpty(mailers)) {
+				mailUtil.setStudents(mailers);
+				mailUtil.setClasswork(map);
+				mailUtil.setFeedbackData(feedbackData);
+				mailExecutor.execute(mailUtil);
 			}
 			
 		} catch (Exception e) {
@@ -277,6 +319,24 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 
 	public void run() {
 		broadcastNotification();
+	}
+
+	public String getMedium() {
+		return medium;
+	}
+
+
+	public void setMedium(String medium) {
+		this.medium = medium;
+	}
+
+	public ThreadPoolTaskExecutor getMailExecutor() {
+		return mailExecutor;
+	}
+
+
+	public void setMailExecutor(ThreadPoolTaskExecutor mailExecutor) {
+		this.mailExecutor = mailExecutor;
 	}
 
 	private static Map<String, String> NOTIFICATION_BODY = Collections.unmodifiableMap(new HashMap<String, String>() {

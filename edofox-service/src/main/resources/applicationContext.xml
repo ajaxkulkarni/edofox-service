@@ -32,6 +32,7 @@
 		<property name="testsDao" ref="testsDao" />
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory"></property>
 		<property name="txManager" ref="transactionManager" />
+		<property name="mailExecutor" ref="mailExecutor"></property>
 	</bean>
 	
 	<bean id="taskService" class="com.rns.web.edo.service.util.EdoBackupRoutine">
@@ -51,8 +52,13 @@
 	</bean>
 
 
-	<bean id="executor"
-		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+	<bean id="executor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
+		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
+	</bean>
+	
+	<bean id="mailExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="5" />
 		<property name="maxPoolSize" value="10" />
 		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
