@@ -194,6 +194,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 					mailers.addAll(mailers2);
 				}
 				mailUtil.setExam(exam);
+				LoggingUtil.logMessage("Found " + mailers + " mailers ", LoggingUtil.emailLogger);
 			} else if (feedback != null) {
 				EdoServiceRequest req = new EdoServiceRequest();
 				req.setFeedback(feedback);
