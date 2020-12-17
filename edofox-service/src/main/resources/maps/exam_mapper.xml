@@ -129,6 +129,7 @@
 		<result column="show_result" property="test.showResult" />
 		<result column="show_question_paper" property="test.showQuestionPaper"/>
 		<result column="random_questions" property="test.randomQuestions"/>
+		<result column="test_ui" property="test.testUi"/>
 		<result column="time_taken" property="question.timeSpent" />
 		<result column="status" property="question.status"/>
 		<result column="question_disabled" property="question.disabled"/>
@@ -191,5 +192,9 @@
 
 	<select id="getExamsForDate" resultMap="test" parameterType="String">
 		SELECT * FROM test where start_date like '%${value}%'
+	</select>
+	
+	<select id="getAnswerFiles" resultMap="answerFiles" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		SELECT * from exam_answer_files where  exam_id = ${test.id} AND student_id = ${student.id} 
 	</select>
 </mapper>

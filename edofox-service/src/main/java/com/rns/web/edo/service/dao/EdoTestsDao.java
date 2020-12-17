@@ -15,6 +15,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 
 public interface EdoTestsDao {
@@ -144,6 +145,7 @@ public interface EdoTestsDao {
 	EDOPackage getLiveSession(Integer id);
 	void saveVideoActiviy(EdoServiceRequest request);
 	List<EdoQuestion> getQuestionBank(EdoQuestion request);
+	List<EdoAnswerFileEntity> getAnswerFiles(EdoServiceRequest request);
 	
 	
 }

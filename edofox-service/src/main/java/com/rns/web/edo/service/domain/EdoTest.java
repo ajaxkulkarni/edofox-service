@@ -10,6 +10,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -50,6 +51,7 @@ public class EdoTest {
 	private Integer pauseTimeout;
 	private Integer maxStarts;
 	private Integer packageId;
+	private List<EdoAnswerFileEntity> answerFiles;
 	
 	public EdoTest() {
 		
@@ -338,6 +340,14 @@ public class EdoTest {
 
 	public void setPackageId(Integer packageId) {
 		this.packageId = packageId;
+	}
+
+	public List<EdoAnswerFileEntity> getAnswerFiles() {
+		return answerFiles;
+	}
+
+	public void setAnswerFiles(List<EdoAnswerFileEntity> answerFiles) {
+		this.answerFiles = answerFiles;
 	}
 	
 }

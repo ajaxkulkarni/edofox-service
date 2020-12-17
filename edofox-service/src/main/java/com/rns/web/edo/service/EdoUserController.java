@@ -3,9 +3,9 @@ package com.rns.web.edo.service;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -38,6 +38,7 @@ import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.RtcTokenBuilder.Role;
 import com.rns.web.edo.service.util.VideoTokenGenerator;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
 @Component
@@ -749,6 +750,28 @@ public class EdoUserController {
 	public EdoServiceResponse getFeedbackDetails(EdoServiceRequest request) {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		response =  userBo.getFeedbackDetails(request);
+		return response;
+	}
+	
+	@Path("/uploadAnswers")
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoApiStatus uploadFiles2(@FormDataParam("tags") String tags,
+			@FormDataParam("files") List<FormDataBodyPart> bodyParts,
+			@FormDataParam("files") FormDataContentDisposition fileDispositions,
+			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId) {
+
+		return userBo.uploadAnswers(bodyParts, testId, studentId);
+	}
+	
+	@POST
+	@Path("/getUploadedAnswers")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getUploadedAnswers(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		response = userBo.getUploadedAnswers(request);
 		return response;
 	}
 }

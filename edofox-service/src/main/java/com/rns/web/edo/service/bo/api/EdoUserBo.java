@@ -11,6 +11,7 @@ import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataBodyPart;
 
 public interface EdoUserBo {
 
@@ -56,5 +57,7 @@ public interface EdoUserBo {
 	EdoApiStatus updateStudentTestActivity(EdoServiceRequest request);
 	EdoServiceResponse createVideoLecture(EdoServiceRequest request);
 	EdoServiceResponse getFeedbackDetails(EdoServiceRequest request);
+	EdoServiceResponse getUploadedAnswers(EdoServiceRequest request);
+	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId);
 	
 }

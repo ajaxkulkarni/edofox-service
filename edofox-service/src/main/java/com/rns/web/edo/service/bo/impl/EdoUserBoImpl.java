@@ -54,6 +54,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoContentMap;
 import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
@@ -62,6 +63,7 @@ import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
+import com.rns.web.edo.service.util.EdoAwsUtil;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
@@ -73,6 +75,8 @@ import com.rns.web.edo.service.util.PaymentUtil;
 import com.rns.web.edo.service.util.QuestionParser;
 import com.rns.web.edo.service.util.VideoUtil;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.FormDataBodyPart;
 
 public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
@@ -129,9 +133,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 		Map<String, BigDecimal> subjectWiseScore = new HashMap<String, BigDecimal>();
 		
+		EdoTest test = null;
 		if(CollectionUtils.isEmpty(map)) {
 			//If the exam is expired..show the solutions anyway
-			EdoTest test = testsDao.getTest(request.getTest().getId());
+			test = testsDao.getTest(request.getTest().getId());
 			if(test != null && test.getEndDate() != null && test.getEndDate().getTime() < new Date().getTime() && StringUtils.equals(test.getShowResult(), "Y")) {
 				request.setRequestType("Solution");
 				map = testsDao.getExamResult(request);
@@ -140,7 +145,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 		
 		if(CollectionUtils.isNotEmpty(map)) {
-			EdoTest test = map.get(0).getTest();
+			test = map.get(0).getTest();
 			
 			Map<String, Object> input = new HashMap<String, Object>();
 			input.put("test", test.getId());
@@ -229,6 +234,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//Fetch video lectures for test (if any)
 			response.setLectures(testsDao.getTestVideoLectures(test.getId()));
+			
+			if(test != null && StringUtils.equals(test.getTestUi(), "DESCRIPTIVE")) {
+				List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
+				if(CollectionUtils.isNotEmpty(answerFiles) && test.getSolvedCount() == null) {
+					test.setSolvedCount(answerFiles.size());
+				}
+				test.setAnswerFiles(answerFiles);
+			} 
 			
 			response.setTest(test);
 		} else {
@@ -2424,6 +2437,77 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.setupFeedbackAttachment(feedbackDetails);
 			questions.add(feedbackDetails);
 			test.setTest(questions);
+			response.setTest(test);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+	
+	public EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId) {
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			if(CollectionUtils.isNotEmpty(bodyParts)) {
+				session = this.sessionFactory.openSession();
+				Transaction tx = session.beginTransaction();
+				for (FormDataBodyPart bodyPart: bodyParts) {
+					/*
+					 * Casting FormDataBodyPart to BodyPartEntity, which can give us
+					 * InputStream for uploaded file
+					 */
+					BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyPart.getEntity();
+					//String fileName = bodyParts.get(i).getContentDisposition().getFileName();
+					/*String answersPath = ANSWERS_PATH + testId + "/";
+					File folder = new File(answersPath);
+					if(!folder.exists()) {
+						folder.mkdirs();
+					}*/
+					EdoAnswerFileEntity answerFileEntity = new EdoAnswerFileEntity();
+					answerFileEntity.setTestId(testId);
+					answerFileEntity.setStudentId(studentId);
+					answerFileEntity.setCreatedDate(new Date());
+					session.persist(answerFileEntity);
+					String fileName = answerFileEntity.getId() +  "_" + bodyPart.getContentDisposition().getFileName();
+					//String filePath = answersPath + fileName;
+					//answersPath = answersPath
+					//writeFile(bodyPartEntity.getInputStream(), new FileOutputStream(filePath));*/
+					answerFileEntity.setFileUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyPart.getContentDisposition().getType(), "answerFilesEdofox"));
+					//answerFileEntity.setFilePath(filePath);
+					//answerFileEntity.setFileUrl(CommonUtils.prepareAnswerURLs(answerFileEntity.getId()));
+					
+				}
+				tx.commit();
+			}
+			
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveAnswerErrorLogger);
+			e.printStackTrace();
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+	
+	public EdoServiceResponse getUploadedAnswers(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if (request.getStudent() == null || request.getStudent().getId() == null || request.getTest() == null || request.getTest().getId() == null) {
+			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
+			return response;
+		}
+		try {
+			EdoTest test = new EdoTest();
+			List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
+			/*if(CollectionUtils.isNotEmpty(answerFiles)) {
+				for(EdoAnswerFileEntity answerFile: answerFiles) {
+					if(StringUtils.isNotBlank(answerFile.getAwsUrl())) {
+						answerFile.setFileUrl(answerFile.getAwsUrl());
+					}
+				}
+			}*/
+			test.setAnswerFiles(answerFiles);
 			response.setTest(test);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
