@@ -15,6 +15,7 @@ public class EdoQuestionDetails {
 	private Integer neet_no_of_ques;
 	private Integer jee_no_of_ques;
 	private Integer setter_id;
+	private Integer operator_id;
 	private Integer board_id;
 	private Integer mht_cet_no_of_ques;
 	private String setter_question_type;
@@ -144,6 +145,12 @@ public class EdoQuestionDetails {
 	}
 	public void setModerator_criteria(String moderator_criteria) {
 		this.moderator_criteria = moderator_criteria;
+	}
+	public Integer getOperator_id() {
+		return operator_id;
+	}
+	public void setOperator_id(Integer operator_id) {
+		this.operator_id = operator_id;
 	}
 	
 
