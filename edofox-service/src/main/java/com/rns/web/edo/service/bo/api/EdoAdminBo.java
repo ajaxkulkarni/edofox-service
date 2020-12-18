@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.bo.api;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.rns.web.edo.service.domain.EdoAdminRequest;
@@ -8,6 +9,7 @@ import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.sun.jersey.multipart.FormDataBodyPart;
 
 public interface EdoAdminBo {
 	
@@ -49,6 +51,7 @@ public interface EdoAdminBo {
 	EdoApiStatus fixRecordedLectures(EdoServiceRequest request);
 	EdoServiceResponse getLiveAnalysis(EdoServiceRequest request);
 	EdoServiceResponse savePackage(EdoServiceRequest request);
-	EdoServiceResponse updateEdofoxTokens(EdoServiceRequest request); 
+	EdoServiceResponse updateEdofoxTokens(EdoServiceRequest request);
+	EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks); 
 	
 }

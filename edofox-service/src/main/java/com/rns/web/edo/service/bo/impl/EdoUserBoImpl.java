@@ -239,6 +239,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
 				if(CollectionUtils.isNotEmpty(answerFiles) && test.getSolvedCount() == null) {
 					test.setSolvedCount(answerFiles.size());
+					for(EdoAnswerFileEntity file: answerFiles) {
+						file.setFileUrl(file.getFileUrl() + "?ver=" + System.currentTimeMillis());
+					}
 				}
 				test.setAnswerFiles(answerFiles);
 			} 

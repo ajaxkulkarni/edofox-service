@@ -2,6 +2,7 @@ package com.rns.web.edo.service.domain.jpa;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -33,6 +34,10 @@ public class EdoAnswerFileEntity {
 	private Date createdDate;
 	@Column(name = "file_url", unique = true)
 	private String fileUrl;
+	@Column(name = "correction_url", unique = true)
+	private String correctionUrl;
+	@Column(name = "correction_marks", unique = true)
+	private BigDecimal correctionMarks;
 	
 	
 	public Date getCreatedDate() {
@@ -76,5 +81,17 @@ public class EdoAnswerFileEntity {
 	}
 	public void setFileUrl(String fileUrl) {
 		this.fileUrl = fileUrl;
+	}
+	public String getCorrectionUrl() {
+		return correctionUrl;
+	}
+	public void setCorrectionUrl(String correctionUrl) {
+		this.correctionUrl = correctionUrl;
+	}
+	public BigDecimal getCorrectionMarks() {
+		return correctionMarks;
+	}
+	public void setCorrectionMarks(BigDecimal correctionMarks) {
+		this.correctionMarks = correctionMarks;
 	}
 }

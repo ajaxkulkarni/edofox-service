@@ -1,6 +1,8 @@
 package com.rns.web.edo.service;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -24,6 +26,7 @@ import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoExcelUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
 @Component
@@ -501,5 +504,18 @@ public class EdoAdminController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse updateEdofoxTokens(EdoServiceRequest request) {
 		return adminBo.updateEdofoxTokens(request);
+	}
+	
+	@Path("/uploadEvaluation")
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse uploadEvaluation(@FormDataParam("file") FormDataBodyPart bodyParts,
+			@FormDataParam("file") FormDataContentDisposition fileDispositions,
+			@FormDataParam("answerId") Integer answerId, @FormDataParam("marks") BigDecimal marks) {
+
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(adminBo.uploadEvaluation(bodyParts, answerId, marks));
+		return response;
 	}
 }

@@ -45,7 +45,6 @@ import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EDOStudentAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
-import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -59,6 +58,7 @@ import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
@@ -67,10 +67,10 @@ import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoUplinkStatus;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
+import com.rns.web.edo.service.util.EdoAwsUtil;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
-import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoNotificationsManager;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
@@ -83,6 +83,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.FormDataBodyPart;
 
 public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
@@ -2084,5 +2086,36 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 
 	public void setMailExecutor(ThreadPoolTaskExecutor mailExecutor) {
 		this.mailExecutor = mailExecutor;
+	}
+
+	public EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks) {
+		Session session = null;
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyParts.getEntity();
+			session = this.sessionFactory.openSession();
+			EdoAnswerFileEntity answerFileEntity = (EdoAnswerFileEntity) session.createCriteria(EdoAnswerFileEntity.class)
+					.add(Restrictions.eq("id", answerId)).uniqueResult();
+			if(answerFileEntity != null) {
+				Transaction tx = session.beginTransaction();
+				String localFileName = bodyParts.getContentDisposition().getFileName();
+				if(localFileName == null) {
+					localFileName = "";
+				}
+				String fileName = "evaluated_" + answerFileEntity.getId() +  "_" + localFileName;
+				answerFileEntity.setCorrectionUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyParts.getContentDisposition().getType(), "answerFilesEdofox"));
+				if(marks != null) {
+					answerFileEntity.setCorrectionMarks(marks);
+				}
+				tx.commit();
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
 	}
 }
