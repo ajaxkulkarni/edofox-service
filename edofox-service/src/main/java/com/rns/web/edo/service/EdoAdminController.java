@@ -2,7 +2,6 @@ package com.rns.web.edo.service;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -516,6 +515,16 @@ public class EdoAdminController {
 
 		EdoServiceResponse response = new EdoServiceResponse();
 		response.setStatus(adminBo.uploadEvaluation(bodyParts, answerId, marks));
+		return response;
+	}
+	
+	@POST
+	@Path("/updateScore")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateScore(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.updateStudentScore(request));
 		return response;
 	}
 }

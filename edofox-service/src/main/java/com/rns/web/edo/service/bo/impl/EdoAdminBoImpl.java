@@ -2102,7 +2102,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				if(localFileName == null) {
 					localFileName = "";
 				}
-				String fileName = "evaluated_" + answerFileEntity.getId() +  "_" + localFileName;
+				String fileName = "evaluated_" + answerFileEntity.getId() +  ".png";
 				answerFileEntity.setCorrectionUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyParts.getContentDisposition().getType(), "answerFilesEdofox"));
 				if(marks != null) {
 					answerFileEntity.setCorrectionMarks(marks);
@@ -2112,9 +2112,57 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
 		} finally {
 			CommonUtils.closeSession(session);
+		}
+		return status;
+	}
+	
+	public EdoApiStatus updateStudentScore(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		if (request.getStudent() == null || request.getStudent().getId() == null || request.getTest() == null || request.getTest().getId() == null) {
+			status.setStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST);
+			return status;
+		}
+		Session session = null;
+		EdoTest test = request.getTest();
+		try {
+			session = this.sessionFactory.openSession();
+			
+			List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+					.add(Restrictions.eq("testId", test.getId()))
+					.add(Restrictions.eq("studentId", request.getStudent().getId()))
+					.list();
+			EdoTestStatusEntity map = null;
+			if(CollectionUtils.isNotEmpty(maps)) {
+				map = maps.get(0);
+			}
+
+			if(map == null) {
+				status.setStatus(-111, "No record found of this student for selected exam");
+				return status;
+			}
+
+
+
+			Transaction tx = session.beginTransaction();
+			
+			map.setSolved(test.getSolvedCount());
+			map.setCorrect(test.getCorrectCount());
+			//map.setFlagged(test.getFlaggedCount());
+			map.setScore(test.getScore());
+			map.setStatus(TEST_STATUS_COMPLETED);
+			map.setUpdatedDate(new Date());
+			//Commit the transaction
+			//txManager.commit(txStatus);
+			tx.commit();
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return status;
 	}
