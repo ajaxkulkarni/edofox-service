@@ -533,6 +533,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	private String addStudent(EdoServiceRequest request, EdoStudent student) {
 		List<EdoStudent> existingStudent = null;
 		
+		if(StringUtils.isBlank(student.getRollNo())) {
+			return ERROR_INCOMPLETE_REQUEST;
+		}
+		
 		/*if(StringUtils.equals(request.getRequestType(), "ROLL")) {
 			existingStudent = testsDao.getStudentByRollNo(student);
 		} else {
@@ -540,7 +544,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}*/
 		
 		boolean update = false;
-		if(StringUtils.equals(request.getRequestType(), "ADD_PKG") || StringUtils.equals(request.getRequestType(), "REMOVE")) {
+		if(StringUtils.equals(request.getRequestType(), "ADD_PKG") || StringUtils.equals(request.getRequestType(), "OVERWRITE_PKG") || StringUtils.equals(request.getRequestType(), "REMOVE")) {
 			update = true;
 		}
 		
@@ -604,7 +608,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				}
 				//if(update) {
 				//LoggingUtil.logMessage("Removing student package IF PRESENT for =>" + student.getId());
+				//Delete package only for overwrite request
 				testsDao.deleteExistingPackages(student);
+				if(StringUtils.equals(request.getRequestType(), "OVERWRITE_PKG")) {
+					testsDao.deleteStudentPackages(student);
+				}
 				//}
 				if(!StringUtils.equals("REMOVE", request.getRequestType())) {
 					LoggingUtil.logMessage("Adding student package for =>" + student.getId());

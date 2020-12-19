@@ -194,6 +194,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_ACTIVATED, "package_active.html");
 			put(MAIL_TYPE_NEW_EXAM, "exam_notification.html");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "doubt_notification.html");
+			put(MAIL_TYPE_NEW_CLASSWORK, "classwork_notification.html");
 		}
 	});
 

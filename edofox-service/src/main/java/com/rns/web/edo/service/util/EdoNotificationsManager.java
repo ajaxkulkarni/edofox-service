@@ -174,27 +174,29 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 				}
 			} else if (exam != null) {
 				exam = testsDao.getTest(exam.getId());
-				if (!DateUtils.isSameDay(exam.getStartDate(), new Date())) {
-					return;
+				if(exam != null && exam.getStartDate() != null) {
+					if (!DateUtils.isSameDay(exam.getStartDate(), new Date())) {
+						return;
+					}
+					bodyText = CommonUtils.prepareTestNotification(bodyText, exam, null, "");
+					titleText = CommonUtils.prepareTestNotification(titleText, exam, null, "");
+					devices = testsDao.getStudentDevicesForPackage(exam.getPackageId());
+					List<EdoStudent> devices2 = testsDao.getStudentDevicesForExam(exam);
+					if (CollectionUtils.isNotEmpty(devices2)) {
+						devices.addAll(devices2);
+					}
+					//Fetch mailing list
+					mailers = testsDao.getStudentContactsForExam(exam);
+					if(mailers == null) {
+						mailers = new ArrayList<EdoStudent>();
+					}
+					List<EdoStudent> mailers2 = testsDao.getStudentContactsForPackage(exam.getPackageId());
+					if(CollectionUtils.isNotEmpty(mailers2)) {
+						mailers.addAll(mailers2);
+					}
+					mailUtil.setExam(exam);
+					LoggingUtil.logMessage("Found " + mailers + " mailers ", LoggingUtil.emailLogger);
 				}
-				bodyText = CommonUtils.prepareTestNotification(bodyText, exam, null, "");
-				titleText = CommonUtils.prepareTestNotification(titleText, exam, null, "");
-				devices = testsDao.getStudentDevicesForPackage(exam.getPackageId());
-				List<EdoStudent> devices2 = testsDao.getStudentDevicesForExam(exam);
-				if (CollectionUtils.isNotEmpty(devices2)) {
-					devices.addAll(devices2);
-				}
-				//Fetch mailing list
-				mailers = testsDao.getStudentContactsForExam(exam);
-				if(mailers == null) {
-					mailers = new ArrayList<EdoStudent>();
-				}
-				List<EdoStudent> mailers2 = testsDao.getStudentContactsForPackage(exam.getPackageId());
-				if(CollectionUtils.isNotEmpty(mailers2)) {
-					mailers.addAll(mailers2);
-				}
-				mailUtil.setExam(exam);
-				LoggingUtil.logMessage("Found " + mailers + " mailers ", LoggingUtil.emailLogger);
 			} else if (feedback != null) {
 				EdoServiceRequest req = new EdoServiceRequest();
 				req.setFeedback(feedback);

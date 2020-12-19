@@ -63,6 +63,7 @@ public interface EdoTestsDao {
 	Integer saveStudent(EdoStudent student);
 	Integer createStudentPackage(EdoStudent student);
 	Integer deleteExistingPackages(EdoStudent student);
+	Integer deleteStudentPackages(EdoStudent student);
 	Integer updatePaymentId(EdoStudent student);
 	Integer updatePayment(EdoPaymentStatus status);
 	List<EdoStudent> getStudentByPhoneNumber(EdoStudent student);
