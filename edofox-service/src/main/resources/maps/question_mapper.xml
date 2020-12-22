@@ -435,7 +435,7 @@
 			group by video_id
 		</if>
 		
-		order by exam_feedback.created_date desc;
+		order by exam_feedback.created_date desc
 	
 		<if test = "startIndex != null">
     		LIMIT ${startIndex}, 20
