@@ -1168,7 +1168,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				EdoQuestion currQ = request.getTest().getCurrentQuestion();
 				currQ.getFeedback().setFeedback(CommonUtils.escapeQuotes(currQ.getFeedback().getFeedback()));
 				if(StringUtils.isBlank(request.getRequestType())) {
-					if(currQ.getId() == null) {
+					if(currQ.getId() == null && (currQ.getFeedback().getId() != null || (request.getFeedback() != null && request.getFeedback().getId() != null) )) {
 						request.setRequestType("video");
 					}
 				}
