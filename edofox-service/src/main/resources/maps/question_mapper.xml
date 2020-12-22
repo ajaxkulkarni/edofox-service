@@ -221,7 +221,7 @@
 		</foreach> -->
 		insert into test_questions_map (test_id,question_id,created_date,question_number,section, weightage, negative_marks) values
 		<foreach item="question" index="index" collection="test.test" open="(" separator="),(" close=")">
-            ${test.id}, ${question.id}, CURRENT_TIMESTAMP, ${question.qn_id}, '${question.subject}', ${question.weightage}, ${question.negativeMarks}
+            ${test.id}, ${question.id}, CURRENT_TIMESTAMP, ${question.qn_id}, '${question.section}', ${question.weightage}, ${question.negativeMarks}
         </foreach>
 	</insert>
 	

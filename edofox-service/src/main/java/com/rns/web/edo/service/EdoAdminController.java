@@ -519,6 +519,21 @@ public class EdoAdminController {
 	}
 	
 	@POST
+	@Path("/updateEvaluation")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse updateEvaluation(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(request.getQuestion() != null) {
+			Integer answerId = request.getQuestion().getId();
+			BigDecimal marks = request.getQuestion().getMarks();
+			response.setStatus(adminBo.uploadEvaluation(null, answerId, marks));
+		}
+		return response;
+	}
+	
+	
+	@POST
 	@Path("/updateScore")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)

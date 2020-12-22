@@ -2100,18 +2100,24 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		Session session = null;
 		EdoApiStatus status = new EdoApiStatus();
 		try {
-			BodyPartEntity bodyPartEntity = (BodyPartEntity) bodyParts.getEntity();
+			BodyPartEntity bodyPartEntity = null;
+			if(bodyParts != null) {
+				bodyPartEntity = (BodyPartEntity) bodyParts.getEntity();
+			}
+			
 			session = this.sessionFactory.openSession();
 			EdoAnswerFileEntity answerFileEntity = (EdoAnswerFileEntity) session.createCriteria(EdoAnswerFileEntity.class)
 					.add(Restrictions.eq("id", answerId)).uniqueResult();
 			if(answerFileEntity != null) {
 				Transaction tx = session.beginTransaction();
-				String localFileName = bodyParts.getContentDisposition().getFileName();
-				if(localFileName == null) {
-					localFileName = "";
+				if(bodyPartEntity != null) {
+					String localFileName = bodyParts.getContentDisposition().getFileName();
+					if(localFileName == null) {
+						localFileName = "";
+					}
+					String fileName = "evaluated_" + answerFileEntity.getId() +  ".png";
+					answerFileEntity.setCorrectionUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyParts.getContentDisposition().getType(), "answerFilesEdofox"));
 				}
-				String fileName = "evaluated_" + answerFileEntity.getId() +  ".png";
-				answerFileEntity.setCorrectionUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyParts.getContentDisposition().getType(), "answerFilesEdofox"));
 				if(marks != null) {
 					answerFileEntity.setCorrectionMarks(marks);
 				}
