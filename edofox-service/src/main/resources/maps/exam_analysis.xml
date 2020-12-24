@@ -93,7 +93,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	
 	
 	<select id="getStudentResults" resultMap="students" parameterType="Integer">
-		select *,student.id as studentId from test_status join student on test_status.student_id = student.id where test_status.test_id = ${value} order by test_status.score desc
+		select *,students.id as studentId from test_status join students on test_status.student_id = students.id where test_status.test_id = ${value} order by test_status.score desc
 	</select>
 	
 	<resultMap id="subjectScore" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
