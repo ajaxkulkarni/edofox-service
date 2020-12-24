@@ -93,7 +93,8 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	
 	
 	<select id="getStudentResults" resultMap="students" parameterType="Integer">
-		select *,students.id as studentId from test_status join students on test_status.student_id = students.id where test_status.test_id = ${value} order by test_status.score desc
+	select *,students.id as studentId,CONCAT(students.last_name,' ',students.first_name,' ',students.middle_name) as name,login_details.username as roll_no from test_status join students on test_status.student_id = students.id join login_details on login_details.student_id = students.id where test_status.test_id = ${value} 
+	order by test_status.score desc
 	</select>
 	
 	<resultMap id="subjectScore" type="com.rns.web.edo.service.domain.EdoTestStudentMap">
