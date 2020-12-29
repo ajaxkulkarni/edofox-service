@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
@@ -49,6 +50,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private List<EdoStudent> students;
 	private EdoVideoLectureMap classwork;
 	private EdoQuestion feedbackData;
+	private EdoMailer mailer;
 
 	public void setInstitute(EDOInstitute institute) {
 		this.institute = institute;
@@ -72,11 +74,11 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 		try {
 			Message message = new MimeMessage(session);
-			if (institute != null) {
-				message.setFrom(new InternetAddress(MAIL_ID, institute.getName()));
-			} else {
-				message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
-			}
+			//if (institute != null) {
+			//	message.setFrom(new InternetAddress(MAIL_ID, institute.getName()));
+			//} else {
+			message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
+			//}
 			if (CollectionUtils.isNotEmpty(students)) {
 				for (EdoStudent stu : students) {
 					student = stu;
@@ -136,6 +138,13 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		try {
 			// boolean attachCv = false;
 			String result = readMailContent(message);
+			
+			if(mailer != null) {
+				result = StringUtils.replace(result, "{additionalMessage}", CommonUtils.getStringValue(mailer.getAdditionalMessage()));
+			} else {
+				result = StringUtils.replace(result, "{additionalMessage}", "");
+			}
+			
 			result = CommonUtils.prepareStudentNotification(result, student);
 			result = CommonUtils.prepareInstituteNotification(result, institute);
 			result = CommonUtils.prepareTestNotification(result, exam, institute, "");
@@ -144,7 +153,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			
 			//Set action URL depending on notification type
 			result = StringUtils.replace(result, "{actionUrl}", "test.edofox.com");
-
+			
 			// message.setContent(result, "text/html");
 			message.setContent(result, "text/html; charset=utf-8");
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(student.getEmail()));
@@ -192,6 +201,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "subscription_mail.html");
 			put(MAIL_TYPE_ACTIVATED, "package_active.html");
+			put(MAIL_TYPE_INVITE, "student_invite.html");
 			put(MAIL_TYPE_NEW_EXAM, "exam_notification.html");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "doubt_notification.html");
 			put(MAIL_TYPE_NEW_CLASSWORK, "classwork_notification.html");
@@ -202,6 +212,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION, "Thank you for registering to {instituteName}");
 			put(MAIL_TYPE_ACTIVATED, "Your course for {instituteName} is now active");
+			put(MAIL_TYPE_INVITE, "{instituteName} invites you to Edofox");
 			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName}");
 			put(MAIL_TYPE_NEW_CLASSWORK, "New {contentType} {title} added for you");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "Doubt resolved by teacher");
@@ -239,5 +250,9 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 	public void setFeedbackData(EdoQuestion feedbackData) {
 		this.feedbackData = feedbackData;
+	}
+
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
 	}
 }

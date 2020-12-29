@@ -219,6 +219,8 @@ public class CommonUtils {
 			result = StringUtils.replace(result, "{name}", CommonUtils.getStringValue(student.getName()));
 			// result = StringUtils.replace(result, "{password}",
 			// CommonUtils.getStringValue(user.getPassword()));
+			result = StringUtils.replace(result, "{username}", CommonUtils.getStringValue(student.getRollNo()));
+			result = StringUtils.replace(result, "{password}", CommonUtils.getStringValue(student.getPassword()));
 			result = StringUtils.replace(result, "{gender}", CommonUtils.getStringValue(student.getGender()));
 			result = StringUtils.replace(result, "{phone}", CommonUtils.getStringValue(student.getPhone()));
 			result = StringUtils.replace(result, "{examMode}", CommonUtils.getStringValue(student.getExamMode()));
@@ -446,12 +448,16 @@ public class CommonUtils {
 
 		if (correctAnswer != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
 
+			//Convert all to lower case
+			correctAnswer = StringUtils.lowerCase(correctAnswer);
+			answered.setAnswer(StringUtils.lowerCase(answered.getAnswer()));
+			
 			String[] selectedPairs = StringUtils.split(answered.getAnswer(), ",");
 			Float count = 0f;
 			if (ArrayUtils.isNotEmpty(selectedPairs)) {
 				Map<String, Integer> pairCount = new HashMap<String, Integer>();
 				for (String selectedPair : selectedPairs) {
-					if (!StringUtils.contains(correctAnswer, selectedPair)) {
+					if (!StringUtils.containsIgnoreCase(correctAnswer, selectedPair)) {
 						count--;
 						continue;
 					}

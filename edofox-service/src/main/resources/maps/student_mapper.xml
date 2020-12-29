@@ -173,9 +173,7 @@
 	</select>
 
 	<select id="getAllStudents" parameterType="Integer" resultMap="studentInfo">
-		select * from student join student_institute on student.id =
-		student_institute.student_id
-		where institute_id = ${value}
+		select name,email,mobile_no,username as roll_no,student_login.password,profile_pic,universal_token as token from student join student_login on student.id = student_login.student_id where institute_id = ${value}
 	</select>
 
 	<select id="getTestPackage" parameterType="Integer" resultMap="packages">

@@ -2024,6 +2024,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			mgr.setExam(request.getTest());
 			mgr.setMailExecutor(mailExecutor);
 			mgr.setFeedback(request.getFeedback());
+			mgr.setInstitute(request.getInstitute());
+			mgr.setMailer(request.getMailer());
 			mgr.setTestsDao(testsDao);
 			
 			if(request.getLecture() != null) {

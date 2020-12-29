@@ -457,8 +457,14 @@
                     <td class="content-cell">
                       <div class="f-fallback">
                         <h1>Hi, {name}!</h1>
-                        <p>Your school {instituteName} has invited you to use the portal to access all the educational content. Use the button below to login to your account and get started:</p>
+                        <p>Your institute {instituteName} has invited you to use the portal to access all the educational content. Use the button below to login to your account and get started:</p>
+                        <hr></hr>
                         <p>Your username is {username} and password is {password}</p>
+                        <hr></hr>
+                        <p>We recommend using the latest Google chrome browser to login to the portal on laptop/mobile device (Laptop is recommended for best exam experience)</p>
+                        <p>Android users can also <a href="https://play.google.com/store/apps/details?id=com.mattersoft.edofoxapp&hl=en_IN&gl=US">download </a>  our app from playstore</p>
+                        <hr></hr>
+                        <p>{additionalMessage}</p>
                         
                         <!-- Action -->
                         <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0" role="presentation">
@@ -476,16 +482,16 @@
                             </td>
                           </tr>
                         </table>
-                        <p>If you have any questions , feel free to <a href="mailto:{supportEmail}">contact our customer success team</a> anytime. </p>
+                        <p>If you have any questions , feel free to <a href="mailto:support@edofox.com">contact our customer success team</a> anytime. </p>
                         <p>Welcome aboard,
                           <br>The Edofox Team</p>
-                        <p><strong>P.S.</strong> Need help getting started? Check out our <a href="{fileUrl}">help documentation</a>.</p>
+                        <p><strong>P.S.</strong> Please contact your institute admin if you are not able to login</p>
                         <!-- Sub copy -->
                         <table class="body-sub" role="presentation">
                           <tr>
                             <td>
                               <p class="f-fallback sub">If you’re having trouble with the button above, copy and paste the URL below into your web browser.</p>
-                              <p class="f-fallback sub">{fileUrl}</p>
+                              <p class="f-fallback sub">{actionUrl}</p>
                             </td>
                           </tr>
                         </table>
@@ -500,7 +506,7 @@
                 <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
                   <tr>
                     <td class="content-cell" align="center">
-                      <p class="f-fallback sub align-center">&copy; 2020 {instituteName}. All rights reserved.</p>
+                      <p class="f-fallback sub align-center">&copy; 2020 Mattersoft Privated Ltd. All rights reserved.</p>
                       <p class="f-fallback sub align-center">
                         Powered by Edofox
                         <!-- <br>1234 Street Rd.

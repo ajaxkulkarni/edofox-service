@@ -64,6 +64,8 @@ public interface EdoConstants {
 	String MAIL_TYPE_NEW_CLASSWORK = "NewClasswork";
 	String MAIL_TYPE_NEW_EXAM = "NewExam";
 	String MAIL_TYPE_DOUBT_RESOLVED = "DoubtResolved";
+	String MAIL_TYPE_INVITE = "StudentInvite";
+	
 	
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";

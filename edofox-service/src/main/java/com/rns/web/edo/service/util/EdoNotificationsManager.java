@@ -31,7 +31,9 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import com.rns.web.edo.service.dao.EdoTestsDao;
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoFeedback;
+import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoStudent;
@@ -61,6 +63,8 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 	private EdoFeedback feedback;
 	private String medium;
 	private ThreadPoolTaskExecutor mailExecutor;
+	private EDOInstitute institute;
+	private EdoMailer mailer;
 	
 	static {
 		
@@ -209,6 +213,13 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 					devices = testsDao.getStudentDevicesForDoubt(feedback);
 					mailers = testsDao.getStudentContactsForDoubt(feedback);
 				}
+			} else if (institute != null) {
+				if(StringUtils.isBlank(institute.getName())) {
+					institute = testsDao.getInstituteById(institute.getId());
+				}
+				if(institute != null) {
+					mailers = testsDao.getAllStudents(institute.getId());
+				}
 			}
 			
 			if(CollectionUtils.isNotEmpty(devices)) {
@@ -224,6 +235,8 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 				mailUtil.setStudents(mailers);
 				mailUtil.setClasswork(map);
 				mailUtil.setFeedbackData(feedbackData);
+				mailUtil.setMailer(mailer);
+				mailUtil.setInstitute(institute);
 				mailExecutor.execute(mailUtil);
 			}
 			
@@ -342,6 +355,24 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 		this.mailExecutor = mailExecutor;
 	}
 
+	public EDOInstitute getInstitute() {
+		return institute;
+	}
+
+
+	public void setInstitute(EDOInstitute institute) {
+		this.institute = institute;
+	}
+
+	public EdoMailer getMailer() {
+		return mailer;
+	}
+
+
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
+	}
+
 	private static Map<String, String> NOTIFICATION_BODY = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			// put(MAIL_TYPE_PAYMENT_RESULT, "Your Bill payment for {month}
@@ -352,6 +383,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			//put(MAIL_TYPE_GENERIC, "{message}");
 			put(MAIL_TYPE_NEW_EXAM, "Exam will be available from {startDate} onwards");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "Your doubt {doubtFor} is resolved. Check your doubts section for more info.");
+			put(MAIL_TYPE_INVITE, "Login using username {username}");
 			
 		}
 	});
@@ -366,6 +398,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			//put(MAIL_TYPE_GENERIC, "{message}");
 			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName}");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "Doubt resolved");
+			put(MAIL_TYPE_INVITE, "Your Login credentials for Edofox");
 		}
 	});
 

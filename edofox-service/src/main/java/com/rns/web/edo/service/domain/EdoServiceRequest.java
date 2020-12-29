@@ -42,6 +42,7 @@ public class EdoServiceRequest {
 	private String startTime;
 	private String endTime;
 	private String classrooms;
+	private EdoMailer mailer;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -224,6 +225,14 @@ public class EdoServiceRequest {
 
 	public void setClassrooms(String classrooms) {
 		this.classrooms = classrooms;
+	}
+
+	public EdoMailer getMailer() {
+		return mailer;
+	}
+
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
 	}
 	
 }

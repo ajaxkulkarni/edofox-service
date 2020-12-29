@@ -56,6 +56,7 @@ public class EdoQuestion {
 	private Integer disabled;
 	private Integer instituteId;
 	private Integer lastIndex;
+	private Integer solvedSequenceNumber;
 	
 	public String getOption1() {
 		return option1;
@@ -336,6 +337,12 @@ public class EdoQuestion {
 	}
 	public void setLastIndex(Integer lastIndex) {
 		this.lastIndex = lastIndex;
+	}
+	public Integer getSolvedSequenceNumber() {
+		return solvedSequenceNumber;
+	}
+	public void setSolvedSequenceNumber(Integer solvedSequenceNumber) {
+		this.solvedSequenceNumber = solvedSequenceNumber;
 	}
 
 }

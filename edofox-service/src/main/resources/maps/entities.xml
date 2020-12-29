@@ -25,6 +25,7 @@
 		<result column="paymentStatus" property="currentPackage.status"/>
 		<result column="roll_no" property="rollNo"/>		
 		<result column="token" property="token"/>
+		<result column="password" property="password"/>
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">
