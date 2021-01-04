@@ -1782,8 +1782,16 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 
 			if(map == null) {
-				status.setStatus(-111, "No record found of this student for selected exam");
-				return status;
+				if(StringUtils.equals(request.getRequestType(), "NEW_SCORE")) {
+					map = new EdoTestStatusEntity();
+					map.setStudentId(request.getStudent().getId());
+					map.setTestId(test.getId());
+					map.setCreatedDate(new Date());
+				} else {
+					status.setStatus(-111, "No record found of this student for selected exam");
+					return status;
+				}
+				
 			}
 
 
@@ -1798,6 +1806,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			map.setUpdatedDate(new Date());
 			//Commit the transaction
 			//txManager.commit(txStatus);
+			if(map.getId() == null) {
+				session.persist(map);
+			}
 			tx.commit();
 			
 		} catch (Exception e) {
