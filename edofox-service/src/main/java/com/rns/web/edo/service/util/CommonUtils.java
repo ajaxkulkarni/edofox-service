@@ -314,10 +314,15 @@ public class CommonUtils {
 			}
 		}
 		
+		//Check if JEE rule of best of 5 is applicable
+		List<String> jeeNewFormatSections = sectionsEligibleForNewJeeFormat(test, questions);
+		
+		
 		Integer solvedCount = 0;
 		Integer correctCount = 0;
 		Integer flaggedCount = 0;
 		BigDecimal score = BigDecimal.ZERO;
+		Map<String, Integer> numericCorrectCount = new HashMap<String, Integer>();
 		for (EdoQuestion answered : test.getTest()) {
 			if (StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
 				setComplexAnswer(answered);
@@ -331,11 +336,20 @@ public class CommonUtils {
 							if (questionScore > 0) {
 								correctCount++;
 							}
-							BigDecimal marks = new BigDecimal(questionScore);
-							answered.setMarks(marks);
-							score = score.add(marks);
-							LoggingUtil.logMessage(answered.getQuestionNumber() + "--" + answered.getQn_id() + " -- " + answered.getAnswer() + " -- "
-									+ answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + answered.getMarks() + " -- " + score);
+							//if section is eligible for new JEE format
+							boolean addScoreToTotal = checkForJeeNewFormat(jeeNewFormatSections, numericCorrectCount, answered, question, questionScore);
+							
+							if(addScoreToTotal) {
+								BigDecimal marks = new BigDecimal(questionScore);
+								answered.setMarks(marks);
+								score = score.add(marks);
+								LoggingUtil.logMessage(answered.getQuestionNumber() + "--" + answered.getQn_id() + " -- " + answered.getAnswer() + " -- "
+										+ answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + answered.getMarks() + " -- " + score);
+							} else {
+								LoggingUtil.logMessage("Did not add score as best of condition reached " + answered.getQuestionNumber() + "--" + answered.getQn_id() + " -- " + answered.getAnswer() + " -- "
+										+ answered.getWeightage() + " -- " + answered.getNegativeMarks() + " " + ":" + answered.getMarks() + " -- " + score);
+							}
+							
 						}
 						break;
 					}
@@ -348,12 +362,57 @@ public class CommonUtils {
 
 		}
 		
+		
 		test.setCorrectCount(correctCount);
 		test.setFlaggedCount(flaggedCount);
 		test.setSolvedCount(solvedCount);
 		test.setScore(score);
 
 		LoggingUtil.logMessage("Evaluated the test - " + test.getCorrectCount() + " .. " + test.getScore());
+	}
+
+	private static boolean checkForJeeNewFormat(List<String> jeeNewFormatSections, Map<String, Integer> numericCorrectCount, EdoQuestion answered,
+			EdoQuestion question, Float questionScore) {
+		String section = StringUtils.isNotBlank(answered.getSection()) ? answered.getSection() : question.getSection();
+		if(questionScore > 0 && CollectionUtils.isNotEmpty(jeeNewFormatSections) && section != null && jeeNewFormatSections.contains(section)) {
+			Integer count = numericCorrectCount.get(section) != null ? numericCorrectCount.get(section) : 1;
+			count++;
+			if(count < EdoConstants.JEE_NEW_FORMAT_BEST_OF_VALUE) {
+				numericCorrectCount.put(section, count);
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static List<String> sectionsEligibleForNewJeeFormat(EdoTest test, List<EdoQuestion> questions) {
+		//Apply JEE pattern rule of best of 5 for NUMBER questions in case of JEE UI and
+		if(!StringUtils.equalsIgnoreCase("JEEM", test.getTestUi())) {
+			return null;
+		}
+				
+		if(CollectionUtils.isNotEmpty(questions)) {
+			Map<String, Integer> numericSectionMap = new HashMap<String, Integer>();
+			for (EdoQuestion question : questions) {
+				if(StringUtils.isNotBlank(question.getSection()) && StringUtils.equals(question.getType(), EdoConstants.QUESTION_TYPE_NUMBER)) {
+					Integer count = 1;
+					if(numericSectionMap.get(question.getSection()) != null) {
+						count = numericSectionMap.get(question.getSection()) + 1;
+					}
+					numericSectionMap.put(question.getSection(), count);
+				}
+			}
+			List<String> numericSections = new ArrayList<String>();
+			for(Entry<String, Integer> sectionEntry: numericSectionMap.entrySet()) {
+				if(sectionEntry.getValue() == 10) {
+					numericSections.add(sectionEntry.getKey());
+				}
+			}
+			return numericSections;
+		}
+		return null;
 	}
 
 	public static void setComplexAnswer(EdoQuestion answered) {

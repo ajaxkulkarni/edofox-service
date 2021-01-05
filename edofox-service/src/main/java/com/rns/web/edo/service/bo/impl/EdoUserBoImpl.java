@@ -623,8 +623,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			Integer currentTest = testSubmissions.get(request.getStudent().getId());
 			if(currentTest != null && request.getTest().getId() == currentTest) {
-				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
-				status.setStatusCode(STATUS_ERROR);
+				//Don't return already submitted as ERROR, consider it a success
+				//status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
+				//status.setStatusCode(STATUS_ERROR);
 				LoggingUtil.logMessage("Test " + currentTest + " being submitted for student=>" + request.getStudent().getId(), LoggingUtil.saveTestLogger);
 				return status;
 			}
@@ -646,12 +647,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(maps)) {
 				map = maps.get(0);
 			}
-			if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
+			
+			//Already submitted error removed from the code Jan 05 21 .. allow student to overwrite and submit again
+			/*if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
 				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
 				status.setStatusCode(STATUS_ERROR);
 				LoggingUtil.logMessage("Already submitted this test for student=>" + request.getStudent().getId(), LoggingUtil.saveTestLogger);
 				return status;
-			}
+			}*/
 			
 			if(map == null) {
 				map = new EdoTestStatusEntity();
@@ -667,6 +670,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				status.setStatusCode(STATUS_ERROR);
 				return status;
 			}
+			
 			CommonUtils.calculateTestScore(test, questions);
 			
 			/*if(request != null && request.getTest() != null && CollectionUtils.isNotEmpty(request.getTest().getTest())) {

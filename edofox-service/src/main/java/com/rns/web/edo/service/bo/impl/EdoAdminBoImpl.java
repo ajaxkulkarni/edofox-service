@@ -433,18 +433,22 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				institute = testsDao.getInstituteById(request.getInstitute().getId());
 			}
 			
-			if(request.getStudent() == null) {
-				List<EdoStudent> students = testsDao.getStudentResults(request.getTest().getId());
-				if(CollectionUtils.isNotEmpty(students)) {
-					for(EdoStudent student: students) {
-						EdoServiceRequest req = new EdoServiceRequest();
-						req.setTest(request.getTest());
-						req.setStudent(student);
-						evalulateStudent(req, questions, bonus, bonusCount, request.getRequestType(), institute, request.getSmsMessage());
+			EdoTest test = testsDao.getTest(request.getTest().getId());
+			if(test != null) {
+				if(request.getStudent() == null) {
+					List<EdoStudent> students = testsDao.getStudentResults(request.getTest().getId());
+					if(CollectionUtils.isNotEmpty(students)) {
+						for(EdoStudent student: students) {
+							EdoServiceRequest req = new EdoServiceRequest();
+							req.setTest(test);
+							req.setStudent(student);
+							evalulateStudent(req, questions, bonus, bonusCount, request.getRequestType(), institute, request.getSmsMessage());
+						}
 					}
+				} else {
+					request.setTest(test);
+					evalulateStudent(request, questions, bonus, bonusCount, request.getRequestType(), institute, request.getSmsMessage());
 				}
-			} else {
-				evalulateStudent(request, questions, bonus, bonusCount, request.getRequestType(), institute, request.getSmsMessage());
 			}
 			
 			

@@ -75,6 +75,7 @@
 		<result column="totalStudents" property="analysis.studentsAppeared"/>
 		<result column="package_id" property="packageId"/>
 		<result column="show_result" property="showResult" />
+		<result column="test_ui" property="testUi"/>
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">

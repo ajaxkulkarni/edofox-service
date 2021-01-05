@@ -66,11 +66,12 @@ public interface EdoConstants {
 	String MAIL_TYPE_DOUBT_RESOLVED = "DoubtResolved";
 	String MAIL_TYPE_INVITE = "StudentInvite";
 	
-	
+	Integer JEE_NEW_FORMAT_BEST_OF_VALUE = 5;
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
 	String QUESTION_TYPE_MATCH = "MATCH";
 	String QUESTION_TYPE_PASSAGE = "PASSAGE";
+	String QUESTION_TYPE_NUMBER = "NUMBER";
 	
 	String REQUEST_FIREBASE_UPDATE = "firebaseUpdate";
 	
