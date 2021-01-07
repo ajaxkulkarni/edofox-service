@@ -375,9 +375,9 @@ public class CommonUtils {
 			EdoQuestion question, Float questionScore) {
 		String section = StringUtils.isNotBlank(answered.getSection()) ? answered.getSection() : question.getSection();
 		if(questionScore > 0 && CollectionUtils.isNotEmpty(jeeNewFormatSections) && section != null && jeeNewFormatSections.contains(section)) {
-			Integer count = numericCorrectCount.get(section) != null ? numericCorrectCount.get(section) : 1;
+			Integer count = numericCorrectCount.get(section) != null ? numericCorrectCount.get(section) : 0;
 			count++;
-			if(count < EdoConstants.JEE_NEW_FORMAT_BEST_OF_VALUE) {
+			if(count <= EdoConstants.JEE_NEW_FORMAT_BEST_OF_VALUE) {
 				numericCorrectCount.put(section, count);
 				return true;
 			} else {
