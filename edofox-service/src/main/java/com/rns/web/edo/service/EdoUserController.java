@@ -585,9 +585,23 @@ public class EdoUserController {
 	public EdoApiStatus uploadFiles2(@FormDataParam("tags") String tags,
 			@FormDataParam("files") List<FormDataBodyPart> bodyParts,
 			@FormDataParam("files") FormDataContentDisposition fileDispositions,
-			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId) {
+			@FormDataParam("testId") Integer testId, 
+			@FormDataParam("studentId") Integer studentId) {
 
-		return userBo.uploadAnswers(bodyParts, testId, studentId);
+		return userBo.uploadAnswers(bodyParts, testId, studentId, null);
+	}
+	
+	@Path("/uploadSubmission")
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoApiStatus uploadSubmission(@FormDataParam("tags") String tags,
+			@FormDataParam("files") List<FormDataBodyPart> bodyParts,
+			@FormDataParam("files") FormDataContentDisposition fileDispositions,
+			@FormDataParam("classworkId") Integer classworkId, 
+			@FormDataParam("studentId") Integer studentId) {
+
+		return userBo.uploadAnswers(bodyParts, classworkId, studentId, "CLASSWORK");
 	}
 	
 	@POST

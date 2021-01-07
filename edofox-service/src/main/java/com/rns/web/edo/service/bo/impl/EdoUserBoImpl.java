@@ -58,6 +58,7 @@ import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkActivity;
 import com.rns.web.edo.service.domain.jpa.EdoClassworkMap;
+import com.rns.web.edo.service.domain.jpa.EdoClassworkSubmission;
 import com.rns.web.edo.service.domain.jpa.EdoConfig;
 import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
@@ -1986,13 +1987,32 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return status;
 	}
 
-	public EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId) {
+	public EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId, String requestType) {
 		EdoApiStatus status = new EdoApiStatus();
 		Session session = null;
 		try {
 			if(CollectionUtils.isNotEmpty(bodyParts)) {
 				session = this.sessionFactory.openSession();
 				Transaction tx = session.beginTransaction();
+				EdoClassworkSubmission submission = null;
+				if(StringUtils.equals("CLASSWORK", requestType)) {
+					//Find if submission exists already
+					List<EdoClassworkSubmission> submissions = session.createCriteria(EdoClassworkSubmission.class)
+							.add(Restrictions.eq("classworkId", testId))
+							.add(Restrictions.eq("studentId", studentId)).list();
+					if(CollectionUtils.isNotEmpty(submissions)) {
+						submission = submissions.get(0);
+					} else {
+						submission = new EdoClassworkSubmission();
+						submission.setCreatedDate(new Date());
+						submission.setClassworkId(testId);
+						submission.setUpdatedDate(new Date());
+						submission.setStudentId(studentId);
+						submission.setStatus("Pending");
+						session.persist(submission);
+					}
+				}
+					
 				for (FormDataBodyPart bodyPart: bodyParts) {
 					/*
 					 * Casting FormDataBodyPart to BodyPartEntity, which can give us
@@ -2006,17 +2026,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						folder.mkdirs();
 					}
 					EdoAnswerFileEntity answerFileEntity = new EdoAnswerFileEntity();
-					answerFileEntity.setTestId(testId);
+					if(StringUtils.equals("CLASSWORK", requestType)) {
+						answerFileEntity.setSubmissionId(submission.getId());
+					} else {
+						answerFileEntity.setTestId(testId);
+					}
 					answerFileEntity.setStudentId(studentId);
 					answerFileEntity.setCreatedDate(new Date());
 					session.persist(answerFileEntity);
 					String fileName = answerFileEntity.getId() +  "_" + bodyPart.getContentDisposition().getFileName();
-					String filePath = answersPath + fileName;
+					//String filePath = answersPath + fileName;
 					//answersPath = answersPath
-					writeFile(bodyPartEntity.getInputStream(), new FileOutputStream(filePath));
+					//writeFile(bodyPartEntity.getInputStream(), new FileOutputStream(filePath));
 					answerFileEntity.setAwsUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyPart.getContentDisposition().getType(), "answerFiles"));
-					answerFileEntity.setFilePath(filePath);
-					answerFileEntity.setFileUrl(CommonUtils.prepareAnswerURLs(answerFileEntity.getId()));
+					//answerFileEntity.setFilePath(filePath);
+					//answerFileEntity.setFileUrl(CommonUtils.prepareAnswerURLs(answerFileEntity.getId()));
 					
 				}
 				tx.commit();

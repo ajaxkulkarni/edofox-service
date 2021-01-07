@@ -172,7 +172,14 @@
 	</select>
 
 	<select id="getAnswerFiles" resultMap="answerFiles" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		SELECT * from exam_answer_files where  exam_id = ${test.id} AND student_id = ${student.id} 
+		SELECT * from exam_answer_files where  
+		<if test="requestType == 'CLASSWORK'">
+		submission_id = ${test.id}
+		</if>
+		<if test="requestType != 'CLASSWORK'">
+		exam_id = ${test.id} 
+		</if>
+		AND student_id = ${student.id} 
 	</select>
 
 </mapper>

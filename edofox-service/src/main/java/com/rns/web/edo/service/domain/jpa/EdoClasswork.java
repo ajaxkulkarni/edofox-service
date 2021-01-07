@@ -53,7 +53,8 @@ public class EdoClasswork {
 	private int disabled;
 	@Column(name = "uploaded_by")
 	private Integer uploader;
-	
+	@Column(name = "is_assignment")
+	private String assignment;
 	
 	public String getFileLoc() {
 		return fileLoc;
@@ -160,5 +161,11 @@ public class EdoClasswork {
 	}
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+	public String getAssignment() {
+		return assignment;
+	}
+	public void setAssignment(String assignment) {
+		this.assignment = assignment;
 	}
 }
