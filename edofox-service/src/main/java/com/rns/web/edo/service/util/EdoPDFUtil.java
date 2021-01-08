@@ -73,6 +73,8 @@ public class EdoPDFUtil {
 				// System.out.println(tStripper.getEndPage());
 				final Map<PDPage, List<EdoPDFCoordinate>> coordinates = new HashMap<PDPage, List<EdoPDFCoordinate>>();
 
+				final Integer from = request.getFromQuestion();
+				
 				PDFTextStripper customStripper = new PDFTextStripper() {
 					int questionCount = 1;
 
@@ -86,6 +88,9 @@ public class EdoPDFUtil {
 						this.pg = page;
 						System.out.println(page);
 						super.startPage(page);
+						if(from != null && from > 0 && from > questionCount) {
+							questionCount = from;
+						}
 					}
 
 					@Override

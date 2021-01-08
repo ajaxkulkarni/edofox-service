@@ -171,22 +171,22 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							qAnalysis.setOption2Count(currentAnalysis.getOptionCount());
 							qAnalysis.setOption2percent(CommonUtils.getPercent(currentAnalysis.getOptionCount(), analysis.getAnalysis().getStudentsAppeared()));
 							if(StringUtils.equalsIgnoreCase(ATTR_OPTION2, question.getCorrectAnswer())) {
-								qAnalysis.setCorrectCount(currentAnalysis.getOption1Count());
-								qAnalysis.setCorrectPercent(qAnalysis.getOption1percent());
+								qAnalysis.setCorrectCount(currentAnalysis.getOption2Count());
+								qAnalysis.setCorrectPercent(qAnalysis.getOption2percent());
 							}
 						} else if(StringUtils.equalsIgnoreCase(ATTR_OPTION3, currentAnalysis.getOptionSelected())) {
 							qAnalysis.setOption3Count(currentAnalysis.getOptionCount());
 							qAnalysis.setOption3percent(CommonUtils.getPercent(currentAnalysis.getOptionCount(), analysis.getAnalysis().getStudentsAppeared()));
 							if(StringUtils.equalsIgnoreCase(ATTR_OPTION3, question.getCorrectAnswer())) {
-								qAnalysis.setCorrectCount(currentAnalysis.getOption1Count());
-								qAnalysis.setCorrectPercent(qAnalysis.getOption1percent());
+								qAnalysis.setCorrectCount(currentAnalysis.getOption3Count());
+								qAnalysis.setCorrectPercent(qAnalysis.getOption3percent());
 							}
 						} else if(StringUtils.equalsIgnoreCase(ATTR_OPTION4, currentAnalysis.getOptionSelected())) {
 							qAnalysis.setOption4Count(currentAnalysis.getOptionCount());
 							qAnalysis.setOption4percent(CommonUtils.getPercent(currentAnalysis.getOptionCount(), analysis.getAnalysis().getStudentsAppeared()));
 							if(StringUtils.equalsIgnoreCase(ATTR_OPTION4, question.getCorrectAnswer())) {
-								qAnalysis.setCorrectCount(currentAnalysis.getOption1Count());
-								qAnalysis.setCorrectPercent(qAnalysis.getOption1percent());
+								qAnalysis.setCorrectCount(currentAnalysis.getOption4Count());
+								qAnalysis.setCorrectPercent(qAnalysis.getOption4percent());
 							}
 						} 
 					}
