@@ -45,7 +45,10 @@
 		<if test="instituteId != null">
 			institute_id,
 		</if>
-		level, ref_id)
+		<!-- <if test="partialCorrection != null">
+			partial,
+		</if> -->
+		level, ref_id, partial)
 		values
 		(${subjectId},'${question}','${option1}','${option2}','${option3}','${option4}','${correctAnswer}','${questionImageUrl}',
 		'${solution}','${solutionImageUrl}',${weightage},${negativeMarks},CURRENT_TIMESTAMP,'${type}','${examType}',
@@ -55,13 +58,16 @@
 		<if test="instituteId != null">
 			${instituteId},
 		</if>
+		<!-- <if test="partialCorrection != null">
+			${partialCorrection},
+		</if> -->
 		<if test="level != null">
 			${level}, 
 		</if>
 		<if test="level == null">
 			NULL, 
 		</if>
-		'${referenceId}')
+		'${referenceId}', '${partialCorrection}')
 	</insert>
 
 	<select id="getNoOfQuestionsByChapter" resultType="Integer"
