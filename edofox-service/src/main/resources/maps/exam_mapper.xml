@@ -34,6 +34,7 @@
 		<result column="end_date" property="test.endDate"/>
 		<result column="random_questions" property="test.randomQuestions"/>
 		<result column="time_constraint" property="test.timeConstraint"/>
+		<result column="student_time_constraint" property="test.studentTimeConstraint"/>
 		<result column="show_question_paper" property="test.showQuestionPaper"/>
 		<result column="pause_timeout_seconds" property="test.pauseTimeout"/>
 		<result column="max_allowed_test_starts" property="test.maxStarts"/>
@@ -78,7 +79,7 @@
 		<result column="test_ui" property="test.testUi"/>
 		<result column="max_allowed_test_starts" property="test.maxStarts"/>
 		<result column="exam_started_count" property="startedCount"/>
-		
+		<result column="created_date" property="createdDate"/>
 	</resultMap>
 
 	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
