@@ -2012,7 +2012,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						session.persist(submission);
 					}
 				}
-					
+				LoggingUtil.logMessage("Uploading submissions .. " + bodyParts.size());
 				for (FormDataBodyPart bodyPart: bodyParts) {
 					/*
 					 * Casting FormDataBodyPart to BodyPartEntity, which can give us
@@ -2038,6 +2038,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					//String filePath = answersPath + fileName;
 					//answersPath = answersPath
 					//writeFile(bodyPartEntity.getInputStream(), new FileOutputStream(filePath));
+					LoggingUtil.logMessage("Uploading to AWS .. " + fileName);
 					answerFileEntity.setAwsUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyPart.getContentDisposition().getType(), "answerFiles"));
 					//answerFileEntity.setFilePath(filePath);
 					//answerFileEntity.setFileUrl(CommonUtils.prepareAnswerURLs(answerFileEntity.getId()));
@@ -2045,7 +2046,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				tx.commit();
 			}
-			
+			LoggingUtil.logMessage("Uploading done .. ");
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveAnswerErrorLogger);
