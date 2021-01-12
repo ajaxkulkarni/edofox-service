@@ -280,7 +280,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				String status = "";
 				if(studentMap != null) {
 					startedDate = studentMap.getCreatedDate();
-					status = studentMap.getStatus();
+					if(DateUtils.isSameDay(startedDate, new Date())) {
+						status = studentMap.getStatus();
+					}
 				}
 				Integer startedCount = 0;
 				//Added on 11/12/19
