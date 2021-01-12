@@ -277,8 +277,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					return response;
 				}
 				
+				String status = "";
 				if(studentMap != null) {
 					startedDate = studentMap.getCreatedDate();
+					status = studentMap.getStatus();
 				}
 				Integer startedCount = 0;
 				//Added on 11/12/19
@@ -342,7 +344,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be available on " + CommonUtils.convertDate(mapTest.getStartDate())));
 							return response;
 						}
-						if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime()) {
+						if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime() && !StringUtils.equals(status, TEST_STATUS_STARTED)) {
 							if(studentMap.getRegisterDate() != null && studentMap.getRegisterDate().getTime() < mapTest.getEndDate().getTime()) {
 								response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
 								return response;
