@@ -42,6 +42,8 @@ public class EdoAnswerEntity {
 	private Date updatedDate;
 	@Column(name = "question_number", unique = true)
 	private Integer questionNumber;
+	@Column(name = "ttl")
+	private Integer ttl;
 	
 	
 	public Date getCreatedDate() {
@@ -110,5 +112,10 @@ public class EdoAnswerEntity {
 	public Integer getQuestionNumber() {
 		return questionNumber;
 	}
-	
+	public void setTtl(Integer ttl) {
+		this.ttl = ttl;
+	}
+	public Integer getTtl() {
+		return ttl;
+	}
 }

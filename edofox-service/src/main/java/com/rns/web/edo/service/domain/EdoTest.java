@@ -52,6 +52,10 @@ public class EdoTest {
 	private Integer maxStarts;
 	private Integer packageId;
 	private List<EdoAnswerFileEntity> answerFiles;
+	private Integer offlineConduction;
+	private String deviceInfo;
+	private String device;
+	private String submissionType;
 	
 	public EdoTest() {
 		
@@ -348,6 +352,38 @@ public class EdoTest {
 
 	public void setAnswerFiles(List<EdoAnswerFileEntity> answerFiles) {
 		this.answerFiles = answerFiles;
+	}
+
+	public Integer getOfflineConduction() {
+		return offlineConduction;
+	}
+
+	public void setOfflineConduction(Integer offlineConduction) {
+		this.offlineConduction = offlineConduction;
+	}
+
+	public String getDeviceInfo() {
+		return deviceInfo;
+	}
+
+	public void setDeviceInfo(String deviceInfo) {
+		this.deviceInfo = deviceInfo;
+	}
+
+	public String getDevice() {
+		return device;
+	}
+
+	public void setDevice(String device) {
+		this.device = device;
+	}
+
+	public String getSubmissionType() {
+		return submissionType;
+	}
+
+	public void setSubmissionType(String submissionType) {
+		this.submissionType = submissionType;
 	}
 	
 }

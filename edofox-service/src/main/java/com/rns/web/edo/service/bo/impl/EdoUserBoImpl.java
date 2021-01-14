@@ -254,8 +254,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	public EdoServiceResponse getTest(Integer testId, Integer studenId) {
+	public EdoServiceResponse getTest(EdoServiceRequest req) {
 		EdoServiceResponse response = new EdoServiceResponse();
+		Integer studenId = null;
+		Integer testId = null;
+		if(req.getTest() != null) {
+			testId = req.getTest().getId();
+		}
+		if(req.getStudent() != null) {
+			studenId = req.getStudent().getId();
+		}
 		if(testId == null) {
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 			return response;
@@ -300,6 +308,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setCorrectCount(0);
 					test.setFlaggedCount(0);
 					test.setScore(BigDecimal.ZERO);
+					test.setDevice(req.getTest().getDevice());
+					test.setDeviceInfo(StringUtils.substring(req.getTest().getDeviceInfo(), 0, 100));
 					testsDao.saveTestStatus(request);
 				} else {
 					//Update test status for timestamp and exam started count
@@ -315,7 +325,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						startedCount = studentMap.getStartedCount();
 					}
 				}
-				addTestActivity(testId, studenId, "STARTED");
+				addTestActivity(testId, studenId, "STARTED", req.getTest());
 				//Added on 11/12/19
 				
 				studentMaps = testsDao.getStudentActivePackage(inputMap);
@@ -436,13 +446,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	private void addTestActivity(Integer testId, Integer studenId, String type) {
+	private void addTestActivity(Integer testId, Integer studenId, String type, EdoTest edoTest) {
 		EdoServiceRequest req = new EdoServiceRequest();
 		EdoStudent stu = new EdoStudent();
 		stu.setId(studenId);
 		req.setStudent(stu);
 		EdoTest tst = new EdoTest();
 		tst.setId(testId);
+		if(edoTest != null) {
+			tst.setDevice(edoTest.getDevice());
+			tst.setDeviceInfo(StringUtils.substring(edoTest.getDeviceInfo(), 0, 100));
+		}
 		req.setTest(tst);
 		req.setRequestType(type);
 		testsDao.saveStudentTestActivity(req);
@@ -605,6 +619,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		if(request.getQuestion().getQuestionNumber() != null) {
 			answer.setQuestionNumber(request.getQuestion().getQuestionNumber());
 		}
+		//Save time taken to load question image
+		if(answer.getTtl() == null && request.getQuestion().getTtl() != null) {
+			answer.setTtl(request.getQuestion().getTtl());
+		}
 		
 		if(answer.getId() == null) {
 			session.persist(answer);
@@ -707,6 +725,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			map.setScore(test.getScore());
 			map.setStatus(TEST_STATUS_COMPLETED);
 			map.setUpdatedDate(new Date());
+			map.setSubmissionType(test.getSubmissionType());
 			if(map.getId() == null) {
 				session.persist(map);
 			}
@@ -714,7 +733,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//txManager.commit(txStatus);
 			tx.commit();
 			LoggingUtil.logMessage("Submitted the test " + test.getId() +  " for .. " + request.getStudent().getId(), LoggingUtil.saveTestLogger);
-			addTestActivity(test.getId(), request.getStudent().getId(), "COMPLETED");
+			addTestActivity(test.getId(), request.getStudent().getId(), "COMPLETED", test);
 		} catch (Exception e) {
 			status.setStatusCode(STATUS_ERROR);
 			status.setResponseText(ERROR_IN_PROCESSING);

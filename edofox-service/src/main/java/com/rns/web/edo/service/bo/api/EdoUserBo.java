@@ -16,7 +16,7 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 public interface EdoUserBo {
 
 	EdoServiceResponse getTestResult(EdoServiceRequest request);
-	EdoServiceResponse getTest(Integer testId, Integer studentId);
+	EdoServiceResponse getTest(EdoServiceRequest request);
 	EdoApiStatus saveTest(EdoServiceRequest request);
 	EdoFile getQuestionImage(Integer questionId, String imageType, Integer testId);
 	EdoServiceResponse getPackages(EDOInstitute institute);

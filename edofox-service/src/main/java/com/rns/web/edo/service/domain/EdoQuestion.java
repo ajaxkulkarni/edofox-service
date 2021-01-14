@@ -57,6 +57,7 @@ public class EdoQuestion {
 	private Integer instituteId;
 	private Integer lastIndex;
 	private Integer solvedSequenceNumber;
+	private Integer ttl;
 	
 	public String getOption1() {
 		return option1;
@@ -343,6 +344,12 @@ public class EdoQuestion {
 	}
 	public void setSolvedSequenceNumber(Integer solvedSequenceNumber) {
 		this.solvedSequenceNumber = solvedSequenceNumber;
+	}
+	public Integer getTtl() {
+		return ttl;
+	}
+	public void setTtl(Integer ttl) {
+		this.ttl = ttl;
 	}
 
 }

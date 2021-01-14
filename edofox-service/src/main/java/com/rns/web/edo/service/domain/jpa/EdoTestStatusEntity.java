@@ -42,6 +42,15 @@ public class EdoTestStatusEntity {
 	private Long timeLeft;
 	@Column(name = "updated_date", unique = true)
 	private Date updatedDate;
+	@Column(name = "exam_started_count", unique = true)
+	private Integer examStartedCount;
+	@Column(name = "device", unique = true)
+	private String device;
+	@Column(name = "device_info", unique = true)
+	private String deviceInfo;
+	@Column(name = "submission_type", unique = true)
+	private String submissionType;
+	
 	
 	public Integer getId() {
 		return id;
@@ -108,6 +117,30 @@ public class EdoTestStatusEntity {
 	}
 	public Date getUpdatedDate() {
 		return updatedDate;
+	}
+	public Integer getExamStartedCount() {
+		return examStartedCount;
+	}
+	public void setExamStartedCount(Integer examStartedCount) {
+		this.examStartedCount = examStartedCount;
+	}
+	public String getDevice() {
+		return device;
+	}
+	public void setDevice(String device) {
+		this.device = device;
+	}
+	public String getDeviceInfo() {
+		return deviceInfo;
+	}
+	public void setDeviceInfo(String deviceInfo) {
+		this.deviceInfo = deviceInfo;
+	}
+	public String getSubmissionType() {
+		return submissionType;
+	}
+	public void setSubmissionType(String submissionType) {
+		this.submissionType = submissionType;
 	}
 	
 }

@@ -38,6 +38,7 @@
 		<result column="show_question_paper" property="test.showQuestionPaper"/>
 		<result column="pause_timeout_seconds" property="test.pauseTimeout"/>
 		<result column="max_allowed_test_starts" property="test.maxStarts"/>
+		<result column="offline_conduction" property="test.offlineConduction"/>
 		<result column="qStatus" property="question.status"/>
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>
