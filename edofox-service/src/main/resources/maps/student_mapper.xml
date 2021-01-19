@@ -266,7 +266,8 @@
 	</select>
 	
 	<select id="getStudentLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="loginInfo">
-		select * from student_login 
+		select student_id,student_login.username,student_login.password,name,student.mobile_no,student.email,
+		student_login.student_access,institute.institute_name, student_login.institute_id,firebase_id  from student_login 
 		join institute on student_login.institute_id = institute.id 
 		join student on student_login.student_id = student.id 
 		where 
