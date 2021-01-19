@@ -241,7 +241,26 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				EdoStudent student = testsDao.getStudentById(studentId);
 				if(student != null) {
 					//Get courses/divisions the exam is mapped to
-					
+					List<EdoTest> maps = testsDao.getTestMaps(testId);
+					if(CollectionUtils.isNotEmpty(maps)) {
+						boolean found = false;
+						for(EdoTest map: maps) {
+							if(StringUtils.equals(student.getCourse(), map.getCourse())) {
+								if(StringUtils.isNotBlank(map.getDivision()) && StringUtils.equals(student.getDivision(), map.getDivision())) {
+									found = true;
+									break;
+								} else if (StringUtils.isBlank(map.getDivision())) {
+									found = true;
+									break;
+								}
+							}
+						}
+						if(!found) {
+							LoggingUtil.logMessage("Course and exam did not match for student " + studentId + " and test " + testId);
+							response.setStatus(new EdoApiStatus(STATUS_ERROR, "Invalid access to exam. Please clear cache and  logout and log back in."));
+							return response;
+						}
+					}
 				}
 			}
 			
