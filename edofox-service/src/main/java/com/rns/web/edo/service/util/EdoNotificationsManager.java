@@ -32,6 +32,7 @@ import com.google.firebase.messaging.MulticastMessage;
 import com.google.firebase.messaging.Notification;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoQuestion;
@@ -65,6 +66,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 	private ThreadPoolTaskExecutor mailExecutor;
 	private EDOInstitute institute;
 	private EdoMailer mailer;
+	private EdoStudent student;
 	
 	static {
 		
@@ -218,7 +220,12 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 					institute = testsDao.getInstituteById(institute.getId());
 				}
 				if(institute != null) {
-					mailers = testsDao.getAllStudents(institute.getId());
+					if(student == null || student.getCurrentPackage() == null || student.getCurrentPackage().getId() == null) {
+						mailers = testsDao.getAllStudents(institute.getId());
+					} else {
+						student.setInstituteId(institute.getId().toString());
+						mailers = testsDao.getAllPackageStudents(student);
+					}
 				}
 			}
 			
@@ -238,6 +245,11 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 				mailUtil.setMailer(mailer);
 				mailUtil.setInstitute(institute);
 				mailExecutor.execute(mailUtil);
+				EdoSMSUtil task = new EdoSMSUtil(notificationType);
+				task.setStudents(mailers);
+				task.setInstitute(institute);
+				task.setMailer(mailer);
+				mailExecutor.execute(task);
 			}
 			
 		} catch (Exception e) {
@@ -371,6 +383,10 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 
 	public void setMailer(EdoMailer mailer) {
 		this.mailer = mailer;
+	}
+
+	public void setStudent(EdoStudent student) {
+		this.student = student;
 	}
 
 	private static Map<String, String> NOTIFICATION_BODY = Collections.unmodifiableMap(new HashMap<String, String>() {

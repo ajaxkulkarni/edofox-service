@@ -96,6 +96,7 @@ public interface EdoTestsDao {
 	Integer updateSolution(EdoQuestion question);
 	List<EdoStudent> getStudentByPayment(String paymentId);
 	List<EdoStudent> getAllStudents(Integer id);
+	List<EdoStudent> getAllPackageStudents(EdoStudent student);
 	Integer getLastQuestionNumber(Integer testId);
 	Integer saveInstitute(EDOInstitute institute);
 	void createAdminLogin(EDOInstitute institute);

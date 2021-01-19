@@ -163,7 +163,7 @@
 		<if test="requestType != 'Solution'">
 			AND test_status.student_id = ${student.id} AND test_status.student_id 
 		</if>
-		AND question_disabled = 0 order by test_questions_map.id asc
+		AND question_disabled = 0 order by test_questions_map.question_number asc
 		
 	</select>
 	

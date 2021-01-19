@@ -4,13 +4,16 @@ import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.sun.jersey.api.client.Client;
@@ -22,7 +25,9 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 public class EdoSMSUtil implements Runnable, EdoConstants {
 
 	//public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
-	public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=EDOFOX&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
+	//public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=EDOFOX&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
+	public static String SMS_URL = "http://weberleads.in/http-tokenkeyapi.php?authentic-key={auth}&senderid=MHEXAM&route=2&number={phoneNo}&message={message}";
+	
 	private EdoStudent student;
 	private String type;
 	private EdoTest test;
@@ -30,6 +35,9 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	private String additionalMessage;
 	private boolean copyParent;
 	private boolean copyAdmin;
+	private List<EdoStudent> students;
+
+	private EdoMailer mailer;
 
 	public EdoSMSUtil() {
 
@@ -52,7 +60,15 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	}
 
 	public void run() {
-		sendSMS();
+		if(CollectionUtils.isNotEmpty(students)) {
+			for(EdoStudent stu: students) {
+				student = stu;
+				sendSMS();
+			}
+		} else {
+			sendSMS();
+		}
+		
 	}
 
 	public void sendSMS() {
@@ -73,11 +89,20 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 			 * CommonUtils.getStringValue(student.getTransactionId()));
 			 */
 			message = CommonUtils.prepareStudentNotification(message, student);
+			
+			if(mailer != null) {
+				message = StringUtils.replace(message, "{additionalMessage}", CommonUtils.getStringValue(mailer.getAdditionalMessage()));
+			} else {
+				message = StringUtils.replace(message, "{additionalMessage}", "");
+			}
 
 			if (test != null) {
 				message = CommonUtils.prepareTestNotification(message, test, institute, additionalMessage);
 			} else if (institute != null) {
 				message = CommonUtils.prepareInstituteNotification(message, institute);
+			}
+			if(mailer != null) {
+				
 			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 			sendSMS(url);
@@ -164,6 +189,14 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		this.copyAdmin = copyAdmin;
 	}
 
+	public List<EdoStudent> getStudents() {
+		return students;
+	}
+
+	public void setStudents(List<EdoStudent> students) {
+		this.students = students;
+	}
+
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION,
@@ -183,9 +216,15 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 					+ "You can upgrade your plan anytime to enable other premium features.");
 			put(MAIL_TYPE_UPGRADE,
 					"Congratulations {instituteName}. Your account has been successfully updated to {purchase} plan at Edofox. {expiryMessage}");
+			put(MAIL_TYPE_INVITE, "Hello {name}, Your Edofox login credentials for tomorrows {instituteName} exam are - username - {username} and password - {password}. Please use this credentials to login to https://test.edofox.com. Use latest Google chrome on laptop for best exam experience. You can also download our Android app https://play.google.com/store/apps/details?id=com.mattersoft.edofoxapp&hl=en_IN&gl=US "
+					+ "{additionalMessage}");
 			
 			
 		}
 	});
+
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
+	}
 
 }

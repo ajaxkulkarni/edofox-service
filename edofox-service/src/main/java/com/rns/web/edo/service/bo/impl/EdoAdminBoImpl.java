@@ -2031,6 +2031,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			mgr.setInstitute(request.getInstitute());
 			mgr.setMailer(request.getMailer());
 			mgr.setTestsDao(testsDao);
+			if(request.getStudent() != null) {
+				mgr.setStudent(request.getStudent());
+			}
 			
 			if(request.getLecture() != null) {
 				//Schedule video notification at a delay since Vimeo will take some time to reflect

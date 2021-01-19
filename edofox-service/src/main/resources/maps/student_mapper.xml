@@ -175,6 +175,14 @@
 	<select id="getAllStudents" parameterType="Integer" resultMap="studentInfo">
 		select name,email,mobile_no,username as roll_no,student_login.password,profile_pic,universal_token as token from student join student_login on student.id = student_login.student_id where institute_id = ${value}
 	</select>
+	
+	<select id="getAllPackageStudents" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="studentInfo">
+		select name,email,mobile_no,username as roll_no,student_login.password,profile_pic,universal_token as token 
+		from student 
+		join student_login on student.id = student_login.student_id
+		join student_institute on student.id = student_institute.student_id 
+		where student_login.institute_id = ${instituteId} AND student_institute.package_id = ${currentPackage.id}
+	</select>
 
 	<select id="getTestPackage" parameterType="Integer" resultMap="packages">
 		select * from test join packages on test.package_id = packages.id
