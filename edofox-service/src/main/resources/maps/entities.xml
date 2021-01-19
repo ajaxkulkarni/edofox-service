@@ -24,6 +24,8 @@
 		<result column="paymentStatus" property="currentPackage.status"/>		
 		<result column="username" property="username"/>		
 		<result column="token" property="token"/>		
+		<result column="class" property="course"/>
+		<result column="division" property="division"/>
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">
@@ -60,6 +62,9 @@
 		<result column="firebase_id" property="firebaseId" />
 		<result column="start_date" property="startDate" />
 		<result column="total_marks" property="totalMarks"/>
+		<result column="course" property="course"/>
+		<result column="division" property="division"/>
+		
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">

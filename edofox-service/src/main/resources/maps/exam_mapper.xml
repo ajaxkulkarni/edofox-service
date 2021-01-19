@@ -163,6 +163,11 @@
 		SELECT * FROM exam_details where id = ${value};
 	</select>
 	
+	<select id="getTestMaps" resultMap="test" parameterType="Integer">
+		SELECT * FROM exam_details join exam_map on exam_details.id = exam_map.exam
+		where exam = ${value};
+	</select>
+	
 	<select id="getInstituteById" resultMap="institute" parameterType="Integer">
 		SELECT * FROM institutes where id = ${value};
 	</select>

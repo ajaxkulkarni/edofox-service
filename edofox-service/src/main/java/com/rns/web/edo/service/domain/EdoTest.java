@@ -41,6 +41,8 @@ public class EdoTest {
 	private Long secLeft;
 	private String solutionUrl;
 	private List<EdoAnswerFileEntity> answerFiles;
+	private String course;
+	private String division;
 	
 	public EdoTest() {
 		
@@ -273,6 +275,22 @@ public class EdoTest {
 
 	public void setAnswerFiles(List<EdoAnswerFileEntity> answerFiles) {
 		this.answerFiles = answerFiles;
+	}
+
+	public String getCourse() {
+		return course;
+	}
+
+	public void setCourse(String course) {
+		this.course = course;
+	}
+
+	public String getDivision() {
+		return division;
+	}
+
+	public void setDivision(String division) {
+		this.division = division;
 	}
 	
 }

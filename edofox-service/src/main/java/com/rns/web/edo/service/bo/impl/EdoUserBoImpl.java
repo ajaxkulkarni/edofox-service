@@ -236,6 +236,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		try {
+			//Verify if student is eligible for this exam
+			if(studentId != null) {
+				EdoStudent student = testsDao.getStudentById(studentId);
+				if(student != null) {
+					//Get courses/divisions the exam is mapped to
+					
+				}
+			}
+			
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
 
