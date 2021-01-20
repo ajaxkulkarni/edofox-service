@@ -2137,7 +2137,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(new Date().compareTo(studentExam.getStartDate()) < 0) {
 						studentExam.setStatus("PENDING");
 					} else if (new Date().compareTo(studentExam.getEndDate()) > 0) {
-						studentExam.setStatus("EXPIRED");
+						//Show expired only if exam is not started today
+						if(studentExam.getStartedDate() != null && DateUtils.isSameDay(new Date(), studentExam.getStartedDate())) {
+							studentExam.setStatus("ACTIVE");
+						} else {
+							studentExam.setStatus("EXPIRED");
+						}
 					} else {
 						studentExam.setStatus("ACTIVE");
 					}

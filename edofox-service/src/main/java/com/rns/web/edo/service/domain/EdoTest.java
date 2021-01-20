@@ -56,6 +56,7 @@ public class EdoTest {
 	private String deviceInfo;
 	private String device;
 	private String submissionType;
+	private Date startedDate;
 	
 	public EdoTest() {
 		
@@ -384,6 +385,14 @@ public class EdoTest {
 
 	public void setSubmissionType(String submissionType) {
 		this.submissionType = submissionType;
+	}
+
+	public Date getStartedDate() {
+		return startedDate;
+	}
+
+	public void setStartedDate(Date startedDate) {
+		this.startedDate = startedDate;
 	}
 	
 }
