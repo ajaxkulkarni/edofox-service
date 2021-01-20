@@ -76,6 +76,7 @@
 		<result column="package_id" property="packageId"/>
 		<result column="show_result" property="showResult" />
 		<result column="test_ui" property="testUi"/>
+		<result column="startedDate" property="startedDate" />
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">
