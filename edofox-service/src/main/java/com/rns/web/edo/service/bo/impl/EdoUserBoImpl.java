@@ -726,6 +726,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			map.setStatus(TEST_STATUS_COMPLETED);
 			map.setUpdatedDate(new Date());
 			map.setSubmissionType(test.getSubmissionType());
+			if(test.getMinLeft() != null && test.getSecLeft() != null) {
+				map.setTimeLeft((test.getMinLeft() * 60) + test.getSecLeft());
+			} else if (map.getTimeLeft() != null) {
+				map.setTimeLeft(map.getTimeLeft());
+			}
 			if(map.getId() == null) {
 				session.persist(map);
 			}
