@@ -524,7 +524,7 @@
             AND ( (test.end_date > CURRENT_TIMESTAMP AND date(test.start_date) &lt;= date(now()) )  OR date(test_status.created_date) = date(now()) )
             </if>
             <if test="requestType != null &amp;&amp; requestType == 'Upcoming'">
-            AND test.start_date > CURRENT_TIMESTAMP
+            AND date(test.start_date) > date(now())
             </if>
             <if test="requestType != null &amp;&amp; requestType == 'Past'">
             AND test.end_date &lt;= CURRENT_TIMESTAMP
