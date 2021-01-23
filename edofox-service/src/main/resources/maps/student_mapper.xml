@@ -145,6 +145,13 @@
 	<select id="getStudentById" parameterType="Integer" resultMap="studentInfo">
 		select * from student_information where id = ${value}
 	</select>
+	
+	<select id="getStudentDetails" parameterType="Integer" resultMap="studentInfo">
+		select concat(first_name, ' ', middle_name, ' ', last_name) as first_name,student_information.created_at,
+		student_information.mobile_number,username,profile_picture_url,student_information.institute_id from student_information 
+		join login_details on student_information.id = login_details.student_id
+		where student_information.id = ${value}
+	</select>
 
 	<select id="getAllStudents" parameterType="Integer" resultMap="studentInfo">
 		select * from student_information join login_details on student_information.id =

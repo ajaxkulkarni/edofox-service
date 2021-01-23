@@ -29,10 +29,12 @@ import com.rns.web.edo.service.bo.api.EdoUserBo;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
+import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
+import com.rns.web.edo.service.util.EdoReportUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.RtcTokenBuilder.Role;
 import com.rns.web.edo.service.util.VideoTokenGenerator;
@@ -612,5 +614,28 @@ public class EdoUserController {
 		EdoServiceResponse response = new EdoServiceResponse();
 		response = userBo.getUploadedAnswers(request);
 		return response;
+	}
+	
+	@GET
+	@Path("/admissionLetter/{studentId}")
+	//@Produces(MediaType.MULTIPART_FORM_DATA)
+	@Produces("image/png")
+	public Response admissionLetter(@PathParam("studentId") Integer studentId) {
+		//LoggingUtil.logObject("Image request:", userId);
+		try {
+			
+			EdoServiceRequest request = new EdoServiceRequest();
+			EdoStudent student = new EdoStudent();
+			student.setId(studentId);
+			request.setStudent(student);
+			EdoFile file = userBo.printReport(request);
+			ResponseBuilder response = Response.ok(file.getContent());
+			response.header("Content-Disposition", "filename=confirmation_letter.pdf");
+			response.header("Content-Type", APPLICATION_PDF);
+			return response.build();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -72,6 +72,7 @@ import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoNotificationsManager;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
+import com.rns.web.edo.service.util.EdoReportUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
 import com.rns.web.edo.service.util.LoggingUtil;
 import com.rns.web.edo.service.util.PaymentUtil;
@@ -2104,6 +2105,41 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setTest(test);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
+	public EdoFile printReport(EdoServiceRequest request) {
+		EdoFile response = new EdoFile();
+		if (request.getStudent() == null || request.getStudent().getId() == null) {
+			return null;
+		}
+		Session session = null;
+		try {
+			EdoStudent student = testsDao.getStudentDetails(request.getStudent().getId());
+			if(student != null) {
+				if(StringUtils.isNotBlank(student.getProfilePic()) && !StringUtils.contains(student.getProfilePic(), "http")) {
+					//Set student profile pic URL based on domain
+					session = this.sessionFactory.openSession();
+					List<EdoConfig> configs = session.createCriteria(EdoConfig.class)
+							.add(Restrictions.eq("name", "app_url"))
+							.add(Restrictions.eq("instituteId", Integer.valueOf(student.getInstituteId())))
+							.list();
+					if(CollectionUtils.isNotEmpty(configs)) {
+						student.setProfilePic(configs.get(0).getValue() + student.getProfilePic());
+					}
+				}
+				
+				String contentPath = "report/admission_letter.html";
+				String result = CommonUtils.readFile(contentPath);
+				String cssString = CommonUtils.readFile("report/report.css");
+				result = EdoReportUtil.prepareStudentReport(student, result);
+				response.setContent(EdoReportUtil.generatePdf(result, cssString));
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return response;
 	}

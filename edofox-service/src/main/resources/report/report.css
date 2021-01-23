@@ -22,3 +22,8 @@ td {
 .bank_master {
 	width: 80%;
 }
+
+.sub-title {
+	font-size: x-large;
+	font-weight: 2;
+}

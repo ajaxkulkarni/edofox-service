@@ -59,6 +59,14 @@ public class CommonUtils {
 		}
 		return null;
 	}
+	
+	public static String convertDate(Date date, String format) {
+		try {
+			return new SimpleDateFormat(format).format(date);
+		} catch (Exception e) {
+		}
+		return null;
+	}
 
 	public static String readFile(String contentPath) throws FileNotFoundException {
 		File file = getFile(contentPath);

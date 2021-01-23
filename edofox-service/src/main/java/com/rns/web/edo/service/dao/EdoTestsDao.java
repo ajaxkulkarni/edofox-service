@@ -60,6 +60,7 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentByPhoneNumber(EdoStudent student);
 	EDOPackage getTestPackage(Integer testId);
 	EdoStudent getStudentById(Integer id);
+	EdoStudent getStudentDetails(Integer id);
 	int updateStudent(EdoStudent student);
 	List<EDOPackage> getLiveSessions(EDOPackage pkg);
 	List<EdoStudent> getStudentByRollNo(EdoStudent student);

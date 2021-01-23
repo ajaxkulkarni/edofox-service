@@ -1,5 +1,6 @@
 package com.rns.web.edo.service.domain;
 
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -33,6 +34,8 @@ public class EdoStudent {
 	private String token;
 	private String course;
 	private String division;
+	private Date createdAt;
+	private String registrationNo;
 
 	public EdoStudent() {
 
@@ -232,6 +235,22 @@ public class EdoStudent {
 
 	public void setDivision(String division) {
 		this.division = division;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public String getRegistrationNo() {
+		return registrationNo;
+	}
+
+	public void setRegistrationNo(String registrationNo) {
+		this.registrationNo = registrationNo;
 	}
 	
 }

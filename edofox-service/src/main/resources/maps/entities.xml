@@ -26,6 +26,9 @@
 		<result column="token" property="token"/>		
 		<result column="class" property="course"/>
 		<result column="division" property="division"/>
+		<result column="created_at" property="createdAt"/>
+		<result column="profile_picture_url" property="profilePic"/>
+		<result column="institute_id" property="instituteId"/>
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">
