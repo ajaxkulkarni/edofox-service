@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,12 +24,14 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
 import org.hibernate.Session;
+import org.hibernate.engine.query.spi.ReturnMetadata;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
@@ -86,6 +89,12 @@ public class CommonUtils {
 		URL resource = classLoader.getResource(contentPath);
 		File file = new File(resource.getFile());
 		return file;
+	}
+	
+	public static String readFile2(String path) throws IOException{
+		ClassLoader classLoader = new CommonUtils().getClass().getClassLoader();
+		InputStream resourceAsStream = classLoader.getResourceAsStream(path);
+		return IOUtils.toString(resourceAsStream);
 	}
 
 	public static String getStringValue(String value) {
