@@ -2133,6 +2133,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				String contentPath = "report/admission_letter.html";
 				String result = CommonUtils.readFile(contentPath);
 				String cssString = CommonUtils.readFile("report/report.css");
+				LoggingUtil.logMessage("Report file " + result);
 				result = EdoReportUtil.prepareStudentReport(student, result);
 				response.setContent(EdoReportUtil.generatePdf(result, cssString));
 			}
