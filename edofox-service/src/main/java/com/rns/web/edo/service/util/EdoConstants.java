@@ -22,6 +22,7 @@ public interface EdoConstants {
 	Integer STATUS_TEST_NOT_PAID = -103;
 	Integer STATUS_TEST_EXPIRED = -104;
 	Integer STATUS_TEST_NOT_OPENED = -105;
+	Integer STATUS_NO_LOCATION = -106;
 	
 	String ERROR_IN_PROCESSING = "Error in processing!";
 	String ERROR_INVALID_PROFILE = "Student profile was not valid. Please contact support.";
@@ -34,6 +35,7 @@ public interface EdoConstants {
 	String ERROR_TEST_NOT_PAID = "You need to complete the payment in order to attempt this test ..";
 	String ERROR_TEST_EXPIRED = "Sorry. This test is already expired ..";
 	String ERROR_STUDENT_NOT_FOUND = "Student profile not found!";
+	String ERROR_NO_LOCATION = "This exam requires you to send your location for monitoring purposes";
 	
 	String COMMA_SEPARATOR = ", ";
 	

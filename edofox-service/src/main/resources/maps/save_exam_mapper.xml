@@ -28,9 +28,10 @@
 	</insert>
 	
 	<insert id="saveTestStatus" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		insert into test_status (test_id, student_id, status, solved, correct, flagged, score, updated_date, exam_started_count, device, device_info) 
+		insert into test_status (test_id, student_id, status, solved, correct, flagged, score, updated_date, exam_started_count, 
+		device, device_info, latitutde, longitude) 
 		values(${test.id}, ${student.id}, '${requestType}', ${test.solvedCount}, ${test.correctCount}, ${test.flaggedCount}, ${test.score}, 
-		CURRENT_TIMESTAMP, 1 , '${test.device}', '${test.deviceInfo}');
+		CURRENT_TIMESTAMP, 1 , '${test.device}', '${test.deviceInfo}', '${test.locationLat}', '${test.locationLong}');
 	</insert>
 	
 	<update id="updateTestStatus" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
@@ -43,6 +44,12 @@
 		</if>
 		<if test="test.score != null">
 		score = ${test.score}, 
+		</if>
+		<if test="test.locationLat != null">
+		latitude = '${test.locationLat}', 
+		</if>
+		<if test="test.locationLong != null">
+		longitude = '${test.locationLat}', 
 		</if>
 		updated_date = CURRENT_TIMESTAMP, exam_started_count = exam_started_count + 1
 		where test_id = ${test.id} AND student_id = ${student.id}

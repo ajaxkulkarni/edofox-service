@@ -310,6 +310,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setScore(BigDecimal.ZERO);
 					test.setDevice(req.getTest().getDevice());
 					test.setDeviceInfo(StringUtils.substring(req.getTest().getDeviceInfo(), 0, 100));
+					test.setLocationLat(req.getTest().getLocationLat());
+					test.setLocationLong(req.getTest().getLocationLong());
 					testsDao.saveTestStatus(request);
 				} else {
 					//Update test status for timestamp and exam started count
@@ -319,11 +321,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					request.setStudent(student);
 					EdoTest test = new EdoTest();
 					test.setId(testId);
+					if(req.getTest().getLocationLat() != null && req.getTest().getLocationLong() != null) {
+						test.setLocationLat(req.getTest().getLocationLat());
+						test.setLocationLong(req.getTest().getLocationLong());
+					}
 					request.setTest(test);
 					testsDao.updateTestStatus(request);
 					if(studentMap.getStartedCount() != null) {
 						startedCount = studentMap.getStartedCount();
 					}
+					
 				}
 				addTestActivity(testId, studenId, "STARTED", req.getTest());
 				//Added on 11/12/19
@@ -389,6 +396,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
 					if(startedDate != null) {
 						calculateTimeLeft(result, startedDate);
+					}
+				}
+				
+				//Check if location is compulsory and location is sent
+				if(result.getAcceptLocation() != null && result.getAcceptLocation() == 1) {
+					if(StringUtils.isBlank(req.getTest().getLocationLat()) || StringUtils.isBlank(req.getTest().getLocationLong())) {
+						response.setStatus(new EdoApiStatus(STATUS_NO_LOCATION, ERROR_NO_LOCATION));
+						return response;
 					}
 				}
 				

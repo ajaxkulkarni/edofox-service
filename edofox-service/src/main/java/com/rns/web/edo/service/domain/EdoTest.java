@@ -57,6 +57,9 @@ public class EdoTest {
 	private String device;
 	private String submissionType;
 	private Date startedDate;
+	private Integer acceptLocation;
+	private String locationLat;
+	private String locationLong;
 	
 	public EdoTest() {
 		
@@ -393,6 +396,30 @@ public class EdoTest {
 
 	public void setStartedDate(Date startedDate) {
 		this.startedDate = startedDate;
+	}
+
+	public Integer getAcceptLocation() {
+		return acceptLocation;
+	}
+
+	public void setAcceptLocation(Integer acceptLocation) {
+		this.acceptLocation = acceptLocation;
+	}
+
+	public String getLocationLat() {
+		return locationLat;
+	}
+
+	public void setLocationLat(String locationLat) {
+		this.locationLat = locationLat;
+	}
+
+	public String getLocationLong() {
+		return locationLong;
+	}
+
+	public void setLocationLong(String locationLong) {
+		this.locationLong = locationLong;
 	}
 	
 }
