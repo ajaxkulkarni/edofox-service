@@ -37,7 +37,7 @@ public interface EdoConstants {
 	String ERROR_TEST_EXPIRED = "Sorry. This test is already expired ..";
 	String ERROR_STUDENT_NOT_FOUND = "Student profile not found!";
 	String ERROR_NO_LOCATION = "This exam requires you to send your location for monitoring purposes";
-	String ERROR_WRONG_VERSION = "This exam requires you update your app version. Please do so from Google playstore";
+	String ERROR_WRONG_VERSION = "This exam requires you update your app version. Update the app from Google playstore and restart";
 	
 	
 	String COMMA_SEPARATOR = ", ";

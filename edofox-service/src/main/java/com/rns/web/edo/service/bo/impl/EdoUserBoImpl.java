@@ -414,24 +414,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						return response;
 					}
 					if(result.getInstituteId() != null && StringUtils.equals(req.getTest().getDevice(), "app")) {
-						String[] values = StringUtils.split(result.getDeviceInfo(), ",");
+						String[] values = StringUtils.split(req.getTest().getDeviceInfo(), ",");
 						String userAppVersion = "";
 						if(ArrayUtils.isNotEmpty(values)) {
 							String[] versionKeys = StringUtils.split(values[0], "=");
 							if(ArrayUtils.isNotEmpty(versionKeys)) {
-								userAppVersion = versionKeys[1];
+								userAppVersion = StringUtils.trimToEmpty(versionKeys[1]);
 							}
 						}
 						EDOInstitute institute = testsDao.getInstituteById(result.getInstituteId());
 						if(institute != null && StringUtils.isNotBlank(institute.getAppVersion())) {
 							//Compare app version with users version and show error if older version
-							if(userAppVersion.compareTo(institute.getAppVersion()) < 0) {
+							if(userAppVersion.compareTo(StringUtils.trimToEmpty(institute.getAppVersion())) < 0) {
 								response.setInstitute(institute);
 								response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
 								return response;
 							}
 						} else {
-							String appVersion = EdoPropertyUtil.getProperty(EdoPropertyUtil.APP_VERSION);
+							String appVersion = StringUtils.trimToEmpty(EdoPropertyUtil.getProperty(EdoPropertyUtil.APP_VERSION));
 							if(StringUtils.isNotBlank(appVersion)) {
 								//Compare app version with users version and show error if older version
 								if(userAppVersion.compareTo(appVersion) < 0) {
