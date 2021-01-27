@@ -407,6 +407,43 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				
+				//Check if force update is set, if yes.. check user device info and ask for app update if required
+				if(result.getForceUpdate() != null && result.getForceUpdate() == 1) {
+					if(StringUtils.isBlank(req.getTest().getDevice()) || StringUtils.isBlank(req.getTest().getDeviceInfo())) {
+						response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
+						return response;
+					}
+					if(result.getInstituteId() != null && StringUtils.equals(req.getTest().getDevice(), "app")) {
+						String[] values = StringUtils.split(result.getDeviceInfo(), ",");
+						String userAppVersion = "";
+						if(ArrayUtils.isNotEmpty(values)) {
+							String[] versionKeys = StringUtils.split(values[0], "=");
+							if(ArrayUtils.isNotEmpty(versionKeys)) {
+								userAppVersion = versionKeys[1];
+							}
+						}
+						EDOInstitute institute = testsDao.getInstituteById(result.getInstituteId());
+						if(institute != null && StringUtils.isNotBlank(institute.getAppVersion())) {
+							//Compare app version with users version and show error if older version
+							if(userAppVersion.compareTo(institute.getAppVersion()) < 0) {
+								response.setInstitute(institute);
+								response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
+								return response;
+							}
+						} else {
+							String appVersion = EdoPropertyUtil.getProperty(EdoPropertyUtil.APP_VERSION);
+							if(StringUtils.isNotBlank(appVersion)) {
+								//Compare app version with users version and show error if older version
+								if(userAppVersion.compareTo(appVersion) < 0) {
+									response.setInstitute(institute);
+									response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
+									return response;
+								}
+							}
+						}
+					}
+				}
+				
 				Integer count = 1;
 				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
 				for(EdoTestQuestionMap mapper: map) {

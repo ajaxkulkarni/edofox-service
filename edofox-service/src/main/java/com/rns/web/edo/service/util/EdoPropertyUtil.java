@@ -47,6 +47,7 @@ public class EdoPropertyUtil {
 	public static final String AWS_KEY = "aws.key";
 	public static final String AWS_SECRET = "aws.secret";
 	public static final String AWS_URL = "aws.url";
+	public static final String APP_VERSION = "edofox.app.version";
 	
 	
 

@@ -50,6 +50,8 @@
 		<result column="firebase_id" property="firebaseId" />
 		<result column="currentCount" property="currentCount" />
 		<result column="contact_number" property="contact" />
+		<result column="app_version" property="appVersion" />
+		<result column="app_url" property="appUrl"/>
 		
 	</resultMap>
 	

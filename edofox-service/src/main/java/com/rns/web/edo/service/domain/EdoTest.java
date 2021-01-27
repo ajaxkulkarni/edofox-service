@@ -60,6 +60,8 @@ public class EdoTest {
 	private Integer acceptLocation;
 	private String locationLat;
 	private String locationLong;
+	private Integer forceUpdate;
+	private Integer instituteId;
 	
 	public EdoTest() {
 		
@@ -420,6 +422,22 @@ public class EdoTest {
 
 	public void setLocationLong(String locationLong) {
 		this.locationLong = locationLong;
+	}
+
+	public Integer getForceUpdate() {
+		return forceUpdate;
+	}
+
+	public void setForceUpdate(Integer forceUpdate) {
+		this.forceUpdate = forceUpdate;
+	}
+
+	public Integer getInstituteId() {
+		return instituteId;
+	}
+
+	public void setInstituteId(Integer instituteId) {
+		this.instituteId = instituteId;
 	}
 	
 }

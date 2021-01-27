@@ -23,6 +23,7 @@ public interface EdoConstants {
 	Integer STATUS_TEST_EXPIRED = -104;
 	Integer STATUS_TEST_NOT_OPENED = -105;
 	Integer STATUS_NO_LOCATION = -106;
+	Integer STATUS_WRONG_VERSION = -107;
 	
 	String ERROR_IN_PROCESSING = "Error in processing!";
 	String ERROR_INVALID_PROFILE = "Student profile was not valid. Please contact support.";
@@ -36,6 +37,8 @@ public interface EdoConstants {
 	String ERROR_TEST_EXPIRED = "Sorry. This test is already expired ..";
 	String ERROR_STUDENT_NOT_FOUND = "Student profile not found!";
 	String ERROR_NO_LOCATION = "This exam requires you to send your location for monitoring purposes";
+	String ERROR_WRONG_VERSION = "This exam requires you update your app version. Please do so from Google playstore";
+	
 	
 	String COMMA_SEPARATOR = ", ";
 	

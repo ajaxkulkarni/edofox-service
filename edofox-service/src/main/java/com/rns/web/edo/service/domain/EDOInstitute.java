@@ -20,6 +20,8 @@ public class EDOInstitute {
 	private Integer currentCount;
 	private String comments;
 	private String status;
+	private String appVersion;
+	private String appUrl;
 	
 	public Integer getId() {
 		return id;
@@ -116,6 +118,18 @@ public class EDOInstitute {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getAppVersion() {
+		return appVersion;
+	}
+	public void setAppVersion(String appVersion) {
+		this.appVersion = appVersion;
+	}
+	public String getAppUrl() {
+		return appUrl;
+	}
+	public void setAppUrl(String appUrl) {
+		this.appUrl = appUrl;
 	}
 
 }
