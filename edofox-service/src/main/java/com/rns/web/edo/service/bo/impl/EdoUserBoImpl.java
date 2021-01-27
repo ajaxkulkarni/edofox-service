@@ -435,7 +435,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							if(StringUtils.isNotBlank(appVersion)) {
 								//Compare app version with users version and show error if older version
 								if(userAppVersion.compareTo(appVersion) < 0) {
-									response.setInstitute(institute);
+									EDOInstitute insti = new EDOInstitute();
+									insti.setAppUrl("https://play.google.com/store/apps/details?id=com.mattersoft.edofoxapp&hl=en_IN&gl=US");
+									response.setInstitute(insti);
 									response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
 									return response;
 								}
