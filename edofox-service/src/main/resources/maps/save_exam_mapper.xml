@@ -49,7 +49,7 @@
 		latitude = '${test.locationLat}', 
 		</if>
 		<if test="test.locationLong != null">
-		longitude = '${test.locationLat}', 
+		longitude = '${test.locationLong}', 
 		</if>
 		updated_date = CURRENT_TIMESTAMP, exam_started_count = exam_started_count + 1
 		where test_id = ${test.id} AND student_id = ${student.id}
