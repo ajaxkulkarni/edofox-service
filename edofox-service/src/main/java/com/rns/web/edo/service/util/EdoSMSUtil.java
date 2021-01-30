@@ -25,8 +25,8 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 public class EdoSMSUtil implements Runnable, EdoConstants {
 
 	//public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
-	//public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=EDOFOX&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
-	public static String SMS_URL = "http://weberleads.in/http-tokenkeyapi.php?authentic-key={auth}&senderid=MHEXAM&route=2&number={phoneNo}&message={message}";
+	public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=MTRSFT&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
+	//public static String SMS_URL = "http://weberleads.in/http-tokenkeyapi.php?authentic-key={auth}&senderid=MHEXAM&route=2&number={phoneNo}&message={message}";
 	
 	private EdoStudent student;
 	private String type;

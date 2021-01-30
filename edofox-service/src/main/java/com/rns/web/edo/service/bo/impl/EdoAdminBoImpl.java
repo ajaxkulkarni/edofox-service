@@ -684,18 +684,29 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				if(question != null && question.getAnalysis() != null) {
 					List<EdoQuestion> examQuestions = new ArrayList<EdoQuestion>();
 					int startId = 1;
-					Integer lastQuestion = testsDao.getLastQuestionNumber(request.getTest().getId());
-					if(lastQuestion != null && lastQuestion > 0) {
-						startId = lastQuestion;
+					if(request.getFirstQuestion() == null) {
+						Integer lastQuestion = testsDao.getLastQuestionNumber(request.getTest().getId());
+						if(lastQuestion != null && lastQuestion > 0) {
+							startId = lastQuestion;
+						}
+					} else {
+						startId = request.getFirstQuestion();
 					}
-					if(StringUtils.equals("CET", question.getExamType())) {
+					
+					//Old logic
+					/*if(StringUtils.equals("CET", question.getExamType())) {
 						question.setType("SINGLE");
 					 	question.setCorrect(true);
 					} else if (StringUtils.isNotBlank(question.getAnalysis().getQuestionType())) {
 						//Not select questions of provided type in normal case
 						question.setType(question.getAnalysis().getQuestionType());
 						question.setCorrect(false);
+					}*/
+					if(StringUtils.isNotBlank(question.getAnalysis().getQuestionType())) {
+						question.setType(question.getAnalysis().getQuestionType());
+					 	question.setCorrect(true);
 					}
+					
 					//List<EdoQuestion> typeBased = new ArrayList<EdoQuestion>();
 					List<EdoQuestion> questions = new ArrayList<EdoQuestion>();
 					int totalQuestions = 0;
@@ -710,7 +721,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							//addQuestionsToExam(request, questions, startId, request.getTest().getName());
 							examQuestions.addAll(questions);
 							//Fetch type based questions
-							addTypeBasedQuestions(question, examQuestions);
+							//addTypeBasedQuestions(question, examQuestions);
 							
 						} /*else {
 							response.setStatus(new EdoApiStatus(-111, "Insufficient hard type questions! Please change the count.."));
@@ -728,7 +739,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getMediumQuestionsCount().intValue()) {
 							examQuestions.addAll(questions);
 							//Fetch type based questions
-							addTypeBasedQuestions(question, examQuestions);
+							//addTypeBasedQuestions(question, examQuestions);
 						} /*else {
 							response.setStatus(new EdoApiStatus(-111, "Insufficient medium type questions! Please change the count.."));
 							return response;
@@ -746,7 +757,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						if(CollectionUtils.isNotEmpty(questions) && questions.size() == question.getAnalysis().getEasyQuestionsCount().intValue()) {
 							examQuestions.addAll(questions);
 							//Fetch type based questions
-							addTypeBasedQuestions(question, examQuestions);
+							//addTypeBasedQuestions(question, examQuestions);
 						} /*else {
 							response.setStatus(new EdoApiStatus(-111, "Insufficient easy type questions! Please change the count.."));
 							return response;
@@ -882,6 +893,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				}
 				q.setQn_id(startId);
 				q.setSubject(subject);
+				q.setSection(question.getSection());
 				startId++;
 			}
 			request.getTest().setTest(questions);

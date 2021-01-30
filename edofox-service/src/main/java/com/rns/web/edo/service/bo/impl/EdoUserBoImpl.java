@@ -386,60 +386,62 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				
-				//Check if time constraint is present
-				if(StringUtils.equals("1", result.getTimeConstraint())) {
-					Date startTime = result.getStartDate();
-					if(startTime != null) {
-						calculateTimeLeft(result, startTime);
-						
-					}
-				} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
-					if(startedDate != null) {
-						calculateTimeLeft(result, startedDate);
-					}
-				}
-				
-				//Check if location is compulsory and location is sent
-				if(result.getAcceptLocation() != null && result.getAcceptLocation() == 1) {
-					if(StringUtils.isBlank(req.getTest().getLocationLat()) || StringUtils.isBlank(req.getTest().getLocationLong())) {
-						response.setStatus(new EdoApiStatus(STATUS_NO_LOCATION, ERROR_NO_LOCATION));
-						return response;
-					}
-				}
-				
-				//Check if force update is set, if yes.. check user device info and ask for app update if required
-				if(result.getForceUpdate() != null && result.getForceUpdate() == 1) {
-					if(StringUtils.isBlank(req.getTest().getDevice()) || StringUtils.isBlank(req.getTest().getDeviceInfo())) {
-						response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
-						return response;
-					}
-					if(result.getInstituteId() != null && StringUtils.equals(req.getTest().getDevice(), "app")) {
-						String[] values = StringUtils.split(req.getTest().getDeviceInfo(), ",");
-						String userAppVersion = "";
-						if(ArrayUtils.isNotEmpty(values)) {
-							String[] versionKeys = StringUtils.split(values[0], "=");
-							if(ArrayUtils.isNotEmpty(versionKeys)) {
-								userAppVersion = StringUtils.trimToEmpty(versionKeys[1]);
-							}
+				if(studenId != null) {
+					//Check if time constraint is present
+					if(StringUtils.equals("1", result.getTimeConstraint())) {
+						Date startTime = result.getStartDate();
+						if(startTime != null) {
+							calculateTimeLeft(result, startTime);
+							
 						}
-						EDOInstitute institute = testsDao.getInstituteById(result.getInstituteId());
-						if(institute != null && StringUtils.isNotBlank(institute.getAppVersion())) {
-							//Compare app version with users version and show error if older version
-							if(userAppVersion.compareTo(StringUtils.trimToEmpty(institute.getAppVersion())) < 0) {
-								response.setInstitute(institute);
-								response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
-								return response;
+					} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
+						if(startedDate != null) {
+							calculateTimeLeft(result, startedDate);
+						}
+					}
+					
+					//Check if location is compulsory and location is sent
+					if(result.getAcceptLocation() != null && result.getAcceptLocation() == 1) {
+						if(StringUtils.isBlank(req.getTest().getLocationLat()) || StringUtils.isBlank(req.getTest().getLocationLong())) {
+							response.setStatus(new EdoApiStatus(STATUS_NO_LOCATION, ERROR_NO_LOCATION));
+							return response;
+						}
+					}
+					
+					//Check if force update is set, if yes.. check user device info and ask for app update if required
+					if(result.getForceUpdate() != null && result.getForceUpdate() == 1) {
+						if(StringUtils.isBlank(req.getTest().getDevice()) || StringUtils.isBlank(req.getTest().getDeviceInfo())) {
+							response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
+							return response;
+						}
+						if(result.getInstituteId() != null && StringUtils.equals(req.getTest().getDevice(), "app")) {
+							String[] values = StringUtils.split(req.getTest().getDeviceInfo(), ",");
+							String userAppVersion = "";
+							if(ArrayUtils.isNotEmpty(values)) {
+								String[] versionKeys = StringUtils.split(values[0], "=");
+								if(ArrayUtils.isNotEmpty(versionKeys)) {
+									userAppVersion = StringUtils.trimToEmpty(versionKeys[1]);
+								}
 							}
-						} else {
-							String appVersion = StringUtils.trimToEmpty(EdoPropertyUtil.getProperty(EdoPropertyUtil.APP_VERSION));
-							if(StringUtils.isNotBlank(appVersion)) {
+							EDOInstitute institute = testsDao.getInstituteById(result.getInstituteId());
+							if(institute != null && StringUtils.isNotBlank(institute.getAppVersion())) {
 								//Compare app version with users version and show error if older version
-								if(userAppVersion.compareTo(appVersion) < 0) {
-									EDOInstitute insti = new EDOInstitute();
-									insti.setAppUrl("https://play.google.com/store/apps/details?id=com.mattersoft.edofoxapp&hl=en_IN&gl=US");
-									response.setInstitute(insti);
+								if(userAppVersion.compareTo(StringUtils.trimToEmpty(institute.getAppVersion())) < 0) {
+									response.setInstitute(institute);
 									response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
 									return response;
+								}
+							} else {
+								String appVersion = StringUtils.trimToEmpty(EdoPropertyUtil.getProperty(EdoPropertyUtil.APP_VERSION));
+								if(StringUtils.isNotBlank(appVersion)) {
+									//Compare app version with users version and show error if older version
+									if(userAppVersion.compareTo(appVersion) < 0) {
+										EDOInstitute insti = new EDOInstitute();
+										insti.setAppUrl("https://play.google.com/store/apps/details?id=com.mattersoft.edofoxapp&hl=en_IN&gl=US");
+										response.setInstitute(insti);
+										response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
+										return response;
+									}
 								}
 							}
 						}
