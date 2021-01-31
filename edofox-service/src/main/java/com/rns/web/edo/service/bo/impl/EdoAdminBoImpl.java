@@ -236,6 +236,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			EDOInstitute institute = null;
 			if(request.getInstitute() != null) {
 				institute = testsDao.getInstituteById(request.getInstitute().getId());
+				response.setInstitute(institute);
 			}
 			
 			//Get subjects to avoid blank result for subject

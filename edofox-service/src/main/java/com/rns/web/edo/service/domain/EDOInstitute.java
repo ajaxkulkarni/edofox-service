@@ -22,6 +22,8 @@ public class EDOInstitute {
 	private String status;
 	private String appVersion;
 	private String appUrl;
+	private String latitude;
+	private String longitude;
 	
 	public Integer getId() {
 		return id;
@@ -130,6 +132,18 @@ public class EDOInstitute {
 	}
 	public void setAppUrl(String appUrl) {
 		this.appUrl = appUrl;
+	}
+	public String getLatitude() {
+		return latitude;
+	}
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+	public String getLongitude() {
+		return longitude;
+	}
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
 	}
 
 }

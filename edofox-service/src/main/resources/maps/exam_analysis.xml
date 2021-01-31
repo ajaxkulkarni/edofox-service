@@ -87,7 +87,8 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="flagged" property="analysis.flaggedCount" />
 		<result column="parent_mobile_no" property="parentMobileNo"/>
 		<result column="school_district" property="schoolDistrict"/>
-		
+		<result column="latitude" property="latitude"/>
+		<result column="longitude" property="longitude"/>
 	</resultMap>
 	
 	

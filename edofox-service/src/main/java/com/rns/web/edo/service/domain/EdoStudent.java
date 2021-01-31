@@ -32,6 +32,8 @@ public class EdoStudent {
 	private String previousMarks;
 	private String referrer;
 	private String token;
+	private String latitude;
+	private String longitude;
 	
 	public EdoStudent() {
 
@@ -223,6 +225,22 @@ public class EdoStudent {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
 	}
 	
 }
