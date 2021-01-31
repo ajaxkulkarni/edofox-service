@@ -24,6 +24,16 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 
 	//public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
 	public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=MTRSFT&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
+	
+	/*String apiKey = "apikey=" + URLEncoder.encode("yourapiKey", "UTF-8");
+	String message = "&message=" + URLEncoder.encode("This is your message", "UTF-8");
+	String sender = "&sender=" + URLEncoder.encode("TXTLCL", "UTF-8");
+	String numbers = "&numbers=" + URLEncoder.encode("918123456789", "UTF-8");
+	*/
+	// Send data
+	//textlocal
+	//public static String SMS_URL = "https://api.textlocal.in/send/?apikey={auth}&numbers={phoneNo}&message={message}&sender={sender}";
+	
 	private EdoStudent student;
 	private String type;
 	private EdoTest test;
