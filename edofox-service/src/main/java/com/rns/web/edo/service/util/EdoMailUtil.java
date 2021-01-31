@@ -18,11 +18,13 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.criterion.Restrictions;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.jpa.EdoConfig;
 
 
 public class EdoMailUtil implements Runnable, EdoConstants {
@@ -201,6 +203,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_SUBSCRIPTION, "subscription_mail.html");
 			put(MAIL_TYPE_ACTIVATED, "package_active.html");
 			put(MAIL_TYPE_INVITE, "student_invitation.html");
+			put(MAIL_TYPE_APPOINTMENT, "student_admission.html");
 		}
 	});
 
@@ -209,6 +212,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_SUBSCRIPTION, "Thank you for registering to {instituteName}");
 			put(MAIL_TYPE_ACTIVATED, "Your course for {instituteName} is now active");
 			put(MAIL_TYPE_INVITE, "You have been invited by your institute {instituteName} on the online learning portal");
+			put(MAIL_TYPE_APPOINTMENT, "You have been invited by {instituteName} for the verification round");
 		}
 	});
 
@@ -218,6 +222,22 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		s.setEmail("ajinkyashiva@gmail.com");
 		edoMailUtil.setStudent(s);;
 		edoMailUtil.sendMail();
+	}
+
+	public static EdoMailer prepareMailer(org.hibernate.Session session, Integer id) {
+		if(session != null && id != null) {
+			String mailId = CommonUtils.getConfig("mail_id", session, id);
+			if(StringUtils.isNotBlank(mailId)) {
+				EdoMailer mailer = new EdoMailer();
+				mailer.setMail(mailId);
+				mailer.setHost(CommonUtils.getConfig("mail_host", session, id));
+				mailer.setPassword(CommonUtils.getConfig("mail_password", session, id));
+				mailer.setSender(CommonUtils.getConfig("mail_sender", session, id));
+				mailer.setActionUrl(CommonUtils.getConfig("mail_redirect", session, id));
+				return mailer;
+			}
+		}
+		return null;
 	}
 }
 

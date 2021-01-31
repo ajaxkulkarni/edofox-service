@@ -30,7 +30,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectWriter;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.query.spi.ReturnMetadata;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
@@ -45,6 +47,7 @@ import com.rns.web.edo.service.domain.EdoStudentSubjectAnalysis;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.jpa.EdoClasswork;
+import com.rns.web.edo.service.domain.jpa.EdoConfig;
 import com.rns.web.edo.service.domain.jpa.EdoNotice;
 
 public class CommonUtils {
@@ -251,6 +254,11 @@ public class CommonUtils {
 				result = StringUtils.replace(result, "{totalStudents}", CommonUtils.getStringValue(student.getAnalysis().getTotalStudents()));
 				result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(student.getAnalysis().getScore()));
 			}
+			if(student.getTimeSlot() != null) {
+				result = StringUtils.replace(result, "{time}", CommonUtils.getStringValue(student.getTimeSlot()));
+				result = StringUtils.replace(result, "{date}", CommonUtils.convertDate(student.getAppointmentDate(), "MMM dd"));
+			}
+			
 		}
 		return result;
 	}
@@ -842,5 +850,20 @@ public class CommonUtils {
 			result = StringUtils.replace(result, "{description}", CommonUtils.getStringValue(notice.getDescription()));
 		}
 		return result;
+	}
+	
+	public static String getConfig(String key, Session session, Integer instituteId) {
+		if(StringUtils.isNotBlank(key) && session != null) {
+			Criteria criteria = session.createCriteria(EdoConfig.class).add(Restrictions.eq("name", key));
+			if(instituteId != null) {
+				criteria.add(Restrictions.eq("instituteId", instituteId));
+			}
+		 	List<EdoConfig> configs = criteria.list();
+		 	if(CollectionUtils.isNotEmpty(configs)) {
+		 		return configs.get(0).getValue();
+		 	}
+		}
+		
+		return "";
 	}
 }

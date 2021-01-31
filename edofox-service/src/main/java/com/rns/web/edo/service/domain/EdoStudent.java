@@ -36,6 +36,8 @@ public class EdoStudent {
 	private String division;
 	private Date createdAt;
 	private String registrationNo;
+	private String timeSlot;
+	private Date appointmentDate;
 
 	public EdoStudent() {
 
@@ -251,6 +253,22 @@ public class EdoStudent {
 
 	public void setRegistrationNo(String registrationNo) {
 		this.registrationNo = registrationNo;
+	}
+
+	public String getTimeSlot() {
+		return timeSlot;
+	}
+
+	public void setTimeSlot(String timeSlot) {
+		this.timeSlot = timeSlot;
+	}
+
+	public Date getAppointmentDate() {
+		return appointmentDate;
+	}
+
+	public void setAppointmentDate(Date appointmentDate) {
+		this.appointmentDate = appointmentDate;
 	}
 	
 }

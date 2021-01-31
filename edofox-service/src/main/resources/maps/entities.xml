@@ -29,6 +29,8 @@
 		<result column="created_at" property="createdAt"/>
 		<result column="profile_picture_url" property="profilePic"/>
 		<result column="institute_id" property="instituteId"/>
+		<result column="time_slot" property="timeSlot"/>
+		<result column="appointment_date" property="appointmentDate"/>
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">

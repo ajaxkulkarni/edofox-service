@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
+import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.sun.jersey.api.client.Client;
@@ -22,7 +23,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 public class EdoSMSUtil implements Runnable, EdoConstants {
 
 	//public static String SMS_URL = "http://bhashsms.com/api/sendmsg.php?user=7350182285&pass=a5c84b9&sender=EDOFOX&phone={phoneNo}&text={message}&priority=ndnd&smstype=normal";
-	public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=EDOFOX&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
+	public static String SMS_URL = "http://api.msg91.com/api/sendhttp.php?country=91&sender=MTRSFT&route=4&mobiles={phoneNo}&authkey={auth}&message={message}";
 	private EdoStudent student;
 	private String type;
 	private EdoTest test;
@@ -30,6 +31,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	private String additionalMessage;
 	private boolean copyParent;
 	private boolean copyAdmin;
+	private EdoMailer mailer;
 
 	public EdoSMSUtil() {
 
@@ -116,12 +118,12 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		ClientConfig config = new DefaultClientConfig();
 		Client client = Client.create(config);
 		WebResource webResource = client.resource(url);
-		LoggingUtil.logMessage("Calling SMS URL:" + url);
+		LoggingUtil.logMessage("Calling SMS URL:" + url, LoggingUtil.emailLogger);
 		ClientResponse response = webResource.get(ClientResponse.class);
 		if (response.getStatus() != 200) {
-			LoggingUtil.logError("SMS sending Failed : HTTP error code : " + response.getStatus());
+			LoggingUtil.logError("SMS sending Failed : HTTP error code : " + response.getStatus(), LoggingUtil.emailLogger);
 		}
-		LoggingUtil.logMessage("Output from SMS .... " + response.getStatus() + " \n");
+		LoggingUtil.logMessage("Output from SMS .... " + response.getStatus() + " \n", LoggingUtil.emailLogger);
 	}
 
 	public static void main(String[] args) {
@@ -164,6 +166,14 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		this.copyAdmin = copyAdmin;
 	}
 
+	public EdoMailer getMailer() {
+		return mailer;
+	}
+
+	public void setMailer(EdoMailer mailer) {
+		this.mailer = mailer;
+	}
+
 	private static Map<String, String> SMS_TEMPLATES = Collections.unmodifiableMap(new HashMap<String, String>() {
 		{
 			put(MAIL_TYPE_SUBSCRIPTION,
@@ -183,7 +193,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 					+ "You can upgrade your plan anytime to enable other premium features.");
 			put(MAIL_TYPE_UPGRADE,
 					"Congratulations {instituteName}. Your account has been successfully updated to {purchase} plan at Edofox. {expiryMessage}");
-			
+			put(MAIL_TYPE_APPOINTMENT, "Hi {name}, {instituteName} has invited you on {date} at {time} for verification round. Please bring confirmation letter and application form with you");
 			
 		}
 	});
