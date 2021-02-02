@@ -596,8 +596,16 @@
 	</select>
 	
 	<insert id="saveStudentTestActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		insert into test_activity (test_id,student_id,activity_type,created_date,device,device_info) values(${test.id}, ${student.id}, '${requestType}'
-		, CURRENT_TIMESTAMP, '${test.device}', '${test.deviceInfo}')
+		insert into test_activity (test_id,student_id,activity_type,created_date,device,device_info
+		<if test="question != null">
+			,question_id, question_number
+		</if>
+		) 
+		values(${test.id}, ${student.id}, '${requestType}', CURRENT_TIMESTAMP, '${test.device}', '${test.deviceInfo}'
+		<if test="question != null">
+			,${question.id}, ${question.questionNumber}
+		</if>
+		)
 	</insert>
 	
 	
