@@ -622,7 +622,7 @@ public class CommonUtils {
 */		
 		//String languageCode = RakeLanguages.EN;
 		//System.out.println("Physics".compareTo("Physics"));
-		String time = "9:20";
+		String time = "00:20";
 		System.out.println(formatTimeString(time));
 	}
 
@@ -631,7 +631,7 @@ public class CommonUtils {
 			return time;
 		}
 		try {
-			SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+			SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			String date = CommonUtils.convertDate(new Date()) + " " + time;
 			Date parse = formatDate.parse(date);
 			return CommonUtils.convertDate(parse, "hh:mm a");
