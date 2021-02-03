@@ -128,7 +128,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		ClientConfig config = new DefaultClientConfig();
 		Client client = Client.create(config);
 		WebResource webResource = client.resource(url);
-		LoggingUtil.logMessage("Calling SMS URL:" + url, LoggingUtil.emailLogger);
+		LoggingUtil.logMessage("Calling SMS URL:" + url);
 		ClientResponse response = webResource.get(ClientResponse.class);
 		if (response.getStatus() != 200) {
 			LoggingUtil.logError("SMS sending Failed : HTTP error code : " + response.getStatus(), LoggingUtil.emailLogger);
