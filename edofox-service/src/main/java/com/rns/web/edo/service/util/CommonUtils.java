@@ -12,6 +12,7 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -255,8 +256,8 @@ public class CommonUtils {
 				result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(student.getAnalysis().getScore()));
 			}
 			if(student.getTimeSlot() != null) {
-				result = StringUtils.replace(result, "{time}", CommonUtils.getStringValue(student.getTimeSlot()));
-				result = StringUtils.replace(result, "{date}", CommonUtils.convertDate(student.getAppointmentDate(), "MMM dd"));
+				result = StringUtils.replace(result, "{time}", CommonUtils.formatTimeString(student.getTimeSlot()));
+				result = StringUtils.replace(result, "{date}", CommonUtils.convertDate(student.getAppointmentDate(), "MMMMM dd, yyyy"));
 			}
 			
 		}
@@ -620,7 +621,24 @@ public class CommonUtils {
 		// System.out.println(calculateMatchScore(question, answer));
 */		
 		//String languageCode = RakeLanguages.EN;
-		System.out.println("Physics".compareTo("Physics"));
+		//System.out.println("Physics".compareTo("Physics"));
+		String time = "9:20";
+		System.out.println(formatTimeString(time));
+	}
+
+	private static String formatTimeString(String time) {
+		if(StringUtils.isBlank(time)) {
+			return time;
+		}
+		try {
+			SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+			String date = CommonUtils.convertDate(new Date()) + " " + time;
+			Date parse = formatDate.parse(date);
+			return CommonUtils.convertDate(parse, "hh:mm a");
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return time;
 	}
 	
 	public static void setQuestionURLs(EdoQuestion question) {
