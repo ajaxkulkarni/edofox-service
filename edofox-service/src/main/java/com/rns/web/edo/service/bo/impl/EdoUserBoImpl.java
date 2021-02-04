@@ -2237,8 +2237,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		Session session = null;
 		try {
 			session = this.sessionFactory.openSession();
-			EdoDeviceId deviceId = (EdoDeviceId) session.createCriteria(EdoDeviceId.class).add(Restrictions.eq("token", deviceIdInput.getToken())).uniqueResult();
-			if(deviceId == null) {
+			List<EdoDeviceId> deviceId = session.createCriteria(EdoDeviceId.class).add(Restrictions.eq("token", deviceIdInput.getToken())).list();
+			if(CollectionUtils.isEmpty(deviceId)) {
 				Transaction tx = session.beginTransaction();
 				deviceIdInput.setCreatedDate(new Date());
 				session.persist(deviceIdInput);
