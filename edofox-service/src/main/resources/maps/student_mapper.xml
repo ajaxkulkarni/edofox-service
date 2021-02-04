@@ -271,10 +271,13 @@
 		select count(*) from classwork_activity where content_id = ${feedback.id} AND read_by = ${student.id};
 	</select>
 	
-	<select id="getAllPendingStudents" resultMap="studentInfo" parameterType="Integer">
+	<select id="getAllPendingStudents" resultMap="studentInfo" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		SELECT * FROM student_information 
 		join admissions on admissions.student_id = student_information.id
-		where student_information.status = 'P' AND time_slot IS NOT NULL AND student_information.institute_id = ${value}
+		where student_information.status = 'P' AND time_slot IS NOT NULL AND student_information.institute_id = ${institute.id}
+		<if test="searchFilter != null">
+		AND student_information.id in (${searchFilter});
+		</if>
 	</select>
 
 </mapper>

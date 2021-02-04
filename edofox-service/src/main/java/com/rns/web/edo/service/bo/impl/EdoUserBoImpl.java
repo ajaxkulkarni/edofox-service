@@ -1938,7 +1938,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					studentCount = students.size();
 				}
 			} else if (StringUtils.equals(MAIL_TYPE_APPOINTMENT, request.getRequestType())) {
-				List<EdoStudent> students = testsDao.getAllPendingStudents(request.getInstitute().getId());
+				List<EdoStudent> students = testsDao.getAllPendingStudents(request);
 				if(CollectionUtils.isNotEmpty(students)) {
 					for(EdoStudent student: students) {
 						EdoMailUtil mailUtil = new EdoMailUtil(request.getRequestType());
