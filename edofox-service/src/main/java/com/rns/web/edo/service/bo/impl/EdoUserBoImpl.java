@@ -372,6 +372,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				
+			} else if (StringUtils.equals("DOWNLOAD_EXAM", req.getRequestType())) {
+				String downloadExam = EdoPropertyUtil.getProperty(EdoPropertyUtil.DOWNLOAD_EXAM);
+				if(StringUtils.isBlank(downloadExam) || !StringUtils.equalsIgnoreCase("Y", downloadExam)) {
+					response.setStatus(new EdoApiStatus(-111, "This feature is disabled at this moment. Please try again later."));
+					return response;
+				}
 			}
 			
 			List<EdoTestQuestionMap> map = testsDao.getExam(testId);

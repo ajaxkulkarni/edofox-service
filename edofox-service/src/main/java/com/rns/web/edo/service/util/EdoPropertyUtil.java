@@ -48,7 +48,7 @@ public class EdoPropertyUtil {
 	public static final String AWS_SECRET = "aws.secret";
 	public static final String AWS_URL = "aws.url";
 	public static final String APP_VERSION = "edofox.app.version";
-	
+	public static final String DOWNLOAD_EXAM = "download.exam";
 	
 
 	public static String getProperty(String name) {
