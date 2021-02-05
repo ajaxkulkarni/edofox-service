@@ -2620,4 +2620,31 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
+	public EdoServiceResponse getAppVersion(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			EDOInstitute institute = null;
+			if(request.getInstitute() != null) {
+				institute = testsDao.getInstituteById(request.getInstitute().getId());
+			}
+			if(institute != null && StringUtils.isNotBlank(institute.getAppVersion())) {
+				//Compare app version with users version and show error if older version
+				response.setInstitute(institute);
+			} else {
+				String appVersion = StringUtils.trimToEmpty(EdoPropertyUtil.getProperty(EdoPropertyUtil.APP_VERSION));
+				if(StringUtils.isNotBlank(appVersion)) {
+					//Compare app version with users version and show error if older version
+					EDOInstitute insti = new EDOInstitute();
+					insti.setAppUrl("https://play.google.com/store/apps/details?id=com.mattersoft.edofoxapp&hl=en_IN&gl=US");
+					insti.setAppVersion(appVersion);
+					response.setInstitute(insti);
+					response.setStatus(new EdoApiStatus(STATUS_WRONG_VERSION, ERROR_WRONG_VERSION));
+				}
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
+
 }

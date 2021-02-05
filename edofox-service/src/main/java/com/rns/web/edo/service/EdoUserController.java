@@ -783,4 +783,14 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/getAppVersion")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getAppVersion(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		response = userBo.getAppVersion(request);
+		return response;
+	}
+	
 }

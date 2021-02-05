@@ -59,5 +59,6 @@ public interface EdoUserBo {
 	EdoServiceResponse getFeedbackDetails(EdoServiceRequest request);
 	EdoServiceResponse getUploadedAnswers(EdoServiceRequest request);
 	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId);
+	EdoServiceResponse getAppVersion(EdoServiceRequest request);
 	
 }
