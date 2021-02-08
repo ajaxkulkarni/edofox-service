@@ -45,6 +45,7 @@ import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EDOStudentAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
+import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -71,6 +72,7 @@ import com.rns.web.edo.service.util.EdoAwsUtil;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
+import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoNotificationsManager;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
@@ -237,6 +239,10 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(request.getInstitute() != null) {
 				institute = testsDao.getInstituteById(request.getInstitute().getId());
 				response.setInstitute(institute);
+			} else if (StringUtils.equals(request.getRequestType(), "SMS")) {
+				if(existing.getCurrentQuestion() != null && existing.getCurrentQuestion().getInstituteId() != null) {
+					institute = testsDao.getInstituteById(existing.getCurrentQuestion().getInstituteId());
+				}
 			}
 			
 			//Get subjects to avoid blank result for subject
@@ -278,15 +284,25 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						}
 						List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(existing, subjectScores, student);
 						student.getAnalysis().setSubjectScores(subjectAnalysis);
+						
 						if(StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {
 							//Send rank SMS to student and parents
 							EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT_RANK);
 							smsUtil.setStudent(student);
 							smsUtil.setTest(existing);
 							smsUtil.setInstitute(institute);
-							smsUtil.setAdditionalMessage(request.getSmsMessage());
+							if(request.getMailer() != null) {
+								smsUtil.setAdditionalMessage(request.getMailer().getAdditionalMessage());
+							}
+							smsUtil.setMailer(request.getMailer());
 							smsUtil.setCopyParent(true);
 							executor.execute(smsUtil);
+							EdoMailUtil mailUtil = new EdoMailUtil(MAIL_TYPE_TEST_RESULT_RANK);
+							mailUtil.setStudent(student);
+							mailUtil.setInstitute(institute);
+							mailUtil.setMailer(request.getMailer());
+							mailUtil.setExam(existing);
+							executor.execute(mailUtil);
 						}
 						if(StringUtils.equalsIgnoreCase(REQUEST_FIREBASE_UPDATE, request.getRequestType())) {
 							EdoFirebaseUtil.updateStudentResult(student, existing, institute.getFirebaseId());

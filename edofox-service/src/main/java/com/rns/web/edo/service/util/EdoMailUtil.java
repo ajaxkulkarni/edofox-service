@@ -205,6 +205,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_NEW_EXAM, "exam_notification.html");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "doubt_notification.html");
 			put(MAIL_TYPE_NEW_CLASSWORK, "classwork_notification.html");
+			put(MAIL_TYPE_TEST_RESULT_RANK, "exam_result.html");
 		}
 	});
 
@@ -216,6 +217,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName}");
 			put(MAIL_TYPE_NEW_CLASSWORK, "New {contentType} {title} added for you");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "Doubt resolved by teacher");
+			put(MAIL_TYPE_TEST_RESULT_RANK, "Your test result for {testName}");
 		}
 	});
 

@@ -276,6 +276,18 @@ public class CommonUtils {
 				result = StringUtils.replace(result, "{expiryMessage}", "");	
 				
 			}
+			String appUrl = "https://play.google.com/store/apps/details?id=com.mattersoft.edofoxapp&hl=en_IN&gl=US";
+			String webUrl = "https://test.edofox.com";
+			if(StringUtils.isNotBlank(institute.getAppUrl())) {
+				result = StringUtils.replace(result, "{appUrl}", institute.getAppUrl());	
+			} else {
+				result = StringUtils.replace(result, "{appUrl}", appUrl);
+			}
+			if(StringUtils.isNotBlank(institute.getWebUrl())) {
+				result = StringUtils.replace(result, "{webUrl}", institute.getWebUrl());	
+			} else {
+				result = StringUtils.replace(result, "{webUrl}", webUrl);
+			}
 			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 		}
 		return result;

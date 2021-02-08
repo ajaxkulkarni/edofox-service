@@ -436,15 +436,15 @@
   <![endif]-->
   </head>
   <body>
-    <span class="preheader">Login invitation from {instituteName}</span>
+    <span class="preheader">Exam notification</span>
     <table class="email-wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
       <tr>
         <td align="center">
           <table class="email-content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
             <tr>
               <td class="email-masthead">
-                <a href="https://example.com" class="f-fallback email-masthead_name">
-                {instituteName}
+                <a href="{actionUrl}" class="f-fallback email-masthead_name">
+                {testName}
               </a>
               </td>
             </tr>
@@ -457,13 +457,8 @@
                     <td class="content-cell">
                       <div class="f-fallback">
                         <h1>Hi, {name}!</h1>
-                        <p>Your institute {instituteName} has invited you to use the portal to access all the educational content. Use the button below to login to your account and get started:</p>
-                        <hr></hr>
-                        <p>Your username is {username} and password is {password}</p>
-                        <hr></hr>
-                        <p>We recommend using the latest Google chrome browser to login to the portal on laptop/mobile device (Laptop is recommended for best exam experience)</p>
-                        <p>Android users can also <a href="{appUrl}">download </a>  our app from playstore</p>
-                        <hr></hr>
+                        <p>Your {instituteName} {testName} score is <b>{score}</b>
+                        <p>Your final rank is <b>{rank}/{totalStudents}</b></p>
                         <p>{additionalMessage}</p>
                         
                         <!-- Action -->
@@ -475,7 +470,7 @@
                               <table width="100%" border="0" cellspacing="0" cellpadding="0" role="presentation">
                                 <tr>
                                   <td align="center">
-                                    <a href="{webUrl}" style="color: inherit" class="f-fallback button" target="_blank">Login to account</a>
+                                    <a href="{webUrl}" style="color: inherit" class="f-fallback button" target="_blank">Login for more details</a>
                                   </td>
                                 </tr>
                               </table>
@@ -483,9 +478,9 @@
                           </tr>
                         </table>
                         <p>If you have any questions , feel free to <a href="mailto:support@edofox.com">contact our customer success team</a> anytime. </p>
-                        <p>Welcome aboard,
+                        <p>Regards,
                           <br>The Edofox Team</p>
-                        <p><strong>P.S.</strong> Please contact your institute admin if you are not able to login</p>
+                        <!-- <p><strong>P.S.</strong> Need help getting started? Check out our <a href="{fileUrl}">help documentation</a>.</p> -->
                         <!-- Sub copy -->
                         <table class="body-sub" role="presentation">
                           <tr>
@@ -506,7 +501,7 @@
                 <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
                   <tr>
                     <td class="content-cell" align="center">
-                      <p class="f-fallback sub align-center">&copy; 2020 Mattersoft Privated Ltd. All rights reserved.</p>
+                      <p class="f-fallback sub align-center">&copy; 2020 Mattersoft Pvt Ltd. All rights reserved.</p>
                       <p class="f-fallback sub align-center">
                         Powered by Edofox
                         <!-- <br>1234 Street Rd.

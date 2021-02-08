@@ -54,6 +54,7 @@
 		<result column="app_url" property="appUrl"/>
 		<result column="latitude" property="latitude"/>
 		<result column="longitude" property="longitude"/>
+		<result column="web_url" property="webUrl" />
 	</resultMap>
 	
 	<resultMap id="test" type="com.rns.web.edo.service.domain.EdoTest">
