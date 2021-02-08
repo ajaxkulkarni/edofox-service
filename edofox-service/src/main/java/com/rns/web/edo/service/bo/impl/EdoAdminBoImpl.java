@@ -1027,11 +1027,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		try {
 			List<EdoTestStudentMap> questionFeedbacks = testsDao.getQuestionFeedbacks(request.getFeedback());
 			if(CollectionUtils.isNotEmpty(questionFeedbacks)) {
-				EdoTestStudentMap map = questionFeedbacks.get(0);
-				if(StringUtils.isNotBlank(map.getTest().getCurrentQuestion().getQuestion())) {
-					QuestionParser.fixQuestion(map.getTest().getCurrentQuestion());
+				//EdoTestStudentMap map = questionFeedbacks.get(0);
+				for(EdoTestStudentMap map: questionFeedbacks) {
+					if(StringUtils.isNotBlank(map.getTest().getCurrentQuestion().getQuestion())) {
+						QuestionParser.fixQuestion(map.getTest().getCurrentQuestion());
+					}
+					CommonUtils.setupFeedbackAttachment(map.getTest().getCurrentQuestion());
 				}
-				CommonUtils.setupFeedbackAttachment(map.getTest().getCurrentQuestion());
 			}
 			response.setMaps(questionFeedbacks);
 		} catch (Exception e) {
