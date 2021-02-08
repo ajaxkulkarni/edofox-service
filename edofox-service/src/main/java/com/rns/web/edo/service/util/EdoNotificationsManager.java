@@ -231,6 +231,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 						mailers = testsDao.getAllPackageStudents(student);
 					}
 				}
+				smsUtil = new EdoSMSUtil(notificationType);
 			}
 			
 			if(CollectionUtils.isNotEmpty(devices)) {

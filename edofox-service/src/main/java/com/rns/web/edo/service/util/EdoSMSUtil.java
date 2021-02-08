@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -76,6 +78,10 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		if (student == null) {
 			return;
 		}
+		
+		if(!validatePhoneNumber(student)) {
+			return;
+		}
 
 		try {
 
@@ -131,6 +137,23 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 
 	}
 
+	private static boolean validatePhoneNumber(EdoStudent currStudent) {
+		if(currStudent == null || StringUtils.isBlank(currStudent.getPhone())) {
+			return false;
+		}
+		try {
+			Pattern p = Pattern.compile("(0/91)?[7-9][0-9]{9}"); 
+		    // Pattern class contains matcher() method 
+		    // to find matching between given number  
+		    // and regular expression 
+		    Matcher m = p.matcher(currStudent.getPhone()); 
+		    return (m.find() && m.group().equals(currStudent.getPhone())); 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	private String initUrl(String phone) {
 		String url = StringUtils.replace(SMS_URL, "{phoneNo}", phone);
 		url = StringUtils.replace(url, "{auth}", EdoPropertyUtil.getProperty(EdoPropertyUtil.SMS_AUTH_KEY));
@@ -152,7 +175,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	public static void main(String[] args) {
 		EdoSMSUtil mail = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
 		EdoStudent s = new EdoStudent();
-		s.setPhone("9423040642");
+		s.setPhone("4423040642");
 		s.setName("Ajinkya C Kulkarni");
 		EdoTest t = new EdoTest();
 		t.setSolvedCount(11);
@@ -162,7 +185,9 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		t.setScore(new BigDecimal(123));
 		mail.setTest(t);
 		mail.setStudent(s);
-		mail.sendSMS();
+		//mail.sendSMS();
+		
+		System.out.println(validatePhoneNumber(s));
 	}
 
 	public EdoTest getTest() {

@@ -257,7 +257,7 @@ public class CommonUtils {
 			result = StringUtils.replace(result, "{correctCount}", CommonUtils.getStringValue(test.getCorrectCount()));
 			result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(test.getScore()));
 			result = StringUtils.replace(result, "{totalMarks}", CommonUtils.getStringValue(test.getTotalMarks()));
-			result = StringUtils.replace(result, "{startDate}", CommonUtils.getStringValue(CommonUtils.convertDate(test.getStartDate(), "MMM dd hh:mm")));
+			result = StringUtils.replace(result, "{startDate}", CommonUtils.getStringValue(CommonUtils.convertDate(test.getStartDate(), "MMM dd hh:mm a")));
 		}
 		result = prepareInstituteNotification(result, institute);
 		result = StringUtils.replace(result, "{additionalMessage}", CommonUtils.getStringValue(additionalMessage));
