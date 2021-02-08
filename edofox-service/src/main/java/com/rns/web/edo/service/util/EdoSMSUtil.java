@@ -218,6 +218,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 					"Congratulations {instituteName}. Your account has been successfully updated to {purchase} plan at Edofox. {expiryMessage}");
 			put(MAIL_TYPE_INVITE, "Hello {name}, Your Edofox login credentials for {instituteName} exam are - username - {username} and password - {password}. Please use this credentials to login to {webUrl}. Use latest Google chrome on laptop for best exam experience. You can also download our Android app {appUrl} "
 					+ "{additionalMessage}");
+			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName} will start on {startDate}");
 			
 			
 		}

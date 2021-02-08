@@ -143,6 +143,7 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 			List<EdoStudent> mailers = null;
 			
 			EdoMailUtil mailUtil = new EdoMailUtil(notificationType);
+			EdoSMSUtil smsUtil = null;
 			EdoVideoLectureMap map = null;
 			EdoQuestion feedbackData = null;
 			
@@ -201,6 +202,9 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 						mailers.addAll(mailers2);
 					}
 					mailUtil.setExam(exam);
+					smsUtil = new EdoSMSUtil(notificationType);
+					smsUtil.setTest(exam);
+					
 					LoggingUtil.logMessage("Found " + mailers + " mailers ", LoggingUtil.emailLogger);
 				}
 			} else if (feedback != null) {
@@ -245,11 +249,12 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 				mailUtil.setMailer(mailer);
 				mailUtil.setInstitute(institute);
 				mailExecutor.execute(mailUtil);
-				EdoSMSUtil task = new EdoSMSUtil(notificationType);
-				task.setStudents(mailers);
-				task.setInstitute(institute);
-				task.setMailer(mailer);
-				mailExecutor.execute(task);
+				if(smsUtil != null) {
+					smsUtil.setStudents(mailers);
+					smsUtil.setInstitute(institute);
+					smsUtil.setMailer(mailer);
+					mailExecutor.execute(smsUtil);
+				}
 			}
 			
 		} catch (Exception e) {
