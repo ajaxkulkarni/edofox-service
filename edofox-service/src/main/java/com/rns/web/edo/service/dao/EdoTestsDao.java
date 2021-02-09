@@ -86,6 +86,7 @@ public interface EdoTestsDao {
 	EDOInstitute getStudentStats(Integer instituteId);
 	void upgradeInstitute(EDOInstitute institute);
 	List<EdoStudent> getAllPendingStudents(EdoServiceRequest request);
+	List<EdoStudent> getAdmissionStudents(EdoServiceRequest request);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects();

@@ -279,5 +279,14 @@
 		AND student_information.id in (${searchFilter});
 		</if>
 	</select>
+	
+	<select id="getAdmissionStudents" resultMap="studentInfo" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		SELECT * FROM student_information 
+		join admissions on admissions.student_id = student_information.id
+		where student_information.flag = '${requestType}' AND time_slot IS NOT NULL AND student_information.institute_id = ${institute.id}
+		<if test="searchFilter != null">
+		AND student_information.id in (${searchFilter});
+		</if>
+	</select>
 
 </mapper>

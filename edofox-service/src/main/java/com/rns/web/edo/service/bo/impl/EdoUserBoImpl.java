@@ -1914,24 +1914,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		Session session = null;
 		try {
 			EDOInstitute institute = testsDao.getInstituteById(request.getInstitute().getId());
-			
-			if(request.getMailer() == null) {
-				//Find if mailer exists for institute in config
+
+			if (request.getMailer() == null) {
+				// Find if mailer exists for institute in config
 				session = this.sessionFactory.openSession();
 				request.setMailer(EdoMailUtil.prepareMailer(session, request.getInstitute().getId()));
 			}
-			
+
 			Integer studentCount = 0;
-			if(StringUtils.equals(MAIL_TYPE_INVITE, request.getRequestType())) {
+			if (StringUtils.equals(MAIL_TYPE_INVITE, request.getRequestType())) {
 				List<EdoStudent> students = testsDao.getAllStudents(request.getInstitute().getId());
-				if(CollectionUtils.isNotEmpty(students)) {
-					for(EdoStudent student: students) {
+				if (CollectionUtils.isNotEmpty(students)) {
+					for (EdoStudent student : students) {
 						student.setPassword("registered mobile number");
 						EdoMailUtil mailUtil = new EdoMailUtil(MAIL_TYPE_INVITE);
 						mailUtil.setStudent(student);
 						mailUtil.setInstitute(institute);
 						mailUtil.setMailer(request.getMailer());
-						if(StringUtils.isNotBlank(student.getEmail())) {
+						if (StringUtils.isNotBlank(student.getEmail())) {
 							mailUtil.sendMail();
 						}
 					}
@@ -1939,16 +1939,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			} else if (StringUtils.equals(MAIL_TYPE_APPOINTMENT, request.getRequestType())) {
 				List<EdoStudent> students = testsDao.getAllPendingStudents(request);
-				if(CollectionUtils.isNotEmpty(students)) {
-					for(EdoStudent student: students) {
+				if (CollectionUtils.isNotEmpty(students)) {
+					for (EdoStudent student : students) {
 						EdoMailUtil mailUtil = new EdoMailUtil(request.getRequestType());
 						mailUtil.setStudent(student);
 						mailUtil.setInstitute(institute);
 						mailUtil.setMailer(request.getMailer());
-						if(StringUtils.isNotBlank(student.getEmail())) {
+						if (StringUtils.isNotBlank(student.getEmail())) {
 							mailUtil.sendMail();
 						}
-						if(StringUtils.isNotBlank(student.getPhone())) {
+						if (StringUtils.isNotBlank(student.getPhone())) {
 							EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_APPOINTMENT);
 							smsUtil.setStudent(student);
 							smsUtil.setInstitute(institute);
@@ -1958,10 +1958,42 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					studentCount = students.size();
 				}
+			} else if (StringUtils.equals("fees_pending", request.getRequestType()) || StringUtils.equals("rejected", request.getRequestType())) {
+				List<EdoStudent> students = testsDao.getAdmissionStudents(request);
+				if (CollectionUtils.isNotEmpty(students)) {
+					String notificationType = "";
+					if(StringUtils.equals("fees_pending", request.getRequestType())) {
+						notificationType = MAIL_TYPE_ADM_SELECTED;
+					} else if (StringUtils.equals("rejected", request.getRequestType())) {
+						notificationType = MAIL_TYPE_ADM_REJECTED;
+					}
+					if(StringUtils.isBlank(notificationType)) {
+						status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
+						return status;
+					}
+					LoggingUtil.logMessage("Sending " + notificationType + " email/sms to " + students.size() + " students");
+					for (EdoStudent student : students) {
+						EdoMailUtil mailUtil = new EdoMailUtil(notificationType);
+						mailUtil.setStudent(student);
+						mailUtil.setInstitute(institute);
+						mailUtil.setMailer(request.getMailer());
+						if (StringUtils.isNotBlank(student.getEmail())) {
+							mailUtil.sendMail();
+						}
+						if (StringUtils.isNotBlank(student.getPhone())) {
+							EdoSMSUtil smsUtil = new EdoSMSUtil(notificationType);
+							smsUtil.setStudent(student);
+							smsUtil.setInstitute(institute);
+							smsUtil.setMailer(request.getMailer());
+							smsUtil.sendSMS();
+						}
+					}
+					studentCount = students.size();
+				}
 			}
-			
+
 			status.setResponseText("Email/SMS sent to " + studentCount + " students successfully");
-			
+
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			status.setStatus(-111, ERROR_IN_PROCESSING);

@@ -205,6 +205,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 					"Congratulations {instituteName}. Your account has been successfully updated to {purchase} plan at Edofox. {expiryMessage}");
 			//put(MAIL_TYPE_APPOINTMENT, "Hi {name}, {instituteName} has invited you on {date} at {time} for verification round. Please bring confirmation letter and application form with you");
 			put(MAIL_TYPE_APPOINTMENT, "Dear Parents,\nYou are scheduled to come for the Document Verification of your child {name} on {date} at {time}.Please bring the documents mentioned in the Application Confirmation Letter.\nRegards,\n{instituteName}");
+			put(MAIL_TYPE_ADM_SELECTED, "Dear Parents,\nWe are pleased to inform you that your child {name} has been selected for L.Kg. for the academic year 2021-22. We request you to kindly login to receive a follow up message for further instructions on Fee Payment and Submissions of Documents.\nRegards,\n{instituteName}");
+			put(MAIL_TYPE_ADM_REJECTED, "Dear Parents,\nWe regret to inform you that your child {name} has not been selected for L.Kg. for the academic year 2021-22.\nRegards,\n{instituteName}");
 			
 		}
 	});

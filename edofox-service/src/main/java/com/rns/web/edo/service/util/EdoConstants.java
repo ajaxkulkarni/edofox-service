@@ -64,6 +64,8 @@ public interface EdoConstants {
 	String MAIL_TYPE_NEW_NOTICE = "NewNotice";
 	String MAIL_TYPE_GENERIC = "Generic";
 	String MAIL_TYPE_APPOINTMENT = "AdmissionAppointment";
+	String MAIL_TYPE_ADM_SELECTED = "AdmissionSelection";
+	String MAIL_TYPE_ADM_REJECTED = "AdmissionRejection";
 	
 	
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
