@@ -313,6 +313,7 @@ public class CommonUtils {
 		
 		//Check if JEE rule of best of 5 is applicable
 		List<String> jeeNewFormatSections = sectionsEligibleForNewJeeFormat(test, questions);
+		LoggingUtil.logMessage("Test UI " + test.getTestUi() + "JEE format sections found as " + jeeNewFormatSections);
 		
 		Map<String, Integer> numericCorrectCount = new HashMap<String, Integer>();
 		
