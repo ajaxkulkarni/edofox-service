@@ -65,7 +65,9 @@ public interface EdoConstants {
 	String MAIL_TYPE_NEW_EXAM = "NewExam";
 	String MAIL_TYPE_DOUBT_RESOLVED = "DoubtResolved";
 	
+	Integer JEE_NEW_FORMAT_BEST_OF_VALUE = 5;
 	
+	String QUESTION_TYPE_NUMBER = "NUMBER";
 	String QUESTION_TYPE_MULTIPLE = "MULTIPLE";
 	String QUESTION_TYPE_MATCH = "MATCH";
 	String QUESTION_TYPE_PASSAGE = "PASSAGE";
