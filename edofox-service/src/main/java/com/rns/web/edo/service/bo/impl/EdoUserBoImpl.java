@@ -2427,6 +2427,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 										analysis.setSubjectAnalysis(new ArrayList<EdoStudentSubjectAnalysis>());
 										test.setAnalysis(analysis);
 									}
+									if(test.getAnalysis() != null && test.getAnalysis().getSubjectAnalysis() == null) {
+										test.getAnalysis().setSubjectAnalysis(new ArrayList<EdoStudentSubjectAnalysis>());
+									}
 									EdoStudentSubjectAnalysis subjectAnalysis = sa.getSubjectScore();
 									test.getAnalysis().getSubjectAnalysis().add(subjectAnalysis);
 								}
