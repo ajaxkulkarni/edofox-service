@@ -449,6 +449,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 			request.getTest().setName(map.get(0).getTest().getName());
 			request.getTest().setTotalMarks(map.get(0).getTest().getTotalMarks());
+			request.getTest().setTestUi(map.get(0).getTest().getTestUi());
 			request.getTest().setTest(solved);
 			CommonUtils.calculateTestScore(request.getTest(), questions);
 			/*if(bonus != null) {

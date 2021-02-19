@@ -699,7 +699,13 @@ public class CommonUtils {
 			if(StringUtils.isNotBlank(question.getMetaDataImageUrl())) {
 				question.setMetaDataImageUrl(prepareUrl(question.getMetaDataImageUrl()));
 			}
-			if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
+			//Set solution URLs prioritize short explaination over long
+			if(StringUtils.isNotBlank(question.getShortExplainationImageUrl())) {
+				question.setSolutionImageUrl(prepareUrl(question.getShortExplainationImageUrl()));
+				if(StringUtils.isNotBlank(question.getShort_explanation())) {
+					question.setSolution(question.getShort_explanation());
+				}
+			} else if(StringUtils.isNotBlank(question.getSolutionImageUrl())) {
 				question.setSolutionImageUrl(prepareUrl(question.getSolutionImageUrl()));
 			}
 		} else {

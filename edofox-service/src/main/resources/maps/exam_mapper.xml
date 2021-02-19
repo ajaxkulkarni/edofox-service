@@ -112,6 +112,8 @@
 		<result column="reviewed" property="question.flagged"/>
 		<result column="question_img_url" property="question.questionImageUrl" />
 		<result column="solution_img_url" property="question.solutionImageUrl" />
+		<result column="short_explanation" property="question.short_explanation"/>
+		<result column="short_explanation_img_url" property="question.shortExplainationImageUrl"/>
 		<result column="option1_img_url" property="question.option1ImageUrl" />
 		<result column="option2_img_url" property="question.option2ImageUrl" />
 		<result column="option3_img_url" property="question.option3ImageUrl" />

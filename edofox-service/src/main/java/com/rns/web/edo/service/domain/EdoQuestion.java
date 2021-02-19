@@ -63,6 +63,7 @@ public class EdoQuestion {
 	private String short_explanation;
 	private String topicName;
 	private String subjectwise_question_number;
+	private String shortExplainationImageUrl;
 	
 	public String getOption1() {
 		return option1;
@@ -385,6 +386,12 @@ public class EdoQuestion {
 	}
 	public void setSubjectwise_question_number(String subjectwise_question_number) {
 		this.subjectwise_question_number = subjectwise_question_number;
+	}
+	public String getShortExplainationImageUrl() {
+		return shortExplainationImageUrl;
+	}
+	public void setShortExplainationImageUrl(String shortExplainationImageUrl) {
+		this.shortExplainationImageUrl = shortExplainationImageUrl;
 	}
 
 }
