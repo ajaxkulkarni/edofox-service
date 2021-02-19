@@ -93,7 +93,7 @@
 	<select id="getExamQuestions" resultMap="questions" parameterType="Integer">
 		SELECT * FROM test_questions_map 
 		join test_questions on test_questions_map.question_id = test_questions.id
-		where test_questions_map.test_id = ${value} order by test_questions_map.id asc
+		where test_questions_map.test_id = ${value} AND question_disabled = 0 order by test_questions_map.id asc
 
 	</select>
 	
