@@ -98,8 +98,12 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	</select>
 	
 	<select id="getStudentResultsWithAbsent" resultMap="students" parameterType="Integer">
-		select *,student.id as studentId from student join student_institute on student.id = student_institute.student_id left join test_status on test_status.student_id = student.id AND test_status.test_id = ${value} 
+		select *,student.id as studentId from student 
+		join student_institute on student.id = student_institute.student_id 
+		join student_login on student_login.student_id = student.id
+		left join test_status on test_status.student_id = student.id AND test_status.test_id = ${value} 
 		where student_institute.package_id = (select package_id from test where test_id = ${value}) 
+		AND (student_login.student_access = '' OR student_login.student_access IS NULL)
 		order by test_status.score desc
 	</select>
 	
