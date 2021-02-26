@@ -215,8 +215,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_ACTIVATED, "Your course for {instituteName} is now active");
 			put(MAIL_TYPE_INVITE, "You have been invited by your institute {instituteName} on the online learning portal");
 			put(MAIL_TYPE_APPOINTMENT, "St. Xavier's School - Schedule for LKG Document Verification Process");
-			put(MAIL_TYPE_ADM_SELECTED, "St. Xavier's School - Your Admission Status");
-			put(MAIL_TYPE_ADM_REJECTED, "St. Xavier's School - Your Admission Status");
+			put(MAIL_TYPE_ADM_SELECTED, "St. Xavier's School - Admission Status");
+			put(MAIL_TYPE_ADM_REJECTED, "St. Xavier's School - Admission Status");
 		}
 	});
 
