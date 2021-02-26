@@ -166,6 +166,12 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	as totalCount on totalCount.test_id = test.test_id
 	where test.institute_id = ${instituteId} AND package_id in (select package_id from student_institute where student_id = ${id})
 	AND test.status = 'Active' AND test.start_date &lt; CURRENT_TIMESTAMP
+	<if test="accessType != null &amp;&amp; accessType == 'DPP'">
+		AND test.test_ui = 'DPP'
+	</if>
+	<if test="accessType != null &amp;&amp; accessType == 'TEST'">
+		AND test.test_ui != 'DPP'
+	</if>
 	order by test.start_date desc
 	</select>
 	
