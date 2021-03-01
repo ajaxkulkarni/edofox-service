@@ -216,7 +216,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//Fetch answer files if descriptive test
 			if(StringUtils.equals(test.getTestUi(), "DESCRIPTIVE")) {
-				test.setAnswerFiles(testsDao.getAnswerFiles(request));
+				List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
+				fixAnswerFiles(answerFiles);
+				test.setAnswerFiles(answerFiles);
 			}
 			
 			response.setTest(test);
@@ -2163,19 +2165,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EdoTest test = new EdoTest();
 			List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
-			if(CollectionUtils.isNotEmpty(answerFiles)) {
-				for(EdoAnswerFileEntity answerFile: answerFiles) {
-					if(StringUtils.isNotBlank(answerFile.getAwsUrl())) {
-						answerFile.setFileUrl(answerFile.getAwsUrl());
-					}
-				}
-			}
+			fixAnswerFiles(answerFiles);
 			test.setAnswerFiles(answerFiles);
 			response.setTest(test);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
+	}
+
+	private void fixAnswerFiles(List<EdoAnswerFileEntity> answerFiles) {
+		if(CollectionUtils.isNotEmpty(answerFiles)) {
+			for(EdoAnswerFileEntity answerFile: answerFiles) {
+				if(StringUtils.isNotBlank(answerFile.getAwsUrl())) {
+					answerFile.setFileUrl(answerFile.getAwsUrl());
+				}
+			}
+		}
 	}
 
 	public EdoFile printReport(EdoServiceRequest request) {
