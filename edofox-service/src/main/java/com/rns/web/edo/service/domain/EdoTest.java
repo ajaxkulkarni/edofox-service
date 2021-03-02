@@ -62,6 +62,7 @@ public class EdoTest {
 	private String locationLong;
 	private Integer forceUpdate;
 	private Integer instituteId;
+	private String instructions;
 	
 	public EdoTest() {
 		
@@ -438,6 +439,14 @@ public class EdoTest {
 
 	public void setInstituteId(Integer instituteId) {
 		this.instituteId = instituteId;
+	}
+
+	public String getInstructions() {
+		return instructions;
+	}
+
+	public void setInstructions(String instructions) {
+		this.instructions = instructions;
 	}
 	
 }

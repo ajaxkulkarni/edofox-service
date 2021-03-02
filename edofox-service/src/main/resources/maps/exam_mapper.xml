@@ -42,6 +42,7 @@
 		<result column="accept_location" property="test.acceptLocation"/>
 		<result column="force_update" property="test.forceUpdate"/>
 		<result column="institute_id" property="test.instituteId"/>
+		<result column="custom_instructions" property="test.instructions"/>
 		<result column="qStatus" property="question.status"/>
 		<result column="weightage" property="question.weightage"/>
 		<result column="negative_marks" property="question.negativeMarks"/>
