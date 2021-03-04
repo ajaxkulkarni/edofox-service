@@ -2650,4 +2650,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
+	public EdoApiStatus updateProfile(EdoServiceRequest request) {
+		EdoApiStatus response = new EdoApiStatus();
+		try {
+			testsDao.updateStudent(request.getStudent());
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(111, ERROR_IN_PROCESSING);
+		}
+		return response;
+	}
+
 }
