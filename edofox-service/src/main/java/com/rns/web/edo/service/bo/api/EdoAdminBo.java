@@ -36,6 +36,7 @@ public interface EdoAdminBo {
 	EdoServiceResponse loadQuestionBank(EdoServiceRequest request);
 	EdoApiStatus sendNotification(EdoServiceRequest request);
 	EdoApiStatus updateStudentScore(EdoServiceRequest request);
+	EdoServiceResponse uploadQuestionImage(EdoServiceRequest request, InputStream fileData);
 	
 	//Super admin
 	EdoApiStatus backupData(EdoAdminRequest request);

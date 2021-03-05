@@ -1,8 +1,12 @@
 package com.rns.web.edo.service.bo.impl;
 
+import java.awt.Toolkit;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,6 +20,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -45,7 +54,6 @@ import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
 import com.rns.web.edo.service.domain.EDOStudentAnalysis;
 import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoApiStatus;
-import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -2219,5 +2227,55 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse uploadQuestionImage(EdoServiceRequest request, InputStream fileData) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		FileOutputStream fos = null;
+		ImageOutputStream ios = null;
+		try {
+			
+			File output = new File(EdoConstants.TEST_QUESTION_PATH + request.getTest().getId());
+			if(!output.exists()) {
+				output.mkdirs();
+			}
+			
+			//ImageIOUtil.writeImage(bim, outputFolder + QUESTION_PREFIX + questionNumber + ".png", 300);
+		
+			//Compress image before saving
+			ImageWriter writer =  ImageIO.getImageWritersByFormatName("jpg").next();
+	        String outputPath = output.getAbsolutePath() + "/" + request.getRequestType() + request.getQuestion().getQuestionNumber() + ".png";
+			fos = new FileOutputStream(outputPath);
+			ios = ImageIO.createImageOutputStream(fos);
+	        writer.setOutput(ios);
+
+	        ImageWriteParam param = writer.getDefaultWriteParam();
+	        if (param.canWriteCompressed()){
+	            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+	            //param.setCompressionQuality(0.05f);
+	        }
+
+	        writer.write(null, new IIOImage(ImageIO.read(fileData), null, null), param);
+	        
+	        LoggingUtil.logMessage("Uploaded file to path " + outputPath);
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+			
+			try {
+				if(fos != null) {
+					fos.close();
+				}
+				if(ios != null) {
+					ios.close();
+				}
+			} catch (IOException e1) {
+				LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+				response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+			}
+		}
+			
+		return response;
 	}
 }
