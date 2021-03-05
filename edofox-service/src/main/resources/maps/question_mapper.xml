@@ -45,6 +45,9 @@
 		<if test="instituteId != null">
 			institute_id,
 		</if>
+		<if test="teacher != null">
+			created_by ,updated_by,
+		</if>
 		<!-- <if test="partialCorrection != null">
 			partial,
 		</if> -->
@@ -57,6 +60,9 @@
 		</if>
 		<if test="instituteId != null">
 			${instituteId},
+		</if>
+		<if test="teacher != null">
+			${teacher.id} , ${teacher.id},
 		</if>
 		<!-- <if test="partialCorrection != null">
 			${partialCorrection},

@@ -58,6 +58,7 @@ public class EdoQuestion {
 	private Integer lastIndex;
 	private Integer solvedSequenceNumber;
 	private Integer ttl;
+	private EdoStudent teacher;
 	
 	public String getOption1() {
 		return option1;
@@ -350,6 +351,12 @@ public class EdoQuestion {
 	}
 	public void setTtl(Integer ttl) {
 		this.ttl = ttl;
+	}
+	public EdoStudent getTeacher() {
+		return teacher;
+	}
+	public void setTeacher(EdoStudent teacher) {
+		this.teacher = teacher;
 	}
 
 }
