@@ -123,6 +123,7 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoContentMap</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoLiveToken</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoProfileEntity</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

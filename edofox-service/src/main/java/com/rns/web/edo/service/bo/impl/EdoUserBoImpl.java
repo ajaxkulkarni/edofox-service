@@ -60,6 +60,7 @@ import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
+import com.rns.web.edo.service.domain.jpa.EdoProfileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
@@ -2652,11 +2653,30 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoApiStatus updateProfile(EdoServiceRequest request) {
 		EdoApiStatus response = new EdoApiStatus();
+		Session session = null;
 		try {
-			testsDao.updateStudent(request.getStudent());
+			session = this.sessionFactory.openSession();
+			EdoStudent student = request.getStudent();
+			List<EdoProfileEntity> profile = session.createCriteria(EdoProfileEntity.class).add(Restrictions.eq("id", student.getId())).list();
+			if(CollectionUtils.isNotEmpty(profile)) {
+				Transaction tx = session.beginTransaction();
+				EdoProfileEntity existing = profile.get(0);
+				if(StringUtils.isNotBlank(student.getName())) {
+					existing.setName(student.getName());
+				}
+				if(StringUtils.isNotBlank(student.getPhone())) {
+					existing.setPhone(student.getPhone());
+				}
+				if(StringUtils.isNotBlank(student.getEmail())) {
+					existing.setEmail(student.getEmail());
+				}
+				tx.commit();
+			}
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		return response;
 	}

@@ -98,18 +98,9 @@
 		<if test="rollNo != null">
 			roll_no = '${rollNo}',
 		</if>
-		<if test="gender != null">
 		gender = '${gender}' ,
-		</if>
-		<if test="schoolDistrict != null">
-		school_district = '${schoolDistrict}',
-		</if> 
-		<if test="dob != null">
-		date_of_birth = '${dob}', 
-		</if>
-		<if test="casteCategory != null">
-		caste_category = '${casteCategory}'
-		</if>
+		school_district = '${schoolDistrict}', date_of_birth = '${dob}', caste_category =
+		'${casteCategory}'
 		where id = ${id}
 	</update>
 	
