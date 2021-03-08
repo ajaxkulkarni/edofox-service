@@ -511,7 +511,7 @@
 			SELECT student_institute.package_id,packages.package_name,test.test_id,test.test_name,
 			test.start_date,test.end_date, test.duration, test.paper_pdf_url,test.solutions_pdf_url,
 			test.no_of_questions,test.total_marks,test_status.status as studentStatus,test_status.created_date as startedDate,
-			test.offline_conduction
+			test.offline_conduction,test.show_question_paper
             FROM student_institute
             INNER JOIN packages
             ON packages.id = student_institute.package_id
