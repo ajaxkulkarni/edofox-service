@@ -453,6 +453,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							}
 						}
 					}
+					
 				}
 				
 				Integer count = 1;
@@ -497,6 +498,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(isRandomizeQuestions(result) && studenId != null) {
 					//Randomize only for student NOT for Admin
 					randomizeQuestions(result, sectionSets);
+				}
+				//Get JEE sections eligible for JEE format
+				if(studenId != null) {
+					result.setJeeNewFormatSections(CommonUtils.sectionsEligibleForNewJeeFormat(result, result.getTest()));
+					if(CollectionUtils.isNotEmpty(result.getJeeNewFormatSections())) {
+						result.setJeeMaxNumeric(JEE_NEW_FORMAT_BEST_OF_VALUE);
+					}
 				}
 				response.setTest(result);
 			}

@@ -63,6 +63,8 @@ public class EdoTest {
 	private Integer forceUpdate;
 	private Integer instituteId;
 	private String instructions;
+	private List<String> jeeNewFormatSections;
+	private Integer jeeMaxNumeric;
 	
 	public EdoTest() {
 		
@@ -447,6 +449,22 @@ public class EdoTest {
 
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
+	}
+
+	public List<String> getJeeNewFormatSections() {
+		return jeeNewFormatSections;
+	}
+
+	public void setJeeNewFormatSections(List<String> jeeNewFormatSections) {
+		this.jeeNewFormatSections = jeeNewFormatSections;
+	}
+
+	public Integer getJeeMaxNumeric() {
+		return jeeMaxNumeric;
+	}
+
+	public void setJeeMaxNumeric(Integer jeeMaxNumeric) {
+		this.jeeMaxNumeric = jeeMaxNumeric;
 	}
 	
 }

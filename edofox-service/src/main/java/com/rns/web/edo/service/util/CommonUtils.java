@@ -399,7 +399,7 @@ public class CommonUtils {
 		return true;
 	}
 
-	private static List<String> sectionsEligibleForNewJeeFormat(EdoTest test, List<EdoQuestion> questions) {
+	public static List<String> sectionsEligibleForNewJeeFormat(EdoTest test, List<EdoQuestion> questions) {
 		//Apply JEE pattern rule of best of 5 for NUMBER questions in case of JEE UI and
 		if(!StringUtils.equalsIgnoreCase("JEEM", test.getTestUi())) {
 			return null;
