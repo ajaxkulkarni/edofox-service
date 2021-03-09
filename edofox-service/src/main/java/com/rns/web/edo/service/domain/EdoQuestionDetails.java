@@ -11,13 +11,13 @@ public class EdoQuestionDetails {
 	private String status;//": "1", "
 	private String short_explanation;//": "ddddd", "
 	private String topics;//": "1"
-	private Integer self_created;
-	private Integer neet_no_of_ques;
-	private Integer jee_no_of_ques;
-	private Integer setter_id;
-	private Integer operator_id;
-	private Integer board_id;
-	private Integer mht_cet_no_of_ques;
+	private int self_created;
+	private int neet_no_of_ques;
+	private int jee_no_of_ques;
+	private int setter_id;
+	private int operator_id;
+	private int board_id;
+	private int mht_cet_no_of_ques;
 	private String setter_question_type;
 	private String setter_criteria;
 	private String moderator_criteria;
@@ -32,34 +32,34 @@ public class EdoQuestionDetails {
 	public void setTopics(String topics) {
 		this.topics = topics;
 	}
-	public Integer getSelf_created() {
+	public int getSelf_created() {
 		return self_created;
 	}
-	public void setSelf_created(Integer self_created) {
+	public void setSelf_created(int self_created) {
 		this.self_created = self_created;
 	}
-	public Integer getNeet_no_of_ques() {
+	public int getNeet_no_of_ques() {
 		return neet_no_of_ques;
 	}
-	public void setNeet_no_of_ques(Integer neet_no_of_ques) {
+	public void setNeet_no_of_ques(int neet_no_of_ques) {
 		this.neet_no_of_ques = neet_no_of_ques;
 	}
-	public Integer getJee_no_of_ques() {
+	public int getJee_no_of_ques() {
 		return jee_no_of_ques;
 	}
-	public void setJee_no_of_ques(Integer jee_no_of_ques) {
+	public void setJee_no_of_ques(int jee_no_of_ques) {
 		this.jee_no_of_ques = jee_no_of_ques;
 	}
-	public Integer getSetter_id() {
+	public int getSetter_id() {
 		return setter_id;
 	}
-	public void setSetter_id(Integer setter_id) {
+	public void setSetter_id(int setter_id) {
 		this.setter_id = setter_id;
 	}
-	public Integer getBoard_id() {
+	public int getBoard_id() {
 		return board_id;
 	}
-	public void setBoard_id(Integer board_id) {
+	public void setBoard_id(int board_id) {
 		this.board_id = board_id;
 	}
 	public String getName_of_publication() {
@@ -98,10 +98,10 @@ public class EdoQuestionDetails {
 	public void setShort_explanation(String short_explanation) {
 		this.short_explanation = short_explanation;
 	}
-	public Integer getMht_cet_no_of_ques() {
+	public int getMht_cet_no_of_ques() {
 		return mht_cet_no_of_ques;
 	}
-	public void setMht_cet_no_of_ques(Integer mht_cet_no_of_ques) {
+	public void setMht_cet_no_of_ques(int mht_cet_no_of_ques) {
 		this.mht_cet_no_of_ques = mht_cet_no_of_ques;
 	}
 	public String getSetter_question_type() {
@@ -146,10 +146,10 @@ public class EdoQuestionDetails {
 	public void setModerator_criteria(String moderator_criteria) {
 		this.moderator_criteria = moderator_criteria;
 	}
-	public Integer getOperator_id() {
+	public int getOperator_id() {
 		return operator_id;
 	}
-	public void setOperator_id(Integer operator_id) {
+	public void setOperator_id(int operator_id) {
 		this.operator_id = operator_id;
 	}
 	
