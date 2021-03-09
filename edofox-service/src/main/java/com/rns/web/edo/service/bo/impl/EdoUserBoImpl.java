@@ -665,22 +665,27 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			CommonUtils.setComplexAnswer(request.getQuestion());
 		}
 		
-		answer.setFlagged(request.getQuestion().getFlagged());
-		if(answer.getFlagged() == null) {
-			answer.setFlagged(0);
-		}
-		if(request.getQuestion().getAnswer() != null) {
-			String pattern = EdoPropertyUtil.getProperty(EdoPropertyUtil.ALLOWED_CHARS);
-			if(StringUtils.isBlank(pattern)) {
-				pattern = "[^a-zA-Z0-9\\s\\-\\,\\+\\*\\/\\^\\~\\.]";
+		//Save flagged and answered only if not time taken request
+		if(!StringUtils.equals(request.getRequestType(), "SAVE_TIME")) {
+			answer.setFlagged(request.getQuestion().getFlagged());
+			if(answer.getFlagged() == null) {
+				answer.setFlagged(0);
 			}
-			answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), pattern, ""));
-		} else {
-			answer.setOptionSelected("");
+			if(request.getQuestion().getAnswer() != null) {
+				String pattern = EdoPropertyUtil.getProperty(EdoPropertyUtil.ALLOWED_CHARS);
+				if(StringUtils.isBlank(pattern)) {
+					pattern = "[^a-zA-Z0-9\\s\\-\\,\\+\\*\\/\\^\\~\\.]";
+				}
+				answer.setOptionSelected(StringUtils.replacePattern(request.getQuestion().getAnswer(), pattern, ""));
+			} else {
+				answer.setOptionSelected("");
+			}
+			if(answer.getOptionSelected() == null) {
+				answer.setOptionSelected("");
+			}
 		}
-		if(answer.getOptionSelected() == null) {
-			answer.setOptionSelected("");
-		}
+		
+		
 		answer.setTimeTaken(request.getQuestion().getTimeSpent());
 		//Will update only for save test
 		answer.setMarks(request.getQuestion().getMarks());
