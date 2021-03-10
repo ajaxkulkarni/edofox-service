@@ -683,6 +683,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(answer.getOptionSelected() == null) {
 				answer.setOptionSelected("");
 			}
+		} else if (answer.getId() == null) {
+			//New submission..first time submission
+			answer.setFlagged(0);
+			answer.setOptionSelected("");
 		}
 		
 		
