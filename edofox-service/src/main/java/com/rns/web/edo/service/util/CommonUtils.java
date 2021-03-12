@@ -664,7 +664,8 @@ public class CommonUtils {
 		// System.out.println(calculateMatchScore(question, answer));
 */		
 		//String languageCode = RakeLanguages.EN;
-		System.out.println("Physics".compareTo("Physics"));
+		//System.out.println("Physics".compareTo("Physics"));
+		System.out.println(prepareUrl("uploads/questions/1613197900_13c63982a46c0f5a434d.png"));
 	}
 	
 	public static void setQuestionURLs(EdoQuestion question) {
@@ -746,6 +747,10 @@ public class CommonUtils {
 		String hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
 		if(StringUtils.isBlank(hostName)) {
 			hostName = "http://test.edofox.com/";
+		}
+		if(StringUtils.contains(url, hostName)) {
+			//Already prepared
+			return url;
 		}
 		if(!StringUtils.contains(url, "reliancedlp")) {
 			folderPath = StringUtils.replace(url, "/var/www/edofoxlatur.com/public_html/", "");
