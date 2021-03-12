@@ -471,8 +471,9 @@
             test.package_id IN 
             (SELECT CASE WHEN sub_packages_mapping.child_packge_id IS NOT NULL THEN sub_packages_mapping.child_packge_id 
             ELSE student_package_mapping.package_id END AS package_id FROM student_package_mapping 
+            JOIN fees_master on student_package_mapping.fee_id = fees_master.id
             LEFT JOIN sub_packages_mapping ON student_package_mapping.package_id = sub_packages_mapping.parent_package_id 
-            WHERE student_package_mapping.student_id = ${student.id})
+            WHERE student_package_mapping.student_id = ${student.id} AND fees_master.fee_status = 'Completed')
             order by test.end_date desc
 	
 			<!-- SELECT student_institute.package_id,packages.package_name,test.test_id,test.test_name,
