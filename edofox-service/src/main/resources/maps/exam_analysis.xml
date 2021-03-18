@@ -144,6 +144,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	where test_id = ${value} group by test_questions.subject_id order by subject asc
 	</select>
 	
+	<!-- test.institute_id = ${instituteId} AND  -->
 	<select id="getStudentPerformance" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="test">
 	select test.test_id,test_name,ranks.rank,ranks.score,ranks.solved,ranks.correct,ranks.flagged,ranks.created_date,test.total_marks,start_date 
 	from test left join 
@@ -151,7 +152,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	left join test_status b on a.score&lt;b.score and a.test_id=b.test_id where a.test_id in 
 	(select test_id from test_status where student_id = ${id}) AND a.student_id = ${id} 
 	group by a.student_id, a.score, a.test_id) as ranks on test.test_id = ranks.test_id 
-	where test.institute_id = ${instituteId} AND package_id in (select package_id from student_institute where student_id = ${id})
+	where package_id in (select package_id from student_package_mapping where student_id = ${id})
 	order by test.start_date desc
 	</select>
 	
