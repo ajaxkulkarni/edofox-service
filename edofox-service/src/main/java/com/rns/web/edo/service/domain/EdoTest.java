@@ -65,6 +65,7 @@ public class EdoTest {
 	private String instructions;
 	private List<String> jeeNewFormatSections;
 	private Integer jeeMaxNumeric;
+	private Integer showRank;
 	
 	public EdoTest() {
 		
@@ -465,6 +466,14 @@ public class EdoTest {
 
 	public void setJeeMaxNumeric(Integer jeeMaxNumeric) {
 		this.jeeMaxNumeric = jeeMaxNumeric;
+	}
+
+	public Integer getShowRank() {
+		return showRank;
+	}
+
+	public void setShowRank(Integer showRank) {
+		this.showRank = showRank;
 	}
 	
 }

@@ -170,7 +170,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}*/
 			
 			//If show result is enabled, show rank and topper score
-			if(StringUtils.equals(test.getShowResult(), "Y")) {
+			//Show rank only if flag is enabled
+			if(StringUtils.equals(test.getShowResult(), "Y") && (test.getShowRank() == null || test.getShowRank() != 0)) {
 				List<EdoTest> rankResponse = testsDao.getStudentRank(request);
 				if(CollectionUtils.isNotEmpty(rankResponse)) {
 					test.setRank(rankResponse.get(0).getRank());
@@ -2450,6 +2451,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 									}
 									EdoStudentSubjectAnalysis subjectAnalysis = sa.getSubjectScore();
 									test.getAnalysis().getSubjectAnalysis().add(subjectAnalysis);
+									//Hide rank if not supposed to be shown
+									if(!CommonUtils.isIntEnabled(test.getShowRank())) {
+										test.setRank(null);
+									}
 								}
 							}
 						}

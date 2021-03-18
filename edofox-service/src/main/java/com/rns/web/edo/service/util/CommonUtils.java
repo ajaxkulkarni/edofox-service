@@ -1059,5 +1059,11 @@ public class CommonUtils {
 		return DigestUtils.sha256Hex(firstLetter + "_" + student.getId());
 	}
 
+	public static boolean isIntEnabled(Integer value) {
+		if(value == null || value != 0) {
+			return true;
+		}
+		return false;
+	}
 	
 }
