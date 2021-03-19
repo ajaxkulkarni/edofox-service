@@ -146,14 +146,15 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	
 	<!-- test.institute_id = ${instituteId} AND  -->
 	<select id="getStudentPerformance" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="test">
-	select test.test_id,test_name,ranks.rank,ranks.score,ranks.solved,ranks.correct,ranks.flagged,ranks.created_date,test.total_marks,start_date 
-	from test left join 
-	( SELECT a.student_id, a.score, a.test_id, a.solved, a.correct, a.flagged, count(b.score)+1 as rank,a.created_date FROM test_status a 
-	left join test_status b on a.score&lt;b.score and a.test_id=b.test_id where a.test_id in 
-	(select test_id from test_status where student_id = ${id}) AND a.student_id = ${id} 
-	group by a.student_id, a.score, a.test_id) as ranks on test.test_id = ranks.test_id 
-	where package_id in (select package_id from student_package_mapping where student_id = ${id})
-	order by test.start_date desc
+	SELECT test.package_id, test.test_id,test_name,ranks.rank,ranks.score,ranks.solved,ranks.correct,ranks.flagged,ranks.created_date,test.total_marks,start_date
+	FROM test
+	LEFT JOIN (select a.student_id, a.score, a.test_id, a.solved, a.correct, a.flagged, count(b.score)+1 as rank,a.created_date FROM test_status a left join test_status b on a.score = b.score and a.test_id=b.test_id where a.test_id in
+ 	(select test_id from test_status where student_id =  ${id}) AND a.student_id =  ${id}
+ 	group by a.student_id, a.score, a.test_id) as ranks
+ 	ON test.test_id = ranks.test_id
+ 	WHERE package_id in (SELECT CASE WHEN sub_packages_mapping.child_packge_id IS NOT NULL THEN sub_packages_mapping.child_packge_id ELSE student_package_mapping.package_id END AS package_id FROM student_package_mapping LEFT JOIN sub_packages_mapping ON student_package_mapping.package_id = sub_packages_mapping.parent_package_id LEFT JOIN fees_master ON fees_master.id = student_package_mapping.fee_id WHERE student_package_mapping.student_id =  ${id} AND fees_master.fee_status = 'Completed')
+ 	AND test.status = 'A'
+ 	ORDER BY test.start_date desc
 	</select>
 	
 	<select id="getStudentRank" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="test">
