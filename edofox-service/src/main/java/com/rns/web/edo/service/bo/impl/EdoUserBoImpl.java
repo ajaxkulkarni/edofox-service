@@ -2451,10 +2451,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 									}
 									EdoStudentSubjectAnalysis subjectAnalysis = sa.getSubjectScore();
 									test.getAnalysis().getSubjectAnalysis().add(subjectAnalysis);
-									//Hide rank if not supposed to be shown
-									if(!CommonUtils.isIntEnabled(test.getShowRank())) {
+									/*if(!CommonUtils.isIntEnabled(test.getShowRank())) {
 										test.setRank(null);
-									}
+									}*/
 								}
 							}
 						}
