@@ -1,12 +1,15 @@
 package com.rns.web.edo.service.bo.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -16,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -29,6 +33,8 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.clickntap.vimeo.VimeoResponse;
+import com.itextpdf.io.source.ByteArrayOutputStream;
+import com.itextpdf.text.pdf.qrcode.ByteArray;
 import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
@@ -60,12 +66,14 @@ import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
+import com.rns.web.edo.service.domain.jpa.EdoProctorImages;
 import com.rns.web.edo.service.domain.jpa.EdoProfileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoAwsUtil;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoFaceDetection;
 import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoPDFUtil;
@@ -2696,6 +2704,46 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
+
+	public EdoServiceResponse matchFaces(EdoServiceRequest request, InputStream file, FormDataContentDisposition fileDetails) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		Session session = null;
+		try {
+			//InputStream inputStream = new FileInputStream(new File(sourceImage));
+			//Target Image from camera
+			byte[] byteArray = IOUtils.toByteArray(file);
+			ByteBuffer destinationImageBytes = ByteBuffer.wrap(byteArray);
+			InputStream backupStream = new ByteArrayInputStream(byteArray);
+			
+			//TODO replace with DB student image
+			String sourceImage = "F:\\Resoneuronance\\Edofox\\Document\\Director_Pic.jpg";
+			ByteBuffer sourceImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(new FileInputStream(sourceImage)));
+			
+			
+			float score = EdoFaceDetection.compareFaceImages(sourceImageBytes, destinationImageBytes);
+			System.out.print("Score is " + score);
+			
+			//Upload file to AWS bucket first
+			String filePath = EdoAwsUtil.uploadToAws(request.getTest().getId() + "_" + request.getStudent().getId() + "_" + System.currentTimeMillis() + ".jpg", null, backupStream, "image/jpeg", "proctoring");
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			EdoProctorImages images = new EdoProctorImages();
+			images.setScore(score);
+			images.setCreatedDate(new Date());
+			images.setTestId(request.getTest().getId());
+			images.setStudentId(request.getStudent().getId());
+			images.setImageUrl(filePath);
+			session.persist(images);
+			tx.commit();
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		} finally {
 			CommonUtils.closeSession(session);
 		}

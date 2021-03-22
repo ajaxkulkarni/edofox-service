@@ -61,5 +61,6 @@ public interface EdoUserBo {
 	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId);
 	EdoServiceResponse getAppVersion(EdoServiceRequest request);
 	EdoApiStatus updateProfile(EdoServiceRequest request);
+	EdoServiceResponse matchFaces(EdoServiceRequest request, InputStream file, FormDataContentDisposition fileDetails);
 	
 }

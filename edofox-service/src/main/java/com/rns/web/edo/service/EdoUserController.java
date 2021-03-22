@@ -31,6 +31,8 @@ import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
+import com.rns.web.edo.service.domain.EdoStudent;
+import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
@@ -803,4 +805,25 @@ public class EdoUserController {
 		return response;
 	}
 	
+	@POST
+	@Path("/uploadProctorImage")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse uploadProctorImage(@FormDataParam("data") InputStream recordingData, @FormDataParam("data") FormDataContentDisposition recordingDataDetails,
+			@FormDataParam("studentId") Integer studentId, @FormDataParam("testId") Integer testId) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EdoServiceRequest request = new EdoServiceRequest();
+			EdoStudent student = new EdoStudent();
+			student.setId(studentId);
+			EdoTest test = new EdoTest();
+			test.setId(testId);
+			request.setStudent(student);
+			request.setTest(test);
+			return userBo.matchFaces(request, recordingData, recordingDataDetails);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
 }
