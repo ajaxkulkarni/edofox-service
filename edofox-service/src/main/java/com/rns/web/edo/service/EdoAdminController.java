@@ -511,10 +511,10 @@ public class EdoAdminController {
 	@Produces(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse uploadEvaluation(@FormDataParam("file") FormDataBodyPart bodyParts,
 			@FormDataParam("file") FormDataContentDisposition fileDispositions,
-			@FormDataParam("answerId") Integer answerId, @FormDataParam("marks") BigDecimal marks) {
+			@FormDataParam("answerId") Integer answerId, @FormDataParam("marks") BigDecimal marks, @FormDataParam("evaluator") Integer evaluator) {
 
 		EdoServiceResponse response = new EdoServiceResponse();
-		response.setStatus(adminBo.uploadEvaluation(bodyParts, answerId, marks));
+		response.setStatus(adminBo.uploadEvaluation(bodyParts, answerId, marks, evaluator));
 		return response;
 	}
 	
@@ -527,7 +527,11 @@ public class EdoAdminController {
 		if(request.getQuestion() != null) {
 			Integer answerId = request.getQuestion().getId();
 			BigDecimal marks = request.getQuestion().getMarks();
-			response.setStatus(adminBo.uploadEvaluation(null, answerId, marks));
+			Integer evaluator = null;
+			if(request.getStudent() != null && request.getStudent().getId() != null) {
+				evaluator = request.getStudent().getId();
+			}
+			response.setStatus(adminBo.uploadEvaluation(null, answerId, marks, evaluator));
 		}
 		return response;
 	}

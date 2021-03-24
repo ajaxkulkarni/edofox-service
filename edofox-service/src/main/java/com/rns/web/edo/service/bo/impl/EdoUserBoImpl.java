@@ -247,10 +247,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			if(test != null && StringUtils.equals(test.getTestUi(), "DESCRIPTIVE")) {
 				List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
-				if(CollectionUtils.isNotEmpty(answerFiles) && test.getSolvedCount() == null) {
-					test.setSolvedCount(answerFiles.size());
+				if(CollectionUtils.isNotEmpty(answerFiles)) {
+					if(test.getSolvedCount() == null) {
+						test.setSolvedCount(answerFiles.size());
+					}
 					for(EdoAnswerFileEntity file: answerFiles) {
 						file.setFileUrl(file.getFileUrl() + "?ver=" + System.currentTimeMillis());
+						if(StringUtils.isNotBlank(file.getCorrectionUrl())) {
+							file.setCorrectionUrl(file.getCorrectionUrl() + "?ver=" + System.currentTimeMillis());
+						}
 					}
 				}
 				test.setAnswerFiles(answerFiles);
@@ -2638,10 +2643,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			EdoTest test = new EdoTest();
 			List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
+			//To avoid cache
 			/*if(CollectionUtils.isNotEmpty(answerFiles)) {
 				for(EdoAnswerFileEntity answerFile: answerFiles) {
-					if(StringUtils.isNotBlank(answerFile.getAwsUrl())) {
-						answerFile.setFileUrl(answerFile.getAwsUrl());
+					if(StringUtils.isNotBlank(answerFile.getCorrectionUrl())) {
+						answerFile.setCorrectionUrl(answerFile.getCorrectionUrl() + "v=" + System.currentTimeMillis());
 					}
 				}
 			}*/

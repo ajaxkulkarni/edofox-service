@@ -2145,7 +2145,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		this.mailExecutor = mailExecutor;
 	}
 
-	public EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks) {
+	public EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks, Integer evaluatorId) {
 		Session session = null;
 		EdoApiStatus status = new EdoApiStatus();
 		try {
@@ -2169,6 +2169,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				}
 				if(marks != null) {
 					answerFileEntity.setCorrectionMarks(marks);
+				}
+				if(evaluatorId != null && evaluatorId > 0) {
+					answerFileEntity.setEvaluator(evaluatorId);
 				}
 				tx.commit();
 			}
@@ -2217,6 +2220,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			map.setScore(test.getScore());
 			map.setStatus(TEST_STATUS_COMPLETED);
 			map.setUpdatedDate(new Date());
+			if(request.getStudent().getTeacherId() != null && request.getStudent().getTeacherId() > 0) {
+				
+			}
 			//Commit the transaction
 			//txManager.commit(txStatus);
 			tx.commit();

@@ -38,6 +38,8 @@ public class EdoAnswerFileEntity {
 	private String correctionUrl;
 	@Column(name = "correction_marks", unique = true)
 	private BigDecimal correctionMarks;
+	@Column(name = "evaluator", unique = true)
+	private Integer evaluator;
 	
 	
 	public Date getCreatedDate() {
@@ -93,5 +95,11 @@ public class EdoAnswerFileEntity {
 	}
 	public void setCorrectionMarks(BigDecimal correctionMarks) {
 		this.correctionMarks = correctionMarks;
+	}
+	public Integer getEvaluator() {
+		return evaluator;
+	}
+	public void setEvaluator(Integer evaluator) {
+		this.evaluator = evaluator;
 	}
 }

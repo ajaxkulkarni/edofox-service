@@ -34,6 +34,7 @@ public class EdoStudent {
 	private String token;
 	private String latitude;
 	private String longitude;
+	private Integer teacherId;
 	
 	public EdoStudent() {
 
@@ -241,6 +242,14 @@ public class EdoStudent {
 
 	public void setLongitude(String longitude) {
 		this.longitude = longitude;
+	}
+
+	public Integer getTeacherId() {
+		return teacherId;
+	}
+
+	public void setTeacherId(Integer teacherId) {
+		this.teacherId = teacherId;
 	}
 	
 }

@@ -50,6 +50,9 @@ public class EdoTestStatusEntity {
 	private String deviceInfo;
 	@Column(name = "submission_type", unique = true)
 	private String submissionType;
+	@Column(name = "evaluator")
+	private Integer evaluator;
+	
 	
 	
 	public Integer getId() {
@@ -141,6 +144,12 @@ public class EdoTestStatusEntity {
 	}
 	public void setSubmissionType(String submissionType) {
 		this.submissionType = submissionType;
+	}
+	public Integer getEvaluator() {
+		return evaluator;
+	}
+	public void setEvaluator(Integer evaluator) {
+		this.evaluator = evaluator;
 	}
 	
 }

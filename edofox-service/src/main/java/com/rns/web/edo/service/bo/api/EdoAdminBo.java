@@ -37,6 +37,7 @@ public interface EdoAdminBo {
 	EdoApiStatus sendNotification(EdoServiceRequest request);
 	EdoApiStatus updateStudentScore(EdoServiceRequest request);
 	EdoServiceResponse uploadQuestionImage(EdoServiceRequest request, InputStream fileData);
+	EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks, Integer evaluatorId); 
 	
 	//Super admin
 	EdoApiStatus backupData(EdoAdminRequest request);
@@ -53,6 +54,6 @@ public interface EdoAdminBo {
 	EdoServiceResponse getLiveAnalysis(EdoServiceRequest request);
 	EdoServiceResponse savePackage(EdoServiceRequest request);
 	EdoServiceResponse updateEdofoxTokens(EdoServiceRequest request);
-	EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks); 
+	
 	
 }
