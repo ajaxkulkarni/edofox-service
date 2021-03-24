@@ -2221,7 +2221,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			map.setStatus(TEST_STATUS_COMPLETED);
 			map.setUpdatedDate(new Date());
 			if(request.getStudent().getTeacherId() != null && request.getStudent().getTeacherId() > 0) {
-				
+				map.setEvaluator(request.getStudent().getTeacherId());
 			}
 			//Commit the transaction
 			//txManager.commit(txStatus);
