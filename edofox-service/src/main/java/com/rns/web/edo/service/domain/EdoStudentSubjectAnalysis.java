@@ -12,6 +12,8 @@ public class EdoStudentSubjectAnalysis {
 	private Integer deductionsCount; //only negatives
 	private Integer incorrectCount; //not neccessarily negative
 	private Integer totalMarks;
+	private BigDecimal maxSubjectMarks;
+	private BigDecimal deviation;
 	
 	public String getSubject() {
 		return subject;
@@ -60,6 +62,18 @@ public class EdoStudentSubjectAnalysis {
 	}
 	public void setTotalMarks(Integer totalMarks) {
 		this.totalMarks = totalMarks;
+	}
+	public BigDecimal getMaxSubjectMarks() {
+		return maxSubjectMarks;
+	}
+	public void setMaxSubjectMarks(BigDecimal maxSubjectMarks) {
+		this.maxSubjectMarks = maxSubjectMarks;
+	}
+	public BigDecimal getDeviation() {
+		return deviation;
+	}
+	public void setDeviation(BigDecimal deviation) {
+		this.deviation = deviation;
 	}
 	
 	

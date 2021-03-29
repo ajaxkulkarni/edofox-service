@@ -11,6 +11,7 @@ public class EDOTestAnalysis {
 	private BigDecimal averageAttempted;
 	private List<EdoStudentSubjectAnalysis> subjectAnalysis;
 	private Integer topScore;
+	private BigDecimal percentile;
 	
 	public Integer getStudentsAppeared() {
 		return studentsAppeared;
@@ -47,6 +48,12 @@ public class EDOTestAnalysis {
 	}
 	public void setTopScore(Integer topScore) {
 		this.topScore = topScore;
+	}
+	public BigDecimal getPercentile() {
+		return percentile;
+	}
+	public void setPercentile(BigDecimal percentile) {
+		this.percentile = percentile;
 	}
 	
 }
