@@ -61,7 +61,7 @@
 	</update>
 	
 	<select id="getStudentStats" parameterType="Integer" resultMap="institute">
-	select count(distinct student_id) as currentCount,institute_name,max_students from student_institute 
+	select count(distinct student_id) as currentCount,institute_name,max_students,web_url from student_institute 
 	join institute on student_institute.institute_id = institute.id
 	where institute_id = ${value};
 	</select>
