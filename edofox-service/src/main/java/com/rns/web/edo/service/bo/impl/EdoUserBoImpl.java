@@ -2355,13 +2355,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 										test.getAnalysis().setSubjectAnalysis(new ArrayList<EdoStudentSubjectAnalysis>());
 									}
 									if(test.getAnalysis() != null && test.getAnalysis().getStudentsAppeared() != null && test.getRank() != null) {
-										Integer rankDifference = test.getAnalysis().getStudentsAppeared() - test.getRank();
-										if(rankDifference <= 0) {
-											test.getAnalysis().setPercentile(BigDecimal.ZERO);
-										} else {
-											BigDecimal division = new BigDecimal(rankDifference).divide(new BigDecimal(test.getAnalysis().getStudentsAppeared()));
-											test.getAnalysis().setPercentile(division.multiply(new BigDecimal(100)));
-										}
+										test.getAnalysis().setPercentile(CommonUtils.calculatePercentile(test.getAnalysis().getStudentsAppeared(), test.getRank()));
 									}
 									EdoStudentSubjectAnalysis subjectAnalysis = sa.getSubjectScore();
 									//Calculate deviation

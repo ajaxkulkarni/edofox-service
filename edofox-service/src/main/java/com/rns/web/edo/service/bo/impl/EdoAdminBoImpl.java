@@ -247,6 +247,23 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(students)) {
 				List<EdoTestStudentMap> subjectScores = testsDao.getSubjectwiseScore(test.getId());
 				if(CollectionUtils.isNotEmpty(subjectScores)) {
+					//Find subject topper scores
+					Map<String, BigDecimal> topperScores = new HashMap<String, BigDecimal>();
+					for(EdoTestStudentMap map: subjectScores) {
+						EdoStudentSubjectAnalysis subjectScore = map.getSubjectScore();
+						if(subjectScore != null && subjectScore.getScore() != null) {
+							if(StringUtils.isNotBlank(subjectScore.getSubject())) {
+								if(topperScores.get(subjectScore.getSubject()) != null
+										&& topperScores.get(subjectScore.getSubject()).compareTo(subjectScore.getScore()) < 0
+										) {
+									topperScores.put(subjectScore.getSubject(), subjectScore.getScore());
+								} else {
+									topperScores.put(subjectScore.getSubject(), subjectScore.getScore());
+								}
+							}
+						}
+					}
+					
 					Integer rank = 0;
 					for(EdoStudent student: students) {
 						if(student.getAnalysis() == null) {
@@ -255,10 +272,24 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						rank++;
 						student.getAnalysis().setRank(rank);
 						student.getAnalysis().setTotalStudents(students.size());
+						//Calculate percentile 
+						if(rank != null) {
+							student.getAnalysis().setPercentile(CommonUtils.calculatePercentile(students.size(), rank));
+						}
+						
 						if(request.getStudent() != null && request.getStudent().getId() != student.getId()) {
 							continue;
 						}
 						List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(existing, subjectScores, student);
+						//Add subject topper deviation
+						if(CollectionUtils.isNotEmpty(subjectAnalysis)) {
+							for(EdoStudentSubjectAnalysis sa: subjectAnalysis) {
+								if(topperScores.get(sa.getSubject()) != null && sa.getScore() != null) {
+									sa.setDeviation(topperScores.get(sa.getSubject()).subtract(sa.getScore()));
+								}
+							}
+						}
+						
 						student.getAnalysis().setSubjectScores(subjectAnalysis);
 						if(StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {
 							//Send rank SMS to student and parents

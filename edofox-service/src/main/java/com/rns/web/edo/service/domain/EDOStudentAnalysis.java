@@ -12,6 +12,7 @@ public class EDOStudentAnalysis {
 	private List<EdoStudentSubjectAnalysis> subjectScores;
 	private Integer rank;
 	private Integer totalStudents;
+	private BigDecimal percentile;
 	
 	public Integer getSolvedCount() {
 		return solvedCount;
@@ -54,6 +55,12 @@ public class EDOStudentAnalysis {
 	}
 	public void setTotalStudents(Integer totalStudents) {
 		this.totalStudents = totalStudents;
+	}
+	public BigDecimal getPercentile() {
+		return percentile;
+	}
+	public void setPercentile(BigDecimal percentile) {
+		this.percentile = percentile;
 	}
 	
 }

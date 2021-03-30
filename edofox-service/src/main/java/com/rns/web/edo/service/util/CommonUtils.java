@@ -961,4 +961,17 @@ public class CommonUtils {
 		
 	}
 	
+	public static BigDecimal calculatePercentile(Integer studentsAppeared, Integer rank) {
+		if(rank == null || studentsAppeared == null) {
+			return null;
+		}
+		Integer rankDifference = studentsAppeared - rank;
+		if(rankDifference <= 0) {
+			return BigDecimal.ZERO;
+		} else {
+			BigDecimal division = new BigDecimal(rankDifference).divide(new BigDecimal(studentsAppeared), 2, RoundingMode.HALF_UP);
+			return division.multiply(new BigDecimal(100));
+		}
+	}
+	
 }
