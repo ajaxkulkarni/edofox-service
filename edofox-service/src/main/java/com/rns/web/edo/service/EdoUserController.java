@@ -775,6 +775,18 @@ public class EdoUserController {
 		return userBo.uploadAnswers(bodyParts, testId, studentId);
 	}
 	
+	@Path("/uploadAnswersAndroid")
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoApiStatus uploadAnswersAndroid(@FormDataParam("tags") String tags,
+			@FormDataParam("files[]") List<FormDataBodyPart> bodyParts,
+			@FormDataParam("files[]") FormDataContentDisposition fileDispositions,
+			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId) {
+
+		return userBo.uploadAnswers(bodyParts, testId, studentId);
+	}
+	
 	@POST
 	@Path("/getUploadedAnswers")
 	@Produces(MediaType.APPLICATION_JSON)
