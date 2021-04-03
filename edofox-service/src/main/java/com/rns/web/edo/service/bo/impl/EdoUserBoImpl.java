@@ -1303,6 +1303,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(!StringUtils.equals("video", request.getRequestType())) {
 				EdoQuestion currentQuestion = request.getTest().getCurrentQuestion();
 				if(currentQuestion != null) {
+					//Fix for Android bug
+					if(currentQuestion.getQn_id() != null && currentQuestion.getQn_id() > currentQuestion.getId()) {
+						currentQuestion.setId(currentQuestion.getQn_id());
+					}
+					
 					if(currentQuestion.getChapter() == null || currentQuestion.getChapter().getChapterId() == null || currentQuestion.getSubjectId() == null) {
 						if(currentQuestion.getId() != null) {
 							List<EdoQuestion> question = testsDao.getNextQuestion(currentQuestion);
