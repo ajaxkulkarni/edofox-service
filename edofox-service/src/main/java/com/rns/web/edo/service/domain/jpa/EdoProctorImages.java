@@ -31,6 +31,8 @@ public class EdoProctorImages {
 	private Date createdDate;
 	@Column(name = "img_path")
 	private String imageUrl;
+	@Column(name = "remarks")
+	private String remarks;
 	
 	
 	public Date getCreatedDate() {
@@ -68,5 +70,11 @@ public class EdoProctorImages {
 	}
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+	public String getRemarks() {
+		return remarks;
+	}
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
 	}
 }

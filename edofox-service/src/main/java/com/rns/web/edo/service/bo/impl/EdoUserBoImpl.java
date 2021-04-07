@@ -6,9 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,8 +34,6 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.clickntap.vimeo.VimeoResponse;
-import com.itextpdf.io.source.ByteArrayOutputStream;
-import com.itextpdf.text.pdf.qrcode.ByteArray;
 import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
@@ -58,6 +57,7 @@ import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
 import com.rns.web.edo.service.domain.EdoTestStudentMap;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.ext.EdoFaceScore;
 import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
@@ -74,6 +74,7 @@ import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoAwsUtil;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoFaceDetection;
+import com.rns.web.edo.service.util.EdoImageUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
 import com.rns.web.edo.service.util.EdoPDFUtil;
@@ -518,6 +519,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					result.setJeeNewFormatSections(CommonUtils.sectionsEligibleForNewJeeFormat(result, result.getTest()));
 					if(CollectionUtils.isNotEmpty(result.getJeeNewFormatSections())) {
 						result.setJeeMaxNumeric(JEE_NEW_FORMAT_BEST_OF_VALUE);
+					}
+					//Check for proctoring
+					if(StringUtils.equalsIgnoreCase(result.getTestUi(), "PROCTORING")) {
+						EdoStudent student = testsDao.getStudentById(studenId);
+						if(student != null) {
+							result.setProctoringImage(student.getProfilePic());
+						}
 					}
 				}
 				response.setTest(result);
@@ -2727,29 +2735,69 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			//InputStream inputStream = new FileInputStream(new File(sourceImage));
 			//Target Image from camera
+			
 			byte[] byteArray = IOUtils.toByteArray(file);
+			
+			File compressedFile = null;
+			//If length of file is greater than max allowed by Amazon, compress it
+			float f = 4194304; //5 MBs
+			if(byteArray.length > f) {
+				String outputPath = PROCTORING_TEMP;
+				if(!new File(outputPath).exists()) {
+					new File(outputPath).mkdirs();
+				}
+				outputPath = outputPath + "/" + request.getStudent().getId() + "_" + System.currentTimeMillis() + ".jpg";
+				InputStream backupInputStream = new ByteArrayInputStream(byteArray);
+				compressedFile = EdoImageUtil.compressImage(backupInputStream, outputPath, 0.5f);
+				byteArray = FileUtils.readFileToByteArray(compressedFile);
+			}		
+			
 			ByteBuffer destinationImageBytes = ByteBuffer.wrap(byteArray);
 			InputStream backupStream = new ByteArrayInputStream(byteArray);
 			
+			
 			//TODO replace with DB student image
-			String sourceImage = "F:\\Resoneuronance\\Edofox\\Document\\Director_Pic.jpg";
-			ByteBuffer sourceImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(new FileInputStream(sourceImage)));
+			//String sourceImage = "F:\\Resoneuronance\\Edofox\\Document\\Director_Pic.jpg";
+			String hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
+			//Get student profile pic for comparison
+			EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
+			//"uploads/profilePics/6c1c3cf7940ac21b0438a39ace76cfba.jpg"
+			String sourceImage = hostName + student.getProfilePic();
+			//FileInputStream fileInputStream = new FileInputStream(sourceImage);
+			ByteBuffer sourceImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(new URL(sourceImage).openStream()));
 			
 			
-			float score = EdoFaceDetection.compareFaceImages(sourceImageBytes, destinationImageBytes);
-			System.out.print("Score is " + score);
+			EdoFaceScore score = EdoFaceDetection.compareFaceImages(sourceImageBytes, destinationImageBytes);
+			//System.out.print("Score is " + score);
 			
 			//Upload file to AWS bucket first
 			String filePath = EdoAwsUtil.uploadToAws(request.getTest().getId() + "_" + request.getStudent().getId() + "_" + System.currentTimeMillis() + ".jpg", null, backupStream, "image/jpeg", "proctoring");
 			session = this.sessionFactory.openSession();
 			Transaction tx = session.beginTransaction();
 			EdoProctorImages images = new EdoProctorImages();
-			images.setScore(score);
+			images.setScore(score.getScore());
 			images.setCreatedDate(new Date());
 			images.setTestId(request.getTest().getId());
 			images.setStudentId(request.getStudent().getId());
 			images.setImageUrl(filePath);
+			images.setRemarks(score.getRemarks());
 			session.persist(images);
+			
+			if(StringUtils.isNotBlank(score.getRemarks())) {
+				List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+						.add(Restrictions.eq("testId", request.getTest().getId()))
+						.add(Restrictions.eq("studentId", request.getStudent().getId()))
+						.list();
+				if(CollectionUtils.isNotEmpty(maps)) {
+					EdoTestStatusEntity edoTestStatusEntity = maps.get(0);
+					if(StringUtils.isBlank(edoTestStatusEntity.getProctoringRemarks())) {
+						edoTestStatusEntity.setProctoringRemarks(score.getRemarks());
+					} else if (!StringUtils.contains(edoTestStatusEntity.getProctoringRemarks(), score.getRemarks())) {
+						edoTestStatusEntity.setProctoringRemarks(edoTestStatusEntity.getProctoringRemarks() + "," + score.getRemarks());
+					}
+				}
+			}
+			
 			tx.commit();
 			
 		} catch (Exception e) {

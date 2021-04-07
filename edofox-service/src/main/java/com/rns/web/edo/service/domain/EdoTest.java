@@ -66,6 +66,7 @@ public class EdoTest {
 	private List<String> jeeNewFormatSections;
 	private Integer jeeMaxNumeric;
 	private Integer showRank;
+	private String proctoringImage;
 	
 	public EdoTest() {
 		
@@ -474,6 +475,14 @@ public class EdoTest {
 
 	public void setShowRank(Integer showRank) {
 		this.showRank = showRank;
+	}
+
+	public String getProctoringImage() {
+		return proctoringImage;
+	}
+	
+	public void setProctoringImage(String proctoringImage) {
+		this.proctoringImage = proctoringImage;
 	}
 	
 }

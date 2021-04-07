@@ -22,6 +22,7 @@ import com.amazonaws.services.rekognition.model.CompareFacesRequest;
 import com.amazonaws.services.rekognition.model.CompareFacesResult;
 import com.amazonaws.services.rekognition.model.ComparedFace;
 import com.amazonaws.services.rekognition.model.Image;
+import com.rns.web.edo.service.domain.ext.EdoFaceScore;
 
 public class EdoFaceDetection {
 	
@@ -43,7 +44,10 @@ public class EdoFaceDetection {
 	public static void main(String[] args) throws Exception {
 		
 		String sourceImage = "F:\\Resoneuronance\\Edofox\\Document\\Director_Pic.jpg";
-		String targetImage = "F:\\Resoneuronance\\Edofox\\Document\\logo.jpg";
+		//String targetImage = "F:\\Resoneuronance\\Edofox\\Document\\webcam.jpg";
+		String largeImage = "H:\\Engagement Photos\\IMG_0182.jpg";
+		String targetImage = "H:\\Engagement Photos\\compressed.jpg";
+		EdoImageUtil.compressImage(new FileInputStream(targetImage), targetImage, 0.5f);
 		//String targetImage = "H:\\Engagement Photos\\Photographer\\IMG_0412.jpg";
 		ByteBuffer sourceImageBytes = null;
 		ByteBuffer targetImageBytes = null;
@@ -68,10 +72,12 @@ public class EdoFaceDetection {
 		compareFaceImages(sourceImageBytes, targetImageBytes);
 	}
 
-	public static float compareFaceImages(ByteBuffer sourceImageBytes, ByteBuffer targetImageBytes) {
+	public static EdoFaceScore compareFaceImages(ByteBuffer sourceImageBytes, ByteBuffer targetImageBytes) {
 		Image source = new Image().withBytes(sourceImageBytes);
 		Image target = new Image().withBytes(targetImageBytes);
 
+		EdoFaceScore fscore = new EdoFaceScore();
+		
 		CompareFacesRequest request = new CompareFacesRequest().withSourceImage(source).withTargetImage(target).withSimilarityThreshold(similarityThreshold);
 
 		// Call operation
@@ -92,9 +98,12 @@ public class EdoFaceDetection {
 		List<ComparedFace> uncompared = compareFacesResult.getUnmatchedFaces();
 		if(CollectionUtils.isNotEmpty(uncompared)) {
 			System.out.println("There was " + uncompared.size() + " face(s) that did not match");
-			return score;
+			fscore.setRemarks("Multiple people found");
+			fscore.setScore(0f);
+			return fscore;
 		} else {
-			return score;
+			fscore.setScore(score);
+			return fscore;
 		}
 
 	}

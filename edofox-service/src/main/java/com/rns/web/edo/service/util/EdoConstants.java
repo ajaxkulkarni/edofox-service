@@ -87,6 +87,7 @@ public interface EdoConstants {
 	String TEST_QUESTION_PATH = "/home/service/testQuestionData/";
 	String VIDEOS_PATH = "/home/service/videos/";
 	String DOUBTS_PATH = "/home/service/doubts/";
+	String PROCTORING_TEMP = "/home/service/proctor/compressed/";
 	
 	//Payment variables
 	String PAYMENT_STATUS_COMPLETED = "completed";

@@ -52,6 +52,8 @@ public class EdoTestStatusEntity {
 	private String submissionType;
 	@Column(name = "evaluator")
 	private Integer evaluator;
+	@Column(name = "proctoring_remarks")
+	private String proctoringRemarks;
 	
 	
 	
@@ -150,6 +152,12 @@ public class EdoTestStatusEntity {
 	}
 	public void setEvaluator(Integer evaluator) {
 		this.evaluator = evaluator;
+	}
+	public String getProctoringRemarks() {
+		return proctoringRemarks;
+	}
+	public void setProctoringRemarks(String proctoringRemarks) {
+		this.proctoringRemarks = proctoringRemarks;
 	}
 	
 }
