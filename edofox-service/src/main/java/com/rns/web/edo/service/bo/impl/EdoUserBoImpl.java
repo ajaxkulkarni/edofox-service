@@ -34,6 +34,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.clickntap.vimeo.VimeoResponse;
+import com.coremedia.iso.boxes.CompositionTimeToSample.Entry;
 import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
@@ -398,6 +399,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
 			
+			//Check for random pool property..if set to 1, random questions need to be picked out of total questions added
+			Map<String, Integer> examQuestionCount = null;
+			Map<String, List<EdoQuestion>> solvedSet = null;
+			
 			if(CollectionUtils.isNotEmpty(map)) {
 				EdoTest result = map.get(0).getTest();
 				//Check for max allowed start attempts
@@ -469,6 +474,44 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						}
 					}
 					
+					if(result.getRandomPool() != null && result.getRandomPool() == 1) {
+						//Check how many question attempted by student..if equals test no of questions..skip randomizing
+						EdoServiceRequest request = new EdoServiceRequest();
+						EdoStudent student = new EdoStudent();
+						student.setId(studenId);
+						request.setStudent(student);
+						request.setTest(result);
+						List<EdoTestQuestionMap> answersMap = testsDao.getExamSolved(request);
+						if(CollectionUtils.isNotEmpty(answersMap)) {
+							if(answersMap.size() < result.getNoOfQuestions()) {
+								//Find out section wise question count
+								examQuestionCount = extractSectionswiseCount(map, examQuestionCount);
+								solvedSet = new HashMap<String, List<EdoQuestion>>();
+								for(EdoTestQuestionMap solved: answersMap) {
+									if(solved.getQuestion() != null && solved.getQuestion().getSection() != null) {
+										String section = solved.getQuestion().getSection();
+										if(StringUtils.isBlank(section)) {
+											solved.getQuestion().setSection("General");
+											section = "General";
+										}
+										if(examQuestionCount.get(section) != null) {
+											examQuestionCount.put(section, examQuestionCount.get(section) - 1);
+											if(solvedSet.get(section) == null) {
+												solvedSet.put(section, new ArrayList<EdoQuestion>());
+											}
+											solvedSet.get(section).add(solved.getQuestion());
+										}
+									}
+								}
+								
+							}
+						} else {
+							//Find out section wise question count
+							examQuestionCount = extractSectionswiseCount(map, examQuestionCount);
+						}
+					}
+					
+					
 				}
 				
 				Integer count = 1;
@@ -512,7 +555,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				if(isRandomizeQuestions(result) && studenId != null) {
 					//Randomize only for student NOT for Admin
-					randomizeQuestions(result, sectionSets);
+					randomizeQuestions(result, sectionSets, examQuestionCount, solvedSet);
 				}
 				//Get JEE sections eligible for JEE format
 				if(studenId != null) {
@@ -537,6 +580,34 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		return response;
+	}
+
+	private Map<String, Integer> extractSectionswiseCount(List<EdoTestQuestionMap> map, Map<String, Integer> examQuestionCount) {
+		if(CollectionUtils.isNotEmpty(map)) {
+			Map<String, Integer> sectionWiseCount = new HashMap<String, Integer>();
+			for(EdoTestQuestionMap m: map) {
+				EdoQuestion question = m.getQuestion();
+				if(question.getSection() == null) {
+					continue;
+				}
+				if(StringUtils.isBlank(question.getSection())) {
+					question.setSection("General");
+				}
+				if(sectionWiseCount.get(question.getSection()) != null) {
+					sectionWiseCount.put(question.getSection(), sectionWiseCount.get(question.getSection()) + 1);
+				} else {
+					sectionWiseCount.put(question.getSection(), 1);
+				}
+			}
+			//Find section wise proportions
+			examQuestionCount = new HashMap<String, Integer>();
+			float proportion = (float) map.get(0).getTest().getNoOfQuestions() / map.size();
+			for(java.util.Map.Entry<String, Integer> e: sectionWiseCount.entrySet()) {
+				Integer examProportion = Double.valueOf(e.getValue() * proportion).intValue();
+				examQuestionCount.put(e.getKey(), examProportion);
+			}
+		}
+		return examQuestionCount;
 	}
 
 	private void addTestActivity(Integer testId, Integer studenId, String type, EdoTest edoTest) {
@@ -571,7 +642,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 	}
 
-	private void randomizeQuestions(EdoTest result, Map<String, List<EdoQuestion>> sectionSets) {
+	private void randomizeQuestions(EdoTest result, Map<String, List<EdoQuestion>> sectionSets, Map<String,Integer> allowedCounts, Map<String,List<EdoQuestion>> solvedSets) {
 		if(CollectionUtils.isNotEmpty(sectionSets.keySet()) && result != null) {
 			List<EdoQuestion> shuffled = new ArrayList<EdoQuestion>();
 			Integer qNo = 1;
@@ -582,10 +653,28 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					//LoggingUtil.logMessage("Shuffling for section .." + section + " - list - " + set.size());
 					Collections.shuffle(set);
 				}
+				
+				//Populate already solved questions in case of random pool
+				if(solvedSets != null && CollectionUtils.isNotEmpty(solvedSets.entrySet()) && solvedSets.get(section) != null) {
+					shuffled.addAll(solvedSets.get(section));
+				}
+				
+				Map<String, Integer> sectionWiseCount = new HashMap<String, Integer>();
 				for(EdoQuestion question: set) {
+					if(allowedCounts != null && allowedCounts.get(section) != null) {
+						if(sectionWiseCount.get(section) != null && allowedCounts.get(section) <= sectionWiseCount.get(section)) {
+							//If questions in the section cross allowed count, don't add
+							break;
+						}
+						if(sectionWiseCount.get(section) == null) {
+							sectionWiseCount.put(section, 0);
+						}
+						sectionWiseCount.put(section, sectionWiseCount.get(section) + 1);
+					}
 					question.setQuestionNumber(qNo);
 					qNo++;
 					shuffled.add(question);
+					
 				}
 			}
 			result.setTest(shuffled);

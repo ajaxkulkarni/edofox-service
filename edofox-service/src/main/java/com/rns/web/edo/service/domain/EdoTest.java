@@ -67,6 +67,7 @@ public class EdoTest {
 	private Integer jeeMaxNumeric;
 	private Integer showRank;
 	private String proctoringImage;
+	private Integer randomPool;
 	
 	public EdoTest() {
 		
@@ -483,6 +484,14 @@ public class EdoTest {
 	
 	public void setProctoringImage(String proctoringImage) {
 		this.proctoringImage = proctoringImage;
+	}
+
+	public Integer getRandomPool() {
+		return randomPool;
+	}
+
+	public void setRandomPool(Integer randomPool) {
+		this.randomPool = randomPool;
 	}
 	
 }

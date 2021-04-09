@@ -41,6 +41,7 @@
 		<result column="offline_conduction" property="test.offlineConduction"/>
 		<result column="accept_location" property="test.acceptLocation"/>
 		<result column="force_update" property="test.forceUpdate"/>
+		<result column="random_pool" property="test.randomPool"/>
 		<result column="institute_id" property="test.instituteId"/>
 		<result column="custom_instructions" property="test.instructions"/>
 		<result column="qStatus" property="question.status"/>
@@ -168,6 +169,15 @@
 		<if test="requestType != 'Solution'">
 			AND test_status.student_id = ${student.id} AND test_status.student_id 
 		</if>
+		AND question_disabled = 0 order by test_questions_map.question_number asc
+		
+	</select>
+	
+	<select id="getExamSolved" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		select * from test_questions_map join test_result on test_questions_map.question_id = test_result.question_id
+		where
+		test_questions_map.test_id = ${test.id} 
+		AND student_id = ${student.id}
 		AND question_disabled = 0 order by test_questions_map.question_number asc
 		
 	</select>
