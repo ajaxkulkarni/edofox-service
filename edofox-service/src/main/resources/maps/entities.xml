@@ -26,6 +26,7 @@
 		<result column="roll_no" property="rollNo"/>		
 		<result column="token" property="token"/>
 		<result column="password" property="password"/>
+		<result column="proctor_img" property="proctorImageRef"/>	
 	</resultMap>
 	
 	<resultMap id="loginInfo" type="com.rns.web.edo.service.domain.EdoStudent">

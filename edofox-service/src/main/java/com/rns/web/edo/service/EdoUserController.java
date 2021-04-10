@@ -838,4 +838,23 @@ public class EdoUserController {
 		}
 		return response;
 	}
+	
+	@POST
+	@Path("/uploadProctorRef")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public EdoServiceResponse uploadProctorRef(@FormDataParam("data") InputStream recordingData, @FormDataParam("data") FormDataContentDisposition recordingDataDetails,
+			@FormDataParam("studentId") Integer studentId) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			EdoServiceRequest request = new EdoServiceRequest();
+			EdoStudent student = new EdoStudent();
+			student.setId(studentId);
+			request.setStudent(student);
+			return userBo.uploadProctorRef(request, recordingData, recordingDataDetails);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		return response;
+	}
 }

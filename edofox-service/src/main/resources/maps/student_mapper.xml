@@ -108,6 +108,10 @@
 		update student_login SET universal_token = '${token}' where student_id = ${id}
 	</update>
 	
+	<update id="updateProctorUrl" parameterType="com.rns.web.edo.service.domain.EdoStudent">
+		update student SET proctor_img = '${proctorImageRef}' where id = ${id}
+	</update>
+	
 	<update id="deleteLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent">
 		delete from student_login where student_id = ${id}
 	</update>

@@ -35,6 +35,7 @@ public class EdoStudent {
 	private String latitude;
 	private String longitude;
 	private Integer teacherId;
+	private String proctorImageRef;
 	
 	public EdoStudent() {
 
@@ -250,6 +251,14 @@ public class EdoStudent {
 
 	public void setTeacherId(Integer teacherId) {
 		this.teacherId = teacherId;
+	}
+
+	public String getProctorImageRef() {
+		return proctorImageRef;
+	}
+
+	public void setProctorImageRef(String proctorImageRef) {
+		this.proctorImageRef = proctorImageRef;
 	}
 	
 }

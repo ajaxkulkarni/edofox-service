@@ -566,8 +566,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					//Check for proctoring
 					if(StringUtils.equalsIgnoreCase(result.getTestUi(), "PROCTORING")) {
 						EdoStudent student = testsDao.getStudentById(studenId);
-						if(student != null) {
-							result.setProctoringImage(student.getProfilePic());
+						if(student != null && StringUtils.isNotBlank(student.getProctorImageRef())) {
+							result.setProctoringImage(student.getProctorImageRef());
+						} else {
+							response.setStatus(new EdoApiStatus(STATUS_PROCTOR_ERROR, ERROR_PROCTOR));
+							return response;
 						}
 					}
 				}
@@ -2847,11 +2850,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//TODO replace with DB student image
 			//String sourceImage = "F:\\Resoneuronance\\Edofox\\Document\\Director_Pic.jpg";
-			String hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
+			//String hostName = EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME);
 			//Get student profile pic for comparison
 			EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
 			//"uploads/profilePics/6c1c3cf7940ac21b0438a39ace76cfba.jpg"
-			String sourceImage = hostName + student.getProfilePic();
+			String sourceImage = CommonUtils.setUrl(student.getProctorImageRef());
+			
 			//FileInputStream fileInputStream = new FileInputStream(sourceImage);
 			ByteBuffer sourceImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(new URL(sourceImage).openStream()));
 			
@@ -2894,6 +2898,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		} finally {
 			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
+
+	public EdoServiceResponse uploadProctorRef(EdoServiceRequest request, InputStream recordingData, FormDataContentDisposition recordingDataDetails) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			EdoStudent student = request.getStudent();
+			String url = EdoAwsUtil.uploadToAws(student.getId() + "_" + System.currentTimeMillis() + ".jpg", null, recordingData, "image/jpeg", "proctorRef");
+			//Update proctor_ref url in DB
+			student.setProctorImageRef(url);
+			testsDao.updateProctorUrl(student);
+			response.setStudent(request.getStudent());
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
 	}

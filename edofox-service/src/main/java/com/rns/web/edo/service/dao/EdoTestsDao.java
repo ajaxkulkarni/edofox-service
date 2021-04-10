@@ -90,6 +90,7 @@ public interface EdoTestsDao {
 	List<EdoTest> getChapterExams(EdoServiceRequest request);
 	void saveStudentTestActivity(EdoServiceRequest request);
 	List<EdoSubject> getDlpContentSubject(Integer value);
+	void updateProctorUrl(EdoStudent student);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);

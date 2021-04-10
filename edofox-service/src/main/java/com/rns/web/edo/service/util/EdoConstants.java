@@ -24,6 +24,7 @@ public interface EdoConstants {
 	Integer STATUS_TEST_NOT_OPENED = -105;
 	Integer STATUS_NO_LOCATION = -106;
 	Integer STATUS_WRONG_VERSION = -107;
+	Integer STATUS_PROCTOR_ERROR = -108;
 	
 	String ERROR_IN_PROCESSING = "Error in processing!";
 	String ERROR_INVALID_PROFILE = "Student profile was not valid. Please contact support.";
@@ -38,6 +39,7 @@ public interface EdoConstants {
 	String ERROR_STUDENT_NOT_FOUND = "Student profile not found!";
 	String ERROR_NO_LOCATION = "This exam requires you to send your location for monitoring purposes";
 	String ERROR_WRONG_VERSION = "This exam requires you update your app version. Update the app from Google playstore and restart";
+	String ERROR_PROCTOR = "This exam requires you provide your photo for proctoring purposes. If you haven't already, please take a photo from your device camera now";
 	
 	
 	String COMMA_SEPARATOR = ", ";
