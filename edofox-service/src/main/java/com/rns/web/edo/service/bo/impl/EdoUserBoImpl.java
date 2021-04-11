@@ -2885,12 +2885,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			session = this.sessionFactory.openSession();
 			Transaction tx = session.beginTransaction();
 			EdoProctorImages images = new EdoProctorImages();
-			images.setScore(score.getScore());
+			if(score != null) {
+				images.setScore(score.getScore());
+				images.setRemarks(score.getRemarks());
+			}
 			images.setCreatedDate(new Date());
 			images.setTestId(request.getTest().getId());
 			images.setStudentId(request.getStudent().getId());
 			images.setImageUrl(filePath);
-			images.setRemarks(score.getRemarks());
 			session.persist(images);
 			
 			if(StringUtils.isNotBlank(score.getRemarks())) {

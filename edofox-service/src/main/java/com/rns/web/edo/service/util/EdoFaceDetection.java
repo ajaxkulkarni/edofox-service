@@ -3,6 +3,7 @@ package com.rns.web.edo.service.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class EdoFaceDetection {
 	public static void main(String[] args) throws Exception {
 		
 		String sourceImage = "F:\\Resoneuronance\\Edofox\\Document\\Director_Pic.jpg";
-		String targetImage = "F:\\Resoneuronance\\Edofox\\Document\\with phone.jpg";
+		String targetImage = "F:\\Resoneuronance\\Edofox\\Document\\logo.jpg";
 		//String largeImage = "H:\\Engagement Photos\\IMG_0182.jpg";
 		//String targetImage = "H:\\Engagement Photos\\compressed.jpg";
 		//EdoImageUtil.compressImage(new FileInputStream(targetImage), targetImage, 0.5f);
@@ -75,7 +76,7 @@ public class EdoFaceDetection {
 			System.exit(1);
 		}
 
-		compareFaceImages(sourceImageBytes, targetImageBytes);
+		System.out.println("Score is " + compareFaceImages(sourceImageBytes, targetImageBytes).getRemarks());
 	}
 	
 	public static void detectObjects(ByteBuffer bytes) {
@@ -121,42 +122,50 @@ public class EdoFaceDetection {
 	}
 
 	public static EdoFaceScore compareFaceImages(ByteBuffer sourceImageBytes, ByteBuffer targetImageBytes) {
-		Image source = new Image().withBytes(sourceImageBytes);
-		Image target = new Image().withBytes(targetImageBytes);
-
 		EdoFaceScore fscore = new EdoFaceScore();
-		
-		CompareFacesRequest request = new CompareFacesRequest().withSourceImage(source).withTargetImage(target).withSimilarityThreshold(similarityThreshold);
+		try {
+			
+			Image source = new Image().withBytes(sourceImageBytes);
+			Image target = new Image().withBytes(targetImageBytes);
 
-		// Call operation
-		CompareFacesResult compareFacesResult = rekognitionClient.compareFaces(request);
+			CompareFacesRequest request = new CompareFacesRequest().withSourceImage(source).withTargetImage(target).withSimilarityThreshold(similarityThreshold);
 
-		// Display results
-		List<CompareFacesMatch> faceDetails = compareFacesResult.getFaceMatches();
-		float score = 0f;
-		for (CompareFacesMatch match : faceDetails) {
-			ComparedFace face = match.getFace();
-			BoundingBox position = face.getBoundingBox();
-			System.out.println("Face at " + position.getLeft().toString() + " " + position.getTop() + " matches with " + match.getSimilarity().toString()
-					+ "% confidence.");
-			score = match.getSimilarity();
-			break;
+			// Call operation
+			CompareFacesResult compareFacesResult = rekognitionClient.compareFaces(request);
 
-		}
-		
-		//detectObjects(targetImageBytes);
-		
-		List<ComparedFace> uncompared = compareFacesResult.getUnmatchedFaces();
-		if(CollectionUtils.isNotEmpty(uncompared)) {
-			System.out.println("There was " + uncompared.size() + " face(s) that did not match");
-			fscore.setRemarks("Multiple people found");
+			// Display results
+			List<CompareFacesMatch> faceDetails = compareFacesResult.getFaceMatches();
+			float score = 0f;
+			for (CompareFacesMatch match : faceDetails) {
+				ComparedFace face = match.getFace();
+				BoundingBox position = face.getBoundingBox();
+				System.out.println("Face at " + position.getLeft().toString() + " " + position.getTop() + " matches with " + match.getSimilarity().toString()
+						+ "% confidence.");
+				score = match.getSimilarity();
+				break;
+
+			}
+			
+			//detectObjects(targetImageBytes);
+			
+			List<ComparedFace> uncompared = compareFacesResult.getUnmatchedFaces();
+			if(CollectionUtils.isNotEmpty(uncompared)) {
+				System.out.println("There was " + uncompared.size() + " face(s) that did not match");
+				fscore.setRemarks("Multiple people found");
+				fscore.setScore(0f);
+				return fscore;
+			} else {
+				fscore.setScore(score);
+				return fscore;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 			fscore.setScore(0f);
-			return fscore;
-		} else {
-			fscore.setScore(score);
+			fscore.setRemarks("Invalid images");
 			return fscore;
 		}
-
+		
 	}
 
 }
