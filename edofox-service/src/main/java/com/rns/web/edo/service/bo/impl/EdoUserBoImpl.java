@@ -474,7 +474,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						}
 					}
 					
-					/*if(result.getRandomPool() != null && result.getRandomPool() == 1) {
+					if(result.getRandomPool() != null && result.getRandomPool() == 1) {
 						//Check how many question attempted by student..if equals test no of questions..skip randomizing
 						EdoServiceRequest request = new EdoServiceRequest();
 						EdoStudent student = new EdoStudent();
@@ -509,7 +509,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							//Find out section wise question count
 							examQuestionCount = extractSectionswiseCount(map, examQuestionCount);
 						}
-					}*/
+					}
 					
 					
 				}
@@ -658,13 +658,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				
 				//Populate already solved questions in case of random pool
-				/*if(solvedSets != null && CollectionUtils.isNotEmpty(solvedSets.entrySet()) && solvedSets.get(section) != null) {
-					shuffled.addAll(solvedSets.get(section));
-				}*/
+				if(solvedSets != null && CollectionUtils.isNotEmpty(solvedSets.entrySet()) && solvedSets.get(section) != null) {
+					List<EdoQuestion> solvedQuestions = solvedSets.get(section);
+					if(CollectionUtils.isNotEmpty(solvedQuestions)) {
+						for(EdoQuestion solvedQ: solvedQuestions) {
+							solvedQ.setQuestionNumber(qNo);
+							qNo++;
+						}
+						shuffled.addAll(solvedQuestions);
+					}
+					
+				}
 				
 				Map<String, Integer> sectionWiseCount = new HashMap<String, Integer>();
 				for(EdoQuestion question: set) {
-					/*if(allowedCounts != null && allowedCounts.get(section) != null) {
+					if(allowedCounts != null && allowedCounts.get(section) != null) {
 						if(sectionWiseCount.get(section) != null && allowedCounts.get(section) <= sectionWiseCount.get(section)) {
 							//If questions in the section cross allowed count, don't add
 							break;
@@ -673,7 +681,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							sectionWiseCount.put(section, 0);
 						}
 						sectionWiseCount.put(section, sectionWiseCount.get(section) + 1);
-					}*/
+					}
 					question.setQuestionNumber(qNo);
 					qNo++;
 					shuffled.add(question);
