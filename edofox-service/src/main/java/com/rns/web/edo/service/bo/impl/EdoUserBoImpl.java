@@ -483,7 +483,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						request.setTest(result);
 						List<EdoTestQuestionMap> answersMap = testsDao.getExamSolved(request);
 						if(CollectionUtils.isNotEmpty(answersMap)) {
-							if(answersMap.size() < result.getNoOfQuestions()) {
+							//if(answersMap.size() < result.getNoOfQuestions()) {
 								//Find out section wise question count
 								examQuestionCount = extractSectionswiseCount(map, examQuestionCount);
 								solvedSet = new HashMap<String, List<EdoQuestion>>();
@@ -504,7 +504,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 									}
 								}
 								
-							}
+							//}
 						} else {
 							//Find out section wise question count
 							examQuestionCount = extractSectionswiseCount(map, examQuestionCount);
@@ -664,6 +664,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						for(EdoQuestion solvedQ: solvedQuestions) {
 							solvedQ.setQuestionNumber(qNo);
 							qNo++;
+							//Remove this question from above set
+							if(CollectionUtils.isNotEmpty(set)) {
+								for(EdoQuestion existing: set) {
+									if(solvedQ.getQn_id() != null && existing.getQn_id() != null && existing.getQn_id().intValue() == solvedQ.getQn_id().intValue()) {
+										set.remove(existing);
+										break;
+									}
+								}
+							}
 						}
 						shuffled.addAll(solvedQuestions);
 					}
