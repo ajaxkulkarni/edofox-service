@@ -291,6 +291,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			inputMap.setTest(new EdoTest(testId));
 			Date startedDate = null;
 			EdoTestStudentMap studentMap = null;
+			Integer adminReset = null;
+			Integer timeLeft = null;
 			if(studenId != null) {
 				inputMap.setStudent(new EdoStudent(studenId));
 				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
@@ -347,7 +349,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(studentMap.getStartedCount() != null) {
 						startedCount = studentMap.getStartedCount();
 					}
-					
+					if(studentMap.getTest() != null) {
+						adminReset = studentMap.getTest().getAdminReset();
+					}
+					timeLeft = studentMap.getTimeLeft();
 				}
 				addTestActivity(testId, studenId, "STARTED", req.getTest());
 				//Added on 11/12/19
@@ -573,6 +578,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							return response;
 						}
 					}
+					
+					//Set admin reset value and time left
+					result.setAdminReset(adminReset);
+					if(adminReset != null && adminReset == 1 && timeLeft != null && timeLeft > 0 && result.getMinLeft() == null && result.getSecLeft() == null) {
+						result.setSecLeft(timeLeft.longValue() % 60); //seconds left
+						result.setMinLeft(timeLeft.longValue() / 60);
+					}
+					
 				}
 				response.setTest(result);
 			}

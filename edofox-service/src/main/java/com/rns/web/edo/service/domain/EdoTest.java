@@ -68,6 +68,7 @@ public class EdoTest {
 	private Integer showRank;
 	private String proctoringImage;
 	private Integer randomPool;
+	private Integer adminReset;
 	
 	public EdoTest() {
 		
@@ -492,6 +493,14 @@ public class EdoTest {
 
 	public void setRandomPool(Integer randomPool) {
 		this.randomPool = randomPool;
+	}
+
+	public Integer getAdminReset() {
+		return adminReset;
+	}
+
+	public void setAdminReset(Integer adminReset) {
+		this.adminReset = adminReset;
 	}
 	
 }

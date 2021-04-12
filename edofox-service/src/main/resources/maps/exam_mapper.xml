@@ -86,6 +86,8 @@
 		<result column="max_allowed_test_starts" property="test.maxStarts"/>
 		<result column="exam_started_count" property="startedCount"/>
 		<result column="created_date" property="createdDate"/>
+		<result column="admin_reset" property="test.adminReset"/>
+		<result column="time_left" property="timeLeft"/>
 	</resultMap>
 
 	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
