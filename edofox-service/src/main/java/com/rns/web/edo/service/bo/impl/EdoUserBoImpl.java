@@ -682,12 +682,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 								for(EdoQuestion existing: set) {
 									if(solvedQ.getQn_id() != null && existing.getQn_id() != null && existing.getQn_id().intValue() == solvedQ.getQn_id().intValue()) {
 										set.remove(existing);
+										shuffled.add(existing);
 										break;
 									}
 								}
 							}
 						}
-						shuffled.addAll(solvedQuestions);
+						//shuffled.addAll(solvedQuestions);
 					}
 					
 				}
