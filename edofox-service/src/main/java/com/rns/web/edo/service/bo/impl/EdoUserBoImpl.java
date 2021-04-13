@@ -695,7 +695,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				Map<String, Integer> sectionWiseCount = new HashMap<String, Integer>();
 				for(EdoQuestion question: set) {
 					if(allowedCounts != null && allowedCounts.get(section) != null) {
-						if(sectionWiseCount.get(section) != null && allowedCounts.get(section) <= sectionWiseCount.get(section)) {
+						if(allowedCounts.get(section) <= 0 || (sectionWiseCount.get(section) != null && allowedCounts.get(section) <= sectionWiseCount.get(section))) {
 							//If questions in the section cross allowed count, don't add
 							break;
 						}
