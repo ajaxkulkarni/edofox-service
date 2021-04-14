@@ -180,7 +180,7 @@
 		where
 		test_questions_map.test_id = ${test.id} 
 		AND student_id = ${student.id}
-		AND question_disabled = 0 order by test_questions_map.question_number asc
+		AND question_disabled = 0 order by test_result.question_number asc
 		
 	</select>
 	
