@@ -211,6 +211,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				
+				if(test.getRandomPool() != null && test.getRandomPool() == 1) {
+					//For random pool, only show solved questions
+					if(question.getMapId() == null) {
+						continue;
+					}
+				}
+				
 				/*if(CollectionUtils.isNotEmpty(questionCorrectness)) {
 					for(EdoQuestion correctness: questionCorrectness) {
 						if(correctness.getQn_id() != null && question.getQn_id() != null && correctness.getQn_id().intValue() == question.getQn_id().intValue()) {
@@ -561,6 +568,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				if(isRandomizeQuestions(result) && studenId != null) {
 					//Randomize only for student NOT for Admin
 					randomizeQuestions(result, sectionSets, examQuestionCount, solvedSet);
+					
+					//If exam has random pool..make entries in test_result for student on first test load
+					if(examQuestionCount != null && CollectionUtils.isNotEmpty(examQuestionCount.entrySet()) && (solvedSet == null || CollectionUtils.isEmpty(solvedSet.entrySet()))) {
+						EdoServiceRequest request = new EdoServiceRequest();
+						EdoStudent student = new EdoStudent();
+						student.setId(studenId);
+						request.setStudent(student);
+						request.setTest(result);
+						testsDao.saveTestResult(request);
+					}
+					
 				}
 				//Get JEE sections eligible for JEE format
 				if(studenId != null) {
@@ -682,6 +700,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 									if(solvedQ.getQn_id() != null && existing.getQn_id() != null && existing.getQn_id().intValue() == solvedQ.getQn_id().intValue()) {
 										set.remove(existing);
 										existing.setQuestionNumber(qNo);
+										if(StringUtils.isBlank(existing.getAnswer())) {
+											existing.setAnswer(solvedQ.getAnswer());
+										}
+										if(existing.getFlagged() == null) {
+											existing.setFlagged(solvedQ.getFlagged());
+										}
+										if(existing.getTimeSpent() == null) {
+											existing.setTimeSpent(solvedQ.getTimeSpent());
+										}
+										if(existing.getTtl() == null) {
+											existing.setTtl(solvedQ.getTtl());
+										}
 										shuffled.add(existing);
 										break;
 									}
@@ -705,6 +735,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							sectionWiseCount.put(section, 0);
 						}
 						sectionWiseCount.put(section, sectionWiseCount.get(section) + 1);
+						if(question.getFlagged() == null) {
+							question.setFlagged(0);
+						}
+						question.setMarks(BigDecimal.ZERO);
+						if(question.getTimeSpent() == null) {
+							question.setTimeSpent(0);
+						}
 					}
 					question.setQuestionNumber(qNo);
 					qNo++;
