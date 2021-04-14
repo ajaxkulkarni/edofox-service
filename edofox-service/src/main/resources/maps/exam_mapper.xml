@@ -156,7 +156,7 @@
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		SELECT *,
 		<if test="requestType != 'Solution'">
-		test_result.id as mapId,test_result.flagged as reviewed,test_result.question_number as solved_sequence
+		test_result.id as mapId,test_result.flagged as reviewed,test_result.question_number as solved_sequence,
 		</if>
 		test_questions.status as questionStatus FROM test 
 		join test_questions_map on test.test_id = test_questions_map.test_id

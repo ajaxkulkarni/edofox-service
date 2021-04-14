@@ -2497,6 +2497,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(chapterContent)) {
 				for(EdoVideoLectureMap map: chapterContent) {
 					if(map.getLecture() != null && StringUtils.equals("DOC", map.getLecture().getType())) {
+						//Temp changes for reliance doc URL
+						if(map.getLecture().getInstituteId() != null && map.getLecture().getInstituteId().intValue() == 9) {
+							if(!StringUtils.contains(map.getLecture().getVideo_url(), "reliancedlp")) {
+								map.getLecture().setVideo_url("/var/www/reliancedlp.edofox.com/public_html/" + map.getLecture().getVideo_url());
+							}
+						}
 						map.getLecture().setVideo_url(CommonUtils.prepareUrl(map.getLecture().getVideo_url()));
 					}
 				}
