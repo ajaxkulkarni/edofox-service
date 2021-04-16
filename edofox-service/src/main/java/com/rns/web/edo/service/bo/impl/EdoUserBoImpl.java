@@ -179,6 +179,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					test.getAnalysis().setTopScore(topScoreResponse.get(0).getAnalysis().getTopScore());
 					test.getAnalysis().setStudentsAppeared(topScoreResponse.get(0).getAnalysis().getStudentsAppeared());
+					test.getAnalysis().setPercentile(CommonUtils.calculatePercentile(test.getAnalysis().getStudentsAppeared(), test.getRank()));
 				}
 			}
 			
