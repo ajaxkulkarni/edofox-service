@@ -156,7 +156,8 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
     left join (select count(*) as totalStudents,test_id from test_status where test_id in (select test_id from test_status where student_id = ${id}) group by test_id) as totalStudents on totalStudents.test_id = test.test_id
     
  	WHERE package_id in (SELECT CASE WHEN sub_packages_mapping.child_packge_id IS NOT NULL THEN sub_packages_mapping.child_packge_id ELSE student_package_mapping.package_id END AS package_id FROM student_package_mapping LEFT JOIN sub_packages_mapping ON student_package_mapping.package_id = sub_packages_mapping.parent_package_id LEFT JOIN fees_master ON fees_master.id = student_package_mapping.fee_id WHERE student_package_mapping.student_id =  ${id} AND fees_master.fee_status = 'Completed')
- 	AND test.status = 'A'
+ 	AND test.status = 'A' AND test.start_date &lt; CURRENT_TIMESTAMP
+	AND test.show_result = 'Y'
  	ORDER BY test.start_date desc
 	</select>
 	
