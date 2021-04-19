@@ -51,7 +51,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private EdoVideoLectureMap classwork;
 	private EdoQuestion feedbackData;
 	private EdoMailer mailer;
-
+	
 	public void setInstitute(EDOInstitute institute) {
 		this.institute = institute;
 	}
@@ -152,7 +152,11 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			result = CommonUtils.prepareFeedbackNotification(result, feedbackData, student);
 			
 			//Set action URL depending on notification type
-			result = StringUtils.replace(result, "{actionUrl}", "test.edofox.com");
+			if(mailer != null && StringUtils.isNotBlank(mailer.getActionUrl())) {
+				result = StringUtils.replace(result, "{actionUrl}", mailer.getActionUrl());
+			} else {
+				result = StringUtils.replace(result, "{actionUrl}", "test.edofox.com");
+			}
 			
 			// message.setContent(result, "text/html");
 			message.setContent(result, "text/html; charset=utf-8");
@@ -206,6 +210,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_DOUBT_RESOLVED, "doubt_notification.html");
 			put(MAIL_TYPE_NEW_CLASSWORK, "classwork_notification.html");
 			put(MAIL_TYPE_TEST_RESULT_RANK, "exam_result.html");
+			put(MAIL_TYPE_PASSWORD_RESET, "password_reset.html");
 		}
 	});
 
@@ -218,6 +223,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_NEW_CLASSWORK, "New {contentType} {title} added for you");
 			put(MAIL_TYPE_DOUBT_RESOLVED, "Doubt resolved by teacher");
 			put(MAIL_TYPE_TEST_RESULT_RANK, "Your test result for {testName}");
+			put(MAIL_TYPE_PASSWORD_RESET, "Password reset request for your Edofox account");
 		}
 	});
 

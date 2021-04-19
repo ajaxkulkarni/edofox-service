@@ -72,6 +72,7 @@ public interface EdoConstants {
 	String MAIL_TYPE_NEW_EXAM = "NewExam";
 	String MAIL_TYPE_DOUBT_RESOLVED = "DoubtResolved";
 	String MAIL_TYPE_INVITE = "StudentInvite";
+	String MAIL_TYPE_PASSWORD_RESET = "PasswordReset";
 	
 	Integer JEE_NEW_FORMAT_BEST_OF_VALUE = 5;
 	

@@ -40,6 +40,7 @@
 		<result column="institute_name" property="currentPackage.institute.name"/>	
 		<result column="institute_id" property="currentPackage.institute.id"/>
 		<result column="firebase_id" property="currentPackage.institute.firebaseId"/>		
+		<result column="universal_token" property="token"/>
 		
 	</resultMap>
 	

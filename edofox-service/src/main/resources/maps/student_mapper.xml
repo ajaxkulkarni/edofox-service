@@ -177,7 +177,7 @@
 	</select>
 
 	<select id="getAllStudents" parameterType="Integer" resultMap="studentInfo">
-		select name,email,mobile_no,username as roll_no,student_login.password,profile_pic,universal_token as token from student join student_login on student.id = student_login.student_id where institute_id = ${value}
+		select student_id as id,name,email,mobile_no,username as roll_no,student_login.password,profile_pic,universal_token as token from student join student_login on student.id = student_login.student_id where institute_id = ${value}
 	</select>
 	
 	<select id="getAllPackageStudents" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="studentInfo">
@@ -271,7 +271,8 @@
 	
 	<select id="getStudentLogin" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="loginInfo">
 		select student_id,student_login.username,student_login.password,name,student.mobile_no,student.email,
-		student_login.student_access,institute.institute_name, student_login.institute_id,firebase_id  from student_login 
+		student_login.student_access,institute.institute_name, student_login.institute_id,firebase_id,universal_token  
+		from student_login 
 		join institute on student_login.institute_id = institute.id 
 		join student on student_login.student_id = student.id 
 		where 

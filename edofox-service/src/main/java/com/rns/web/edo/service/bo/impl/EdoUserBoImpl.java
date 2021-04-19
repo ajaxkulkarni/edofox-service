@@ -46,6 +46,7 @@ import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoChapter;
 import com.rns.web.edo.service.domain.EdoComplexOption;
 import com.rns.web.edo.service.domain.EdoFeedback;
+import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
@@ -2994,6 +2995,50 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return response;
+	}
+
+	public EdoApiStatus forgotPassword(EdoServiceRequest request) {
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+		 	List<EdoStudent> existing = testsDao.getStudentLogin(request.getStudent());
+		 	if(CollectionUtils.isNotEmpty(existing)) {
+		 		EdoStudent student = existing.get(0);
+		 		if(StringUtils.isBlank(student.getToken())) {
+		 			status.setResponseText("Your profile does not have access to password reset. Please contact your admin.");
+		 			return status;
+		 		}
+		 		boolean email = false , sms= false;
+		 		if(StringUtils.equalsIgnoreCase(student.getEmail(), request.getStudent().getEmail())) {
+		 			//Send email for password reset request
+		 			EdoMailUtil mailUtil = new EdoMailUtil(MAIL_TYPE_PASSWORD_RESET);
+		 			mailUtil.setStudent(student);
+		 			EdoMailer mailer = new EdoMailer();
+		 			mailer.setActionUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "reset_password.php?id=" + student.getToken());
+					mailUtil.setMailer(mailer);
+					executor.execute(mailUtil);
+					email = true;
+		 		}
+		 		if(StringUtils.equalsIgnoreCase(student.getPhone(), request.getStudent().getPhone())) {
+		 			//Send email for password reset request
+		 			EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_PASSWORD_RESET);
+		 			smsUtil.setStudent(student);
+		 			EdoMailer mailer = new EdoMailer();
+		 			mailer.setActionUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "reset_password.php?id=" + student.getToken());
+		 			smsUtil.setMailer(mailer);
+					smsUtil.sendSMS();
+					sms = true;
+		 		}
+		 		if(!email && !sms) {
+		 			status.setStatus(-111, "No valid email ID or mobile number found for this user");
+		 		}
+		 	} else {
+		 		status.setStatus(-111, ERROR_INVALID_PROFILE);
+		 	}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return status;
 	}
 
 }

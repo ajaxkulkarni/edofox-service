@@ -857,4 +857,14 @@ public class EdoUserController {
 		}
 		return response;
 	}
+	
+	@POST
+	@Path("/forgotPassword")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse resetPassword(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		response.setStatus(userBo.forgotPassword(request));
+		return response;
+	}
 }

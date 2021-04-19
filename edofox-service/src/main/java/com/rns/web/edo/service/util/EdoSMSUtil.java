@@ -108,7 +108,9 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 				message = CommonUtils.prepareInstituteNotification(message, institute);
 			}
 			if(mailer != null) {
-				
+				if(StringUtils.isNotBlank(mailer.getActionUrl())) {
+					message = StringUtils.replace(message, "{actionUrl}", CommonUtils.getStringValue(mailer.getActionUrl()));
+				}
 			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
 			sendSMS(url);
@@ -244,6 +246,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_INVITE, "Hello {name}, Your Edofox login credentials for {instituteName} exam are - username - {username} and password - {password}. Please use this credentials to login to {webUrl}. Use latest Google chrome on laptop for best exam experience. You can also download our Android app {appUrl} "
 					+ "{additionalMessage}");
 			put(MAIL_TYPE_NEW_EXAM, "Today's exam {testName} will start on {startDate}");
+			put(MAIL_TYPE_PASSWORD_RESET, "Hi {name}. We received password reset request for your Edofox account. Please click on this link to reset your password {actionUrl}");
 			
 			
 		}
