@@ -957,11 +957,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				return status;
 			}
 			
-			EdoTest existing = testsDao.getTest(test.getId());
+			//EdoTest existing = testsDao.getTest(test.getId());
 			
-			if(existing == null || StringUtils.isBlank(existing.getShowResult()) || StringUtils.equalsIgnoreCase("Y", existing.getShowResult())) {
-				CommonUtils.calculateTestScore(test, questions);
-			}
+			//if(existing == null || StringUtils.isBlank(existing.getShowResult()) || StringUtils.equalsIgnoreCase("Y", existing.getShowResult())) {
+			CommonUtils.calculateTestScore(test, questions);
+			//}
 			
 			/*if(request != null && request.getTest() != null && CollectionUtils.isNotEmpty(request.getTest().getTest())) {
 				testsDao.saveTestResult(request);
