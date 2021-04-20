@@ -3008,7 +3008,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		 			return status;
 		 		}
 		 		boolean email = false , sms= false;
-		 		if(StringUtils.equalsIgnoreCase(student.getEmail(), request.getStudent().getEmail())) {
+		 		if(StringUtils.isNotBlank(student.getEmail())) {
 		 			//Send email for password reset request
 		 			EdoMailUtil mailUtil = new EdoMailUtil(MAIL_TYPE_PASSWORD_RESET);
 		 			mailUtil.setStudent(student);
@@ -3018,7 +3018,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					executor.execute(mailUtil);
 					email = true;
 		 		}
-		 		if(StringUtils.equalsIgnoreCase(student.getPhone(), request.getStudent().getPhone())) {
+		 		if(StringUtils.isNotBlank(student.getPhone())) {
 		 			//Send email for password reset request
 		 			EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_PASSWORD_RESET);
 		 			smsUtil.setStudent(student);
@@ -3030,6 +3030,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		 		}
 		 		if(!email && !sms) {
 		 			status.setStatus(-111, "No valid email ID or mobile number found for this user");
+		 		} else {
+		 			String successMsg = "We have send the reset password link on your ";
+		 			if(email) {
+		 				String maskedEmail = StringUtils.substring(student.getEmail(), 0, 3) + "****  ";
+		 				successMsg = successMsg + " email at " + maskedEmail;
+		 			}
+		 			if(sms) {
+		 				String maskedPhone = StringUtils.substring(student.getPhone(), 0, 1) + "****" + StringUtils.substring(student.getPhone(), student.getPhone().length() - 1, student.getPhone().length());
+		 				successMsg = successMsg + " phone at " + maskedPhone;
+		 			}
+		 			status.setResponseText(successMsg);
 		 		}
 		 	} else {
 		 		status.setStatus(-111, ERROR_INVALID_PROFILE);
