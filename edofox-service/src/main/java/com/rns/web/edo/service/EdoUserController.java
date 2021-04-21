@@ -817,7 +817,7 @@ public class EdoUserController {
 		return response;
 	}
 	
-	/*@POST
+	@POST
 	@Path("/uploadProctorImage")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -837,7 +837,7 @@ public class EdoUserController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
-	}*/
+	}
 	
 	@POST
 	@Path("/uploadProctorRef")
