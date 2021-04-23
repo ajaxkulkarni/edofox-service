@@ -3000,6 +3000,64 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return response;
 	}
+	
+	public EdoServiceResponse saveProctorRefImageUrl(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			EdoStudent student = request.getStudent();
+			//String url = EdoAwsUtil.uploadToAws(student.getId() + "_" + System.currentTimeMillis() + ".jpg", null, recordingData, "image/jpeg", "proctorRef");
+			//Update proctor_ref url in DB
+			//student.setProctorImageRef(url);
+			testsDao.updateProctorUrl(student);
+			response.setStudent(request.getStudent());
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
+	}
+	
+	public EdoServiceResponse saveProctorImage(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			EdoProctorImages images = new EdoProctorImages();
+			/*if(score != null) {
+				images.setScore(score.getScore());
+				images.setRemarks(score.getRemarks());
+			}*/
+			images.setCreatedDate(new Date());
+			images.setTestId(request.getTest().getId());
+			images.setStudentId(request.getStudent().getId());
+			images.setImageUrl(request.getStudent().getProctorImageRef());
+			session.persist(images);
+			
+			/*if(StringUtils.isNotBlank(score.getRemarks())) {
+				List<EdoTestStatusEntity> maps = testsDao.getTestStatus(inputMap) session.createCriteria(EdoTestStatusEntity.class)
+						.add(Restrictions.eq("testId", request.getTest().getId()))
+						.add(Restrictions.eq("studentId", request.getStudent().getId()))
+						.list();
+				if(CollectionUtils.isNotEmpty(maps)) {
+					EdoTestStatusEntity edoTestStatusEntity = maps.get(0);
+					if(StringUtils.isBlank(edoTestStatusEntity.getProctoringRemarks())) {
+						edoTestStatusEntity.setProctoringRemarks(score.getRemarks());
+					} else if (!StringUtils.contains(edoTestStatusEntity.getProctoringRemarks(), score.getRemarks())) {
+						edoTestStatusEntity.setProctoringRemarks(edoTestStatusEntity.getProctoringRemarks() + "," + score.getRemarks());
+					}
+				}
+			}*/
+			
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return response;
+	}
 
 	public EdoApiStatus forgotPassword(EdoServiceRequest request) {
 		EdoApiStatus status = new EdoApiStatus();

@@ -817,7 +817,7 @@ public class EdoUserController {
 		return response;
 	}
 	
-	@POST
+	/*@POST
 	@Path("/uploadProctorImage")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -838,8 +838,24 @@ public class EdoUserController {
 		}
 		return response;
 	}
+	*/
+	@POST
+	@Path("/saveProctorImageRef")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse saveProctorImageRef(EdoServiceRequest request) {
+		return userBo.saveProctorRefImageUrl(request);
+	}
 	
 	@POST
+	@Path("/saveProctorImage")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse saveProctorImage(EdoServiceRequest request) {
+		return userBo.saveProctorImage(request);
+	}
+	
+	/*@POST
 	@Path("/uploadProctorRef")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -856,7 +872,7 @@ public class EdoUserController {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
-	}
+	}*/
 	
 	@POST
 	@Path("/forgotPassword")

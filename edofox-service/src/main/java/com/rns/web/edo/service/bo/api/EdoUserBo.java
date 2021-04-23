@@ -62,6 +62,8 @@ public interface EdoUserBo {
 	EdoServiceResponse getAppVersion(EdoServiceRequest request);
 	EdoApiStatus updateProfile(EdoServiceRequest request);
 	EdoServiceResponse matchFaces(EdoServiceRequest request, InputStream file, FormDataContentDisposition fileDetails);
+	EdoServiceResponse saveProctorImage(EdoServiceRequest request);
 	EdoServiceResponse uploadProctorRef(EdoServiceRequest request, InputStream recordingData, FormDataContentDisposition recordingDataDetails);
+	EdoServiceResponse saveProctorRefImageUrl(EdoServiceRequest request);
 	EdoApiStatus forgotPassword(EdoServiceRequest request);
 }
