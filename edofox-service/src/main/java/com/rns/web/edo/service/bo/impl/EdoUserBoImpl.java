@@ -3113,5 +3113,141 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		return status;
 	}
+	
+	//TODO Temporary..To be removed
+	public EdoApiStatus saveTestNoCommit(EdoServiceRequest request) {
+		EdoTest test = request.getTest();
+		if(request.getStudent() == null || request.getStudent().getId() == null || test == null || test.getId() == null) {
+			LoggingUtil.logMessage("Invalid test input", LoggingUtil.saveTestLogger);
+			return new EdoApiStatus(-111, ERROR_INVALID_PROFILE);
+		}
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		//TransactionStatus txStatus = txManager.getTransaction(new DefaultTransactionDefinition());
+		
+		try {
+			
+			CommonUtils.saveJson(request);
+			
+			Integer currentTest = testSubmissions.get(request.getStudent().getId());
+			if(currentTest != null && request.getTest().getId() == currentTest) {
+				//Don't return already submitted as ERROR, consider it a success
+				//status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
+				//status.setStatusCode(STATUS_ERROR);
+				LoggingUtil.logMessage("Test " + currentTest + " being submitted for student=>" + request.getStudent().getId(), LoggingUtil.saveTestLogger);
+				return status;
+			}
+			LoggingUtil.logMessage("Submitting test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions, LoggingUtil.saveTestLogger);
+			testSubmissions.put(request.getStudent().getId(), request.getTest().getId());
+			
+			/*EdoTestStudentMap inputMap = new EdoTestStudentMap();
+			inputMap.setTest(test);
+			inputMap.setStudent(request.getStudent());*/
+			
+			//New flow
+			session = sessionFactory.openSession();
+			
+			List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+											.add(Restrictions.eq("testId", test.getId()))
+											.add(Restrictions.eq("studentId", request.getStudent().getId()))
+											.list();
+			EdoTestStatusEntity map = null;
+			if(CollectionUtils.isNotEmpty(maps)) {
+				map = maps.get(0);
+			}
+			
+			//Already submitted error removed from the code Jan 05 21 .. allow student to overwrite and submit again
+			/*if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
+				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
+				status.setStatusCode(STATUS_ERROR);
+				LoggingUtil.logMessage("Already submitted this test for student=>" + request.getStudent().getId(), LoggingUtil.saveTestLogger);
+				return status;
+			}*/
+			
+			if(map == null) {
+				map = new EdoTestStatusEntity();
+				map.setCreatedDate(new Date());
+				map.setTestId(test.getId());
+				map.setStudentId(request.getStudent().getId());
+			}
+			
+			List<EdoQuestion> questions = testsDao.getExamQuestions(test.getId());
+			
+			if(CollectionUtils.isEmpty(questions)) {
+				status.setResponseText(ERROR_IN_PROCESSING);
+				status.setStatusCode(STATUS_ERROR);
+				return status;
+			}
+			
+			//EdoTest existing = testsDao.getTest(test.getId());
+			
+			//if(existing == null || StringUtils.isBlank(existing.getShowResult()) || StringUtils.equalsIgnoreCase("Y", existing.getShowResult())) {
+			CommonUtils.calculateTestScore(test, questions);
+			//}
+			
+			/*if(request != null && request.getTest() != null && CollectionUtils.isNotEmpty(request.getTest().getTest())) {
+				testsDao.saveTestResult(request);
+				testsDao.saveTestStatus(request);
+				
+				//TODO: Temporary
+				EdoSMSUtil smsUtil = new EdoSMSUtil(MAIL_TYPE_TEST_RESULT);
+				smsUtil.setTest(test);
+				EdoStudent student = testsDao.getStudentById(request.getStudent().getId());
+				smsUtil.setStudent(student);
+				executor.execute(smsUtil);
+			}*/
+			Transaction tx = session.beginTransaction();
+			if(CollectionUtils.isNotEmpty(test.getTest())) {
+				for(EdoQuestion question: test.getTest()) {
+					EdoServiceRequest saveAnswerRequest = new EdoServiceRequest();
+					saveAnswerRequest.setTest(test);
+					saveAnswerRequest.setStudent(request.getStudent());
+					saveAnswerRequest.setQuestion(question);
+					if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, question.getType()) || StringUtils.isNotBlank(question.getAnswer())) {
+						saveAnswer(saveAnswerRequest, session);
+					}
+				}
+			}
+			
+			map.setSolved(test.getSolvedCount());
+			map.setCorrect(test.getCorrectCount());
+			map.setFlagged(test.getFlaggedCount());
+			map.setScore(test.getScore());
+			map.setStatus(TEST_STATUS_COMPLETED);
+			map.setUpdatedDate(new Date());
+			map.setSubmissionType(test.getSubmissionType());
+			if(test.getMinLeft() != null && test.getSecLeft() != null) {
+				map.setTimeLeft((test.getMinLeft() * 60) + test.getSecLeft());
+			} else if (map.getTimeLeft() != null) {
+				map.setTimeLeft(map.getTimeLeft());
+			}
+			if(map.getId() == null) {
+				session.persist(map);
+			}
+			//Commit the transaction
+			//txManager.commit(txStatus);
+			//tx.commit();
+			LoggingUtil.logMessage("Submitted the test " + test.getId() +  " for .. " + request.getStudent().getId(), LoggingUtil.saveTestLogger);
+			addTestActivity(test.getId(), request.getStudent().getId(), "COMPLETED", test);
+		} catch (Exception e) {
+			status.setStatusCode(STATUS_ERROR);
+			status.setResponseText(ERROR_IN_PROCESSING);
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveTestErrorLogger);
+			//rollback
+			/*try {
+				txManager.rollback(txStatus);
+			} catch (Exception e2) {
+				LoggingUtil.logError(ExceptionUtils.getStackTrace(e2));
+			}*/
+			
+		} finally {
+			CommonUtils.closeSession(session);
+			if(request.getStudent() != null && request.getStudent().getId() != null) {
+				testSubmissions.remove(request.getStudent().getId());
+				LoggingUtil.logMessage("Submitted test .. " + request.getTest().getId() + " by student .. " + request.getStudent().getId() + " map =>" + testSubmissions, LoggingUtil.saveTestLogger);
+			}
+		}
+		return status;
+	}
 
 }

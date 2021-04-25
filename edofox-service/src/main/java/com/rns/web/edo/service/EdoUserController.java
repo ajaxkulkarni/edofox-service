@@ -108,6 +108,23 @@ public class EdoUserController {
 		return response;
 	}
 	
+	//TODO To be removed later
+	@POST
+	@Path("/saveTestNoCommit")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse saveTestNoCommit(EdoServiceRequest request) {
+		LoggingUtil.logMessage("Save Test No commit result Request :" + request, LoggingUtil.saveTestLogger);
+		EdoServiceResponse response = CommonUtils.initResponse();
+		try {
+			response.setStatus(userBo.saveTestNoCommit(request));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//LoggingUtil.logMessage("Save Test result Response");
+		return response;
+	}
+	
 	@POST
 	@Path("/saveAnswer")
 	@Produces(MediaType.APPLICATION_JSON)

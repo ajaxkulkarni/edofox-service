@@ -66,4 +66,7 @@ public interface EdoUserBo {
 	EdoServiceResponse uploadProctorRef(EdoServiceRequest request, InputStream recordingData, FormDataContentDisposition recordingDataDetails);
 	EdoServiceResponse saveProctorRefImageUrl(EdoServiceRequest request);
 	EdoApiStatus forgotPassword(EdoServiceRequest request);
+	
+	//TODO To be removed
+	EdoApiStatus saveTestNoCommit(EdoServiceRequest request);
 }
