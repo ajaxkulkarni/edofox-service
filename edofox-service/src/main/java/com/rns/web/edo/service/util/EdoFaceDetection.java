@@ -238,7 +238,7 @@ public class EdoFaceDetection implements Runnable {
 							if(score != null) {
 								img.setScore(score.getScore());
 								img.setRemarks(score.getRemarks());
-								if(StringUtils.isNotBlank(score.getRemarks())) {
+								if(StringUtils.isNotBlank(score.getRemarks()) && !StringUtils.contains(remarks, score.getRemarks())) {
 									remarks.append(score.getRemarks()).append(",");
 								}
 							} else {
