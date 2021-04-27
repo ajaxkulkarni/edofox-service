@@ -70,6 +70,7 @@ import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
+import com.rns.web.edo.service.domain.jpa.EdoProctorImages;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
 import com.rns.web.edo.service.domain.jpa.EdoSalesDetails;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -78,6 +79,7 @@ import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoAwsUtil;
 import com.rns.web.edo.service.util.EdoConstants;
+import com.rns.web.edo.service.util.EdoFaceDetection;
 import com.rns.web.edo.service.util.EdoFirebaseUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
@@ -2284,5 +2286,51 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 			
 		return response;
+	}
+
+	public EdoApiStatus calculateProctoringScore(EdoServiceRequest request) {
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			List<EdoStudent> students = testsDao.getStudentResults(request.getTest().getId());
+			if(CollectionUtils.isNotEmpty(students)) {
+				EdoTest test = new EdoTest();
+				test.setId(request.getTest().getId());
+				LoggingUtil.logMessage("Calculating proctoring score for " + students.size() + " students ", LoggingUtil.saveTestLogger);
+				int processedStudents = 0;
+				int noOfJobs = 0;
+				if(students.size() > 500) {
+					//Calculate no of jobs
+					noOfJobs = students.size() / 500;
+					for(int i = 0; i < noOfJobs; i++) {
+						EdoFaceDetection faceDetection = new EdoFaceDetection();
+						faceDetection.setJobNo(i + 1);
+						List<EdoStudent> subList = students.subList(i * 500, (i * 500) + 500);
+						processedStudents = processedStudents + subList.size();
+						faceDetection.setStudents(subList);
+						faceDetection.setSessionFactory(this.sessionFactory);
+						faceDetection.setTest(test);
+						executor.execute(faceDetection);
+					}
+				}
+				int remaining = students.size() - processedStudents;
+				if(remaining > 0) {
+					EdoFaceDetection faceDetection = new EdoFaceDetection();
+					faceDetection.setJobNo(noOfJobs + 1);
+					List<EdoStudent> subList = students.subList(students.size() - remaining, students.size());
+					processedStudents = processedStudents + subList.size();
+					faceDetection.setStudents(subList);
+					faceDetection.setSessionFactory(this.sessionFactory);
+					faceDetection.setTest(test);
+					executor.execute(faceDetection);
+				}
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return null;
 	}
 }

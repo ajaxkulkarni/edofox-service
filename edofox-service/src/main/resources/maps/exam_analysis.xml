@@ -89,6 +89,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="school_district" property="schoolDistrict"/>
 		<result column="latitude" property="latitude"/>
 		<result column="longitude" property="longitude"/>
+		<result column="proctor_img" property="proctorImageRef"/>
 	</resultMap>
 	
 	

@@ -1065,5 +1065,15 @@ public class CommonUtils {
 		}
 		return false;
 	}
+
+	public static void closeStream(InputStream is) {
+		try {
+			if(is != null) {
+				is.close();
+			}
+		} catch (Exception e) {
+
+		}
+	}
 	
 }
