@@ -548,6 +548,16 @@ public class EdoAdminController {
 		return response;
 	}
 	
+	@POST
+	@Path("/calculateProctoringScore")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse calculateProctoringScore(EdoServiceRequest request) {
+		EdoServiceResponse response = CommonUtils.initResponse();
+		response.setStatus(adminBo.calculateProctoringScore(request));
+		return response;
+	}
+	
 	@GET
 	@Path("/clearGarbage")
 	public String clearGarbage() {
