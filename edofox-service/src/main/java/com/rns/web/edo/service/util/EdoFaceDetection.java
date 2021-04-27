@@ -230,24 +230,27 @@ public class EdoFaceDetection implements Runnable {
 					StringBuilder remarks = new StringBuilder();
 					for(EdoProctorImages img: images) {
 						if(StringUtils.isNotBlank(img.getImageUrl()) && StringUtils.isNotBlank(student.getProctorImageRef())) {
-							//FileInputStream fileInputStream = new FileInputStream(sourceImage);
-							InputStream sourceStream = new URL(student.getProctorImageRef()).openStream();
-							ByteBuffer sourceImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(sourceStream));
-							InputStream targetStream = new URL(img.getImageUrl()).openStream();
-							ByteBuffer targetImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(targetStream));
-							EdoFaceScore score = compareFaceImages(sourceImageBytes, targetImageBytes);
-							if(score != null) {
-								img.setScore(score.getScore());
-								img.setRemarks(score.getRemarks());
-								if(StringUtils.isNotBlank(score.getRemarks()) && !StringUtils.contains(remarks, score.getRemarks())) {
-									remarks.append(score.getRemarks()).append(",");
+							try {
+								//FileInputStream fileInputStream = new FileInputStream(sourceImage);
+								InputStream sourceStream = new URL(student.getProctorImageRef()).openStream();
+								ByteBuffer sourceImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(sourceStream));
+								InputStream targetStream = new URL(img.getImageUrl()).openStream();
+								ByteBuffer targetImageBytes = ByteBuffer.wrap(IOUtils.toByteArray(targetStream));
+								EdoFaceScore score = compareFaceImages(sourceImageBytes, targetImageBytes);
+								if(score != null) {
+									img.setScore(score.getScore());
+									img.setRemarks(score.getRemarks());
+									if(StringUtils.isNotBlank(score.getRemarks()) && !StringUtils.contains(remarks, score.getRemarks())) {
+										remarks.append(score.getRemarks()).append(",");
+									}
+								} else {
+									img.setScore(0f);
 								}
-							} else {
-								img.setScore(0f);
+								CommonUtils.closeStream(sourceStream);
+								CommonUtils.closeStream(targetStream);
+							} catch (Exception e) {
+								LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 							}
-							CommonUtils.closeStream(sourceStream);
-							CommonUtils.closeStream(targetStream);
-							
 						}
 					}
 					if(StringUtils.isNotBlank(remarks.toString())) {
