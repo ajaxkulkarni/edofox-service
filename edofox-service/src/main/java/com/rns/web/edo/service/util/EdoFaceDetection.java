@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -210,7 +211,7 @@ public class EdoFaceDetection implements Runnable {
 			session = this.sessionFactory.openSession();
 			calculateProctoringScore(session);
 		} catch (Exception e) {
-			
+			LoggingUtil.logError("Error in proctoring job " + ExceptionUtils.getStackTrace(e));
 		} finally {
 			CommonUtils.closeSession(session);
 		}
