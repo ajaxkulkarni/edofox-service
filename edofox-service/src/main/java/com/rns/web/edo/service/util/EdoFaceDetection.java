@@ -254,7 +254,7 @@ public class EdoFaceDetection implements Runnable {
 																.add(Restrictions.eq("testId", test.getId()))
 																.add(Restrictions.eq("studentId", student.getId())).list();
 						if(CollectionUtils.isNotEmpty(entity)) {
-							entity.get(0).setProctoringRemarks(remarks.toString());
+							entity.get(0).setProctoringRemarks(StringUtils.removeEnd(remarks.toString(), ","));
 						}
 						
 					}
