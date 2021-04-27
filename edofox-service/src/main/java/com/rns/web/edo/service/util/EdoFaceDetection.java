@@ -263,6 +263,8 @@ public class EdoFaceDetection implements Runnable {
 				
 			}
 			tx.commit();
+			LoggingUtil.logMessage(" #### Completed proctoring JOB " + jobNo + " for test " + test.getId() + " and students " + students.size(), LoggingUtil.saveTestLogger);
+			
 		}
 	}
 
