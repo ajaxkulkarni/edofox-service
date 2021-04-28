@@ -900,4 +900,12 @@ public class EdoUserController {
 		response.setStatus(userBo.forgotPassword(request));
 		return response;
 	}
+	
+	@POST
+	@Path("/getStudentExamActivity")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getStudentExamActivity(EdoServiceRequest request) {
+		return userBo.getStudentActivity(request);
+	}
 }
