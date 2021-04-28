@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
+import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
@@ -91,6 +92,7 @@ public interface EdoTestsDao {
 	void saveStudentTestActivity(EdoServiceRequest request);
 	List<EdoSubject> getDlpContentSubject(Integer value);
 	void updateProctorUrl(EdoStudent student);
+	List<EdoTestQuestionMap> getStudentTestActivity(EdoServiceRequest request);
 	
 	//Admin queries
 	Integer saveQuestion(EdoQuestion question);

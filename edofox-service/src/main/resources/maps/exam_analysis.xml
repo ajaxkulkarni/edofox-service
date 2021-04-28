@@ -196,4 +196,5 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		on test_questions.subject_id = test_subjects.subject_id where student_id = ${value} 
 		GROUP BY test_result.student_id,test_result.test_id, test_questions.subject_id
 	</select>
+	
 </mapper>

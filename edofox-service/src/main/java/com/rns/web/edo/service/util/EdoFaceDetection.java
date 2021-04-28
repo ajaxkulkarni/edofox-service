@@ -221,12 +221,13 @@ public class EdoFaceDetection implements Runnable {
 	public void calculateProctoringScore(Session session) throws MalformedURLException, IOException {
 		if(CollectionUtils.isNotEmpty(students) && test != null) {
 			LoggingUtil.logMessage(" #### Started proctoring JOB " + jobNo + " for test " + test.getId() + " and students " + students.size(), LoggingUtil.saveTestLogger);
-			Transaction tx = session.beginTransaction();
 			for(EdoStudent student: students) {
 				List<EdoProctorImages> images = session.createCriteria(EdoProctorImages.class)
 														.add(Restrictions.eq("testId", test.getId()))
-														.add(Restrictions.eq("studentId", student.getId())).list();
+														.add(Restrictions.eq("studentId", student.getId()))
+														.add(Restrictions.isNull("score")).list();
 				if(CollectionUtils.isNotEmpty(images)) {
+					Transaction tx = session.beginTransaction();
 					StringBuilder remarks = new StringBuilder();
 					for(EdoProctorImages img: images) {
 						if(StringUtils.isNotBlank(img.getImageUrl()) && StringUtils.isNotBlank(student.getProctorImageRef())) {
@@ -262,11 +263,11 @@ public class EdoFaceDetection implements Runnable {
 						}
 						
 					}
+					tx.commit();
 					LoggingUtil.logMessage("Calculated proctoring score for " + student.getId() + " with " + remarks, LoggingUtil.saveTestLogger);
 				}
 				
 			}
-			tx.commit();
 			LoggingUtil.logMessage(" #### Completed proctoring JOB " + jobNo + " for test " + test.getId() + " and students " + students.size(), LoggingUtil.saveTestLogger);
 			
 		}

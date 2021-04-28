@@ -151,6 +151,8 @@
 		<result column="question_type" property="question.type"/>
 		<result column="section" property="question.section" />
 		<result column="solved_sequence" property="question.solvedSequenceNumber"/>
+		<result column="activity_type" property="question.activityType"/>
+		<result column="activity_time" property="question.activityTime"/>
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
@@ -213,5 +215,14 @@
 	
 	<select id="getAnswerFiles" resultMap="answerFiles" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		SELECT * from exam_answer_files where  exam_id = ${test.id} AND student_id = ${student.id} 
+	</select>
+	
+	<select id="getStudentTestActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="testAnswersMap" >
+	
+	SELECT test_activity.*,test_activity.created_date as activity_time,test_questions.question_img_url FROM test_activity 
+    LEFT JOIN test_questions ON test_activity.question_id = test_questions.id
+    WHERE test_activity.test_id = ${test.id} AND test_activity.student_id = ${student.id} 
+    ORDER BY test_activity.created_date ASC
+		
 	</select>
 </mapper>

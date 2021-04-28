@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.domain;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -59,6 +60,8 @@ public class EdoQuestion {
 	private Integer solvedSequenceNumber;
 	private Integer ttl;
 	private EdoStudent teacher;
+	private String activityType;
+	private Date activityTime;
 	
 	public String getOption1() {
 		return option1;
@@ -357,6 +360,18 @@ public class EdoQuestion {
 	}
 	public void setTeacher(EdoStudent teacher) {
 		this.teacher = teacher;
+	}
+	public String getActivityType() {
+		return activityType;
+	}
+	public void setActivityType(String activityType) {
+		this.activityType = activityType;
+	}
+	public Date getActivityTime() {
+		return activityTime;
+	}
+	public void setActivityTime(Date activityTime) {
+		this.activityTime = activityTime;
 	}
 
 }
