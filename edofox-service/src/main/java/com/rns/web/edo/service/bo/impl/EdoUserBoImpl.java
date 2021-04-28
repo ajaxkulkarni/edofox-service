@@ -829,7 +829,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 	//As of 11/12/19
 
-	private void saveAnswer(EdoServiceRequest request, Session session) {
+	public void saveAnswer(EdoServiceRequest request, Session session) {
 		EdoAnswerEntity answer = new EdoAnswerEntity();
 		List<EdoAnswerEntity> existing = session.createCriteria(EdoAnswerEntity.class)
 						.add(Restrictions.eq("testId", request.getTest().getId()))

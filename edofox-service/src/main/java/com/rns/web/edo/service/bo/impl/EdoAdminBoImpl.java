@@ -1,12 +1,9 @@
 package com.rns.web.edo.service.bo.impl;
 
-import java.awt.Toolkit;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -70,7 +67,6 @@ import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
-import com.rns.web.edo.service.domain.jpa.EdoProctorImages;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
 import com.rns.web.edo.service.domain.jpa.EdoSalesDetails;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
@@ -2332,5 +2328,37 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return null;
+	}
+
+	public EdoApiStatus fixStudentScore(EdoServiceRequest request) {
+		Session session = null;
+		EdoApiStatus status = new EdoApiStatus();
+		try {
+			session = this.sessionFactory.openSession();
+			EdoUserBoImpl userbo = new EdoUserBoImpl();
+			Transaction tx = session.beginTransaction();
+			List<EdoTestQuestionMap> map = testsDao.getStudentTestActivity(request);
+			if(CollectionUtils.isNotEmpty(map)) {
+				LoggingUtil.logMessage("Fixing the student result for " + request.getStudent().getId() + " for " + request.getTest().getId(), LoggingUtil.saveAnswerLogger);
+				for(EdoTestQuestionMap m: map) {
+					if(m.getQuestion() != null && m.getQuestion().getQn_id() != null) {
+						if(!StringUtils.contains(m.getQuestion().getActivityType(), "Navigate") && !StringUtils.contains(m.getQuestion().getActivityType(), "Clear")) {
+							m.getQuestion().setAnswer(m.getQuestion().getActivityType());
+							request.setQuestion(m.getQuestion());
+							LoggingUtil.logMessage("Saving answer " + m.getQuestion().getAnswer() + " for " + m.getQuestion().getQn_id(), LoggingUtil.saveAnswerLogger);
+							userbo.saveAnswer(request, session);
+						}
+					}
+				}
+			}
+			tx.commit();
+			LoggingUtil.logMessage("DONE Fixing the student result for " + request.getStudent().getId() + " for " + request.getTest().getId(), LoggingUtil.saveAnswerLogger);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			status.setStatus(-111, ERROR_IN_PROCESSING);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
 	}
 }
