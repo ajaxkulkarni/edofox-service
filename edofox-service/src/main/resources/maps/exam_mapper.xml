@@ -153,6 +153,10 @@
 		<result column="solved_sequence" property="question.solvedSequenceNumber"/>
 		<result column="activity_type" property="question.activityType"/>
 		<result column="activity_time" property="question.activityTime"/>
+		<result column="device" property="question.device"/>
+		<result column="deviceInfo" property="question.device_info"/>
+		<result column="question_number" property="question.questionNumber"/>
+		
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">

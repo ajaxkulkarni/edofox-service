@@ -62,6 +62,8 @@ public class EdoQuestion {
 	private EdoStudent teacher;
 	private String activityType;
 	private Date activityTime;
+	private String deviceInfo;
+	private String device;
 	
 	public String getOption1() {
 		return option1;
@@ -372,6 +374,18 @@ public class EdoQuestion {
 	}
 	public void setActivityTime(Date activityTime) {
 		this.activityTime = activityTime;
+	}
+	public String getDeviceInfo() {
+		return deviceInfo;
+	}
+	public void setDeviceInfo(String deviceInfo) {
+		this.deviceInfo = deviceInfo;
+	}
+	public String getDevice() {
+		return device;
+	}
+	public void setDevice(String device) {
+		this.device = device;
 	}
 
 }

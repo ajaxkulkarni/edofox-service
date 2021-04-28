@@ -3260,6 +3260,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				for(EdoTestQuestionMap map: activity) {
 					EdoQuestion q = map.getQuestion();
 					CommonUtils.setQuestionURLs(q);
+					if (ACTIVITY_INFO.get(q.getActivityType()) != null) {
+						q.setActivityType(ACTIVITY_INFO.get(q.getActivityType()));
+					} else {
+						q.setActivityType("You clicked on " + q.getActivityType());
+					}
 					test.getTest().add(q);
 				}
 				edoServiceResponse.setTest(test);

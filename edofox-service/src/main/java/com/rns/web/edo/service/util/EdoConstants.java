@@ -126,6 +126,19 @@ public interface EdoConstants {
 		}
 	});
 	
+	static Map<String, String> ACTIVITY_INFO = Collections.unmodifiableMap(new HashMap<String, String>() {
+		{
+			put("STARTED", "You logged into the exam");
+			put("COMPLETED", "You submitted the exam");
+			put("JOINED", "You opened the exam screen");
+			put("LEFT", "You left the exam screen");
+			put("STARTED", "You logged into the exam");
+			put("Navigate", "You navigated away from this question");
+			put("Cleared", "You cleared the answer selected for this question");
+			
+		}
+	});
+	
 	String VIDEO_BASE_URL = "https://streaming.edofox.com:8443/vod/{fileName}.smil/playlist.m3u8";
 	
 	//EDOFOX
