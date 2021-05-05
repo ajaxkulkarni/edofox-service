@@ -157,9 +157,9 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	
 	<select id="getStudentPerformance" parameterType="com.rns.web.edo.service.domain.EdoStudent" resultMap="test">
 	select test.test_id,test_name,ranks.rank,ranks.score,ranks.solved,ranks.correct,ranks.flagged,ranks.created_date,
-	test.total_marks,start_date,totalCount.totalStudents,test.show_student_rank
+	test.total_marks,start_date,totalCount.totalStudents,test.show_student_rank,ranks.testStatus
 	from test left join 
-	( SELECT a.student_id, a.score, a.test_id, a.solved, a.correct, a.flagged, count(b.score)+1 as rank,a.created_date FROM test_status a 
+	( SELECT a.student_id, a.score, a.test_id, a.solved, a.correct, a.flagged, count(b.score)+1 as rank,a.created_date,a.status as testStatus FROM test_status a 
 	left join test_status b on a.score&lt;b.score and a.test_id=b.test_id where a.test_id in 
 	(select test_id from test_status where student_id = ${id}) AND a.student_id = ${id} 
 	group by a.student_id, a.score, a.test_id) as ranks on test.test_id = ranks.test_id 
@@ -167,7 +167,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	as totalCount on totalCount.test_id = test.test_id
 	where test.institute_id = ${instituteId} AND package_id in (select package_id from student_institute where student_id = ${id})
 	AND test.status = 'Active' AND test.start_date &lt; CURRENT_TIMESTAMP
-	AND test.show_result = 'Y'
+	AND test.show_result = 'Y' AND (ranks.testStatus = 'COMPLETED' OR ranks.testStatus IS NULL)
 	<if test="accessType != null &amp;&amp; accessType == 'DPP'">
 		AND test.test_ui = 'DPP'
 	</if>
