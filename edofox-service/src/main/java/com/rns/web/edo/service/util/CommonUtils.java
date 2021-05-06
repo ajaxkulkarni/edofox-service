@@ -494,10 +494,10 @@ public class CommonUtils {
 			}
 			
 		} else if (StringUtils.equals(EdoConstants.QUESTION_TYPE_MATCH, question.getType())) {
-			Float matchScore = calculateMatchScore(question.getCorrectAnswer(), answered);
+			Float matchScore = calculateMatchScore(question.getCorrectAnswer(), answered, question);
 			Float altScore = null;
 			if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
-				altScore = calculateMatchScore(question.getAlternateAnswer(), answered);
+				altScore = calculateMatchScore(question.getAlternateAnswer(), answered, question);
 			}
 			if (altScore != null && altScore > matchScore) {
 				return altScore;
@@ -515,7 +515,7 @@ public class CommonUtils {
 		return StringUtils.equalsIgnoreCase("bonus", question.getCorrectAnswer());
 	}
 
-	private static Float calculateMatchScore(String correctAnswer, EdoQuestion answered) {
+	private static Float calculateMatchScore(String correctAnswer, EdoQuestion answered, EdoQuestion question) {
 
 		if (correctAnswer != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
 
@@ -552,6 +552,9 @@ public class CommonUtils {
 							}
 						}
 					}
+				}
+				if(question != null && question.getWeightage() != null) {
+					return count * question.getWeightage();
 				}
 				return count;
 			}
