@@ -113,6 +113,22 @@ public class EdoLiveUtil {
 		return null;
 	}
 	
+	public static EdoImpartusResponse scheduleSettings(String token, String scheduleId) {
+		String url = BASE_URL + "schedules/settings/" + scheduleId;
+		JSONObject request = new JSONObject();
+		try {
+			request.put("proctoring", 1);
+			String response = CommonUtils.callExternalApi(url, request, "PUTACTUAL", "adminBearer " + token);
+			if(response != null) {
+				return new ObjectMapper().readValue(response, EdoImpartusResponse.class);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		}
+		
+		return null;
+	}
+	
 	public static EdoImpartusResponse join(String token, Integer pkg, Integer user) {
 		String url = BASE_URL + "courses/" + pkg + "/users" ;
 		JSONObject request = new JSONObject();

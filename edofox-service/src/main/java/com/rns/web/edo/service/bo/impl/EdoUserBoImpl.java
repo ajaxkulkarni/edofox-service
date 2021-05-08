@@ -1800,6 +1800,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			live.setHlsUrl(impartusResponse.getHlsPlaybackUrl());
 			live.setPptUrl(impartusResponse.getPptUrl());
 			
+			//If proctoring session..make respective settings
+			if(StringUtils.equals("PROCTORING", request.getRequestType()) && live.getScheduleId() != null) {
+				EdoLiveUtil.scheduleSettings(tokenString, live.getScheduleId());
+			}
+			
 			impartusResponse = EdoLiveUtil.join(tokenString, channel.getId(), request.getStudent().getId());
 			if(!impartusResponse.isSuccess()) {
 				LoggingUtil.logMessage("Could not join course .. " + live.getSessionName());

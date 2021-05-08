@@ -914,6 +914,8 @@ public class CommonUtils {
 			ClientResponse response = null;
 			if (StringUtils.equals("GET", methodType)) {
 				response = builder.get(ClientResponse.class);
+			} else if (StringUtils.equals(methodType, "PUTACTUAL")) { 
+				response = builder.put(ClientResponse.class, request);
 			} else {
 				response = builder.post(ClientResponse.class, request);
 			}
