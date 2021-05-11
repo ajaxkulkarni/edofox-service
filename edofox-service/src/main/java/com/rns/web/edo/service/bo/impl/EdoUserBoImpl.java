@@ -2584,6 +2584,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoStudent host = testsDao.getStudentById(request.getStudent().getId());
 			Integer userType = 2;
 			if(host != null) {
+				if(host.getRollNo() != null) {
+					List<EdoStudent> existing = testsDao.getStudentLogin(host);
+					if(CollectionUtils.isNotEmpty(existing) && StringUtils.equals("Teacher", existing.get(0).getAccessType())) {
+						host.setAccessType(existing.get(0).getAccessType());
+					}
+				}
 				if(StringUtils.isBlank(host.getAccessType())) {
 					userType = 6;
 				}
@@ -2592,29 +2598,26 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				host.setName("Admin");
 			}
 			
+			
 			EdoImpartusResponse impartusResponse = EdoLiveUtil.createUser(tokenString, host, userType);
 			if(!impartusResponse.isSuccess()) {
 				LoggingUtil.logMessage("Could not create user for live classroom .. " + live.getSessionName());
 				return response;
 			}
 			
+			//If Teacher..add professor
+			if(userType == 2) {
+				LoggingUtil.logMessage("Adding professor access to user .. " + live.getSessionName());
+				EdoImpartusResponse joinResponse = EdoLiveUtil.addProfressorAccess(tokenString, live.getClassroomId(), request.getStudent().getId());
+				if(joinResponse == null || !joinResponse.isSuccess()) {
+					LoggingUtil.logMessage("Could not add professor .. " + live.getSessionName());
+				}
+			}
 			
 			impartusResponse = EdoLiveUtil.join(tokenString, live.getClassroomId(), request.getStudent().getId());
 			if(!impartusResponse.isSuccess()) {
 				LoggingUtil.logMessage("Could not join course .. " + live.getSessionName());
-				//Try to add this user as teacher to course as there might be another teacher already present
-				if(userType == 2) {
-					LoggingUtil.logMessage("Adding professor access to user .. " + live.getSessionName());
-					EdoImpartusResponse joinResponse = EdoLiveUtil.addProfressorAccess(tokenString, live.getClassroomId(), request.getStudent().getId());
-					if(joinResponse != null && joinResponse.isSuccess()) {
-						impartusResponse = EdoLiveUtil.join(tokenString, live.getClassroomId(), request.getStudent().getId());
-					} else {
-						LoggingUtil.logMessage("Could not add professor .. " + live.getSessionName());
-						return response;
-					}
-				} else {
-					return response;
-				}
+				return response;
 			}
 			
 			impartusResponse = EdoLiveUtil.ssoToken(request.getStudent().getId());
