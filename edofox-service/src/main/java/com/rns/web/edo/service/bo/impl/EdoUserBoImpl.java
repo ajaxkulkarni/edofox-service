@@ -2612,7 +2612,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						impartusResponse = EdoLiveUtil.join(tokenString, live.getClassroomId(), request.getStudent().getId());
 					} else {
 						LoggingUtil.logMessage("Could not add professor .. " + live.getSessionName());
-						return impartusResponse;
+						return response;
 					}
 				}
 			}
