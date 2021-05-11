@@ -186,7 +186,7 @@ public class EdoLiveUtil {
 		JSONObject request = new JSONObject();
 		try {
 
-			request.put("externalUserId", user);
+			request.put("externalId", user);
 			//request.put
 			String response = CommonUtils.callExternalApi(url, request, null, "adminBearer " + tokenString);
 			if(response != null) {
