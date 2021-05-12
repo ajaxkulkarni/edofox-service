@@ -2606,9 +2606,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			//If Teacher..add professor
-			if(userType == 2) {
-				LoggingUtil.logMessage("Adding professor access to user .. " + live.getSessionName());
-				EdoImpartusResponse joinResponse = EdoLiveUtil.addProfressorAccess(tokenString, live.getClassroomId(), request.getStudent().getId());
+			if(userType == 2 && request.getStudent().getId() != null && live.getCreatedBy() != null && request.getStudent().getId().intValue() != live.getCreatedBy().intValue()) {
+				LoggingUtil.logMessage("Adding professor access to user " + request.getStudent().getId() + " for  " + live.getSessionName() + " started by  " + live.getCreatedBy());
+				EdoImpartusResponse joinResponse = EdoLiveUtil.addProfressorAccess(tokenString, live.getClassroomId(), request.getStudent().getId(), live.getCreatedBy());
 				if(joinResponse == null || !joinResponse.isSuccess()) {
 					LoggingUtil.logMessage("Could not add professor .. " + live.getSessionName());
 				}

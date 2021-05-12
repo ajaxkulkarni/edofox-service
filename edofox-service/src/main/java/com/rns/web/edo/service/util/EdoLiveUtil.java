@@ -181,13 +181,13 @@ public class EdoLiveUtil {
 		return null;
 	}
 
-	public static EdoImpartusResponse addProfressorAccess(String tokenString, Integer classroomId, Integer user) {
+	public static EdoImpartusResponse addProfressorAccess(String tokenString, Integer classroomId, Integer user, Integer host) {
 		String url = BASE_URL + "professor-access/add" ;
 		JSONObject request = new JSONObject();
 		try {
 
 			request.put("externalId", user);
-			request.put("externalId2", user);
+			request.put("externalId2", host);
 			//request.put
 			String response = CommonUtils.callExternalApi(url, request, null, "adminBearer " + tokenString);
 			if(response != null) {
