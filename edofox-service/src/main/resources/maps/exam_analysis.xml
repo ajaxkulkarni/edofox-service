@@ -55,7 +55,8 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		join test_questions on test_questions.id = test_questions_map.question_id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
 		left join (select count(*) as optionCount,test_id, question_id, option_selected from test_result where test_id = ${value} group by option_selected, test_id, question_id) as result
-		on result.question_id = test_questions_map.question_id where test_questions_map.test_id = ${value};
+		on result.question_id = test_questions_map.question_id where test_questions_map.test_id = ${value}
+		AND test_questions_map.question_disabled = 0 order by test_questions_map.question_number asc;
 	</select>
 	
 	<select id="getQuestionCorrectness" resultMap="questionAnalysis" parameterType="Integer">

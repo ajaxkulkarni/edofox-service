@@ -155,12 +155,14 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				return response;
 			}
 			List<EdoQuestion> questionAnalysis = testsDao.getQuestionAnalysis(test.getId());
+			List<EdoQuestion> finalList = new ArrayList<EdoQuestion>();
 			if(CollectionUtils.isNotEmpty(questionAnalysis)) {
 				Map<Integer, EdoQuestion> questionMap = new HashMap<Integer, EdoQuestion>();
 				for(EdoQuestion question: questionAnalysis) {
 					EdoQuestion existing = questionMap.get(question.getQn_id());
 					if(existing == null) {
 						existing = question;
+						finalList.add(existing);
 					}
 					EDOQuestionAnalysis qAnalysis = existing.getAnalysis();
 					if(qAnalysis == null) {
@@ -204,7 +206,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					questionMap.put(question.getQn_id(), existing);
 				}
 				if(CollectionUtils.isNotEmpty(questionMap.values())) {
-					analysis.setTest(new ArrayList<EdoQuestion>(questionMap.values()));
+					analysis.setTest(/*new ArrayList<EdoQuestion>(questionMap.values())*/finalList);
 				}
 				response.setTest(analysis);
 			}
