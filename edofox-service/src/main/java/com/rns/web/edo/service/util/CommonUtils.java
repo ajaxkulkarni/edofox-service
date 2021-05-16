@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -553,8 +555,13 @@ public class CommonUtils {
 						}
 					}
 				}
-				if(question != null && question.getWeightage() != null) {
+				if(question != null && question.getWeightage() != null && count > 0) {
 					return count * question.getWeightage();
+				} else if (question != null && question.getNegativeMarks() != null && count <= 0) {
+					if(question.getNegativeMarks() == 0f) {
+						return 0f;
+					}
+					return count * question.getNegativeMarks();
 				}
 				return count;
 			}
@@ -901,7 +908,7 @@ public class CommonUtils {
 			WebResource webResource = client.resource(url);
 			LoggingUtil.logMessage("Calling API URL :" + url + " with request:" + request, LoggingUtil.videoLogger);
 
-			
+			//webResource.type(MediaType.TEXT_HTML);
 			Builder builder = webResource.type("application/json");
 			if(authKey != null) {
 				builder.header("Authorization", authKey);
@@ -919,7 +926,7 @@ public class CommonUtils {
 			} else {
 				response = builder.post(ClientResponse.class, request);
 			}
-				
+			
 			if (response.getStatus() != 200) {
 				LoggingUtil.logMessage("Failed in API URL " + url + ": HTTP error code : " + response.getStatus(), LoggingUtil.videoLogger);
 			}
