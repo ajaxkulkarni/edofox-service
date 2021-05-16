@@ -93,6 +93,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.mail.iap.Response;
 
 public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
@@ -2362,5 +2363,40 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse getProctoringVideo(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			List<EdoStudent> students = new ArrayList<EdoStudent>();
+			List<String> files = EdoAwsUtil.videoProctoringFiles(request.getLecture().getVideoName());
+			if(CollectionUtils.isNotEmpty(files)) {
+				for(String file: files) {
+					String[] values = StringUtils.split(file, "/");
+					if(ArrayUtils.isNotEmpty(values)) {
+						String[] subValues = StringUtils.split(values[values.length - 1], "-");
+						if(ArrayUtils.isNotEmpty(subValues)) {
+							Integer id = new Integer(subValues[0]);
+							EdoStudent student = testsDao.getStudentById(id);
+							if(student != null) {
+								EDOPackage currentPackage = new EDOPackage();
+								currentPackage.setVideoUrl(file);
+								student.setCurrentPackage(currentPackage);
+								students.add(student);
+							}
+						}
+ 					}
+				}
+			}
+			
+			response.setStudents(students);
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		} finally {
+			//CommonUtils.closeSession(session);
+		}
+		return response;
 	}
 }

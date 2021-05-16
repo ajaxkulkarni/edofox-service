@@ -564,4 +564,12 @@ public class EdoAdminController {
 		System.gc();
 		return "Done";
 	}
+	
+	@POST
+	@Path("/getVideoProctoringRecords")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getVideoProctoringRecords(EdoServiceRequest request) {
+		return adminBo.getProctoringVideo(request);
+	}
 }
