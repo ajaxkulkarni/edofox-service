@@ -560,7 +560,7 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse saveQuestionActivity(EdoServiceRequest request) {
-		//LoggingUtil.logMessage("Save Test activity request :" + request, LoggingUtil.activityLogger);
+		LoggingUtil.logMessage("Save Question activity request :" + request, LoggingUtil.testActivityLogger);
 		EdoServiceResponse response = new EdoServiceResponse();
 		response.setStatus(userBo.updateStudentTestActivity(request));
 		//LoggingUtil.logObject("Save video activity response ", response);

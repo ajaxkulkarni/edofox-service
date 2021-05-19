@@ -35,6 +35,10 @@ public class LoggingUtil {
 
 	public static Logger emailLogger = Logger.getLogger("emailLog");
 	
+	public static Logger testActivityLogger = Logger.getLogger("testActivityLog");
+	
+	public static Logger testActivityErrorLogger = Logger.getLogger("testActivityErrorLog");
+	
 	
 	//private static Logger emailLogger = Logger.getLogger("email");
 	

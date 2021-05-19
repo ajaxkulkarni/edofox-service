@@ -98,7 +98,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 			exportVideos(session);
 			
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.videoLogger);
 		} finally {
 			CommonUtils.closeSession(session);
 		}
@@ -202,7 +202,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 			}
 			
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.schedulerLogger);
 		} finally {
 			CommonUtils.closeSession(session);
 		}
@@ -285,7 +285,7 @@ public class VideoExportScheduler implements SchedulingConfigurer {
 			}
 
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.schedulerLogger);
 		}
 		return time;
 	}

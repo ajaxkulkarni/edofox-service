@@ -2700,7 +2700,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			testsDao.saveStudentTestActivity(request);
 		} catch (Exception e) {
-			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.activityLogger);
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.testActivityErrorLogger);
 		}
 		return status;
 	}
