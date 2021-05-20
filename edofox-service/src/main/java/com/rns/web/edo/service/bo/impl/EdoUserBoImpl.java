@@ -544,9 +544,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					EdoQuestion question = mapper.getQuestion();
 					if(question != null) {
 						question.setId(count);
-						CommonUtils.setQuestionURLs(question);
-						prepareMatchTypeQuestion(question);
-						QuestionParser.fixQuestion(question);
+						//CommonUtils.setQuestionURLs(question);
+						//prepareMatchTypeQuestion(question);
+						//QuestionParser.fixQuestion(question);
 						//Don't show answers in case of student getTest call
 						if(studenId != null) {
 							question.setCorrectAnswer(null);
@@ -577,7 +577,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						count++;
 					}
 				}
-				/*if(isRandomizeQuestions(result) && studenId != null) {
+				if(isRandomizeQuestions(result) && studenId != null) {
 					//Randomize only for student NOT for Admin
 					randomizeQuestions(result, sectionSets, examQuestionCount, solvedSet);
 					
@@ -591,9 +591,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						testsDao.saveTestResult(request);
 					}
 					
-				}*/
+				}
 				//Get JEE sections eligible for JEE format
-				/*if(studenId != null) {
+				if(studenId != null) {
 					result.setJeeNewFormatSections(CommonUtils.sectionsEligibleForNewJeeFormat(result, result.getTest()));
 					if(CollectionUtils.isNotEmpty(result.getJeeNewFormatSections())) {
 						result.setJeeMaxNumeric(JEE_NEW_FORMAT_BEST_OF_VALUE);
@@ -616,7 +616,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						result.setMinLeft(timeLeft.longValue() / 60);
 					}
 					
-				}*/
+				}
 				response.setTest(result);
 			}
 			
