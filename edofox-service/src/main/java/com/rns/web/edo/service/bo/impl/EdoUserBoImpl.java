@@ -283,7 +283,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoServiceResponse getTest(EdoServiceRequest req) {
 		
 		long time0 = System.currentTimeMillis();
-		long initTime = 0, fetchTime = 0, processTime = 0;
+		long initTime = 0, fetchTime = 0, fetchQueryTime = 0, processTime = 0;
 		
 		EdoServiceResponse response = new EdoServiceResponse();
 		Integer studenId = null;
@@ -418,7 +418,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			initTime = System.currentTimeMillis() - time0;
 			time0 = System.currentTimeMillis();
 			
+			fetchQueryTime = System.currentTimeMillis();
+			
 			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
+			
+			fetchQueryTime = System.currentTimeMillis() - fetchQueryTime;
 			
 			//Check for random pool property..if set to 1, random questions need to be picked out of total questions added
 			Map<String, Integer> examQuestionCount = null;
@@ -622,7 +626,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			processTime = System.currentTimeMillis() - time0;
 			
-			LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
+			LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " query fetch:" + fetchQueryTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
