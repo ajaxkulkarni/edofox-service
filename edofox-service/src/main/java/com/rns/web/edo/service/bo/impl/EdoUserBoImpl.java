@@ -30,6 +30,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -280,6 +281,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	}
 
 	public EdoServiceResponse getTest(EdoServiceRequest req) {
+		
+		long time0 = System.currentTimeMillis();
+		long initTime = 0, fetchTime = 0, processTime = 0;
+		
 		EdoServiceResponse response = new EdoServiceResponse();
 		Integer studenId = null;
 		Integer testId = null;
@@ -410,6 +415,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			
+			initTime = System.currentTimeMillis() - time0;
+			time0 = System.currentTimeMillis();
+			
 			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
 			
 			//Check for random pool property..if set to 1, random questions need to be picked out of total questions added
@@ -527,6 +535,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					
 				}
 				
+				fetchTime = System.currentTimeMillis() - time0;
+				time0 = System.currentTimeMillis();
+				
 				Integer count = 1;
 				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
 				for(EdoTestQuestionMap mapper: map) {
@@ -608,6 +619,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				response.setTest(result);
 			}
+			
+			processTime = System.currentTimeMillis() - time0;
+			
+			LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
