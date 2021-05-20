@@ -545,8 +545,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(question != null) {
 						question.setId(count);
 						//CommonUtils.setQuestionURLs(question);
-						//prepareMatchTypeQuestion(question);
-						//QuestionParser.fixQuestion(question);
+						prepareMatchTypeQuestion(question);
+						QuestionParser.fixQuestion(question);
 						//Don't show answers in case of student getTest call
 						if(studenId != null) {
 							question.setCorrectAnswer(null);
