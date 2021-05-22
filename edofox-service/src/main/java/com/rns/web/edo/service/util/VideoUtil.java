@@ -259,7 +259,7 @@ public class VideoUtil {
 		if(instituteId == 9) {
 			//For reliance
 			vimeoKey = EdoPropertyUtil.getProperty("reliance.video.key");
-		} else if  (instituteId == 4) {
+		} else if  (instituteId == 4 || instituteId == 1037) {
 			//For shahu
 			vimeoKey = EdoPropertyUtil.getProperty("shahu.video.key");
 		}
