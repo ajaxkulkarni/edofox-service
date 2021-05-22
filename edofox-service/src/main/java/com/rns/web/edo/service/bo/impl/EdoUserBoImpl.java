@@ -282,9 +282,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 
 	public EdoServiceResponse getTest(EdoServiceRequest req) {
 		
-		long time0 = System.currentTimeMillis();
-		long initTime = 0, fetchTime = 0, processTime = 0;
-		
 		EdoServiceResponse response = new EdoServiceResponse();
 		Integer studenId = null;
 		Integer testId = null;
@@ -415,8 +412,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			
-			initTime = System.currentTimeMillis() - time0;
-			time0 = System.currentTimeMillis();
 			
 			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
 			
@@ -535,9 +530,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					
 				}
 				
-				fetchTime = System.currentTimeMillis() - time0;
-				time0 = System.currentTimeMillis();
-				
 				Integer count = 1;
 				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
 				for(EdoTestQuestionMap mapper: map) {
@@ -620,9 +612,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				response.setTest(result);
 			}
 			
-			processTime = System.currentTimeMillis() - time0;
-			
-			LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
+			//LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
