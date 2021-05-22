@@ -626,7 +626,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			processTime = System.currentTimeMillis() - time0;
 			
-			LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " query fetch:" + fetchQueryTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
+			//LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " query fetch:" + fetchQueryTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
