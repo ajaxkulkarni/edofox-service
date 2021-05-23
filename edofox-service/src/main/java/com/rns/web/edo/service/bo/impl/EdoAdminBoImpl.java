@@ -508,6 +508,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			testsDao.updateTestStatus(request);
 			if(CollectionUtils.isNotEmpty(request.getTest().getTest())) {
 				for(EdoQuestion question: request.getTest().getTest()) {
+					if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_DESCRIPTIVE, question.getType())) {
+						continue;
+					}
 					Map<String, Object> requestMap = new HashMap<String, Object>();
 					requestMap.put("marks", question.getMarks());
 					requestMap.put("test", request.getTest().getId());
