@@ -3,6 +3,15 @@ package com.rns.web.edo.service.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_EMPTY)
 public class EDOTestAnalysis {
 	
 	private Integer studentsAppeared;
@@ -12,6 +21,36 @@ public class EDOTestAnalysis {
 	private List<EdoStudentSubjectAnalysis> subjectAnalysis;
 	private Integer topScore;
 	
+	private Integer mcqSolved;
+	private Integer mcqCorrect;
+	private Integer mcqWrong;
+	private BigDecimal mcqScore;
+	
+	
+	public Integer getMcqSolved() {
+		return mcqSolved;
+	}
+	public void setMcqSolved(Integer mcqSolved) {
+		this.mcqSolved = mcqSolved;
+	}
+	public Integer getMcqCorrect() {
+		return mcqCorrect;
+	}
+	public void setMcqCorrect(Integer mcqCorrect) {
+		this.mcqCorrect = mcqCorrect;
+	}
+	public Integer getMcqWrong() {
+		return mcqWrong;
+	}
+	public void setMcqWrong(Integer mcqWrong) {
+		this.mcqWrong = mcqWrong;
+	}
+	public BigDecimal getMcqScore() {
+		return mcqScore;
+	}
+	public void setMcqScore(BigDecimal mcqScore) {
+		this.mcqScore = mcqScore;
+	}
 	public Integer getStudentsAppeared() {
 		return studentsAppeared;
 	}

@@ -80,6 +80,7 @@ public interface EdoConstants {
 	String QUESTION_TYPE_MATCH = "MATCH";
 	String QUESTION_TYPE_PASSAGE = "PASSAGE";
 	String QUESTION_TYPE_NUMBER = "NUMBER";
+	String QUESTION_TYPE_DESCRIPTIVE = "DESCRIPTIVE";
 	
 	String REQUEST_FIREBASE_UPDATE = "firebaseUpdate";
 	

@@ -199,6 +199,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			test.setSections(new ArrayList<String>());
+			
+			int mcqSolved = 0, mcqCorrect = 0, mcqWrong = 0; 
+			BigDecimal mcqMarks = BigDecimal.ZERO;
 
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
@@ -236,6 +239,21 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				
 				test.getTest().add(question);
+				
+				//Calculate mcq parameters
+				if(test != null && StringUtils.equals(test.getTestUi(), EdoConstants.QUESTION_TYPE_DESCRIPTIVE)) {
+					if(!StringUtils.equals(EdoConstants.QUESTION_TYPE_DESCRIPTIVE, question.getType())) {
+						mcqSolved ++;
+						if(question.getMarks() != null && question.getMarks().compareTo(BigDecimal.ZERO) > 0) {
+							mcqCorrect++;
+							mcqMarks = mcqMarks.add(question.getMarks());
+						} else if (StringUtils.isNotBlank(question.getAnswer()) && question.getMarks() != null) {
+							mcqWrong++;
+							mcqMarks = mcqMarks.add(question.getMarks());
+						}
+					}
+				}
+				
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
 				}
@@ -270,6 +288,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				test.setAnswerFiles(answerFiles);
+				
+				if(test.getAnalysis() == null) {
+					test.setAnalysis(new EDOTestAnalysis());
+				}
+				test.getAnalysis().setMcqCorrect(mcqCorrect);
+				test.getAnalysis().setMcqScore(mcqMarks);
+				test.getAnalysis().setMcqSolved(mcqSolved);
+				test.getAnalysis().setMcqWrong(mcqWrong);
 			} 
 			
 			response.setTest(test);

@@ -340,6 +340,8 @@ public class CommonUtils {
 		for (EdoQuestion answered : test.getTest()) {
 			if (StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_MATCH, answered.getType())) {
 				setComplexAnswer(answered);
+			} else if (StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_DESCRIPTIVE, answered.getType())) {
+				continue;
 			}
 			answered.setMarks(BigDecimal.ZERO);
 			if (StringUtils.isNotBlank(answered.getAnswer())) {
