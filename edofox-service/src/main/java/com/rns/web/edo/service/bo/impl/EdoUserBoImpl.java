@@ -2200,6 +2200,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			} else {
 				EdoStudent edoStudent = existing.get(0);
 				if (StringUtils.equals(student.getPassword(), edoStudent.getPassword()) || StringUtils.isNotBlank(student.getToken())) {
+					//Check for institute permissions in case of logging in from different app
+					if(request.getInstitute() != null && request.getInstitute().getId() != null && student.getCurrentPackage() != null && student.getCurrentPackage().getInstitute() != null && student.getCurrentPackage().getInstitute().getId().intValue() != request.getInstitute().getId().intValue()) {
+						response.setStatus(new EdoApiStatus(-403, "Unauthorized access. Please try again."));
+						return response;
+					}
 					response.setStudent(edoStudent);
 				} else {
 					response.setStatus(new EdoApiStatus(-111, "Username and password incorrect. Please try again."));
