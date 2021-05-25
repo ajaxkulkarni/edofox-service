@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -2200,11 +2201,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			} else {
 				EdoStudent edoStudent = existing.get(0);
 				if (StringUtils.equals(student.getPassword(), edoStudent.getPassword()) || StringUtils.isNotBlank(student.getToken())) {
-					//Check for institute permissions in case of logging in from different app
-					if(request.getInstitute() != null && request.getInstitute().getId() != null && edoStudent.getCurrentPackage() != null && edoStudent.getCurrentPackage().getInstitute() != null && edoStudent.getCurrentPackage().getInstitute().getId().intValue() != request.getInstitute().getId().intValue()) {
-						response.setStatus(new EdoApiStatus(-403, "Unauthorized access. Please try again."));
-						return response;
+					
+					if(StringUtils.isNotBlank(student.getInstituteId())) {
+						String[] instituteIds = StringUtils.split(student.getInstituteId(), ",");
+						if(ArrayUtils.isNotEmpty(instituteIds)) {
+							for(String instituteId: instituteIds) { 
+								Integer instId = Integer.parseInt(instituteId);
+								//Check for institute permissions in case of logging in from different app
+								if(instId != null && edoStudent.getCurrentPackage() != null && edoStudent.getCurrentPackage().getInstitute() != null && edoStudent.getCurrentPackage().getInstitute().getId().intValue() != instId.intValue()) {
+									response.setStatus(new EdoApiStatus(-403, "Unauthorized access. Please try again."));
+									return response;
+								}
+							}
+						}
+							
 					}
+					
+					
 					response.setStudent(edoStudent);
 				} else {
 					response.setStatus(new EdoApiStatus(-111, "Username and password incorrect. Please try again."));
