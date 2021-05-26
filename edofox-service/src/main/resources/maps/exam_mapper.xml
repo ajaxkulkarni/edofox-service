@@ -58,7 +58,7 @@
 	</resultMap>
 
 
-	<select id="getExam" resultMap="testQuestionsMap" parameterType="Integer">
+	<select id="getExam" resultType="hashmap"  parameterType="Integer">
 		SELECT *,test_questions.status as qStatus FROM test
 		join test_questions_map on test.test_id =
 		test_questions_map.test_id

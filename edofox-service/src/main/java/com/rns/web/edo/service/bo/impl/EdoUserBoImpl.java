@@ -80,6 +80,7 @@ import com.rns.web.edo.service.util.EdoFaceDetection;
 import com.rns.web.edo.service.util.EdoImageUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
+import com.rns.web.edo.service.util.EdoMyBatisUtil;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
@@ -420,7 +421,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			fetchQueryTime = System.currentTimeMillis();
 			
-			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
+			List<EdoTestQuestionMap> map = EdoMyBatisUtil.convertExamMap(testsDao.getExam(testId));
 			
 			fetchQueryTime = System.currentTimeMillis() - fetchQueryTime;
 			
