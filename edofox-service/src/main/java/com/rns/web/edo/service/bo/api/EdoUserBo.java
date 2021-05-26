@@ -3,6 +3,8 @@ package com.rns.web.edo.service.bo.api;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
@@ -54,7 +56,7 @@ public interface EdoUserBo {
 	EdoServiceResponse getChapterExams(EdoServiceRequest request);
 	EdoServiceResponse joinSession(EdoServiceRequest request);
 	EdoServiceResponse getStudentPerformance(EdoServiceRequest request);
-	EdoApiStatus updateStudentTestActivity(EdoServiceRequest request);
+	EdoApiStatus updateStudentTestActivity(EdoServiceRequest request, HttpServletRequest servletRequest);
 	EdoServiceResponse createVideoLecture(EdoServiceRequest request);
 	EdoServiceResponse getFeedbackDetails(EdoServiceRequest request);
 	EdoServiceResponse getUploadedAnswers(EdoServiceRequest request);

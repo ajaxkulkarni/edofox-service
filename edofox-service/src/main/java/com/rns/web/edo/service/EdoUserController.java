@@ -5,6 +5,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -12,6 +14,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -31,8 +34,6 @@ import com.rns.web.edo.service.domain.EdoApiStatus;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoServiceRequest;
 import com.rns.web.edo.service.domain.EdoServiceResponse;
-import com.rns.web.edo.service.domain.EdoStudent;
-import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.util.CommonUtils;
 import com.rns.web.edo.service.util.EdoConstants;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
@@ -51,6 +52,10 @@ public class EdoUserController {
 	@Autowired(required = true)
 	@Qualifier(value = "userBo")
 	EdoUserBo userBo;
+	
+	
+	@Context private HttpServletRequest servletRequest;
+	@Context private HttpServletResponse servletResponse;
 	
 	public void setUserBo(EdoUserBo userBo) {
 		this.userBo = userBo;
@@ -550,7 +555,7 @@ public class EdoUserController {
 	public EdoServiceResponse saveTestActivity(EdoServiceRequest request) {
 		//LoggingUtil.logMessage("Save Test activity request :" + request, LoggingUtil.activityLogger);
 		EdoServiceResponse response = new EdoServiceResponse();
-		response.setStatus(userBo.updateStudentTestActivity(request));
+		response.setStatus(userBo.updateStudentTestActivity(request, servletRequest));
 		//LoggingUtil.logObject("Save video activity response ", response);
 		return response;
 	}
@@ -561,8 +566,9 @@ public class EdoUserController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse saveQuestionActivity(EdoServiceRequest request) {
 		LoggingUtil.logMessage("Save Question activity request :" + request, LoggingUtil.testActivityLogger);
+		//System.out.println("Called service from addres ==> " + servletRequest.getRemoteAddr());
 		EdoServiceResponse response = new EdoServiceResponse();
-		response.setStatus(userBo.updateStudentTestActivity(request));
+		response.setStatus(userBo.updateStudentTestActivity(request, servletRequest));
 		//LoggingUtil.logObject("Save video activity response ", response);
 		return response;
 	}

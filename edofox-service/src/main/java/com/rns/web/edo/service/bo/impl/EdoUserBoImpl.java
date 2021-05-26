@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -2740,7 +2742,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 
-	public EdoApiStatus updateStudentTestActivity(EdoServiceRequest request) {
+	public EdoApiStatus updateStudentTestActivity(EdoServiceRequest request, HttpServletRequest servletRequest) {
 		EdoApiStatus status = new EdoApiStatus();
 		if(StringUtils.isBlank(request.getRequestType()) || request.getStudent() == null || request.getTest() == null) {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
@@ -2749,6 +2751,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		if(request.getTest().getId() == null && request.getStudent().getId() == null) {
 			status.setStatus(-111, ERROR_INCOMPLETE_REQUEST);
 			return status;
+		}
+		
+		if(request.getTest() != null && servletRequest != null && servletRequest.getRemoteAddr() != null) {
+			if(request.getTest().getDeviceInfo() == null) {
+				request.getTest().setDeviceInfo("");
+			} 
+			request.getTest().setDeviceInfo(request.getTest().getDeviceInfo() + " ;IP=" + servletRequest.getRemoteAddr());
 		}
 		
 		try {
