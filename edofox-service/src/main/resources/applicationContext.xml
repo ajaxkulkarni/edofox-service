@@ -78,15 +78,15 @@
 		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edo_prod" 
 			/> <property name="username" value="root" /> <property name="password" value="" 
 			/> -->
-		<property name="testOnReturn" value="true" />
+		<!-- <property name="testOnReturn" value="true" />
 		<property name="testOnBorrow" value="true" />
-		<property name="testWhileIdle" value="true" />
+		<property name="testWhileIdle" value="true" /> -->
 		<property name="validationQuery" value="SELECT 1" />
 		<!-- <property name="initialSize" value="8" /> <property name="maxActive" 
 			value="20" /> <property name="maxIdle" value="20" /> <property name="minIdle" 
 			value="0" /> -->
 		<property name="initialSize" value="50" />
-		<property name="maxActive" value="1000" />
+		<property name="maxActive" value="200" />
 		<property name="maxIdle" value="50" />
 		<property name="minIdle" value="0" />
 	</bean>
