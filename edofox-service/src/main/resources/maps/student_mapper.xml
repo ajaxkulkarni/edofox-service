@@ -43,13 +43,17 @@
 	</resultMap>
 
 	<select id="getInstituePackages" resultMap="packages"
-		parameterType="Integer">
+		parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		select *, packages.id as packageId from institute join
 		packages on institute.id =
 		packages.institute_id
 		where institute.status
 		= 'Active' AND
-		institute.id =${value} AND packages.is_disabled = 0;
+		institute.id =${institute.id} AND packages.is_disabled = 0
+		<if test="requestType == 'public'">
+			AND is_public = 1
+		</if>
+		;
 
 	</select>
 

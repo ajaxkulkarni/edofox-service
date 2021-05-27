@@ -1136,13 +1136,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return null;
 	}
 
-	public EdoServiceResponse getPackages(EDOInstitute institute) {
+	public EdoServiceResponse getPackages(EdoServiceRequest request) {
+		EDOInstitute institute = request.getInstitute();
 		if(institute == null || institute.getId() == null) {
 			return new EdoServiceResponse(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 		}
 		EdoServiceResponse response = new EdoServiceResponse();
 		try {
-			response.setPackages(testsDao.getInstituePackages(institute.getId()));
+			response.setPackages(testsDao.getInstituePackages(request));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));

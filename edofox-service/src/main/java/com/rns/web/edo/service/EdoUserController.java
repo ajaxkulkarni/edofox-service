@@ -245,7 +245,7 @@ public class EdoUserController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getPackages(EdoServiceRequest request) {
 		//LoggingUtil.logMessage("Get packages Request :" + request);
-		EdoServiceResponse response = userBo.getPackages(request.getInstitute());
+		EdoServiceResponse response = userBo.getPackages(request);
 		//LoggingUtil.logMessage("Get packages Response");
 		return response;
 	}

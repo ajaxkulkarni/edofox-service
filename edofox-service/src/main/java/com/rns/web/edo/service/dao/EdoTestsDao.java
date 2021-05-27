@@ -60,7 +60,7 @@ public interface EdoTestsDao {
 	
 	
 	//Student queries
-	List<EDOPackage> getInstituePackages(Integer instituteId);
+	List<EDOPackage> getInstituePackages(/*Integer instituteId*/EdoServiceRequest request);
 	List<EDOPackage> getStudentPackages(Integer studentId);
 	Integer saveStudent(EdoStudent student);
 	Integer createStudentPackage(EdoStudent student);
