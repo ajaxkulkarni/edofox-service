@@ -1245,6 +1245,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				institute = testsDao.getInstituteById(student.getPackages().get(0).getInstitute().getId());
 			}*/
 			notifyStudent(student, MAIL_TYPE_SUBSCRIPTION, institute);
+			response.setStudent(student);
 			//txManager.commit(txStatus);
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
