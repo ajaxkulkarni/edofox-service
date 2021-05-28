@@ -85,6 +85,18 @@
 		<result column="test_ui" property="testUi"/>
 		<result column="startedDate" property="startedDate" />
 		<result column="offline_conduction" property="offlineConduction"/>
+		
+		<result column="start_date" property="startDate"/>
+		<result column="end_date" property="endDate"/>
+		<result column="random_questions" property="randomQuestions"/>
+		<result column="time_constraint" property="timeConstraint"/>
+		<result column="student_time_constraint" property="studentTimeConstraint"/>
+		<result column="pause_timeout_seconds" property="pauseTimeout"/>
+		<result column="max_allowed_test_starts" property="maxStarts"/>
+		<result column="accept_location" property="acceptLocation"/>
+		<result column="force_update" property="forceUpdate"/>
+		<result column="random_pool" property="randomPool"/>
+		<result column="custom_instructions" property="instructions"/>
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">
