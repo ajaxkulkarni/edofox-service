@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
-import com.rns.web.edo.service.domain.EDOTestAnalysis;
 import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
@@ -25,7 +24,7 @@ public interface EdoTestsDao {
 	List<EdoQuestion> getTestResult(EdoStudent student);
 	List<EdoQuestion> getExamQuestions(Integer value);
 	EdoQuestion getQuestion(Integer value);
-	List<Map> getExam(Integer value);
+	List<EdoTestQuestionMap> getExam(Integer value);
 	List<EdoTestQuestionMap> getExamResult(EdoServiceRequest request);
 	List<EdoTestQuestionMap> getExamSolved(EdoServiceRequest request);
 	List<EdoTestStudentMap> getTestStatus(EdoTestStudentMap map); 

@@ -301,7 +301,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		try {
-			EdoTestStudentMap inputMap = new EdoTestStudentMap();
+			/*EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
 			Date startedDate = null;
 			EdoTestStudentMap studentMap = null;
@@ -414,14 +414,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					response.setStatus(new EdoApiStatus(-111, "This feature is disabled at this moment. Please try again later."));
 					return response;
 				}
-			}
+			}*/
 			
 			initTime = System.currentTimeMillis() - time0;
 			time0 = System.currentTimeMillis();
 			
 			fetchQueryTime = System.currentTimeMillis();
 			
-			List<EdoTestQuestionMap> map = EdoMyBatisUtil.convertExamMap(testsDao.getExam(testId));
+			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
 			
 			fetchQueryTime = System.currentTimeMillis() - fetchQueryTime;
 			
@@ -432,14 +432,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(map)) {
 				EdoTest result = map.get(0).getTest();
 				//Check for max allowed start attempts
-				if(studentMap != null && studentMap.getStartedCount() != null && result.getMaxStarts() != null) {
+				/*if(studentMap != null && studentMap.getStartedCount() != null && result.getMaxStarts() != null) {
 					if(result.getMaxStarts() <= studentMap.getStartedCount()) {
 						response.setStatus(new EdoApiStatus(STATUS_ERROR, "You have reached maximum no of test attempts. Please contact your admin for more info."));
 						return response;
 					}
-				}
+				}*/
 				
-				if(studenId != null) {
+				/*if(studenId != null) {
 					//Check if time constraint is present
 					if(StringUtils.equals("1", result.getTimeConstraint())) {
 						Date startTime = result.getStartDate();
@@ -538,7 +538,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					
 					
-				}
+				}*/
 				
 				fetchTime = System.currentTimeMillis() - time0;
 				time0 = System.currentTimeMillis();
@@ -615,11 +615,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					
 					//Set admin reset value and time left
-					result.setAdminReset(adminReset);
+					/*result.setAdminReset(adminReset);
 					if(adminReset != null && adminReset == 1 && timeLeft != null && timeLeft > 0 && result.getMinLeft() == null && result.getSecLeft() == null) {
 						result.setSecLeft(timeLeft.longValue() % 60); //seconds left
 						result.setMinLeft(timeLeft.longValue() / 60);
-					}
+					}*/
 					
 				}
 				response.setTest(result);
