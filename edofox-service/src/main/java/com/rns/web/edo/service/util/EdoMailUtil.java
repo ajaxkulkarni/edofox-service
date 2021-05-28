@@ -145,6 +145,12 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 				result = StringUtils.replace(result, "{additionalMessage}", "");
 			}
 			
+			if(StringUtils.equals(type, EdoConstants.MAIL_TYPE_SUBSCRIPTION) && student != null && student.getPayment() != null && !student.getPayment().isOffline()) {
+				result = StringUtils.replace(result, "{paymentDetails}", "<tr><td>Payment Mode</td><td>{paymentMode}</td></tr><tr><td>Payment ID (Only for online payment)</td><td>{paymentId}</td></tr>");
+			} else {
+				result = StringUtils.replace(result, "{paymentDetails}", "");
+			}
+			
 			result = CommonUtils.prepareStudentNotification(result, student);
 			result = CommonUtils.prepareInstituteNotification(result, institute);
 			result = CommonUtils.prepareTestNotification(result, exam, institute, "");

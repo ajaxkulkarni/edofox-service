@@ -72,25 +72,28 @@
                         <td>{phone}</td>
                     </tr>
                     <tr>
-                        <td>Package(s) Purchased</td>
+                        <td>Username</td>
+                        <td>{username}</td>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td>{password}</td>
+                    </tr>
+                    <tr>
+                        <td>Classroom(s) Subscribed</td>
                         <td>{packages}</td>
                     </tr>
                     <tr>
                         <td>Exam Mode</td>
                         <td>{examMode}</td>
                     </tr>
+                    
                     <tr>
-                        <td>Payment Mode</td>
-                        <td>{paymentMode}</td>
-                    </tr>
-                    <tr>
-                        <td>Payment ID (Only for online payment)</td>
-                        <td>{paymentId}</td>
-                    </tr>
-                    <tr>
-                        <td>Transaction ID (Only for online payment)</td>
+                        <td>Transaction reference </td>
                         <td>{transactionId}</td>
                     </tr>
+                    
+                    {paymentDetails}
                 </tbody>
             </table>
             <p>Login at <a href="{webUrl}">{webUrl}</a> with username {username} and password {password} <!-- for online exams and exam results --></p>
