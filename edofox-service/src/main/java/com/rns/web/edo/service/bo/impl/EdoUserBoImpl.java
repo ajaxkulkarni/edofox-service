@@ -543,6 +543,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				fetchTime = System.currentTimeMillis() - time0;
 				time0 = System.currentTimeMillis();
 				
+				//TODO New code
+				result = testsDao.getTest(testId);
+				result.setSubjects(new ArrayList<String>());
+				
+				
 				Integer count = 1;
 				Map<String, List<EdoQuestion>> sectionSets = new HashMap<String, List<EdoQuestion>>();
 				for(EdoTestQuestionMap mapper: map) {
