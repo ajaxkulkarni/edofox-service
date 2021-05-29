@@ -85,10 +85,10 @@
 		<!-- <property name="initialSize" value="8" /> <property name="maxActive" 
 			value="20" /> <property name="maxIdle" value="20" /> <property name="minIdle" 
 			value="0" /> -->
-		<property name="initialSize" value="50" />
-		<property name="maxActive" value="500" />
-		<property name="maxIdle" value="50" />
-		<property name="minIdle" value="0" />
+		<property name="initialSize" value="100" />
+		<property name="maxActive" value="1000" />
+		<property name="maxIdle" value="300" />
+		<property name="minIdle" value="100" />
 	</bean>
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
