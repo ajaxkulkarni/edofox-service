@@ -524,7 +524,7 @@ public class CommonUtils {
 		if (correctAnswer != null && answered != null && StringUtils.isNotBlank(answered.getAnswer())) {
 
 			//Convert all to lower case
-			correctAnswer = StringUtils.lowerCase(correctAnswer);
+			/*correctAnswer = StringUtils.lowerCase(correctAnswer);
 			answered.setAnswer(StringUtils.lowerCase(answered.getAnswer()));
 			
 			String[] selectedPairs = StringUtils.split(answered.getAnswer(), ",");
@@ -547,7 +547,8 @@ public class CommonUtils {
 				}
 				if (CollectionUtils.isNotEmpty(pairCount.keySet())) {
 					for (Entry<String, Integer> pair : pairCount.entrySet()) {
-						int actualCount = StringUtils.countMatches(correctAnswer, pair.getKey());
+						//Calculate how many times this key (left column value) appears in correct answer
+						int actualCount = calculateActualCount(correctAnswer, pair.getKey());
 						if (pair.getValue() != null) {
 							if (actualCount == pair.getValue().intValue()) {
 								count++;
@@ -566,9 +567,62 @@ public class CommonUtils {
 					return count * question.getNegativeMarks();
 				}
 				return count;
+			}*/
+			
+			//New SIMPLIFIED logic for match column 29/05/21
+			String[] correctAnswers = StringUtils.split(correctAnswer, ",");
+			String[] studentAnswers = StringUtils.split(answered.getAnswer(), ",");
+			int matchedCount = 0, unMatchedCount = 0;
+			if(ArrayUtils.isNotEmpty(studentAnswers)) {
+				for(String studentAnswer: studentAnswers) {
+					boolean matched = false;
+					for(String correctPair: correctAnswers) {
+						if(StringUtils.equalsIgnoreCase(studentAnswer, correctPair)) {
+							matched = true; 
+							break;
+						}
+					}
+					if(matched) {
+						matchedCount++;
+					} else {
+						unMatchedCount++;
+					}
+				}
+				
 			}
+			
+			float score = 0f;
+			if(question.getWeightage() != null && question.getWeightage() > 0f && matchedCount > 0) {
+				score = question.getWeightage() * matchedCount;
+			}
+			if(question.getNegativeMarks() != null && question.getNegativeMarks() > 0f && unMatchedCount > 0) {
+				score = score - question.getNegativeMarks() * unMatchedCount;
+			}
+			return score;
 		}
 		return null;
+	}
+
+	private static int calculateActualCount(String correctAnswer, String key) {
+		try {
+			if(StringUtils.isNotBlank(correctAnswer) && StringUtils.isNotBlank(key)) {
+				String[] correctAnswerValues = StringUtils.split(correctAnswer, ",");
+				int count = 0;
+				if(ArrayUtils.isNotEmpty(correctAnswerValues)) {
+					for(String cols: correctAnswerValues) {
+						String[] columns = StringUtils.split(cols, "-");
+						if(ArrayUtils.isNotEmpty(columns) && StringUtils.equalsIgnoreCase(columns[0], key)) {
+							count++;
+						}
+					}
+					
+				}
+				return count;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
 	public static Float calculateMultipleTypeScore(String[] correctAnswers, String[] selectedAnswers, EdoQuestion question) {
