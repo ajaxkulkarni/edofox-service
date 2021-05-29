@@ -57,6 +57,7 @@ public class EdoPropertyUtil {
 			FileInputStream fileInput = new FileInputStream(file);
 			properties = new Properties();
 			properties.load(fileInput);
+			
 			fileInput.close();
 			
 		} catch (Exception e) {
@@ -68,6 +69,13 @@ public class EdoPropertyUtil {
 
 	public static String getProperty(String name) {
 		try {
+			if(name.equals(HOST_NAME) || name.equals(HOST_NAME_RELIANCE)) {
+				return "https://test.edofox.com/";
+			}
+			if(name.equals(HOST_URL)) {
+				return "https://test.edofox.com:8443/edofox/service/";
+			}
+			
 			return StringUtils.trimToEmpty(properties.getProperty(name));
 		} catch (Exception e) {
 			e.printStackTrace();

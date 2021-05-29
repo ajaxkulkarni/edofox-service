@@ -708,7 +708,7 @@ public class CommonUtils {
 			if(!StringUtils.contains(question.getQuestionImageUrl(), "http") && !StringUtils.contains(question.getQuestionImageUrl(), "https")) {
 				question.setQuestionImageUrl("http://" + question.getQuestionImageUrl());
 			}
-			LoggingUtil.logMessage("Setting question image ==> " + question.getQuestionImageUrl() + " ABS URL ==> " + absoluteUrls);
+			//LoggingUtil.logMessage("Setting question image ==> " + question.getQuestionImageUrl() + " ABS URL ==> " + absoluteUrls);
 			return;
 		}
 		
