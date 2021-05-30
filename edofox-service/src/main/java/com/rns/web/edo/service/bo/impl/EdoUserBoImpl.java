@@ -631,8 +631,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					
 					//Set admin reset value and time left
+					//If Admin reset is set, override the time constraint calculated time left value and use admin set value 30/05/21
 					result.setAdminReset(adminReset);
-					if(adminReset != null && adminReset == 1 && timeLeft != null && timeLeft > 0 && result.getMinLeft() == null && result.getSecLeft() == null) {
+					if(adminReset != null && adminReset == 1 && timeLeft != null && timeLeft > 0 /*&& result.getMinLeft() == null && result.getSecLeft() == null*/) {
 						result.setSecLeft(timeLeft.longValue() % 60); //seconds left
 						result.setMinLeft(timeLeft.longValue() / 60);
 					}
