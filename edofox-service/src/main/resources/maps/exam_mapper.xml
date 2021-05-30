@@ -183,10 +183,10 @@
 	</select>
 	
 	<select id="getExamSolved" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		select * from test_questions_map join test_result on test_questions_map.question_id = test_result.question_id
-		where
-		test_questions_map.test_id = ${test.id} 
-		AND student_id = ${student.id}
+		select * from test_result join test_questions_map 
+		on test_result.question_id = test_questions_map.question_id 	
+		and test_result.test_id = test_questions_map.test_id
+		where test_result.test_id = ${test.id} and test_result.student_id = ${student.id}
 		AND question_disabled = 0 order by test_result.question_number asc
 		
 	</select>
