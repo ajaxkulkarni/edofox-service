@@ -50,6 +50,7 @@ public class EdoTest {
 	private Integer pauseTimeout;
 	private Integer maxStarts;
 	private Integer packageId;
+	private Integer showAnswerKey;
 	
 	public EdoTest() {
 		
@@ -338,6 +339,14 @@ public class EdoTest {
 
 	public void setPackageId(Integer packageId) {
 		this.packageId = packageId;
+	}
+
+	public Integer getShowAnswerKey() {
+		return showAnswerKey;
+	}
+
+	public void setShowAnswerKey(Integer showAnswerKey) {
+		this.showAnswerKey = showAnswerKey;
 	}
 	
 }
