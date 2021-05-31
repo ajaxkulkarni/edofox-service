@@ -353,7 +353,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setDeviceInfo(StringUtils.substring(req.getTest().getDeviceInfo(), 0, 100));
 					test.setLocationLat(req.getTest().getLocationLat());
 					test.setLocationLong(req.getTest().getLocationLong());
-					testsDao.saveTestStatus(request);
+					//TODO Add later testsDao.saveTestStatus(request);
 				} else {
 					//Update test status for timestamp and exam started count
 					EdoServiceRequest request = new EdoServiceRequest();
@@ -367,7 +367,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						test.setLocationLong(req.getTest().getLocationLong());
 					}
 					request.setTest(test);
-					testsDao.updateTestStatus(request);
+					//TODO ADD later testsDao.updateTestStatus(request);
 					if(studentMap.getStartedCount() != null) {
 						startedCount = studentMap.getStartedCount();
 					}
