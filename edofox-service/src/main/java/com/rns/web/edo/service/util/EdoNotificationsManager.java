@@ -208,17 +208,24 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 					LoggingUtil.logMessage("Found " + mailers + " mailers ", LoggingUtil.emailLogger);
 				}
 			} else if (feedback != null) {
-				EdoServiceRequest req = new EdoServiceRequest();
-				req.setFeedback(feedback);
-				feedbackData = testsDao.getFeedbackDetails(req);
-				if(feedbackData != null && feedbackData.getFeedback() != null) {
-					feedbackData.getFeedback().setVideoId(feedback.getVideoId());
-					feedbackData.getFeedback().setQuestionId(feedback.getQuestionId());
-					feedbackData.getFeedback().setId(feedback.getId());
-					bodyText = CommonUtils.prepareFeedbackNotification(bodyText, feedbackData, null);
-					devices = testsDao.getStudentDevicesForDoubt(feedback);
-					mailers = testsDao.getStudentContactsForDoubt(feedback);
+				
+				//Check if its academic feedback or helpdesk ticket
+				if(StringUtils.equals(notificationType, EdoConstants.MAIL_TYPE_TICKET_ACK) || StringUtils.equals(notificationType, EdoConstants.MAIL_TYPE_TICKET_REPLY)) {
+					
+				} else {
+					EdoServiceRequest req = new EdoServiceRequest();
+					req.setFeedback(feedback);
+					feedbackData = testsDao.getFeedbackDetails(req);
+					if(feedbackData != null && feedbackData.getFeedback() != null) {
+						feedbackData.getFeedback().setVideoId(feedback.getVideoId());
+						feedbackData.getFeedback().setQuestionId(feedback.getQuestionId());
+						feedbackData.getFeedback().setId(feedback.getId());
+						bodyText = CommonUtils.prepareFeedbackNotification(bodyText, feedbackData, null);
+						devices = testsDao.getStudentDevicesForDoubt(feedback);
+						mailers = testsDao.getStudentContactsForDoubt(feedback);
+					}
 				}
+				
 			} else if (institute != null) {
 				if(StringUtils.isBlank(institute.getName())) {
 					institute = testsDao.getInstituteById(institute.getId());
