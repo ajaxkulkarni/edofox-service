@@ -69,7 +69,7 @@
 		<constructor-arg ref="dataSource" />
 	</bean>
 
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url" value="${db.jdbcurl}" />
@@ -86,7 +86,9 @@
 			value="20" /> <property name="maxIdle" value="20" /> <property name="minIdle" 
 			value="0" /> -->
 		<property name="initialSize" value="100" />
-		<property name="maxActive" value="5000" />
+		<!-- <property name="maxActive" value="5000" />
+		 -->
+		<property name="maxTotal" value="1000" />
 		<property name="maxIdle" value="300" />
 		<property name="minIdle" value="100" />
 	</bean>
