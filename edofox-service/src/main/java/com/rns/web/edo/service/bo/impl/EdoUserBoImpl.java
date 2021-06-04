@@ -258,7 +258,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						subReq.setTest(test);
 						subReq.setStudent(request.getStudent());
 						subReq.setQuestion(question);
-						question.setAnswerFiles(testsDao.getAnswerFiles(request));
+						question.setAnswerFiles(testsDao.getAnswerFiles(subReq));
 					}
 					
 				}
