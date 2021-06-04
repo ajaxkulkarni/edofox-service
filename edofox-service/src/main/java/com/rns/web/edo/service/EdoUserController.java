@@ -75,7 +75,8 @@ public class EdoUserController {
 		try {
 			response =  userBo.getTestResult(request);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, EdoConstants.ERROR_IN_PROCESSING));
 		}
 		//LoggingUtil.logMessage("Get Test result Response");
 		return response;
