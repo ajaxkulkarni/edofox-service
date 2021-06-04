@@ -2858,7 +2858,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		return response;
 	}
 	
-	public EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId) {
+	public EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId, Integer questionId) {
 		EdoApiStatus status = new EdoApiStatus();
 		Session session = null;
 		try {
@@ -2880,6 +2880,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					EdoAnswerFileEntity answerFileEntity = new EdoAnswerFileEntity();
 					answerFileEntity.setTestId(testId);
 					answerFileEntity.setStudentId(studentId);
+					answerFileEntity.setQuestionId(questionId);
 					answerFileEntity.setCreatedDate(new Date());
 					session.persist(answerFileEntity);
 					String fileName = answerFileEntity.getId() +  "_" + bodyPart.getContentDisposition().getFileName();

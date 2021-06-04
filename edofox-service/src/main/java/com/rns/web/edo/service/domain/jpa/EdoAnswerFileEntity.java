@@ -40,7 +40,8 @@ public class EdoAnswerFileEntity {
 	private BigDecimal correctionMarks;
 	@Column(name = "evaluator", unique = true)
 	private Integer evaluator;
-	
+	@Column(name = "question_id", unique = true)
+	private Integer questionId;
 	
 	public Date getCreatedDate() {
 		return createdDate;
@@ -101,5 +102,11 @@ public class EdoAnswerFileEntity {
 	}
 	public void setEvaluator(Integer evaluator) {
 		this.evaluator = evaluator;
+	}
+	public void setQuestionId(Integer questionId) {
+		this.questionId = questionId;
+	}
+	public Integer getQuestionId() {
+		return questionId;
 	}
 }

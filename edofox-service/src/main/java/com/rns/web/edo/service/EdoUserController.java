@@ -793,9 +793,10 @@ public class EdoUserController {
 	public EdoApiStatus uploadFiles2(@FormDataParam("tags") String tags,
 			@FormDataParam("files") List<FormDataBodyPart> bodyParts,
 			@FormDataParam("files") FormDataContentDisposition fileDispositions,
-			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId) {
+			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId, 
+			@FormDataParam("questionId") Integer questionId) {
 
-		return userBo.uploadAnswers(bodyParts, testId, studentId);
+		return userBo.uploadAnswers(bodyParts, testId, studentId, questionId);
 	}
 	
 	@Path("/uploadAnswersAndroid")
@@ -805,9 +806,10 @@ public class EdoUserController {
 	public EdoApiStatus uploadAnswersAndroid(@FormDataParam("tags") String tags,
 			@FormDataParam("files[]") List<FormDataBodyPart> bodyParts,
 			@FormDataParam("files[]") FormDataContentDisposition fileDispositions,
-			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId) {
+			@FormDataParam("testId") Integer testId, @FormDataParam("studentId") Integer studentId,
+			@FormDataParam("questionId") Integer questionId) {
 
-		return userBo.uploadAnswers(bodyParts, testId, studentId);
+		return userBo.uploadAnswers(bodyParts, testId, studentId, questionId);
 	}
 	
 	@POST

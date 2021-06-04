@@ -219,6 +219,9 @@
 	
 	<select id="getAnswerFiles" resultMap="answerFiles" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		SELECT * from exam_answer_files where  exam_id = ${test.id} AND student_id = ${student.id} 
+		<if test="question != null">
+			AND question_id = ${question.id}
+		</if>
 	</select>
 	
 	<select id="getStudentTestActivity" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="testAnswersMap" >

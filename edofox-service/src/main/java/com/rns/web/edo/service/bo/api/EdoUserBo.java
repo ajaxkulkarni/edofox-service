@@ -60,7 +60,7 @@ public interface EdoUserBo {
 	EdoServiceResponse createVideoLecture(EdoServiceRequest request);
 	EdoServiceResponse getFeedbackDetails(EdoServiceRequest request);
 	EdoServiceResponse getUploadedAnswers(EdoServiceRequest request);
-	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId);
+	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId, Integer questionId);
 	EdoServiceResponse getAppVersion(EdoServiceRequest request);
 	EdoApiStatus updateProfile(EdoServiceRequest request);
 	EdoServiceResponse matchFaces(EdoServiceRequest request, InputStream file, FormDataContentDisposition fileDetails);
