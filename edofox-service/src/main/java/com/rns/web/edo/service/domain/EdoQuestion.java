@@ -7,6 +7,8 @@ import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class EdoQuestion {
@@ -64,6 +66,7 @@ public class EdoQuestion {
 	private Date activityTime;
 	private String deviceInfo;
 	private String device;
+	private List<EdoAnswerFileEntity> answerFiles;
 	
 	public String getOption1() {
 		return option1;
@@ -386,6 +389,12 @@ public class EdoQuestion {
 	}
 	public void setDevice(String device) {
 		this.device = device;
+	}
+	public List<EdoAnswerFileEntity> getAnswerFiles() {
+		return answerFiles;
+	}
+	public void setAnswerFiles(List<EdoAnswerFileEntity> answerFiles) {
+		this.answerFiles = answerFiles;
 	}
 
 }

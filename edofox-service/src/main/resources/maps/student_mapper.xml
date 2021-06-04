@@ -688,4 +688,11 @@
 	</if>
 	
 	</select>
+	
+	<select id="getTicketDetails" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest" resultMap="feedbackData">
+	SELECT student.name,student.email,tickets.ticket_number,tickets.comment,tickets.attachment,tickets.status,test.test_name FROM tickets
+	join student on tickets.student_id = student.id
+	left join test on tickets.test_id = test.test_id
+	where tickets.id = 1
+	</select>
 </mapper>

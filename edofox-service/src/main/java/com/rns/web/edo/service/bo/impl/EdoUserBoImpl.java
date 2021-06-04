@@ -241,8 +241,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				
-				test.getTest().add(question);
-				
 				//Calculate mcq parameters
 				if(test != null && StringUtils.equals(test.getTestUi(), EdoConstants.QUESTION_TYPE_DESCRIPTIVE)) {
 					if(!StringUtils.equals(EdoConstants.QUESTION_TYPE_DESCRIPTIVE, question.getType())) {
@@ -254,8 +252,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							mcqWrong++;
 							mcqMarks = mcqMarks.add(question.getMarks());
 						}
+					} else {
+						//Load subjective answers question wise
+						EdoServiceRequest subReq = new EdoServiceRequest();
+						subReq.setTest(test);
+						subReq.setStudent(request.getStudent());
+						subReq.setQuestion(question);
+						question.setAnswerFiles(testsDao.getAnswerFiles(request));
 					}
+					
 				}
+				
+				test.getTest().add(question);
+				
 				
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
@@ -272,6 +281,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					score = score.subtract(new BigDecimal(question.getNegativeMarks()));
 				}
 				subjectWiseScore.put(question.getSubject(), score);*/
+				
+				
+				
 			}
 			
 			//Fetch video lectures for test (if any)
