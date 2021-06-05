@@ -87,7 +87,7 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse getTest(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Get Test Request :" + request, LoggingUtil.requestLogger);
+		//LoggingUtil.logMessage("Get Test Request :" + request, LoggingUtil.requestLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			response =  userBo.getTest(request);

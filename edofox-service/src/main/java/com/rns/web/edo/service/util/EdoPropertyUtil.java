@@ -50,19 +50,35 @@ public class EdoPropertyUtil {
 	public static final String APP_VERSION = "edofox.app.version";
 	public static final String DOWNLOAD_EXAM = "download.exam";
 	
+	private static Properties properties;
+	
+	static {
+		try {
+			
+			File file = new File(PROPERTIES_PATH);
+			FileInputStream fileInput = new FileInputStream(file);
+			properties = new Properties();
+			properties.load(fileInput);
+			
+			fileInput.close();
+			
+		} catch (Exception e) {
+			//LoggingUtil.logError(message);
+			e.printStackTrace();
+		}
+	}
+	
+	
 
 	public static String getProperty(String name) {
 		try {
-			File file = new File(PROPERTIES_PATH);
+			/*File file = new File(PROPERTIES_PATH);
 			FileInputStream fileInput = new FileInputStream(file);
 			Properties properties = new Properties();
 			properties.load(fileInput);
-			fileInput.close();
-
+			fileInput.close();*/
 			return StringUtils.trimToEmpty(properties.getProperty(name));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
