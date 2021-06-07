@@ -25,6 +25,8 @@ public class EdoQuestionDetails {
 	private String moderator_difficulty_level;
 	private List<EdoQuestionCriteria> criterias;
 	private EdoQuestionDifficulty difficulty;
+	private String question_criteria_name;
+	private String question_type_name;
 	
 	public String getTopics() {
 		return topics;
@@ -151,6 +153,18 @@ public class EdoQuestionDetails {
 	}
 	public void setOperator_id(int operator_id) {
 		this.operator_id = operator_id;
+	}
+	public String getQuestion_criteria_name() {
+		return question_criteria_name;
+	}
+	public void setQuestion_criteria_name(String question_criteria_name) {
+		this.question_criteria_name = question_criteria_name;
+	}
+	public String getQuestion_type_name() {
+		return question_type_name;
+	}
+	public void setQuestion_type_name(String question_type_name) {
+		this.question_type_name = question_type_name;
 	}
 	
 

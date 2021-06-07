@@ -53,7 +53,12 @@
 		<result column="setter_difficulty_level" property="question.details.setter_difficulty_level"/>
 		<result column="setter_criteria" property="question.details.setter_criteria"/>
 		<result column="topic_id" property="question.topicId"/>
+		<result column="topic_name" property="question.topicName"/>
 		<result column="subject_id" property="question.subjectId"/>
+		<result column="question_difficulty_level" property="question.details.difficulty.difficulty"/>
+		<result column="criteria" property="question.details.question_criteria_name"/>
+		<result column="que_type" property="question.details.question_type_name"/>
+		
 		<!-- <result column="board_id" property="board_id"/>
 		<result column="class_id" property="class_id"/> -->
 		
@@ -61,7 +66,7 @@
 
 
 	<select id="getExam" resultMap="testQuestionsMap" parameterType="Integer">
-		SELECT *,test_questions.status as qStatus FROM test
+		SELECT *,test_questions.status as qStatus,question_difficulty_level.level as question_difficulty_level FROM test
 		join test_questions_map on test.test_id =
 		test_questions_map.test_id
 		join test_questions on
@@ -72,6 +77,14 @@
 		on test_questions.chapter = chapters.id
 		left join questions_details
 		on test_questions.id = questions_details.question_id
+		LEFT JOIN question_criteria
+        ON question_criteria.id = questions_details.setter_criteria
+        LEFT JOIN question_type
+        ON question_type.id = questions_details.setter_question_type
+        LEFT JOIN question_difficulty_level
+        ON question_difficulty_level.id = questions_details.setter_difficulty_level
+		LEFT JOIN topics
+        ON test_questions.topic_id = topics.id
 		where
 		test.test_id = ${value} 
 		AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)
