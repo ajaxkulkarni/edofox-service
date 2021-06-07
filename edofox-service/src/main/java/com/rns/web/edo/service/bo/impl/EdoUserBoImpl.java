@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,12 +32,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.clickntap.vimeo.VimeoResponse;
-import com.coremedia.iso.boxes.CompositionTimeToSample.Entry;
 import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
@@ -3376,6 +3373,29 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			edoServiceResponse.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
 		}
 		return edoServiceResponse;
+	}
+
+	public EdoServiceResponse saveSubjectiveAnswer(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		Session session = null;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			EdoAnswerFileEntity answerFileEntity = new EdoAnswerFileEntity();
+			answerFileEntity.setTestId(request.getTest().getId());
+			answerFileEntity.setStudentId(request.getStudent().getId());
+			answerFileEntity.setQuestionId(request.getQuestion().getId());
+			answerFileEntity.setCreatedDate(new Date());
+			//answerFileEntity.setFileUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyPart.getContentDisposition().getType(), "answerFilesEdofox"));
+			answerFileEntity.setFileUrl(request.getFilePath());
+			session.persist(answerFileEntity);
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return response;
 	}
 
 }

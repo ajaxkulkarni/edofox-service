@@ -61,6 +61,7 @@ public interface EdoUserBo {
 	EdoServiceResponse getFeedbackDetails(EdoServiceRequest request);
 	EdoServiceResponse getUploadedAnswers(EdoServiceRequest request);
 	EdoApiStatus uploadAnswers(List<FormDataBodyPart> bodyParts, Integer testId, Integer studentId, Integer questionId);
+	EdoServiceResponse saveSubjectiveAnswer(EdoServiceRequest request);
 	EdoServiceResponse getAppVersion(EdoServiceRequest request);
 	EdoApiStatus updateProfile(EdoServiceRequest request);
 	EdoServiceResponse matchFaces(EdoServiceRequest request, InputStream file, FormDataContentDisposition fileDetails);
@@ -72,4 +73,5 @@ public interface EdoUserBo {
 	
 	//TODO To be removed
 	EdoApiStatus saveTestNoCommit(EdoServiceRequest request);
+	
 }

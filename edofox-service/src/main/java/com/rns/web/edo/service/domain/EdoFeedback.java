@@ -34,6 +34,7 @@ public class EdoFeedback {
 	private String askedBy;
 	private Date lastUpdated;
 	private String questionText;
+	private String ticketId;
 	
 	public String getFeedback() {
 		return feedback;
@@ -184,6 +185,12 @@ public class EdoFeedback {
 	}
 	public void setQuestionText(String questionText) {
 		this.questionText = questionText;
+	}
+	public String getTicketId() {
+		return ticketId;
+	}
+	public void setTicketId(String ticketId) {
+		this.ticketId = ticketId;
 	}
 	
 

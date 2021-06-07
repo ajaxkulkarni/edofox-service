@@ -813,6 +813,14 @@ public class EdoUserController {
 		return userBo.uploadAnswers(bodyParts, testId, studentId, questionId);
 	}
 	
+	@Path("/saveSubjectiveAnswer")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse saveSubjectiveAnswer(EdoServiceRequest request) {
+		return userBo.saveSubjectiveAnswer(request);
+	}
+	
 	@POST
 	@Path("/getUploadedAnswers")
 	@Produces(MediaType.APPLICATION_JSON)
