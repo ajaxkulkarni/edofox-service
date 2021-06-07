@@ -49,6 +49,14 @@
 		<result column="chapter_name" property="question.chapter.chapterName" />
 		<result column="level" property="question.level" />
 		<result column="moderator_difficulty_level" property="question.details.moderator_difficulty_level"/>
+		<result column="setter_question_type" property="question.details.setter_question_type"/>
+		<result column="setter_difficulty_level" property="question.details.setter_difficulty_level"/>
+		<result column="setter_criteria" property="question.details.setter_criteria"/>
+		<result column="topic_id" property="question.topicId"/>
+		<result column="subject_id" property="question.subjectId"/>
+		<!-- <result column="board_id" property="board_id"/>
+		<result column="class_id" property="class_id"/> -->
+		
 	</resultMap>
 
 
