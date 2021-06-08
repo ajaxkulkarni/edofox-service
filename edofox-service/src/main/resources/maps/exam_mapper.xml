@@ -163,6 +163,7 @@
 		<result column="show_result" property="test.showResult" />
 		<result column="show_question_paper" property="test.showQuestionPaper"/>
 		<result column="show_answer_key" property="test.showAnswerKey"/>
+		<result column="random_questions" property="test.randomQuestions"/>
 		<result column="test_ui" property="test.testUi"/>
 		<result column="time_taken" property="question.timeSpent" />
 		<result column="status" property="question.status"/>
