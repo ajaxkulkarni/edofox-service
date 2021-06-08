@@ -665,7 +665,8 @@ public class CommonUtils {
 */		
 		//String languageCode = RakeLanguages.EN;
 		//System.out.println("Physics".compareTo("Physics"));
-		System.out.println(prepareUrl("uploads/questions/1613197900_13c63982a46c0f5a434d.png"));
+		//System.out.println(prepareUrl("uploads/questions/1613197900_13c63982a46c0f5a434d.png"));
+		System.out.println(CommonUtils.calculatePercentile(117, 68));
 	}
 	
 	public static void setQuestionURLs(EdoQuestion question) {
@@ -969,7 +970,7 @@ public class CommonUtils {
 		if(rankDifference <= 0) {
 			return BigDecimal.ZERO;
 		} else {
-			BigDecimal division = new BigDecimal(rankDifference).divide(new BigDecimal(studentsAppeared), 2, RoundingMode.HALF_UP);
+			BigDecimal division = new BigDecimal(rankDifference).divide(new BigDecimal(studentsAppeared), 4, RoundingMode.HALF_UP);
 			return division.multiply(new BigDecimal(100));
 		}
 	}
