@@ -58,7 +58,10 @@
 		<result column="question_difficulty_level" property="question.details.difficulty.difficulty"/>
 		<result column="criteria" property="question.details.question_criteria_name"/>
 		<result column="que_type" property="question.details.question_type_name"/>
-		
+		<result column="class_id" property="question.class_id"/>
+		<result column="board_id" property="question.board_id"/>
+		<result column="class_name" property="question.className"/>
+		<result column="board_name" property="question.boardName"/>
 		<!-- <result column="board_id" property="board_id"/>
 		<result column="class_id" property="class_id"/> -->
 		
@@ -85,6 +88,11 @@
         ON question_difficulty_level.id = questions_details.setter_difficulty_level
 		LEFT JOIN topics
         ON test_questions.topic_id = topics.id
+        LEFT JOIN class
+        on test_questions.class_id = class.id
+        LEFT JOIN boards
+        on test_questions.board_id = boards.id
+        
 		where
 		test.test_id = ${value} 
 		AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)

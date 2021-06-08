@@ -60,6 +60,8 @@ public class EdoQuestion {
 	private Integer topicId;
 	private Integer board_id;
 	private Integer class_id;
+	private String className;
+	private String boardName;
 	private String short_explanation;
 	private String topicName;
 	private String subjectwise_question_number;
@@ -392,6 +394,18 @@ public class EdoQuestion {
 	}
 	public void setShortExplainationImageUrl(String shortExplainationImageUrl) {
 		this.shortExplainationImageUrl = shortExplainationImageUrl;
+	}
+	public String getClassName() {
+		return className;
+	}
+	public void setClassName(String className) {
+		this.className = className;
+	}
+	public String getBoardName() {
+		return boardName;
+	}
+	public void setBoardName(String boardName) {
+		this.boardName = boardName;
 	}
 
 }
