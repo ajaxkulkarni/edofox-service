@@ -178,10 +178,20 @@
 		<result column="moderator_criteria" property="question.details.moderator_criteria"/>
 		<result column="moderator_difficulty_level" property="question.details.moderator_difficulty_level"/>
 		
+		<result column="question_difficulty_level" property="question.details.difficulty.difficulty"/>
+		<result column="criteria" property="question.details.question_criteria_name"/>
+		<result column="que_type" property="question.details.question_type_name"/>
+		<result column="class_id" property="question.class_id"/>
+		<result column="board_id" property="question.board_id"/>
+		<result column="class_name" property="question.className"/>
+		<result column="board_name" property="question.boardName"/>
+		
 	</resultMap>
 	
 	<select id="getExamResult" resultMap="testAnswersMap" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
-		SELECT *,test_result.id as mapId,test_result.flagged as reviewed, test_questions.status as questionStatus FROM test 
+		SELECT *,test_result.id as mapId,test_result.flagged as reviewed, test_questions.status as questionStatus,
+		question_difficulty_level.level as question_difficulty_level
+		FROM test 
 		join test_questions_map on test.test_id = test_questions_map.test_id
 		join test_questions on test_questions_map.question_id = test_questions.id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
@@ -190,6 +200,17 @@
 		left join topics on test_questions.topic_id = topics.id
 		left join test_status on test.test_id = test_status.test_id
 		left join test_result on test.test_id = test_result.test_id AND test_status.student_id = test_result.student_id AND test_questions.id = test_result.question_id
+		LEFT JOIN question_criteria
+        ON question_criteria.id = questions_details.setter_criteria
+        LEFT JOIN question_type
+        ON question_type.id = questions_details.setter_question_type
+        LEFT JOIN question_difficulty_level
+        ON question_difficulty_level.id = questions_details.setter_difficulty_level
+        LEFT JOIN class
+        on test_questions.class_id = class.id
+        LEFT JOIN boards
+        on test_questions.board_id = boards.id
+		
 		where
 		test.test_id = ${test.id} 
 		<if test="requestType != 'Solution'">
