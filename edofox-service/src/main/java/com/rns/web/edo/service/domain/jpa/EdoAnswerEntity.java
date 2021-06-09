@@ -44,6 +44,8 @@ public class EdoAnswerEntity {
 	private Integer questionNumber;
 	@Column(name = "ttl")
 	private Integer ttl;
+	@Column(name = "files_uploaded")
+	private Integer filesUploaded;
 	
 	
 	public Date getCreatedDate() {
@@ -117,5 +119,11 @@ public class EdoAnswerEntity {
 	}
 	public Integer getTtl() {
 		return ttl;
+	}
+	public void setFilesUploaded(Integer filesUploaded) {
+		this.filesUploaded = filesUploaded;
+	}
+	public Integer getFilesUploaded() {
+		return filesUploaded;
 	}
 }

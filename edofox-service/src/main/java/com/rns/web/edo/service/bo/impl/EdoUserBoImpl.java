@@ -934,6 +934,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			answer.setTtl(request.getQuestion().getTtl());
 		}
 		
+		if(request.getQuestion().getFilesUploaded() != null) {
+			if(answer.getFilesUploaded() == null) {
+				answer.setFilesUploaded(0);
+			}
+			answer.setFilesUploaded(answer.getFilesUploaded() + request.getQuestion().getFilesUploaded());
+		}
+		
 		if(answer.getId() == null) {
 			session.persist(answer);
 		}
@@ -1629,6 +1636,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					q.setAnswer(answer.getOptionSelected());
 					if(StringUtils.isNotBlank(answer.getOptionSelected())) {
 						solvedCount ++;
+					} else if (answer.getFilesUploaded() != null && answer.getFilesUploaded() > 0) {
+						solvedCount ++;
 					}
 					if(StringUtils.contains(answer.getOptionSelected(), "-")) {
 						EdoQuestion original = testsDao.getQuestion(answer.getQuestionId());
@@ -1638,6 +1647,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					q.setTimeSpent(answer.getTimeTaken());
 					q.setFlagged(answer.getFlagged());
+					q.setFilesUploaded(answer.getFilesUploaded());
 					solved.add(q);
 				}
 				test.setTest(solved);
@@ -3389,6 +3399,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			//answerFileEntity.setFileUrl(EdoAwsUtil.uploadToAws(fileName, null, bodyPartEntity.getInputStream(), bodyPart.getContentDisposition().getType(), "answerFilesEdofox"));
 			answerFileEntity.setFileUrl(request.getFilePath());
 			session.persist(answerFileEntity);
+			//Save Answer entity
+			request.getQuestion().setQn_id(request.getQuestion().getId());
+			request.getQuestion().setFilesUploaded(1);
+			saveAnswer(request, session);
 			tx.commit();
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));

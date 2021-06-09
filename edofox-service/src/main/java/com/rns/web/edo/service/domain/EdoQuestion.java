@@ -67,6 +67,7 @@ public class EdoQuestion {
 	private String deviceInfo;
 	private String device;
 	private List<EdoAnswerFileEntity> answerFiles;
+	private Integer filesUploaded;
 	
 	public String getOption1() {
 		return option1;
@@ -395,6 +396,12 @@ public class EdoQuestion {
 	}
 	public void setAnswerFiles(List<EdoAnswerFileEntity> answerFiles) {
 		this.answerFiles = answerFiles;
+	}
+	public Integer getFilesUploaded() {
+		return filesUploaded;
+	}
+	public void setFilesUploaded(Integer filesUploaded) {
+		this.filesUploaded = filesUploaded;
 	}
 
 }
