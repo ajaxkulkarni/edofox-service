@@ -436,19 +436,23 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//List<EdoTestQuestionMap> map = testsDao.getExam(testId);
 			
-			SQLQuery query = session.createSQLQuery("SELECT test.test_id,test_questions.status as qStatus FROM test" +
-		" join test_questions_map on test.test_id =" +
-		" test_questions_map.test_id" +
-		" join test_questions on" +
-		" test_questions_map.question_id = test_questions.id" +
-		" join test_subjects" +
-		" on test_questions.subject_id = test_subjects.subject_id" +
-		" left join chapters" +
-		" on test_questions.chapter = chapters.id" +
-		" where" +
-		" test.test_id =:testId" + 
-		" AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)" +
-		" order by test_questions_map.question_number,test_questions_map.id asc");
+			SQLQuery query = session.createSQLQuery("SELECT test_questions_map.question_id,question,option1,option2,option3,option4,option5,test_subjects.subject, " +
+					"test_questions.status as qStatus,question_img_url,option1_img_url,option2_img_url,option3_img_url,option4_img_url, " +
+					"test_questions.question_type,meta_data,meta_data_img_url,test_questions_map.section,test_questions_map.question_number, " +
+					"test_questions_map.weightage,test_questions_map.negative_marks,test_questions.correct_answer,alt_answer,partial,solution, " +
+					"solution_img_url,test_questions.chapter,chapters.chapter_name,test_questions.level FROM test" +
+					" join test_questions_map on test.test_id =" +
+					" test_questions_map.test_id" +
+					" join test_questions on" +
+					" test_questions_map.question_id = test_questions.id" +
+					" join test_subjects" +
+					" on test_questions.subject_id = test_subjects.subject_id" +
+					" left join chapters" +
+					" on test_questions.chapter = chapters.id" +
+					" where" +
+					" test.test_id =:testId" + 
+					" AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)" +
+					" order by test_questions_map.question_number,test_questions_map.id asc");
 			query.setInteger("testId", testId);
 			
 			List list = query.list();
