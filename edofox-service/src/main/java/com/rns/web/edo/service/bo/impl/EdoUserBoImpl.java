@@ -25,17 +25,16 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import com.clickntap.vimeo.VimeoResponse;
-import com.coremedia.iso.boxes.CompositionTimeToSample.Entry;
 import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
@@ -80,7 +79,6 @@ import com.rns.web.edo.service.util.EdoFaceDetection;
 import com.rns.web.edo.service.util.EdoImageUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
-import com.rns.web.edo.service.util.EdoMyBatisUtil;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
@@ -300,9 +298,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			return response;
 		}
 		
+		Session session = null;
+		
 		try {
 			
-			EdoTest result = testsDao.getTest(testId);
+			session = this.sessionFactory.openSession();
+			
+			/*EdoTest result = testsDao.getTest(testId);
 			if(result == null) {
 				response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 				return response;
@@ -423,19 +425,38 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					response.setStatus(new EdoApiStatus(-111, "This feature is disabled at this moment. Please try again later."));
 					return response;
 				}
-			}
+			}*/
+			
+			
 			
 			initTime = System.currentTimeMillis() - time0;
 			time0 = System.currentTimeMillis();
 			
 			fetchQueryTime = System.currentTimeMillis();
 			
-			List<EdoTestQuestionMap> map = testsDao.getExam(testId);
+			//List<EdoTestQuestionMap> map = testsDao.getExam(testId);
+			
+			SQLQuery query = session.createSQLQuery("SELECT test.test_id,test_questions.status as qStatus FROM test" +
+		" join test_questions_map on test.test_id =" +
+		" test_questions_map.test_id" +
+		" join test_questions on" +
+		" test_questions_map.question_id = test_questions.id" +
+		" join test_subjects" +
+		" on test_questions.subject_id = test_subjects.subject_id" +
+		" left join chapters" +
+		" on test_questions.chapter = chapters.id" +
+		" where" +
+		" test.test_id =:testId" + 
+		" AND (test_questions_map.question_disabled is NULL or test_questions_map.question_disabled = 0)" +
+		" order by test_questions_map.question_number,test_questions_map.id asc");
+			query.setInteger("testId", testId);
+			
+			List list = query.list();
 			
 			fetchQueryTime = System.currentTimeMillis() - fetchQueryTime;
 			
 			//Check for random pool property..if set to 1, random questions need to be picked out of total questions added
-			Map<String, Integer> examQuestionCount = null;
+			/*Map<String, Integer> examQuestionCount = null;
 			Map<String, List<EdoQuestion>> solvedSet = null;
 			
 			if(CollectionUtils.isNotEmpty(map)) {
@@ -636,7 +657,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					
 				}
 				response.setTest(result);
-			}
+			}*/
 			
 			processTime = System.currentTimeMillis() - time0;
 			
@@ -645,6 +666,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
 		
 		return response;
