@@ -202,6 +202,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			int mcqSolved = 0, mcqCorrect = 0, mcqWrong = 0; 
 			BigDecimal mcqMarks = BigDecimal.ZERO;
+			int questionAnswersFound = 0;
 
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
@@ -257,7 +258,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						EdoQuestion q = new EdoQuestion();
 						q.setId(question.getQn_id());
 						subReq.setQuestion(q);
-						question.setAnswerFiles(testsDao.getAnswerFiles(subReq));
+						List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(subReq);
+						question.setAnswerFiles(answerFiles);
+						if(CollectionUtils.isNotEmpty(answerFiles)) {
+							questionAnswersFound = questionAnswersFound++;
+						}
+						
 					}
 					
 				}
@@ -289,19 +295,24 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			response.setLectures(testsDao.getTestVideoLectures(test.getId()));
 			
 			if(test != null && StringUtils.equals(test.getTestUi(), "DESCRIPTIVE")) {
-				List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
-				if(CollectionUtils.isNotEmpty(answerFiles)) {
-					if(test.getSolvedCount() == null) {
-						test.setSolvedCount(answerFiles.size());
-					}
-					for(EdoAnswerFileEntity file: answerFiles) {
-						file.setFileUrl(file.getFileUrl() + "?ver=" + System.currentTimeMillis());
-						if(StringUtils.isNotBlank(file.getCorrectionUrl())) {
-							file.setCorrectionUrl(file.getCorrectionUrl() + "?ver=" + System.currentTimeMillis());
+				if(questionAnswersFound == 0) {
+					List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(request);
+					if(CollectionUtils.isNotEmpty(answerFiles)) {
+						if(test.getSolvedCount() == null) {
+							test.setSolvedCount(answerFiles.size());
+						}
+						for(EdoAnswerFileEntity file: answerFiles) {
+							file.setFileUrl(file.getFileUrl() + "?ver=" + System.currentTimeMillis());
+							if(StringUtils.isNotBlank(file.getCorrectionUrl())) {
+								file.setCorrectionUrl(file.getCorrectionUrl() + "?ver=" + System.currentTimeMillis());
+							}
 						}
 					}
+					test.setAnswerFiles(answerFiles);
+				} else if (test.getSolvedCount() == null) {
+					test.setSolvedCount(questionAnswersFound);
 				}
-				test.setAnswerFiles(answerFiles);
+				
 				
 				if(test.getAnalysis() == null) {
 					test.setAnalysis(new EDOTestAnalysis());
