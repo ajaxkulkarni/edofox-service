@@ -32,6 +32,11 @@ public class EdoStudent {
 	private String previousMarks;
 	private String referrer;
 	private String token;
+	private Integer districtId;
+	private Integer regionId;
+	private Integer categoryId;
+	private String regionName;
+	private String districtName;
 	
 	public EdoStudent() {
 
@@ -223,6 +228,46 @@ public class EdoStudent {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public Integer getDistrictId() {
+		return districtId;
+	}
+
+	public void setDistrictId(Integer districtId) {
+		this.districtId = districtId;
+	}
+
+	public Integer getRegionId() {
+		return regionId;
+	}
+
+	public void setRegionId(Integer regionId) {
+		this.regionId = regionId;
+	}
+
+	public Integer getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Integer categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public String getRegionName() {
+		return regionName;
+	}
+
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+
+	public String getDistrictName() {
+		return districtName;
+	}
+
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
 	}
 	
 }

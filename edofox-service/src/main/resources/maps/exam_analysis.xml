@@ -80,20 +80,45 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		<result column="email" property="email" />
 		<result column="roll_no" property="rollNo" />
 		<result column="mobile_no" property="phone"/>
-		<result column="caste_category" property="casteCategory" />
+		<result column="category_name" property="casteCategory" />
 		<result column="score" property="analysis.score" />
 		<result column="correct" property="analysis.correctCount" />
 		<result column="solved" property="analysis.solvedCount" />
 		<result column="flagged" property="analysis.flaggedCount" />
 		<result column="parent_mobile_no" property="parentMobileNo"/>
 		<result column="school_district" property="schoolDistrict"/>
+		<result column="category_id" property="categoryId"/>
+		<result column="districtId" property="districtId"/>
+		<result column="regionId" property="regionId"/>
+		<result column="institute_id" property="instituteId"/>
+		<result column="regionName" property="regionName"/>
+		<result column="districtName" property="districtName"/>
 		
 	</resultMap>
 	
 	
 	
 	<select id="getStudentResults" resultMap="students" parameterType="Integer">
-	select *,students.id as studentId,CONCAT(students.last_name,' ',students.first_name,' ',students.middle_name) as name,login_details.username as roll_no from test_status join students on test_status.student_id = students.id join login_details on login_details.student_id = students.id where test_status.test_id = ${value} 
+	select *,students.id as studentId,CONCAT(students.last_name,' ',students.first_name,' ',students.middle_name) as name,login_details.username as roll_no, 
+	IF(districts.id IS NULL,student_districts.id ,districts.id) as districtId,
+	IF(regions.id IS NULL,student_regions.id ,regions.id) as regionId,
+	IF(districts.district_name IS NULL,student_districts.district_name ,districts.district_name) as districtName,
+	IF(regions.region_name IS NULL,student_regions.region_name ,regions.region_name) as regionName
+	
+	from test_status join students on test_status.student_id = students.id 
+	join login_details on login_details.student_id = students.id 
+	LEFT JOIN categories on students.category_id = categories.id
+	LEFT JOIN institutes
+	ON institutes.id = students.institute_id
+	LEFT JOIN districts
+	ON districts.id = institutes.district_id
+	LEFT JOIN districts student_districts
+	ON student_districts.id = students.district_id
+	LEFT JOIN regions
+	ON regions.id  = districts.region_id
+	LEFT JOIN regions student_regions
+	ON student_regions.id  = student_districts.region_id
+	where test_status.test_id = ${value} 
 	order by test_status.score desc
 	</select>
 	

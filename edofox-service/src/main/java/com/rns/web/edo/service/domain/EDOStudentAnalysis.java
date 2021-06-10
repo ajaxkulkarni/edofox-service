@@ -1,8 +1,14 @@
 package com.rns.web.edo.service.domain;
 
 import java.math.BigDecimal;
+
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class EDOStudentAnalysis {
 	
 	private Integer solvedCount;
@@ -13,7 +19,57 @@ public class EDOStudentAnalysis {
 	private Integer rank;
 	private Integer totalStudents;
 	private BigDecimal percentile;
+	private Integer categoryRank;
+	private Integer districtRank;
+	private Integer districtCategoryRank;
+	private Integer regionRank;
+	private Integer regionCategoryRank;
+	private Integer instituteRank;
+	private Integer instituteCategoryRank;
 	
+	
+	public Integer getCategoryRank() {
+		return categoryRank;
+	}
+	public void setCategoryRank(Integer categoryRank) {
+		this.categoryRank = categoryRank;
+	}
+	public Integer getDistrictRank() {
+		return districtRank;
+	}
+	public void setDistrictRank(Integer districtRank) {
+		this.districtRank = districtRank;
+	}
+	public Integer getDistrictCategoryRank() {
+		return districtCategoryRank;
+	}
+	public void setDistrictCategoryRank(Integer districtCategoryRank) {
+		this.districtCategoryRank = districtCategoryRank;
+	}
+	public Integer getRegionRank() {
+		return regionRank;
+	}
+	public void setRegionRank(Integer regionRank) {
+		this.regionRank = regionRank;
+	}
+	public Integer getRegionCategoryRank() {
+		return regionCategoryRank;
+	}
+	public void setRegionCategoryRank(Integer regionCategoryRank) {
+		this.regionCategoryRank = regionCategoryRank;
+	}
+	public Integer getInstituteRank() {
+		return instituteRank;
+	}
+	public void setInstituteRank(Integer instituteRank) {
+		this.instituteRank = instituteRank;
+	}
+	public Integer getInstituteCategoryRank() {
+		return instituteCategoryRank;
+	}
+	public void setInstituteCategoryRank(Integer instituteCategoryRank) {
+		this.instituteCategoryRank = instituteCategoryRank;
+	}
 	public Integer getSolvedCount() {
 		return solvedCount;
 	}

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -265,6 +266,27 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					}
 					
 					Integer rank = 0;
+					
+					Map<Integer, Integer> categoryRanks = null;
+					Map<Integer, Integer> districtRanks = null;
+					Map<Integer, Integer> instituteRanks = null;
+					Map<Integer, Integer> regionRanks = null;
+					Map<Integer, List<EdoStudent>> regionStudents = null;
+					Map<Integer, List<EdoStudent>> instituteStudents = null;
+					Map<Integer, List<EdoStudent>> districtStudents = null;
+					
+					
+					if(StringUtils.equals(request.getRequestType(), "RANK_ANALYSIS")) {
+						categoryRanks = new HashMap<Integer, Integer>();
+						districtRanks = new HashMap<Integer, Integer>();
+						instituteRanks = new HashMap<Integer, Integer>();
+						regionRanks = new HashMap<Integer, Integer>();
+						
+						regionStudents = new HashMap<Integer, List<EdoStudent>>();
+						instituteStudents = new HashMap<Integer, List<EdoStudent>>();
+						districtStudents = new HashMap<Integer, List<EdoStudent>>();
+					}
+					
 					for(EdoStudent student: students) {
 						if(student.getAnalysis() == null) {
 							continue;
@@ -304,6 +326,50 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						if(StringUtils.equalsIgnoreCase(REQUEST_FIREBASE_UPDATE, request.getRequestType())) {
 							EdoFirebaseUtil.updateStudentResult(student, existing, institute.getFirebaseId());
 						}
+						
+						//Calculate other ranks
+						student.getAnalysis().setCategoryRank(setSpecialRanks(categoryRanks, student.getCategoryId(), null, student));
+						student.getAnalysis().setDistrictRank(setSpecialRanks(districtRanks, student.getDistrictId(), districtStudents, student));
+						student.getAnalysis().setRegionRank(setSpecialRanks(regionRanks, student.getRegionId(), regionStudents, student));
+						if(student.getInstituteId() != null) {
+							student.getAnalysis().setInstituteRank(setSpecialRanks(instituteRanks, Integer.parseInt(student.getInstituteId()), instituteStudents, student));
+						}
+						
+						
+					}
+					
+					//Set other special ranks like district category, region category, institute category etc
+					if(districtStudents != null && CollectionUtils.isNotEmpty(districtStudents.keySet())) {
+						for(Entry<Integer, List<EdoStudent>> e: districtStudents.entrySet()) {
+							if(CollectionUtils.isNotEmpty(e.getValue())) {
+								categoryRanks = new HashMap<Integer, Integer>();
+								for(EdoStudent s: e.getValue()) {
+									s.getAnalysis().setDistrictCategoryRank(setSpecialRanks(categoryRanks, s.getCategoryId(), null, s));
+								}
+							}
+						}
+					}
+					
+					if(regionStudents != null && CollectionUtils.isNotEmpty(regionStudents.keySet())) {
+						for(Entry<Integer, List<EdoStudent>> e: regionStudents.entrySet()) {
+							if(CollectionUtils.isNotEmpty(e.getValue())) {
+								categoryRanks = new HashMap<Integer, Integer>();
+								for(EdoStudent s: e.getValue()) {
+									s.getAnalysis().setRegionCategoryRank(setSpecialRanks(categoryRanks, s.getCategoryId(), null, s));
+								}
+							}
+						}
+					}
+					
+					if(instituteStudents != null && CollectionUtils.isNotEmpty(instituteStudents.keySet())) {
+						for(Entry<Integer, List<EdoStudent>> e: instituteStudents.entrySet()) {
+							if(CollectionUtils.isNotEmpty(e.getValue())) {
+								categoryRanks = new HashMap<Integer, Integer>();
+								for(EdoStudent s: e.getValue()) {
+									s.getAnalysis().setInstituteCategoryRank(setSpecialRanks(categoryRanks, s.getCategoryId(), null, s));
+								}
+							}
+						}
 					}
 				}
 			}
@@ -317,6 +383,33 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
+	}
+
+	private Integer setSpecialRanks(Map<Integer, Integer> categoryRanks, Integer differentiator, Map<Integer, List<EdoStudent>> studentSet, EdoStudent student) {
+		if(categoryRanks != null && differentiator != null) {
+			if(CollectionUtils.isEmpty(categoryRanks.keySet()) || categoryRanks.get(differentiator) == null) {
+				categoryRanks.put(differentiator, 1);
+				if(studentSet != null) {
+					List<EdoStudent> list = new ArrayList<EdoStudent>();
+					list.add(student);
+					studentSet.put(differentiator, list);
+				}
+				return 1;
+			} else {
+				int newRank = categoryRanks.get(differentiator) + 1;
+				categoryRanks.put(differentiator, newRank);
+				if(studentSet != null) {
+					List<EdoStudent> list = studentSet.get(differentiator);
+					if(list == null) {
+						list = new ArrayList<EdoStudent>();
+					}
+					list.add(student);
+					studentSet.put(differentiator, list);
+				}
+				return newRank;
+			}
+		}
+		return null;
 	}
 
 
