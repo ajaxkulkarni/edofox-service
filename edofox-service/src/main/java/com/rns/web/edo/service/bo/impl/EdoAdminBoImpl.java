@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -65,6 +66,7 @@ import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.ext.EdoImpartusResponse;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
+import com.rns.web.edo.service.domain.jpa.EdoEmailSmsLog;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
 import com.rns.web.edo.service.domain.jpa.EdoQuestionEntity;
@@ -93,7 +95,6 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.mail.iap.Response;
 
 public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
@@ -2414,5 +2415,35 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			//CommonUtils.closeSession(session);
 		}
 		return response;
+	}
+
+	public EdoApiStatus updateEmailStatus(String request, String channel) {
+		EdoApiStatus status = new EdoApiStatus();
+		Session session = null;
+		try {
+			
+			JSONObject json = new JSONObject(request);
+			if(json != null && json.has("event-data")) {
+				JSONObject eventData = json.getJSONObject("event-data");
+				if(eventData == null || !eventData.has("user-variables")) {
+					return status;
+				}
+				JSONObject userVariables = eventData.getJSONObject("user-variables");
+				if(userVariables != null && userVariables.has("my_message_id")) {
+					session = this.sessionFactory.openSession();
+					Transaction tx = session.beginTransaction();
+					session.createCriteria(EdoEmailSmsLog.class).add(Restrictions.eq("id", Integer.parseInt(userVariables.getString("my_message_id")))).list();
+					
+					
+					tx.commit();
+				}
+			}
+			
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.emailLogger);
+		} finally {
+			CommonUtils.closeSession(session);
+		}
+		return status;
 	}
 }

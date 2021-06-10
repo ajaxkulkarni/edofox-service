@@ -175,6 +175,11 @@ public class EdoNotificationsManager implements Runnable, EdoConstants {
 					} else {
 						devices = testsDao.getStudentDevicesForVideo(classworkInfo);
 						mailers = testsDao.getStudentContactsForVideo(classworkInfo);
+						if(CollectionUtils.isNotEmpty(mailers)) {
+							for(EdoStudent mailer: mailers) {
+								System.out.println(mailer.getEmail());
+							}
+						}
 					}
 					
 					bodyText = CommonUtils.prepareClassworkNotification(bodyText, classworkInfo);

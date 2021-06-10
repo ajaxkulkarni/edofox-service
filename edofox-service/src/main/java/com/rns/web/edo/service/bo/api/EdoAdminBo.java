@@ -57,5 +57,6 @@ public interface EdoAdminBo {
 	EdoServiceResponse savePackage(EdoServiceRequest request);
 	EdoServiceResponse updateEdofoxTokens(EdoServiceRequest request);
 	EdoServiceResponse getProctoringVideo(EdoServiceRequest request);
+	EdoApiStatus updateEmailStatus(String request, String string);
 	
 }

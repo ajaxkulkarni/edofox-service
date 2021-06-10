@@ -577,4 +577,27 @@ public class EdoAdminController {
 	public EdoServiceResponse getVideoProctoringRecords(EdoServiceRequest request) {
 		return adminBo.getProctoringVideo(request);
 	}
+	
+	/*
+{"signature":{"token":"91b3050780c8ee0528c01ce6cc346055f3d3667cd6ec5ca82f","timestamp":"1623307643",
+"signature":"172bfaf08c1f21e41db21fbf23d622467fb47fc4c40d48c326c88dcfc826698f"},
+"event-data":{"tags": [], "timestamp": 1623307639.353644, 
+"storage": {"url": "https://sw.api.mailgun.net/v3/domains/mg.edofox.com/messages/AgEFx6alaGzzS7dwhLZHdqNCpMxw4aXmZA==", 
+"key": "AgEFx6alaGzzS7dwhLZHdqNCpMxw4aXmZA=="}, "recipient-domain": "gmail.com", "event": "delivered", 
+"campaigns": [], "user-variables": {"my_message_id": 123}, 
+
+"flags": {"is-routed": false, "is-authenticated": true, "is-system-test": false, "is-test-mode": false}, "log-level": "info", "envelope": {"transport": "smtp", "sender": "postmaster@mg.edofox.com", "sending-ip": "209.61.151.228", "targets": "ajinkyashiva@gmail.com"}, "message": {"headers": {"to": "ajinkyashiva@gmail.com", "message-id": "1448209846.11623307649042.JavaMail.Admin@LAPTOP-3QT1KVRC", "from": "Edofox <postmaster@mg.edofox.com>", "subject": "Today's exam TESTING SMS"}, "attachments": [], "size": 14178}, "recipient": "ajinkyashiva@gmail.com", "id": "2HOVQ7URT3WCokw2xqGuoA", "delivery-status": {"tls": true, "mx-host": "gmail-smtp-in.l.google.com", "attempt-no": 1, "description": "", "session-seconds": 0.5016169548034668, "utf8": true, "code": 250, "message": "OK", "certificate-verified": true}}}
+
+	 */
+	
+	@POST
+	@Path("/emailWebHook")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoApiStatus emailWebHook(String request) {
+		
+		EdoServiceResponse response = new EdoServiceResponse();
+		System.out.println("Web hook called .... " + request);
+		return adminBo.updateEmailStatus(request, "email");
+	}
 }

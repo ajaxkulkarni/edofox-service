@@ -1,8 +1,8 @@
 package com.rns.web.edo.service.util;
 
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +20,8 @@ import javax.mail.internet.MimeMessage;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoMailer;
@@ -27,6 +29,7 @@ import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
+import com.rns.web.edo.service.domain.jpa.EdoEmailSmsLog;
 
 public class EdoMailUtil implements Runnable, EdoConstants {
 
@@ -51,6 +54,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private EdoVideoLectureMap classwork;
 	private EdoQuestion feedbackData;
 	private EdoMailer mailer;
+	private Integer instituteId;
+	private SessionFactory sessionFactory;
 	
 	public void setInstitute(EDOInstitute institute) {
 		this.institute = institute;
@@ -63,6 +68,14 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	public EdoMailUtil(String mailType) {
 		this.type = mailType;
 	}
+	
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+	
+	public void setInstituteId(Integer instituteId) {
+		this.instituteId = instituteId;
+	}
 
 	public EdoMailUtil() {
 
@@ -71,6 +84,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	public void sendMail() {
 
 		Session session = prepareMailSession();
+		
+		org.hibernate.Session dbSession = null;
 
 		try {
 			Message message = new MimeMessage(session);
@@ -79,17 +94,25 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			//} else {
 			message.setFrom(new InternetAddress(MAIL_ID, "Edofox"));
 			//}
+			
+			dbSession = this.sessionFactory.openSession();
+			Transaction tx = dbSession.beginTransaction();
+			
 			if (CollectionUtils.isNotEmpty(students)) {
 				for (EdoStudent stu : students) {
 					student = stu;
-					sendMail(message);
+					sendMail(message, dbSession);
 				}
 			} else {
-				sendMail(message);
+				sendMail(message, dbSession);
 			}
+			
+			tx.commit();
 
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.emailLogger);
+		} finally {
+			CommonUtils.closeSession(dbSession);
 		}
 	}
 
@@ -103,7 +126,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		return pat.matcher(email).matches();
 	}
 
-	private void sendMail(Message message) throws MessagingException {
+	private void sendMail(Message message, org.hibernate.Session dbSession) throws MessagingException {
+		
 		if (student == null || StringUtils.isBlank(student.getEmail())) {
 			return;
 		}
@@ -111,8 +135,22 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			return;
 		}
 		prepareMailContent(message);
+		
+		//Add db log
+		EdoEmailSmsLog smsLog = new EdoEmailSmsLog();
+		smsLog.setChannel("email");
+		smsLog.setCreatedDate(new Date());
+		smsLog.setInstituteId(instituteId);
+		smsLog.setSentTo(student.getEmail());
+		smsLog.setText(message.getSubject());
+		smsLog.setStatus("Sent");
+		dbSession.persist(smsLog);
+		
+		message.setHeader("X-Mailgun-Variables", "{\"my_message_id\": " + smsLog.getId() + "}");
+
 		Transport.send(message);
 		LoggingUtil.logMessage("Sent email " + type + " to .." + student.getEmail(), LoggingUtil.emailLogger);
+		
 	}
 
 	private static Session prepareMailSession() {
@@ -167,7 +205,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			// message.setContent(result, "text/html");
 			message.setContent(result, "text/html; charset=utf-8");
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(student.getEmail()));
-
+			
 			// Format subject
 			if (message.getSubject() != null) {
 				String subjectText = CommonUtils.prepareInstituteNotification(message.getSubject(), institute);
