@@ -261,7 +261,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						List<EdoAnswerFileEntity> answerFiles = testsDao.getAnswerFiles(subReq);
 						question.setAnswerFiles(answerFiles);
 						if(CollectionUtils.isNotEmpty(answerFiles)) {
-							questionAnswersFound = questionAnswersFound++;
+							questionAnswersFound++;
 						}
 						
 					}
