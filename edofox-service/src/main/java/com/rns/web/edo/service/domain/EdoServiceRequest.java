@@ -42,6 +42,7 @@ public class EdoServiceRequest {
 	private String startTime;
 	private String endTime;
 	private String classrooms;
+	private Integer resultLimit;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -224,6 +225,14 @@ public class EdoServiceRequest {
 
 	public void setClassrooms(String classrooms) {
 		this.classrooms = classrooms;
+	}
+
+	public Integer getResultLimit() {
+		return resultLimit;
+	}
+
+	public void setResultLimit(Integer resultLimit) {
+		this.resultLimit = resultLimit;
 	}
 	
 }

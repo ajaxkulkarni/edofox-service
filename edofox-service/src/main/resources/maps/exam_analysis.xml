@@ -99,7 +99,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	
 	
 	
-	<select id="getStudentResults" resultMap="students" parameterType="Integer">
+	<select id="getStudentResults" resultMap="students" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 	select *,students.id as studentId,CONCAT(students.last_name,' ',students.first_name,' ',students.middle_name) as name,login_details.username as roll_no, 
 	IF(districts.id IS NULL,student_districts.id ,districts.id) as districtId,
 	IF(regions.id IS NULL,student_regions.id ,regions.id) as regionId,
@@ -119,8 +119,11 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	ON regions.id  = districts.region_id
 	LEFT JOIN regions student_regions
 	ON student_regions.id  = student_districts.region_id
-	where test_status.test_id = ${value} 
+	where test_status.test_id = ${test.id} 
 	order by test_status.score desc
+	<if test="resultLimit != null">
+	LIMIT ${resultLimit}
+	</if>
 	</select>
 	
 	<resultMap id="subjectScore" type="com.rns.web.edo.service.domain.EdoTestStudentMap">

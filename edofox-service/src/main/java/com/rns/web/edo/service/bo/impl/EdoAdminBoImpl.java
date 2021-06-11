@@ -243,7 +243,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				existing.setSubjects(subjectsList);
 			}
 			
-			List<EdoStudent> students = testsDao.getStudentResults(test.getId());
+			List<EdoStudent> students = testsDao.getStudentResults(request);
 			
 			if(CollectionUtils.isNotEmpty(students)) {
 				List<EdoTestStudentMap> subjectScores = testsDao.getSubjectwiseScore(test.getId());
@@ -541,7 +541,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 			
 			if(request.getStudent() == null) {
-				List<EdoStudent> students = testsDao.getStudentResults(request.getTest().getId());
+				List<EdoStudent> students = testsDao.getStudentResults(request);
 				if(CollectionUtils.isNotEmpty(students)) {
 					for(EdoStudent student: students) {
 						EdoServiceRequest req = new EdoServiceRequest();
