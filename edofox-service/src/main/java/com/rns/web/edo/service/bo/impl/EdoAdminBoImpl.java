@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -1821,7 +1822,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			edoSMSUtil.setCopyAdmin(true);
 			edoSMSUtil.setInstitute(institute);
 			edoSMSUtil.setStudent(student);
-			edoSMSUtil.sendSMS();
+			edoSMSUtil.sendSMS(null);
 			//executor.execute(edoSMSUtil);
 			response.setStudent(student);
 			response.setInstitute(institute);
@@ -1891,7 +1892,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			student.setPhone(institute.getContact());
 			edoSMSUtil.setStudent(student);
 			edoSMSUtil.setInstitute(institute);
-			edoSMSUtil.sendSMS();
+			edoSMSUtil.sendSMS(null);
 			//executor.execute(edoSMSUtil);
 			
 		} catch (Exception e) {
@@ -2422,20 +2423,50 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		Session session = null;
 		try {
 			
-			JSONObject json = new JSONObject(request);
-			if(json != null && json.has("event-data")) {
-				JSONObject eventData = json.getJSONObject("event-data");
-				if(eventData == null || !eventData.has("user-variables")) {
-					return status;
+			if(StringUtils.equals(channel, "email")) {
+				JSONObject json = new JSONObject(request);
+				if(json != null && json.has("event-data")) {
+					JSONObject eventData = json.getJSONObject("event-data");
+					if(eventData == null || !eventData.has("user-variables") || !eventData.has("event")) {
+						return status;
+					}
+					JSONObject userVariables = eventData.getJSONObject("user-variables");
+					if(userVariables != null && userVariables.has("my_message_id")) {
+						session = this.sessionFactory.openSession();
+						Transaction tx = session.beginTransaction();
+						List<EdoEmailSmsLog> list = session.createCriteria(EdoEmailSmsLog.class).add(Restrictions.eq("id", Integer.parseInt(userVariables.getString("my_message_id")))).list();
+						if(CollectionUtils.isNotEmpty(list)) {
+							list.get(0).setStatus(eventData.getString("event"));
+							list.get(0).setUpdatedDate(new Date());
+						}
+						
+						tx.commit();
+					}
 				}
-				JSONObject userVariables = eventData.getJSONObject("user-variables");
-				if(userVariables != null && userVariables.has("my_message_id")) {
-					session = this.sessionFactory.openSession();
-					Transaction tx = session.beginTransaction();
-					session.createCriteria(EdoEmailSmsLog.class).add(Restrictions.eq("id", Integer.parseInt(userVariables.getString("my_message_id")))).list();
-					
-					
-					tx.commit();
+			} else {
+				JSONArray jsonArr = new JSONArray(request);
+				if(jsonArr != null && jsonArr.length() > 0) {
+					JSONObject json = jsonArr.getJSONObject(0);
+					if(json == null || !json.has("requestId")) {
+						return status;
+					}
+					String sid = json.getString("requestId");
+					if(StringUtils.isNotBlank(sid) && json.has("report")) {
+						JSONArray report = json.getJSONArray("report");
+						String reportStatus = "";
+						if(report != null && report.length() > 0) {
+							reportStatus = report.getJSONObject(0).getString("desc");
+							session = this.sessionFactory.openSession();
+							Transaction tx = session.beginTransaction();
+							List<EdoEmailSmsLog> list = session.createCriteria(EdoEmailSmsLog.class).add(Restrictions.eq("smsId", sid)).list();
+							if(CollectionUtils.isNotEmpty(list)) {
+								list.get(0).setStatus(reportStatus);
+								list.get(0).setUpdatedDate(new Date());
+							}
+							
+							tx.commit();
+						}
+					}
 				}
 			}
 			

@@ -30,6 +30,7 @@ import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoVideoLectureMap;
 import com.rns.web.edo.service.domain.jpa.EdoEmailSmsLog;
+import com.rns.web.edo.service.domain.jpa.EdoEmailSmsSummary;
 
 public class EdoMailUtil implements Runnable, EdoConstants {
 
@@ -99,9 +100,30 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			Transaction tx = dbSession.beginTransaction();
 			
 			if (CollectionUtils.isNotEmpty(students)) {
+				
+				int count = 0;
+				
 				for (EdoStudent stu : students) {
 					student = stu;
-					sendMail(message, dbSession);
+					boolean sent = sendMail(message, dbSession);
+					if(sent) {
+						count++;
+					}
+				}
+				if(count > 0) {
+					EdoEmailSmsSummary summary = new EdoEmailSmsSummary();
+					summary.setChannel("email");
+					summary.setCreatedDate(new Date());
+					summary.setNoOfStudents(count);
+					summary.setInstituteId(instituteId);
+					if(exam != null) {
+						summary.setExamId(exam.getId());
+					}
+					if(classwork != null && classwork.getLecture() != null) {
+						summary.setClassworkId(classwork.getLecture().getId());
+					}
+					summary.setNotificationType(type);
+					dbSession.persist(summary);
 				}
 			} else {
 				sendMail(message, dbSession);
@@ -126,13 +148,13 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		return pat.matcher(email).matches();
 	}
 
-	private void sendMail(Message message, org.hibernate.Session dbSession) throws MessagingException {
+	private boolean sendMail(Message message, org.hibernate.Session dbSession) throws MessagingException {
 		
 		if (student == null || StringUtils.isBlank(student.getEmail())) {
-			return;
+			return false;
 		}
 		if(!isValid(student.getEmail())) {
-			return;
+			return false;
 		}
 		prepareMailContent(message);
 		
@@ -143,6 +165,13 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		smsLog.setInstituteId(instituteId);
 		smsLog.setSentTo(student.getEmail());
 		smsLog.setText(message.getSubject());
+		smsLog.setStudentId(student.getId());
+		if(classwork != null && classwork.getLecture() != null) {
+			smsLog.setClassworkId(classwork.getLecture().getId());
+		}
+		if(exam != null) {
+			smsLog.setExamId(exam.getId());
+		}
 		smsLog.setStatus("Sent");
 		dbSession.persist(smsLog);
 		
@@ -150,6 +179,8 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 		Transport.send(message);
 		LoggingUtil.logMessage("Sent email " + type + " to .." + student.getEmail(), LoggingUtil.emailLogger);
+		
+		return true;
 		
 	}
 

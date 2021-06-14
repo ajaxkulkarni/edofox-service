@@ -596,8 +596,21 @@ public class EdoAdminController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoApiStatus emailWebHook(String request) {
 		
-		EdoServiceResponse response = new EdoServiceResponse();
-		System.out.println("Web hook called .... " + request);
+		LoggingUtil.logMessage("Email Web hook called .... " + request, LoggingUtil.emailLogger);
 		return adminBo.updateEmailStatus(request, "email");
+	}
+	
+	/*
+data: [{"senderId":"mtrsft","requestId":"31666d745341353534373539","report":[{"date":"2021-06-13 20:45:29","number":"919623736773","status":"2","desc":"FAILED"}],"userId":"193344","campaignName":"API"}]
+	 * 
+	 */
+	
+	@POST
+	@Path("/smsWebHook")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoApiStatus smsWebHook(String request) {
+		LoggingUtil.logMessage("SMS Web hook called .... " + request, LoggingUtil.emailLogger);
+		return adminBo.updateEmailStatus(request, "sms");
 	}
 }

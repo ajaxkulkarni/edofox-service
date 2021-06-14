@@ -3,6 +3,7 @@ package com.rns.web.edo.service.util;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,11 +14,16 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoStudent;
 import com.rns.web.edo.service.domain.EdoTest;
+import com.rns.web.edo.service.domain.jpa.EdoEmailSmsLog;
+import com.rns.web.edo.service.domain.jpa.EdoEmailSmsSummary;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -38,6 +44,8 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	private boolean copyParent;
 	private boolean copyAdmin;
 	private List<EdoStudent> students;
+	private Integer instituteId;
+	private SessionFactory sessionFactory;
 
 	private EdoMailer mailer;
 
@@ -52,6 +60,14 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	public void setStudent(EdoStudent student) {
 		this.student = student;
 	}
+	
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
+	
+	public void setInstituteId(Integer instituteId) {
+		this.instituteId = instituteId;
+	}
 
 	public void setCopyParent(boolean copyParent) {
 		this.copyParent = copyParent;
@@ -62,27 +78,54 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 	}
 
 	public void run() {
-		if(CollectionUtils.isNotEmpty(students)) {
-			for(EdoStudent stu: students) {
-				student = stu;
-				sendSMS();
+		Session session = null;
+		int count = 0;
+		try {
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			if(CollectionUtils.isNotEmpty(students)) {
+				for(EdoStudent stu: students) {
+					student = stu;
+					boolean result = sendSMS(session);
+					if(result) {
+						count++;
+					}
+				}
+			} else {
+				sendSMS(session);
 			}
-		} else {
-			sendSMS();
+			
+			if(count > 0) {
+				EdoEmailSmsSummary summary = new EdoEmailSmsSummary();
+				summary.setChannel("sms");
+				summary.setCreatedDate(new Date());
+				summary.setNoOfStudents(count);
+				summary.setInstituteId(instituteId);
+				if(test != null) {
+					summary.setExamId(test.getId());
+				}
+				summary.setNotificationType(type);
+				session.persist(summary);
+			}
+			
+			tx.commit();
+		} catch (Exception e) {
+			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+		} finally {
+			CommonUtils.closeSession(session);
 		}
-		
 	}
 
-	public void sendSMS() {
+	public boolean sendSMS(Session session) {
 
 		if (student == null) {
-			return;
+			return false;
 		}
 		
 		if(!validatePhoneNumber(student)) {
-			return;
+			return false;
 		}
-
+		
 		try {
 
 			String url = initUrl(student.getPhone());
@@ -113,7 +156,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 				}
 			}
 			url = StringUtils.replace(url, "{message}", URLEncoder.encode(message, "UTF-8"));
-			sendSMS(url);
+			String sid = sendSMS(url);
 
 			if (copyParent && StringUtils.isNotBlank(student.getParentMobileNo())) {
 				// Send same SMS to parents
@@ -133,9 +176,28 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 				}
 			}
 
+			if(session != null) {
+				EdoEmailSmsLog smsLog = new EdoEmailSmsLog();
+				smsLog.setChannel("sms");
+				smsLog.setCreatedDate(new Date());
+				smsLog.setInstituteId(instituteId);
+				smsLog.setSentTo(student.getPhone());
+				smsLog.setText(message);
+				smsLog.setStudentId(student.getId());
+				if(test != null) {
+					smsLog.setExamId(test.getId());
+				}
+				smsLog.setStatus("Sent");
+				smsLog.setSmsId(sid);
+				session.persist(smsLog);
+			}
+			
+			
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
+			return false;
 		}
+		return true;
 
 	}
 
@@ -162,7 +224,7 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		return url;
 	}
 
-	private void sendSMS(String url) {
+	private String sendSMS(String url) {
 		ClientConfig config = new DefaultClientConfig();
 		Client client = Client.create(config);
 		WebResource webResource = client.resource(url);
@@ -171,7 +233,9 @@ public class EdoSMSUtil implements Runnable, EdoConstants {
 		if (response.getStatus() != 200) {
 			LoggingUtil.logError("SMS sending Failed : HTTP error code : " + response.getStatus());
 		}
-		LoggingUtil.logMessage("Output from SMS .... " + response.getStatus() + " \n");
+		String smsId = response.getEntity(String.class);
+		LoggingUtil.logMessage("Output from SMS .... " + response.getStatus() + " for URL " + url);
+		return smsId;
 	}
 
 	public static void main(String[] args) {

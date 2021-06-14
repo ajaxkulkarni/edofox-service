@@ -3206,7 +3206,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		 			EdoMailer mailer = new EdoMailer();
 		 			mailer.setActionUrl(EdoPropertyUtil.getProperty(EdoPropertyUtil.HOST_NAME) + "reset_password.php?id=" + student.getToken());
 		 			smsUtil.setMailer(mailer);
-					smsUtil.sendSMS();
+					smsUtil.sendSMS(null);
 					sms = true;
 		 		}
 		 		if(!email && !sms) {
