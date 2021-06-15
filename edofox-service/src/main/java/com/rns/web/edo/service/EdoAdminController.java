@@ -515,7 +515,7 @@ public class EdoAdminController {
 			@FormDataParam("answerId") Integer answerId, @FormDataParam("marks") BigDecimal marks, @FormDataParam("evaluator") Integer evaluator) {
 
 		EdoServiceResponse response = new EdoServiceResponse();
-		response.setStatus(adminBo.uploadEvaluation(bodyParts, answerId, marks, evaluator, null));
+		response.setStatus(adminBo.uploadEvaluation(bodyParts, answerId, marks, evaluator, null, null));
 		return response;
 	}
 	
@@ -536,8 +536,12 @@ public class EdoAdminController {
 			if(request.getQuestion().getWeightage() != null) {
 				questionMarks = new BigDecimal(request.getQuestion().getWeightage());
 			}
+			BigDecimal testMarks = null;
+			if(request.getTest() != null) {
+				testMarks = request.getTest().getScore();
+			}
 			
-			response.setStatus(adminBo.uploadEvaluation(null, answerId, marks, evaluator, questionMarks));
+			response.setStatus(adminBo.uploadEvaluation(null, answerId, marks, evaluator, questionMarks, testMarks));
 		}
 		return response;
 	}

@@ -37,7 +37,7 @@ public interface EdoAdminBo {
 	EdoApiStatus sendNotification(EdoServiceRequest request);
 	EdoApiStatus updateStudentScore(EdoServiceRequest request);
 	EdoServiceResponse uploadQuestionImage(EdoServiceRequest request, InputStream fileData);
-	EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks, Integer evaluatorId, BigDecimal questionMarks); 
+	EdoApiStatus uploadEvaluation(FormDataBodyPart bodyParts, Integer answerId, BigDecimal marks, Integer evaluatorId, BigDecimal questionMarks, BigDecimal testMarks); 
 	EdoApiStatus calculateProctoringScore(EdoServiceRequest request);
 	EdoApiStatus fixStudentScore(EdoServiceRequest request);
 	
