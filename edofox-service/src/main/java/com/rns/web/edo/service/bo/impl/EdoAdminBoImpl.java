@@ -2157,11 +2157,11 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				if(StringUtils.isNotBlank(videoDelay)) {
 					delay = new Integer(videoDelay);
 				}
-				LoggingUtil.logMessage("Executing task with delay " + delay, LoggingUtil.emailLogger);
+				//LoggingUtil.logMessage("Executing task with delay " + delay, LoggingUtil.emailLogger);
 				scheduler.schedule(mgr, delay, TimeUnit.MINUTES);
 				scheduler.shutdown();
 			} else {
-				LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
+				//LoggingUtil.logMessage("Executing notification task " + request.getRequestType(), LoggingUtil.emailLogger);
 				executor.execute(mgr);
 			}
 			
