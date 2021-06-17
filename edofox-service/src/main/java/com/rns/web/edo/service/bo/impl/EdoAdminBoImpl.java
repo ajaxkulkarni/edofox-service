@@ -273,6 +273,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				students = testsDao.getStudentResults(test.getId());
 			}
 			
+			List<EdoStudent> meritList = new ArrayList<EdoStudent>();
+			
 			if(CollectionUtils.isNotEmpty(students)) {
 				List<EdoTestStudentMap> subjectScores = testsDao.getSubjectwiseScore(test.getId());
 				if(CollectionUtils.isNotEmpty(subjectScores)) {
@@ -318,6 +320,8 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						if(StringUtils.equalsIgnoreCase(REQUEST_FIREBASE_UPDATE, request.getRequestType())) {
 							EdoFirebaseUtil.updateStudentResult(student, existing, institute.getFirebaseId());
 						}
+						
+						addToMeritList(meritList, student, request);
 					}
 				}
 			}
@@ -325,12 +329,76 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(!StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {
 				formatQuestions(existing);
 				response.setTest(existing);
-				response.setStudents(students);
+				//response.setStudents(students);
+				response.setStudents(meritList);
 			}
 		} catch (Exception e) {
 			LoggingUtil.logMessage(ExceptionUtils.getStackTrace(e));
 		}
 		return response;
+	}
+
+	private void addToMeritList(List<EdoStudent> meritList, EdoStudent student, EdoServiceRequest request) {
+		//Check if subject sorting is sent
+		if(StringUtils.isNotBlank(request.getSortFilter()) && student.getAnalysis() != null && student.getAnalysis().getScore() != null) {
+			String[] sortOrder = StringUtils.split(request.getSortFilter(), ",");
+			if(ArrayUtils.isNotEmpty(sortOrder)) {
+				//Compare student with all students and decide where to put it
+				int placeIndex = -1;
+				int index = 0;
+				for(EdoStudent stu: meritList) {
+					if(stu.getAnalysis() != null && stu.getAnalysis().getScore() != null) {
+						if(stu.getAnalysis().getScore().compareTo(student.getAnalysis().getScore()) > 0) {
+							index++; //If stu score is greater..keep moving down the merit list
+						} else if (stu.getAnalysis().getScore().compareTo(student.getAnalysis().getScore()) == 0) {
+							//If stu score is same as this student..use sort order to decide whom to place first
+							for(String subject: sortOrder) {
+								BigDecimal score = stu.getAnalysis().getSubjectScore(subject);
+								BigDecimal currScore = student.getAnalysis().getSubjectScore(subject);
+								if(currScore == null) {
+									break;
+								}
+								if(score == null || score.compareTo(currScore) < 0) {
+									placeIndex = index;
+									break;
+								}
+								if(currScore.compareTo(score) < 0) {
+									break;
+								}
+								if(currScore.compareTo(score) == 0) {
+									continue;
+								}
+							}
+							if(placeIndex != -1) {
+								break;
+							}
+							
+						} else {
+							//Found stu where score is less than current student score..then set rank here
+							placeIndex = index;
+							break;
+						}
+						
+					}
+				}
+				if(placeIndex != -1) {
+					student.getAnalysis().setRank(placeIndex + 1);
+					meritList.add(placeIndex, student);
+				} else {
+					student.getAnalysis().setRank(meritList.size() + 1);
+					meritList.add(student);
+				}
+				
+				
+			} else {
+				student.getAnalysis().setRank(meritList.size() + 1);
+				meritList.add(student);
+			}
+		} else {
+			student.getAnalysis().setRank(meritList.size() + 1);
+			meritList.add(student);
+		}
+		
 	}
 
 

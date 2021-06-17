@@ -43,6 +43,7 @@ public class EdoServiceRequest {
 	private String endTime;
 	private String classrooms;
 	private EdoMailer mailer;
+	private String sortFilter;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -233,6 +234,14 @@ public class EdoServiceRequest {
 
 	public void setMailer(EdoMailer mailer) {
 		this.mailer = mailer;
+	}
+
+	public String getSortFilter() {
+		return sortFilter;
+	}
+
+	public void setSortFilter(String sortFilter) {
+		this.sortFilter = sortFilter;
 	}
 	
 }

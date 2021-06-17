@@ -3,6 +3,9 @@ package com.rns.web.edo.service.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
 public class EDOStudentAnalysis {
 	
 	private Integer solvedCount;
@@ -61,6 +64,17 @@ public class EDOStudentAnalysis {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public BigDecimal getSubjectScore(String subject) {
+		if(StringUtils.isBlank(subject) || CollectionUtils.isEmpty(this.subjectScores)) {
+			return null;
+		}
+		for(EdoStudentSubjectAnalysis sa: subjectScores) {
+			if(StringUtils.equals(sa.getSubject(), subject)) {
+				return sa.getScore();
+			}
+		}
+		return null;
 	}
 	
 }
