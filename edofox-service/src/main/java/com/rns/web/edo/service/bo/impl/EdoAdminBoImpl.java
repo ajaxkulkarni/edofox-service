@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -256,6 +257,13 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				}
 			}
 			
+			List<String> colOrder = null;
+			
+			if(StringUtils.isNotBlank(request.getColumnSequence())) {
+				colOrder = Arrays.asList(StringUtils.split(request.getColumnSequence(), ","));
+			}
+			
+			
 			//Get subjects to avoid blank result for subject
 			List<EdoSubject> subjects = testsDao.getTestSubjects(test.getId());
 			if(CollectionUtils.isNotEmpty(subjects)) {
@@ -263,7 +271,22 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				for(EdoSubject sub: subjects) {
 					subjectsList.add(sub.getSubjectName());
 				}
+				
+				final List<String> colSeq = colOrder;
+				
+				if(CollectionUtils.isNotEmpty(colOrder)) {
+					Collections.sort(subjectsList, new Comparator<String>() {
+
+						public int compare(String o1, String o2) {
+							int index1 = colSeq.indexOf(o1);
+							int index2 = colSeq.indexOf(o2);
+							return index1 - index2;
+						}
+					});
+				}
+				
 				existing.setSubjects(subjectsList);
+				
 			}
 			
 			List<EdoStudent> students = null;
@@ -275,6 +298,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			
 			List<EdoStudent> meritList = new ArrayList<EdoStudent>();
 			
+			
 			if(CollectionUtils.isNotEmpty(students)) {
 				List<EdoTestStudentMap> subjectScores = testsDao.getSubjectwiseScore(test.getId());
 				if(CollectionUtils.isNotEmpty(subjectScores)) {
@@ -282,7 +306,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					for(EdoStudent student: students) {
 						if(student.getAnalysis() == null) {
 							List<EdoStudentSubjectAnalysis> subjectAnalysis = new ArrayList<EdoStudentSubjectAnalysis>();
-							CommonUtils.setupSubjectAnalysis(existing, subjectAnalysis);
+							CommonUtils.setupSubjectAnalysis(existing, subjectAnalysis, colOrder);
 							EDOStudentAnalysis studentAnalysis = new EDOStudentAnalysis();
 							studentAnalysis.setSubjectScores(subjectAnalysis);
 							studentAnalysis.setStatus("Absent");
@@ -295,7 +319,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						if(request.getStudent() != null && request.getStudent().getId() != student.getId()) {
 							continue;
 						}
-						List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(existing, subjectScores, student);
+						List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(existing, subjectScores, student, colOrder);
 						student.getAnalysis().setSubjectScores(subjectAnalysis);
 						
 						if(StringUtils.equalsIgnoreCase("SMS", request.getRequestType())) {

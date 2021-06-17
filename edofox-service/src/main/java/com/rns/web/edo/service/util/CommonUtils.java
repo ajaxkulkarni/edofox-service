@@ -690,7 +690,7 @@ public class CommonUtils {
 		return -question.getNegativeMarks();
 	}
 	
-	public static List<EdoStudentSubjectAnalysis> getSubjectAnalysis(EdoTest existing, List<EdoTestStudentMap> subjectScores, EdoStudent student) {
+	public static List<EdoStudentSubjectAnalysis> getSubjectAnalysis(EdoTest existing, List<EdoTestStudentMap> subjectScores, EdoStudent student, List<String> colSeq) {
 		List<EdoStudentSubjectAnalysis> subjectAnalysis = new ArrayList<EdoStudentSubjectAnalysis>();
 		for(EdoTestStudentMap map: subjectScores) {
 			if(map.getStudent() != null && map.getStudent().getId().intValue() == student.getId().intValue() && map.getSubjectScore() != null ) {
@@ -702,13 +702,12 @@ public class CommonUtils {
 			
 		}
 		
-		setupSubjectAnalysis(existing, subjectAnalysis);
+		setupSubjectAnalysis(existing, subjectAnalysis, colSeq);
 		
 		return subjectAnalysis;
 	}
 
-	public static void setupSubjectAnalysis(EdoTest existing, List<EdoStudentSubjectAnalysis> subjectAnalysis) {
-		
+	public static void setupSubjectAnalysis(EdoTest existing, List<EdoStudentSubjectAnalysis> subjectAnalysis, final List<String> colSeq) {
 		if(existing == null || CollectionUtils.isEmpty(existing.getSubjects())) {
 			return;
 		}
@@ -732,6 +731,11 @@ public class CommonUtils {
 		Collections.sort(subjectAnalysis, new Comparator<EdoStudentSubjectAnalysis>() {
 
 			public int compare(EdoStudentSubjectAnalysis o1, EdoStudentSubjectAnalysis o2) {
+				if(CollectionUtils.isNotEmpty(colSeq)) {
+					int index1 = colSeq.indexOf(o1.getSubject());
+					int index2 = colSeq.indexOf(o2.getSubject());
+					return index1 - index2;
+				}
 				return o1.getSubject().compareTo(o2.getSubject());
 			}
 		});

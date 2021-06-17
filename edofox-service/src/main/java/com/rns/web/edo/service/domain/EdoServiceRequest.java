@@ -44,6 +44,7 @@ public class EdoServiceRequest {
 	private String classrooms;
 	private EdoMailer mailer;
 	private String sortFilter;
+	private String columnSequence;
 	
 	public EdoStudent getStudent() {
 		return student;
@@ -242,6 +243,14 @@ public class EdoServiceRequest {
 
 	public void setSortFilter(String sortFilter) {
 		this.sortFilter = sortFilter;
+	}
+
+	public String getColumnSequence() {
+		return columnSequence;
+	}
+
+	public void setColumnSequence(String columnSequence) {
+		this.columnSequence = columnSequence;
 	}
 	
 }
