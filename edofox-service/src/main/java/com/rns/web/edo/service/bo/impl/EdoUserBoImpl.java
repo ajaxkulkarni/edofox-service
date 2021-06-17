@@ -164,7 +164,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			input.put("test", test.getId());
 			input.put("student", request.getStudent().getId());
 			List<EdoTestStudentMap> resultMap = testsDao.getSubjectwiseScoreStudent(input);
-			List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(test, resultMap, request.getStudent());
+			List<EdoStudentSubjectAnalysis> subjectAnalysis = CommonUtils.getSubjectAnalysis(test, resultMap, request.getStudent(), null);
 			EDOTestAnalysis analysis = new EDOTestAnalysis();
 			analysis.setSubjectAnalysis(subjectAnalysis);
 			test.setAnalysis(analysis);
