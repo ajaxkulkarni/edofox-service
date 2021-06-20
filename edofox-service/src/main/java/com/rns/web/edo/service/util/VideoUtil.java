@@ -597,7 +597,7 @@ public class VideoUtil {
 		file.setDownloadUrl(video_url);
 		if(!StringUtils.equals(requestType, "player")) {
 			//Prepare download URLs
-			String lowQ = StringUtils.replace(video_url, ":8443/vod", "/mediamanager/cdn");
+			String lowQ = StringUtils.replace(video_url, ":1935/vod", "/mediamanager/cdn");
 			lowQ = StringUtils.replace(lowQ, ".smil/playlist.m3u8", "");
 			lowQ = StringUtils.replace(lowQ, ".mp4", "_240px.mp4");
 			EdoFile lowFile = new EdoFile();
