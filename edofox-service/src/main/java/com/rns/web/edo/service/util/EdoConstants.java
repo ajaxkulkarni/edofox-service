@@ -143,7 +143,7 @@ public interface EdoConstants {
 		}
 	});
 	
-	String VIDEO_BASE_URL = "https://streaming.edofox.com:8443/vod/{fileName}.smil/playlist.m3u8";
+	String VIDEO_BASE_URL = "https://streaming.edofox.com:1935/vod/{fileName}.smil/playlist.m3u8";
 	
 	//EDOFOX
 	//String CLIENT_SECRET = "Ha4HAOtj2MMOOTqgqwAOjpLz1yulsGE6knDSnk8alulr6V2FkD63A3rBXn68LroZR8QWsLpsAXK6xJXTXXmQmHWu5plenh8FRvJjFt0Rn1wnSIgSWncRxeQy1vEMPaEF";

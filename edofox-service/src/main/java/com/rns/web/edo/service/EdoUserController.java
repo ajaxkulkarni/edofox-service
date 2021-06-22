@@ -758,18 +758,24 @@ public class EdoUserController {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public EdoServiceResponse updateVideoProgress(EdoServiceRequest request) {
-		LoggingUtil.logMessage("Update video progress :" + request, LoggingUtil.videoLogger);
 		EdoServiceResponse response = CommonUtils.initResponse();
 		try {
 			if(request.getLecture() != null && request.getLecture().getId() == null) {
 				if(StringUtils.isNotBlank(request.getLecture().getVideoName())) {
 					String[] values = StringUtils.split(request.getLecture().getVideoName(), "_");
 					if(ArrayUtils.isNotEmpty(values)) {
-						request.getLecture().setId(new Integer(values[0]));
+						String number = values[0];
+						if(StringUtils.isNumeric(number)) {
+							request.getLecture().setId(new Integer(number));	
+						} else {
+							return response;
+						}
+						
 					}
 					
 				}
 			}
+			LoggingUtil.logMessage("Update video progress :" + request, LoggingUtil.videoLogger);
 			response.setStatus(userBo.updateVideoLecture(request));
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
