@@ -6,11 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
+import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoChapter;
 import com.rns.web.edo.service.domain.EdoQuestion;
 import com.rns.web.edo.service.domain.EdoTest;
 import com.rns.web.edo.service.domain.EdoTestQuestionMap;
+import com.rns.web.edo.service.domain.jpa.EdoInstituteEntity;
+import com.rns.web.edo.service.domain.jpa.EdoTestEntity;
 
 public class EdoMyBatisUtil {
 	
@@ -146,6 +150,85 @@ public class EdoMyBatisUtil {
 		}
 		return list;
 	}
+	
+	/*
+	 * test_questions_map.question_id,question,option1,option2,option3,option4,option5,test_subjects.subject, " +
+					"test_questions.status as qStatus,question_img_url,option1_img_url,option2_img_url,option3_img_url,option4_img_url, " +
+					"test_questions.question_type,meta_data,meta_data_img_url,test_questions_map.section,test_questions_map.question_number, " +
+					"test_questions_map.weightage,test_questions_map.negative_marks,test_questions.correct_answer,alt_answer,partial,solution, " +
+					"solution_img_url,test_questions.chapter,chapters.chapter_name,test_questions.level
+	 * 
+	 * */
+	
+	public static List<EdoTestQuestionMap> convertHibernateExamMap(List<Object[]> records) {
+		if(CollectionUtils.isEmpty(records)) {
+			return null;
+		}
+		List<EdoTestQuestionMap> list = new ArrayList<EdoTestQuestionMap>();
+		//EdoTest test = null;
+		for(Object[] row: records) {
+			if(ArrayUtils.isEmpty(row)) {
+				continue;
+			}
+			EdoTestQuestionMap map = new EdoTestQuestionMap();
+			EdoQuestion question = new EdoQuestion();
+			question.setQn_id(getInteger(row, 0));
+			question.setQuestion(getString(row, 1));
+			question.setOption1(getString(row, 2));
+			question.setOption2(getString(row, 3));
+			question.setOption3(getString(row, 4));
+			question.setOption4(getString(row, 5));
+			question.setOption5(getString(row, 6));
+			question.setSubject(getString(row, 7));
+			question.setStatus(getString(row, 8));
+			question.setQuestionImageUrl(getString(row, 9));
+			question.setOption1ImageUrl(getString(row, 10));
+			question.setOption2ImageUrl(getString(row, 11));
+			question.setOption3ImageUrl(getString(row, 12));
+			question.setOption4ImageUrl(getString(row, 13));
+			question.setType(getString(row, 14));
+			question.setMetaData(getString(row, 15));
+			question.setMetaDataImageUrl(getString(row, 16));
+			question.setSection(getString(row, 17));
+			question.setQuestionNumber(getInteger(row, 18));
+			question.setWeightage(getFloat(row, 19));
+			question.setNegativeMarks(getFloat(row, 20));
+			question.setCorrectAnswer(getString(row, 21));
+			question.setAlternateAnswer(getString(row, 22));
+			question.setPartialCorrection(getString(row, 23));
+			question.setSolution(getString(row, 24));
+			question.setSolutionImageUrl(getString(row, 25));
+			EdoChapter chapter = new EdoChapter();
+			chapter.setChapterId(getInteger(row, 26));
+			chapter.setChapterName(getString(row, 27));
+			question.setChapter(chapter);
+			question.setLevel(getInteger(row, 28));
+			map.setQuestion(question);
+			list.add(map);
+		}
+		return list;
+	}
+
+	private static Integer getInteger(Object[] row, int i) {
+		if(i >= 0 && i < row.length) {
+			return row[i] != null ? Integer.parseInt(row[i].toString()) : null;
+		}
+		return null;
+	}
+	
+	private static String getString(Object[] row, int i) {
+		if(i >= 0 && i < row.length) {
+			return row[i] != null ? row[i].toString() : null;
+		}
+		return null;
+	}
+	
+	private static Float getFloat(Object[] row, int i) {
+		if(i >= 0 && i < row.length) {
+			return row[i] != null ? Float.parseFloat(row[i].toString()) : null;
+		}
+		return null;
+	}
 
 	private static Integer getBoolean(Map record, String key) {
 		if(key != null && record != null && record.containsKey(key)) {
@@ -182,4 +265,45 @@ public class EdoMyBatisUtil {
 		return null;
 	}
 
+	public static EdoTest convertToTest(EdoTestEntity entity) {
+		if(entity == null) {
+			return null;
+		}
+		EdoTest test = new EdoTest();
+		test.setId(entity.getId());
+		test.setName(entity.getName());
+		test.setAcceptLocation(entity.getAcceptLocation());
+		test.setCreatedDate(entity.getCreatedDate());
+		test.setDuration(entity.getDuration());
+		test.setEndDate(entity.getEndDate());
+		test.setForceUpdate(entity.getForceUpdate());
+		test.setInstituteId(entity.getInstituteId());
+		test.setInstructions(entity.getInstructions());
+		test.setMaxStarts(entity.getMaxStarts());
+		test.setNoOfQuestions(entity.getNoOfQuestions());
+		test.setOfflineConduction(entity.getOfflineConduction());
+		test.setPauseTimeout(entity.getPauseTimeout());
+		test.setRandomPool(entity.getRandomPool());
+		test.setRandomQuestions(entity.getRandomQuestions());
+		test.setShowQuestionPaper(entity.getShowQuestionPaper());
+		test.setShowResult(entity.getShowResult());
+		test.setStartDate(entity.getStartDate());
+		test.setTestUi(entity.getTestUi());
+		test.setTimeConstraint(entity.getTimeConstraint());
+		test.setStudentTimeConstraint(entity.getStudentTimeConstraint());
+		test.setTotalMarks(entity.getTotalMarks());
+		return test;
+	}
+	
+	public static EDOInstitute convertToInstitute(EdoInstituteEntity entity) {
+		if(entity == null) {
+			return null;
+		}
+		EDOInstitute institute = new EDOInstitute();
+		institute.setId(entity.getId());
+		institute.setName(entity.getName());
+		institute.setAppVersion(entity.getAppVersion());
+		institute.setAppUrl(entity.getAppUrl());
+		return institute;
+	}
 }

@@ -38,6 +38,7 @@ import com.clickntap.vimeo.VimeoResponse;
 import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoFile;
 import com.rns.web.edo.service.bo.api.EdoUserBo;
+import com.rns.web.edo.service.dao.EdoHibernateDao;
 import com.rns.web.edo.service.dao.EdoTestsDao;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
@@ -65,11 +66,14 @@ import com.rns.web.edo.service.domain.jpa.EdoAnswerEntity;
 import com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity;
 import com.rns.web.edo.service.domain.jpa.EdoContentMap;
 import com.rns.web.edo.service.domain.jpa.EdoDeviceId;
+import com.rns.web.edo.service.domain.jpa.EdoInstituteEntity;
 import com.rns.web.edo.service.domain.jpa.EdoKeyword;
 import com.rns.web.edo.service.domain.jpa.EdoLiveSession;
 import com.rns.web.edo.service.domain.jpa.EdoLiveToken;
 import com.rns.web.edo.service.domain.jpa.EdoProctorImages;
 import com.rns.web.edo.service.domain.jpa.EdoProfileEntity;
+import com.rns.web.edo.service.domain.jpa.EdoStudentEntity;
+import com.rns.web.edo.service.domain.jpa.EdoTestEntity;
 import com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity;
 import com.rns.web.edo.service.domain.jpa.EdoVideoLecture;
 import com.rns.web.edo.service.util.CommonUtils;
@@ -79,6 +83,7 @@ import com.rns.web.edo.service.util.EdoFaceDetection;
 import com.rns.web.edo.service.util.EdoImageUtil;
 import com.rns.web.edo.service.util.EdoLiveUtil;
 import com.rns.web.edo.service.util.EdoMailUtil;
+import com.rns.web.edo.service.util.EdoMyBatisUtil;
 import com.rns.web.edo.service.util.EdoPDFUtil;
 import com.rns.web.edo.service.util.EdoPropertyUtil;
 import com.rns.web.edo.service.util.EdoSMSUtil;
@@ -299,12 +304,15 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		Session session = null;
-		
+		EdoHibernateDao hDao = null;
 		try {
 			
 			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			hDao = new EdoHibernateDao(session);
 			
-			/*EdoTest result = testsDao.getTest(testId);
+			//EdoTest result = testsDao.getTest(testId);
+			EdoTest result = EdoMyBatisUtil.convertToTest(hDao.getEntityByKey(EdoTestEntity.class, "id", testId));
 			if(result == null) {
 				response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_INCOMPLETE_REQUEST));
 				return response;
@@ -314,12 +322,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoTestStudentMap inputMap = new EdoTestStudentMap();
 			inputMap.setTest(new EdoTest(testId));
 			Date startedDate = null;
-			EdoTestStudentMap studentMap = null;
+			EdoTestStatusEntity studentMap = null;
 			Integer adminReset = null;
 			Integer timeLeft = null;
 			if(studenId != null) {
 				inputMap.setStudent(new EdoStudent(studenId));
-				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
+				//List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
+				
+				List<EdoTestStatusEntity> studentMaps = session.createCriteria(EdoTestStatusEntity.class)
+														.add(Restrictions.eq("studentId", studenId))
+														.add(Restrictions.eq("testId", testId)).list();
+				
 				if(CollectionUtils.isNotEmpty(studentMaps)) {
 					studentMap = studentMaps.get(0);
 				}
@@ -339,7 +352,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				//Added on 11/12/19
 				if(studentMap == null) {
 					//Add test status as 'STARTED' to track students who logged in
-					EdoServiceRequest request = new EdoServiceRequest();
+					/*EdoServiceRequest request = new EdoServiceRequest();
 					EdoStudent student = new EdoStudent();
 					student.setId(studenId);
 					request.setStudent(student);
@@ -354,11 +367,29 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setDevice(req.getTest().getDevice());
 					test.setDeviceInfo(StringUtils.substring(req.getTest().getDeviceInfo(), 0, 100));
 					test.setLocationLat(req.getTest().getLocationLat());
-					test.setLocationLong(req.getTest().getLocationLong());
+					test.setLocationLong(req.getTest().getLocationLong());*/
 					//TODO Add later testsDao.saveTestStatus(request);
+					
+					EdoTestStatusEntity testStatus = new EdoTestStatusEntity();
+					testStatus.setTestId(testId);
+					testStatus.setStudentId(studenId);
+					testStatus.setCreatedDate(new Date());
+					testStatus.setSolved(0);
+					testStatus.setCorrect(0);
+					testStatus.setFlagged(0);
+					testStatus.setScore(BigDecimal.ZERO);
+					testStatus.setDevice(req.getTest().getDevice());
+					testStatus.setDeviceInfo(req.getTest().getDeviceInfo());
+					testStatus.setLatitude(req.getTest().getLocationLat());
+					testStatus.setLongitude(req.getTest().getLocationLong());
+					testStatus.setStartedCount(1);
+					testStatus.setStatus(TEST_STATUS_STARTED);
+					
+					session.persist(testStatus);
+					
 				} else {
 					//Update test status for timestamp and exam started count
-					EdoServiceRequest request = new EdoServiceRequest();
+					/*EdoServiceRequest request = new EdoServiceRequest();
 					EdoStudent student = new EdoStudent();
 					student.setId(studenId);
 					request.setStudent(student);
@@ -368,21 +399,60 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						test.setLocationLat(req.getTest().getLocationLat());
 						test.setLocationLong(req.getTest().getLocationLong());
 					}
-					request.setTest(test);
+					request.setTest(test);*/
+					
+					studentMap.setStartedCount(studentMap.getStartedCount() + 1);
+					studentMap.setUpdatedDate(new Date());
+					if(req.getTest().getLocationLat() != null && req.getTest().getLocationLong() != null) {
+						studentMap.setLatitude(req.getTest().getLocationLat());
+						studentMap.setLongitude(req.getTest().getLocationLong());
+					}
+					
 					//TODO ADD later testsDao.updateTestStatus(request);
 					if(studentMap.getStartedCount() != null) {
 						startedCount = studentMap.getStartedCount();
 					}
-					if(studentMap.getTest() != null) {
+					/*if(studentMap.getTest() != null) {
 						adminReset = studentMap.getTest().getAdminReset();
+					}*/
+					if(studentMap.getAdminReset()  != null) {
+						adminReset = studentMap.getAdminReset();
 					}
-					timeLeft = studentMap.getTimeLeft();
+					//timeLeft = studentMap.getTimeLeft();
+					if(studentMap.getTimeLeft() != null) {
+						timeLeft = studentMap.getTimeLeft().intValue();
+					}
+					
+					//Check for max allowed start attempts
+					if(studentMap != null && studentMap.getStartedCount() != null && result.getMaxStarts() != null) {
+						if(result.getMaxStarts() <= studentMap.getStartedCount()) {
+							response.setStatus(new EdoApiStatus(STATUS_ERROR, "You have reached maximum no of test attempts. Please contact your admin for more info."));
+							return response;
+						}
+					}
+					
 				}
 				
 				//TODO add later addTestActivity(testId, studenId, "STARTED", req.getTest());
 				//Added on 11/12/19
 				
-				studentMaps = testsDao.getStudentActivePackage(inputMap);
+				//Check against test start and end date
+				EdoTest mapTest = result;
+				if(mapTest != null) {
+					if(mapTest.getStartDate() != null && mapTest.getStartDate().getTime() > new Date().getTime()) {
+						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_OPENED, "Test will be available on " + CommonUtils.convertDate(mapTest.getStartDate())));
+						return response;
+					}
+					if(mapTest.getEndDate() != null && mapTest.getEndDate().getTime() < new Date().getTime() && !StringUtils.equals(status, TEST_STATUS_STARTED)) {
+						response.setStatus(new EdoApiStatus(STATUS_TEST_EXPIRED, ERROR_TEST_EXPIRED));
+						return response;
+						
+					}
+				}
+				
+				//TODO discuss and decide if it's needed
+				/*
+				 studentMaps = testsDao.getStudentActivePackage(inputMap);
 				
 				if(CollectionUtils.isNotEmpty(studentMaps)) {
 					studentMap = studentMaps.get(0);
@@ -397,8 +467,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				
 				studentMap.setStartedCount(startedCount);
-				
-				if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
+				 * if(!StringUtils.equalsIgnoreCase(studentMap.getStudentAccess(), ACCESS_LEVEL_ADMIN)) {
 					if(!StringUtils.equalsIgnoreCase(STATUS_ACTIVE, result.getStatus())) {
 						response.setStatus(new EdoApiStatus(STATUS_TEST_NOT_ACTIVE, ERROR_TEST_NOT_ACTIVE));
 						return response;
@@ -417,9 +486,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 							}
 						}
 					}
-				}
+				}*/
 				
-			} else if (StringUtils.equals("DOWNLOAD_EXAM", req.getRequestType())) {
+			/*} else if (StringUtils.equals("DOWNLOAD_EXAM", req.getRequestType())) {
 				String downloadExam = EdoPropertyUtil.getProperty(EdoPropertyUtil.DOWNLOAD_EXAM);
 				if(StringUtils.isBlank(downloadExam) || !StringUtils.equalsIgnoreCase("Y", downloadExam)) {
 					response.setStatus(new EdoApiStatus(-111, "This feature is disabled at this moment. Please try again later."));
@@ -427,7 +496,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}*/
 			
-			
+				
+			}
 			
 			initTime = System.currentTimeMillis() - time0;
 			time0 = System.currentTimeMillis();
@@ -455,23 +525,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					" order by test_questions_map.question_number,test_questions_map.id asc");
 			query.setInteger("testId", testId);
 			
-			List list = query.list();
-			
+			List<Object[]> list = query.list();
+			List<EdoTestQuestionMap> map = EdoMyBatisUtil.convertHibernateExamMap(list);
 			fetchQueryTime = System.currentTimeMillis() - fetchQueryTime;
 			
 			//Check for random pool property..if set to 1, random questions need to be picked out of total questions added
-			/*Map<String, Integer> examQuestionCount = null;
+			Map<String, Integer> examQuestionCount = null;
 			Map<String, List<EdoQuestion>> solvedSet = null;
 			
 			if(CollectionUtils.isNotEmpty(map)) {
 				//EdoTest result = map.get(0).getTest();
-				//Check for max allowed start attempts
-				if(studentMap != null && studentMap.getStartedCount() != null && result.getMaxStarts() != null) {
-					if(result.getMaxStarts() <= studentMap.getStartedCount()) {
-						response.setStatus(new EdoApiStatus(STATUS_ERROR, "You have reached maximum no of test attempts. Please contact your admin for more info."));
-						return response;
-					}
-				}
 				
 				if(studenId != null) {
 					//Check if time constraint is present
@@ -510,7 +573,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 									userAppVersion = StringUtils.trimToEmpty(versionKeys[1]);
 								}
 							}
-							EDOInstitute institute = testsDao.getInstituteById(result.getInstituteId());
+							//EDOInstitute institute = testsDao.getInstituteById(result.getInstituteId());
+							EDOInstitute institute = EdoMyBatisUtil.convertToInstitute(hDao.getEntityByKey(EdoInstituteEntity.class, "id", result.getInstituteId()));
+							
 							if(institute != null && StringUtils.isNotBlank(institute.getAppVersion())) {
 								//Compare app version with users version and show error if older version
 								if(userAppVersion.compareTo(StringUtils.trimToEmpty(institute.getAppVersion())) < 0) {
@@ -643,7 +708,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					//Check for proctoring
 					if(StringUtils.equalsIgnoreCase(result.getTestUi(), "PROCTORING")) {
-						EdoStudent student = testsDao.getStudentById(studenId);
+						//EdoStudent student = testsDao.getStudentById(studenId);
+						EdoStudentEntity student = hDao.getEntityByKey(EdoStudentEntity.class, "id", studenId);
 						if(student != null && StringUtils.isNotBlank(student.getProctorImageRef())) {
 							result.setProctoringImage(student.getProctorImageRef());
 						} else {
@@ -661,11 +727,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					
 				}
 				response.setTest(result);
-			}*/
+			}
 			
 			processTime = System.currentTimeMillis() - time0;
 			
 			//LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " query fetch:" + fetchQueryTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
+			
+			tx.commit();
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));

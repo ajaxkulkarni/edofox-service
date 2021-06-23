@@ -127,6 +127,9 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoProfileEntity</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoProctorImages</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoTestEntity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoInstituteEntity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoStudentEntity</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

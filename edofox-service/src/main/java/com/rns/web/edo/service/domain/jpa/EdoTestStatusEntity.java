@@ -42,8 +42,8 @@ public class EdoTestStatusEntity {
 	private Long timeLeft;
 	@Column(name = "updated_date", unique = true)
 	private Date updatedDate;
-	@Column(name = "exam_started_count", unique = true)
-	private Integer examStartedCount;
+	@Column(name = "exam_started_count")
+	private Integer startedCount;
 	@Column(name = "device", unique = true)
 	private String device;
 	@Column(name = "device_info", unique = true)
@@ -54,7 +54,12 @@ public class EdoTestStatusEntity {
 	private Integer evaluator;
 	@Column(name = "proctoring_remarks")
 	private String proctoringRemarks;
-	
+	@Column(name = "latitude")
+	private String latitude;
+	@Column(name = "longitude")
+	private String longitude;
+	@Column(name = "admin_reset")
+	private Integer adminReset;
 	
 	
 	public Integer getId() {
@@ -123,11 +128,11 @@ public class EdoTestStatusEntity {
 	public Date getUpdatedDate() {
 		return updatedDate;
 	}
-	public Integer getExamStartedCount() {
-		return examStartedCount;
+	public Integer getStartedCount() {
+		return startedCount;
 	}
-	public void setExamStartedCount(Integer examStartedCount) {
-		this.examStartedCount = examStartedCount;
+	public void setStartedCount(Integer startedCount) {
+		this.startedCount = startedCount;
 	}
 	public String getDevice() {
 		return device;
@@ -159,5 +164,22 @@ public class EdoTestStatusEntity {
 	public void setProctoringRemarks(String proctoringRemarks) {
 		this.proctoringRemarks = proctoringRemarks;
 	}
-	
+	public String getLatitude() {
+		return latitude;
+	}
+	public void setLatitude(String latiude) {
+		this.latitude = latitude;
+	}
+	public String getLongitude() {
+		return longitude;
+	}
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+	public Integer getAdminReset() {
+		return adminReset;
+	}
+	public void setAdminReset(Integer adminReset) {
+		this.adminReset = adminReset;
+	}
 }
