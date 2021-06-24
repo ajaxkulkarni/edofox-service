@@ -330,9 +330,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				inputMap.setStudent(new EdoStudent(studenId));
 				//List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
 				
-				writeSession = this.sessionFactory.openSession();
+				//writeSession = this.sessionFactory.openSession();
 				
-				List<EdoTestStatusEntity> studentMaps = writeSession.createCriteria(EdoTestStatusEntity.class)
+				List<EdoTestStatusEntity> studentMaps = session.createCriteria(EdoTestStatusEntity.class)
 														.add(Restrictions.eq("studentId", studenId))
 														.add(Restrictions.eq("testId", testId)).list();
 				
@@ -353,11 +353,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				Integer startedCount = 0;
 				
-				Transaction tx = writeSession.beginTransaction();
+				//Transaction tx = writeSession.beginTransaction();
+				
 				//Added on 11/12/19
 				if(studentMap == null) {
 					//Add test status as 'STARTED' to track students who logged in
-					/*EdoServiceRequest request = new EdoServiceRequest();
+					EdoServiceRequest request = new EdoServiceRequest();
 					EdoStudent student = new EdoStudent();
 					student.setId(studenId);
 					request.setStudent(student);
@@ -372,10 +373,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setDevice(req.getTest().getDevice());
 					test.setDeviceInfo(StringUtils.substring(req.getTest().getDeviceInfo(), 0, 100));
 					test.setLocationLat(req.getTest().getLocationLat());
-					test.setLocationLong(req.getTest().getLocationLong());*/
-					//TODO Add later testsDao.saveTestStatus(request);
+					test.setLocationLong(req.getTest().getLocationLong());
+					testsDao.saveTestStatus(request);
 					
-					EdoTestStatusEntity testStatus = new EdoTestStatusEntity();
+					/*EdoTestStatusEntity testStatus = new EdoTestStatusEntity();
 					testStatus.setTestId(testId);
 					testStatus.setStudentId(studenId);
 					testStatus.setCreatedDate(new Date());
@@ -392,11 +393,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					
 					writeSession.persist(testStatus);
 					
-					tx.commit();
+					tx.commit();*/
 					
 				} else {
 					//Update test status for timestamp and exam started count
-					/*EdoServiceRequest request = new EdoServiceRequest();
+					EdoServiceRequest request = new EdoServiceRequest();
 					EdoStudent student = new EdoStudent();
 					student.setId(studenId);
 					request.setStudent(student);
@@ -406,18 +407,19 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						test.setLocationLat(req.getTest().getLocationLat());
 						test.setLocationLong(req.getTest().getLocationLong());
 					}
-					request.setTest(test);*/
+					request.setTest(test);
+					testsDao.updateTestStatus(request);
 					
-					studentMap.setStartedCount(studentMap.getStartedCount() + 1);
+					/*studentMap.setStartedCount(studentMap.getStartedCount() + 1);
 					studentMap.setUpdatedDate(new Date());
 					if(req.getTest().getLocationLat() != null && req.getTest().getLocationLong() != null) {
 						studentMap.setLatitude(req.getTest().getLocationLat());
 						studentMap.setLongitude(req.getTest().getLocationLong());
-					}
+					}*/
 					
-					tx.commit();
+					//tx.commit();
 					
-					//TODO ADD later testsDao.updateTestStatus(request);
+					
 					if(studentMap.getStartedCount() != null) {
 						startedCount = studentMap.getStartedCount();
 					}
