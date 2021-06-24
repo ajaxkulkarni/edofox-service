@@ -330,6 +330,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				inputMap.setStudent(new EdoStudent(studenId));
 				//List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
 				
+				writeSession = this.sessionFactory.openSession();
+				
 				List<EdoTestStatusEntity> studentMaps = writeSession.createCriteria(EdoTestStatusEntity.class)
 														.add(Restrictions.eq("studentId", studenId))
 														.add(Restrictions.eq("testId", testId)).list();
@@ -351,7 +353,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				Integer startedCount = 0;
 				
-				writeSession = this.sessionFactory.openSession();
 				Transaction tx = writeSession.beginTransaction();
 				//Added on 11/12/19
 				if(studentMap == null) {
