@@ -304,11 +304,12 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 		
 		Session session = null;
+		Session writeSession = null;
 		EdoHibernateDao hDao = null;
 		try {
 			
 			session = this.sessionFactory.openSession();
-			Transaction tx = session.beginTransaction();
+			
 			hDao = new EdoHibernateDao(session);
 			
 			//EdoTest result = testsDao.getTest(testId);
@@ -349,6 +350,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 				}
 				Integer startedCount = 0;
+				
+				writeSession = this.sessionFactory.openSession();
+				Transaction tx = writeSession.beginTransaction();
 				//Added on 11/12/19
 				if(studentMap == null) {
 					//Add test status as 'STARTED' to track students who logged in
@@ -385,7 +389,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					testStatus.setStartedCount(1);
 					testStatus.setStatus(TEST_STATUS_STARTED);
 					
-					session.persist(testStatus);
+					writeSession.persist(testStatus);
+					
+					tx.commit();
 					
 				} else {
 					//Update test status for timestamp and exam started count
@@ -407,6 +413,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						studentMap.setLatitude(req.getTest().getLocationLat());
 						studentMap.setLongitude(req.getTest().getLocationLong());
 					}
+					
+					tx.commit();
 					
 					//TODO ADD later testsDao.updateTestStatus(request);
 					if(studentMap.getStartedCount() != null) {
@@ -432,6 +440,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					}
 					
 				}
+				
+				
 				
 				//TODO add later addTestActivity(testId, studenId, "STARTED", req.getTest());
 				//Added on 11/12/19
@@ -733,13 +743,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			
 			//LoggingUtil.logMessage("Get Test Processing time ==> init: " + initTime + " query fetch:" + fetchQueryTime + " fetch:" + fetchTime + " process:" + processTime, LoggingUtil.debugLogger);
 			
-			tx.commit();
 			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 			response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_IN_PROCESSING));
 		} finally {
 			CommonUtils.closeSession(session);
+			CommonUtils.closeSession(writeSession);
 		}
 		
 		return response;
