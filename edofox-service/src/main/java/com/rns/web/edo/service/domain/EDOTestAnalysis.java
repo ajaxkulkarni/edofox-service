@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class EDOTestAnalysis {
 	
 	private Integer studentsAppeared;
+	private Integer studentsAbsent;
 	private BigDecimal averageScore;
 	private BigDecimal averageCorrect;
 	private BigDecimal averageAttempted;
@@ -86,6 +87,12 @@ public class EDOTestAnalysis {
 	}
 	public void setTopScore(Integer topScore) {
 		this.topScore = topScore;
+	}
+	public Integer getStudentsAbsent() {
+		return studentsAbsent;
+	}
+	public void setStudentsAbsent(Integer studentsAbsent) {
+		this.studentsAbsent = studentsAbsent;
 	}
 	
 }

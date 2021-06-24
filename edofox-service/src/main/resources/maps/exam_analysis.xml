@@ -11,6 +11,8 @@
 		<result column="no_of_questions" property="noOfQuestions" />
 		<result column="total_marks" property="totalMarks" />
 		<result column="duration" property="duration" />
+		<result column="institute_id" property="instituteId"/>
+		<result column="package_id" property="packageId"/>
 		<result column="studentsAppeared" property="analysis.studentsAppeared" />
 		<result column="avgScore" property="analysis.averageScore" />
 		<result column="avgCorrect" property="analysis.averageCorrect" />
@@ -39,7 +41,6 @@
 		<result column="correctCount" property="analysis.correctCount"/>
 		<result column="wrongCount" property="analysis.wrongCount"/>
 		<result column="solvedCount" property="analysis.solvedCount"/>
-		
 	</resultMap>
 	
 	
@@ -54,8 +55,10 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		select * from test_questions_map
 		join test_questions on test_questions.id = test_questions_map.question_id
 		join test_subjects on test_questions.subject_id = test_subjects.subject_id
-		left join (select count(*) as optionCount,test_id, question_id, option_selected from test_result where test_id = ${value} group by option_selected, test_id, question_id) as result
-		on result.question_id = test_questions_map.question_id where test_questions_map.test_id = ${value}
+		left join (select count(*) as optionCount,test_id, question_id, option_selected from test_result where test_id = ${value} AND option_selected != '' group by option_selected, test_id, question_id) as result
+		on result.question_id = test_questions_map.question_id
+		
+	 	where test_questions_map.test_id = ${value}		
 		AND test_questions_map.question_disabled = 0 order by test_questions_map.question_number asc;
 	</select>
 	
@@ -196,6 +199,13 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		join test_questions on test_result.question_id = test_questions.id join test_subjects 
 		on test_questions.subject_id = test_subjects.subject_id where student_id = ${value} 
 		GROUP BY test_result.student_id,test_result.test_id, test_questions.subject_id
+	</select>
+	
+	<select id="getQuestionwiseCounts" resultMap="questionAnalysis" parameterType="Integer">
+		select test_questions_map.question_id,question_number,solvedCount,correctCount from test_questions_map 
+		left join (select count(*) as solvedCount,question_id from test_result where test_id = ${value} and option_selected != '' group by question_id) as solvedCount on solvedCount.question_id = test_questions_map.question_id
+		left join (select count(*) as correctCount,question_id from test_result where test_id = ${value} and option_selected != '' AND marks &gt; 0 group by question_id) as correctCount on correctCount.question_id = test_questions_map.question_id
+		where test_questions_map.test_id = ${value} order by test_questions_map.question_number asc
 	</select>
 	
 </mapper>

@@ -158,6 +158,23 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				//response.setStatus(new EdoApiStatus(STATUS_ERROR, ERROR_RESULT_NOT_FOUND));
 				return response;
 			}
+			
+			//Get students of package to find out absent students
+			if(analysis.getInstituteId() != null) {
+				EdoStudent student = new EdoStudent();
+				student.setInstituteId(analysis.getInstituteId().toString());
+				EDOPackage currentPackage = new EDOPackage();
+				currentPackage.setId(analysis.getPackageId());
+				student.setCurrentPackage(currentPackage);
+				List<EdoStudent> packageStudents = testsDao.getAllPackageStudents(student);
+				if(CollectionUtils.isNotEmpty(packageStudents)) {
+					if(analysis.getAnalysis().getStudentsAppeared() == null) {
+						analysis.getAnalysis().setStudentsAppeared(0);
+					}
+					analysis.getAnalysis().setStudentsAbsent(packageStudents.size() - analysis.getAnalysis().getStudentsAppeared());
+				}
+			}
+			
 			List<EdoQuestion> questionAnalysis = testsDao.getQuestionAnalysis(test.getId());
 			List<EdoQuestion> finalList = new ArrayList<EdoQuestion>();
 			if(CollectionUtils.isNotEmpty(questionAnalysis)) {
@@ -209,6 +226,40 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					QuestionParser.fixQuestion(existing);
 					questionMap.put(question.getQn_id(), existing);
 				}
+				//Add question level analysis to the mix
+				List<EdoQuestion> questionCounts = testsDao.getQuestionwiseCounts(test.getId());
+				if(CollectionUtils.isNotEmpty(questionCounts)) {
+					for(EdoQuestion question: finalList) {
+						for(EdoQuestion q: questionCounts) {
+							if(q.getQn_id() != null && q.getQn_id().intValue() == question.getQn_id().intValue()) {
+								if(question.getAnalysis() == null) {
+									question.setAnalysis(new EDOQuestionAnalysis());
+								}
+								if(q.getAnalysis() == null) {
+									question.getAnalysis().setUnattemptedCount(analysis.getAnalysis().getStudentsAppeared());
+								} else {
+									if(q.getAnalysis().getSolvedCount() == null) {
+										q.getAnalysis().setSolvedCount(0);
+									}
+									if(q.getAnalysis().getCorrectCount() == null) {
+										q.getAnalysis().setCorrectCount(0);
+									}
+									question.getAnalysis().setSolvedCount(q.getAnalysis().getSolvedCount());
+									question.getAnalysis().setAttemptedPercent(CommonUtils.getPercent(q.getAnalysis().getSolvedCount(), analysis.getAnalysis().getStudentsAppeared()));
+									question.getAnalysis().setUnattemptedCount(analysis.getAnalysis().getStudentsAppeared() - q.getAnalysis().getSolvedCount());
+									if(question.getAnalysis().getCorrectCount() == null) {
+										question.getAnalysis().setCorrectCount(q.getAnalysis().getCorrectCount());
+										question.getAnalysis().setCorrectPercent(CommonUtils.getPercent(q.getAnalysis().getCorrectCount(), analysis.getAnalysis().getStudentsAppeared()));
+									}
+									question.getAnalysis().setWrongCount(q.getAnalysis().getSolvedCount() - question.getAnalysis().getCorrectCount());
+									question.getAnalysis().setWrongPercent(CommonUtils.getPercent(q.getAnalysis().getWrongCount(), analysis.getAnalysis().getStudentsAppeared()));
+								}
+								break;
+							}
+						}
+					}
+				}
+				
 				if(CollectionUtils.isNotEmpty(questionMap.values())) {
 					analysis.setTest(/*new ArrayList<EdoQuestion>(questionMap.values())*/finalList);
 				}

@@ -2,6 +2,11 @@ package com.rns.web.edo.service.domain;
 
 import java.math.BigDecimal;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class EDOQuestionAnalysis {
 	
 
@@ -14,11 +19,14 @@ public class EDOQuestionAnalysis {
 	private Integer correctCount;
 	private Integer solvedCount;
 	private Integer wrongCount;
+	private Integer unattemptedCount;
 	private BigDecimal option1percent;
 	private BigDecimal option2percent;
 	private BigDecimal option3percent;
 	private BigDecimal option4percent;
 	private BigDecimal correctPercent;
+	private BigDecimal wrongPercent;
+	private BigDecimal attemptedPercent;
 	
 	private Integer questionsAddedBySubject;
 	private Integer questionsAddedByChapter;
@@ -163,6 +171,24 @@ public class EDOQuestionAnalysis {
 	}
 	public void setWrongCount(Integer wrongCount) {
 		this.wrongCount = wrongCount;
+	}
+	public Integer getUnattemptedCount() {
+		return unattemptedCount;
+	}
+	public void setUnattemptedCount(Integer unattemptedCount) {
+		this.unattemptedCount = unattemptedCount;
+	}
+	public BigDecimal getWrongPercent() {
+		return wrongPercent;
+	}
+	public void setWrongPercent(BigDecimal wrongPercent) {
+		this.wrongPercent = wrongPercent;
+	}
+	public BigDecimal getAttemptedPercent() {
+		return attemptedPercent;
+	}
+	public void setAttemptedPercent(BigDecimal attemptedPercent) {
+		this.attemptedPercent = attemptedPercent;
 	}
 	
 	
