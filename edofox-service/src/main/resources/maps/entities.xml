@@ -123,6 +123,8 @@
 		<result property="classroomId" column="classroom_id"/>
 		<result property="classroomName" column="package_name"/>
 		<result property="chapterId" column="chapter_id"/>
+		<result property="totalQuestions" column="totalQuestions"/>
+		<result property="totalMarks" column="totalMarks"/>
 	</resultMap>
 	
 	<resultMap type="com.rns.web.edo.service.domain.EdoFeedback" id="feedback">

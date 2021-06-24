@@ -58,6 +58,7 @@ public interface EdoTestsDao {
 	List<EdoTest> getStudentRank(EdoServiceRequest request);
 	List<EdoTest> getTopperScore(Integer value);
 	List<EdoQuestion> getQuestionwiseCounts(Integer value);
+	List<EdoQuestion> getSubjectWiseAverage(EdoServiceRequest request);
 	
 	//Student queries
 	List<EDOPackage> getInstituePackages(/*Integer instituteId*/EdoServiceRequest request);

@@ -97,6 +97,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.xml.bind.v2.util.TypeCast;
 
 public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 	
@@ -320,7 +321,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			if(CollectionUtils.isNotEmpty(subjects)) {
 				List<String> subjectsList = new ArrayList<String>();
 				for(EdoSubject sub: subjects) {
-					subjectsList.add(sub.getSubjectName());
+					subjectsList.add(sub.getSubjectName());  
 				}
 				
 				final List<String> colSeq = colOrder;
@@ -2628,5 +2629,71 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			CommonUtils.closeSession(session);
 		}
 		return status;
+	}
+
+	public EdoServiceResponse getSubjectAnalysis(EdoServiceRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		if(request.getTest() == null || request.getTest().getId() == null) {
+			return response;
+		}
+		try {
+			List<EdoSubject> subjects = testsDao.getTestSubjects(request.getTest().getId());
+			if(CollectionUtils.isNotEmpty(subjects)) {
+				//Subject wise solved count
+				request.setRequestType("count");
+				List<EdoQuestion> solvedAvgs = testsDao.getSubjectWiseAverage(request);
+				request.setSearchFilter("correctCount");
+				List<EdoQuestion> correctAvgs = testsDao.getSubjectWiseAverage(request);
+				request.setSearchFilter(null);
+				request.setRequestType("sum");
+				List<EdoQuestion> avgScore = testsDao.getSubjectWiseAverage(request);
+				request.setSearchFilter("topper");
+				List<EdoQuestion> toppers = testsDao.getSubjectWiseAverage(request);
+				
+				List<EdoQuestion> finalAnalysis = new ArrayList<EdoQuestion>();
+				
+				for(EdoSubject subject: subjects) {
+					EdoQuestion question = new EdoQuestion();
+					EDOQuestionAnalysis analysis = new EDOQuestionAnalysis();
+					analysis.setAvgSolved(findAverage(solvedAvgs, subject));
+					analysis.setAvgCorrect(findAverage(correctAvgs, subject));
+					if(subject.getTotalQuestions() != null) {
+						analysis.setAvgUnsolved(CommonUtils.subtract(new BigDecimal(subject.getTotalQuestions()), analysis.getAvgSolved()));
+						analysis.setAvgWrong(CommonUtils.subtract(analysis.getAvgSolved(), analysis.getAvgCorrect()));
+						analysis.setTypeCount(subject.getTotalQuestions());	
+					}
+					analysis.setSubAvg(findAverage(avgScore, subject));
+					analysis.setSubjectTopper(findAverage(toppers, subject));
+					analysis.setSubjectTotal(subject.getTotalMarks());
+					question.setSubject(subject.getSubjectName());
+					question.setSubjectId(subject.getId());
+					question.setAnalysis(analysis);
+					
+					finalAnalysis.add(question);
+				}
+				
+				EdoTest test = new EdoTest();
+				test.setTest(finalAnalysis);
+				response.setTest(test);
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+		} finally {
+			
+		}
+		
+		return response;
+	}
+
+	private BigDecimal findAverage(List<EdoQuestion> avgCollection, EdoSubject subject) {
+		if(CollectionUtils.isEmpty(avgCollection) || subject == null) {
+			return null;
+		}
+		for(EdoQuestion q: avgCollection) {
+			if(q.getAnalysis() != null && q.getAnalysis().getSubAvg() != null && q.getSubjectId() != null && q.getSubjectId().intValue() == subject.getId().intValue()) {
+				return new BigDecimal(Math.ceil(q.getAnalysis().getSubAvg().doubleValue()));
+			}
+		}
+		return null;
 	}
 }

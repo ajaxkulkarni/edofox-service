@@ -27,6 +27,16 @@ public class EDOQuestionAnalysis {
 	private BigDecimal correctPercent;
 	private BigDecimal wrongPercent;
 	private BigDecimal attemptedPercent;
+	private BigDecimal subAvg;
+	
+	//For subjectwise avg
+	private BigDecimal avgSolved;
+	private BigDecimal avgCorrect;
+	private BigDecimal avgUnsolved;
+	private BigDecimal avgWrong;
+	private BigDecimal subjectTopper;
+	private BigDecimal subjectTotal;
+	
 	
 	private Integer questionsAddedBySubject;
 	private Integer questionsAddedByChapter;
@@ -39,6 +49,30 @@ public class EDOQuestionAnalysis {
 	private Integer typeCount;
 	private String questionType;
 	
+	public BigDecimal getAvgSolved() {
+		return avgSolved;
+	}
+	public void setAvgSolved(BigDecimal avgSolved) {
+		this.avgSolved = avgSolved;
+	}
+	public BigDecimal getAvgCorrect() {
+		return avgCorrect;
+	}
+	public void setAvgCorrect(BigDecimal avgCorrect) {
+		this.avgCorrect = avgCorrect;
+	}
+	public BigDecimal getAvgUnsolved() {
+		return avgUnsolved;
+	}
+	public void setAvgUnsolved(BigDecimal avgUnsolved) {
+		this.avgUnsolved = avgUnsolved;
+	}
+	public BigDecimal getAvgWrong() {
+		return avgWrong;
+	}
+	public void setAvgWrong(BigDecimal avgWrong) {
+		this.avgWrong = avgWrong;
+	}
 	
 	public Integer getHardQuestionsCount() {
 		return hardQuestionsCount;
@@ -189,6 +223,24 @@ public class EDOQuestionAnalysis {
 	}
 	public void setAttemptedPercent(BigDecimal attemptedPercent) {
 		this.attemptedPercent = attemptedPercent;
+	}
+	public BigDecimal getSubAvg() {
+		return subAvg;
+	}
+	public void setSubAvg(BigDecimal subAvg) {
+		this.subAvg = subAvg;
+	}
+	public BigDecimal getSubjectTopper() {
+		return subjectTopper;
+	}
+	public void setSubjectTopper(BigDecimal subjectTopper) {
+		this.subjectTopper = subjectTopper;
+	}
+	public BigDecimal getSubjectTotal() {
+		return subjectTotal;
+	}
+	public void setSubjectTotal(BigDecimal subjectTotal) {
+		this.subjectTotal = subjectTotal;
 	}
 	
 	

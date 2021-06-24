@@ -38,9 +38,11 @@
 		<result column="optionCount" property="analysis.optionCount" />
 		<result column="option_selected" property="analysis.optionSelected" />
 		<result column="subject" property="subject" />
+		<result column="subject_id" property="subjectId"/>
 		<result column="correctCount" property="analysis.correctCount"/>
 		<result column="wrongCount" property="analysis.wrongCount"/>
 		<result column="solvedCount" property="analysis.solvedCount"/>
+		<result column="subAvg" property="analysis.subAvg"/>
 	</resultMap>
 	
 	
@@ -153,7 +155,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	</select>
 	
 	<select id="getTestSubjects" resultMap="subjects" parameterType="Integer">
-	SELECT subject,test_questions.subject_id FROM `test_questions_map` 
+	SELECT subject,test_questions.subject_id,count(test_questions_map.id) as totalQuestions,sum(test_questions_map.weightage) as totalMarks FROM `test_questions_map` 
 	join test_questions on test_questions_map.question_id = test_questions.id 
 	join test_subjects on test_questions.subject_id = test_subjects.subject_id 
 	where test_id = ${value} group by test_questions.subject_id order by subject asc
@@ -206,6 +208,32 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		left join (select count(*) as solvedCount,question_id from test_result where test_id = ${value} and option_selected != '' group by question_id) as solvedCount on solvedCount.question_id = test_questions_map.question_id
 		left join (select count(*) as correctCount,question_id from test_result where test_id = ${value} and option_selected != '' AND marks &gt; 0 group by question_id) as correctCount on correctCount.question_id = test_questions_map.question_id
 		where test_questions_map.test_id = ${value} order by test_questions_map.question_number asc
+	</select>
+	
+	<select id="getSubjectWiseAverage" resultMap="questionAnalysis" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		select 
+		<if test="searchFilter == 'topper'">
+			max(subCount.subjectCount) as subAvg, 
+		</if>
+		<if test="searchFilter != 'topper'">
+			avg(subCount.subjectCount) as subAvg, 		
+		</if>
+		subject_id from (
+		select 
+		<if test="requestType == 'count'">
+		count(*) as subjectCount
+		</if>
+		<if test="requestType == 'sum'">
+		sum(marks) as subjectCount
+		</if>
+		,student_id,subject_id from test_result 
+		join test_questions on test_result.question_id = test_questions.id
+		where test_id = ${test.id} AND option_selected != '' 
+		<if test="searchFilter == 'correctCount'">
+			AND marks &gt; 0
+		</if>
+		group by test_result.student_id, test_questions.subject_id) as subCount 
+		group by subject_id
 	</select>
 	
 </mapper>

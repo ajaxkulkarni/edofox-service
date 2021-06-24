@@ -1146,5 +1146,20 @@ public class CommonUtils {
 
 		}
 	}
+
+	public static BigDecimal subtract(BigDecimal subtractFrom, BigDecimal subtract) {
+		try {
+			if(subtractFrom == null) {
+				subtractFrom = BigDecimal.ZERO;
+			}
+			if(subtract == null) {
+				subtract = BigDecimal.ZERO;
+			}
+			return subtractFrom.subtract(subtract);
+		} catch (Exception e) {
+			
+		}
+		return null;
+	}
 	
 }

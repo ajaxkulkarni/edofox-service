@@ -1,5 +1,6 @@
 package com.rns.web.edo.service.domain;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -16,6 +17,8 @@ public class EdoSubject {
 	private Integer classroomId;
 	private String classroomName;
 	private Integer chapterId;
+	private Integer totalQuestions;
+	private BigDecimal totalMarks;
 	
 	public String getSubjectName() {
 		return subjectName;
@@ -58,6 +61,18 @@ public class EdoSubject {
 	}
 	public void setChapterId(Integer chapterId) {
 		this.chapterId = chapterId;
+	}
+	public Integer getTotalQuestions() {
+		return totalQuestions;
+	}
+	public void setTotalQuestions(Integer totalQuestions) {
+		this.totalQuestions = totalQuestions;
+	}
+	public BigDecimal getTotalMarks() {
+		return totalMarks;
+	}
+	public void setTotalMarks(BigDecimal totalMarks) {
+		this.totalMarks = totalMarks;
 	}
 	
 }
