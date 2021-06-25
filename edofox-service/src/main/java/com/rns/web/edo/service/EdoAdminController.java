@@ -617,4 +617,12 @@ data: [{"senderId":"mtrsft","requestId":"31666d745341353534373539","report":[{"d
 		LoggingUtil.logMessage("SMS Web hook called .... " + request, LoggingUtil.emailLogger);
 		return adminBo.updateEmailStatus(request, "sms");
 	}
+	
+	@POST
+	@Path("/getSubjectTestAnalysis")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public EdoServiceResponse getSubjectTestAnalysis(EdoServiceRequest request) {
+		return adminBo.getSubjectAnalysis(request);
+	}
 }
