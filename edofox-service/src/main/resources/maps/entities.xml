@@ -71,6 +71,7 @@
 		<result column="show_question_paper" property="showQuestionPaper"/>
 		<result column="pause_timeout_seconds" property="pauseTimeout"/>
 		<result column="topScore" property="analysis.topScore"/>
+		<result column="avgScore" property="analysis.averageScore"/>
 		<result column="totalStudents" property="analysis.studentsAppeared"/>
 		<result column="package_id" property="packageId"/>
 		<result column="show_result" property="showResult" />

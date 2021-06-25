@@ -54,6 +54,7 @@ public interface EdoTestsDao {
 	List<EdoTest> getStudentPerformance(EdoStudent value);
 	List<EdoTest> getStudentRank(EdoServiceRequest request);
 	List<EdoTest> getTopperScore(Integer value);
+	List<EdoTest> getAvgScore(Integer value);
 	
 	
 	//Student queries

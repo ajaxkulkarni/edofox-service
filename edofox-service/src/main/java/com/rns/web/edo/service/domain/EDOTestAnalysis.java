@@ -10,8 +10,10 @@ public class EDOTestAnalysis {
 	private BigDecimal averageCorrect;
 	private BigDecimal averageAttempted;
 	private List<EdoStudentSubjectAnalysis> subjectAnalysis;
-	private Integer topScore;
+	private BigDecimal topScore;
 	private BigDecimal percentile;
+	private BigDecimal deviation;
+	private BigDecimal marksLost;
 	
 	public Integer getStudentsAppeared() {
 		return studentsAppeared;
@@ -43,10 +45,10 @@ public class EDOTestAnalysis {
 	public List<EdoStudentSubjectAnalysis> getSubjectAnalysis() {
 		return subjectAnalysis;
 	}
-	public Integer getTopScore() {
+	public BigDecimal getTopScore() {
 		return topScore;
 	}
-	public void setTopScore(Integer topScore) {
+	public void setTopScore(BigDecimal topScore) {
 		this.topScore = topScore;
 	}
 	public BigDecimal getPercentile() {
@@ -54,6 +56,18 @@ public class EDOTestAnalysis {
 	}
 	public void setPercentile(BigDecimal percentile) {
 		this.percentile = percentile;
+	}
+	public BigDecimal getDeviation() {
+		return deviation;
+	}
+	public void setDeviation(BigDecimal deviation) {
+		this.deviation = deviation;
+	}
+	public BigDecimal getMarksLost() {
+		return marksLost;
+	}
+	public void setMarksLost(BigDecimal marksLost) {
+		this.marksLost = marksLost;
 	}
 	
 }

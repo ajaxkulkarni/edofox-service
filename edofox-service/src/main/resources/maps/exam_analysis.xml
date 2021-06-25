@@ -120,6 +120,9 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	LEFT JOIN regions student_regions
 	ON student_regions.id  = student_districts.region_id
 	where test_status.test_id = ${test.id} 
+	<if test="searchFilter != null">
+		AND students.payment_flow = '${searchFilter}'
+	</if>
 	order by test_status.score desc
 	<if test="resultLimit != null">
 	LIMIT ${resultLimit}
@@ -202,6 +205,10 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 	
 	<select id="getTopperScore" parameterType="Integer" resultMap="test">
 		select max(score) as topScore,count(*) as totalStudents from test_status where test_id = ${value}
+	</select>
+	
+	<select id="getAvgScore" parameterType="Integer" resultMap="test">
+		select avg(score) as avgScore from test_status where test_id = ${value}
 	</select>
 
 	<select id="getSubjectwisePerformanceStudent" resultMap="subjectScore" parameterType="Integer">

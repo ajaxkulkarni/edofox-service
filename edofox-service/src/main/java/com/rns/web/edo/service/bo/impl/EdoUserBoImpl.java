@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -180,6 +181,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.getAnalysis().setTopScore(topScoreResponse.get(0).getAnalysis().getTopScore());
 					test.getAnalysis().setStudentsAppeared(topScoreResponse.get(0).getAnalysis().getStudentsAppeared());
 					test.getAnalysis().setPercentile(CommonUtils.calculatePercentile(test.getAnalysis().getStudentsAppeared(), test.getRank()));
+					if(test.getAnalysis().getTopScore() != null && test.getScore() != null) {
+						test.getAnalysis().setDeviation(test.getAnalysis().getTopScore().subtract(test.getScore()));
+					}
+					List<EdoTest> avgScoreResponse = testsDao.getAvgScore(test.getId());
+					if(CollectionUtils.isNotEmpty(avgScoreResponse) && avgScoreResponse.get(0).getAnalysis() != null) {
+						test.getAnalysis().setAverageScore(avgScoreResponse.get(0).getAnalysis().getAverageScore());
+						if(test.getAnalysis().getAverageScore() != null) {
+							test.getAnalysis().setAverageScore(test.getAnalysis().getAverageScore().setScale(2, RoundingMode.HALF_EVEN));
+						}
+					}
+					
 				}
 			}
 			
@@ -189,6 +201,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			List<EdoQuestionCriteria> criterias = testsDao.getCriterias();
 			//Get difficulties
 			List<EdoQuestionDifficulty> difficulties = testsDao.getDifficulties();
+			
+			BigDecimal marksLost = BigDecimal.ZERO;
 			
 			for(EdoTestQuestionMap mapper: map) {
 				EdoQuestion question = mapper.getQuestion();
@@ -224,6 +238,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				//Set difficulty
 				setDifficulty(difficulties, question);
 				
+				//If question was attempted and wrong..calculate how much marks would have saved
+				if(question.getMarks() != null && question.getMarks().compareTo(BigDecimal.ZERO) < 0) {
+					marksLost = marksLost.add(question.getMarks().abs());
+				}
+				
 				test.getTest().add(question);
 				/*if(!CommonUtils.isBonus(question) && StringUtils.isBlank(StringUtils.trimToEmpty(question.getAnswer()))) {
 					continue;
@@ -240,6 +259,10 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					score = score.subtract(new BigDecimal(question.getNegativeMarks()));
 				}
 				subjectWiseScore.put(question.getSubject(), score);*/
+			}
+			
+			if(test.getAnalysis() != null) {
+				test.getAnalysis().setMarksLost(marksLost);
 			}
 			
 			//Fetch video lectures for test (if any)
