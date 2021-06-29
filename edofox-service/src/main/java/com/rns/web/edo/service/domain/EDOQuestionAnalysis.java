@@ -20,6 +20,7 @@ public class EDOQuestionAnalysis {
 	private Integer solvedCount;
 	private Integer wrongCount;
 	private Integer unattemptedCount;
+	
 	private BigDecimal option1percent;
 	private BigDecimal option2percent;
 	private BigDecimal option3percent;
@@ -27,6 +28,7 @@ public class EDOQuestionAnalysis {
 	private BigDecimal correctPercent;
 	private BigDecimal wrongPercent;
 	private BigDecimal attemptedPercent;
+	private BigDecimal unattemptedPercent;
 	private BigDecimal subAvg;
 	
 	//For subjectwise avg
@@ -241,6 +243,12 @@ public class EDOQuestionAnalysis {
 	}
 	public void setSubjectTotal(BigDecimal subjectTotal) {
 		this.subjectTotal = subjectTotal;
+	}
+	public BigDecimal getUnattemptedPercent() {
+		return unattemptedPercent;
+	}
+	public void setUnattemptedPercent(BigDecimal unattemptedPercent) {
+		this.unattemptedPercent = unattemptedPercent;
 	}
 	
 	

@@ -248,6 +248,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 									question.getAnalysis().setSolvedCount(q.getAnalysis().getSolvedCount());
 									question.getAnalysis().setAttemptedPercent(CommonUtils.getPercent(q.getAnalysis().getSolvedCount(), analysis.getAnalysis().getStudentsAppeared()));
 									question.getAnalysis().setUnattemptedCount(analysis.getAnalysis().getStudentsAppeared() - q.getAnalysis().getSolvedCount());
+									question.getAnalysis().setUnattemptedPercent(CommonUtils.getPercent(q.getAnalysis().getUnattemptedCount(), analysis.getAnalysis().getStudentsAppeared()));
 									if(question.getAnalysis().getCorrectCount() == null) {
 										question.getAnalysis().setCorrectCount(q.getAnalysis().getCorrectCount());
 										question.getAnalysis().setCorrectPercent(CommonUtils.getPercent(q.getAnalysis().getCorrectCount(), analysis.getAnalysis().getStudentsAppeared()));
