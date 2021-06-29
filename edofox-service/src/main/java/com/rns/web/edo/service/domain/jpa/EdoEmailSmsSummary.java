@@ -35,8 +35,24 @@ public class EdoEmailSmsSummary {
 	private Integer classworkId;
 	@Column(name = "no_of_students", unique = true)
 	private Integer noOfStudents;
+	@Column(name = "success_count", unique = true)
+	private Integer successCount;
+	@Column(name = "failure_count", unique = true)
+	private Integer failureCount;
 	
 	
+	public Integer getSuccessCount() {
+		return successCount;
+	}
+	public void setSuccessCount(Integer successCount) {
+		this.successCount = successCount;
+	}
+	public Integer getFailureCount() {
+		return failureCount;
+	}
+	public void setFailureCount(Integer failureCount) {
+		this.failureCount = failureCount;
+	}
 	public Date getCreatedDate() {
 		return createdDate;
 	}

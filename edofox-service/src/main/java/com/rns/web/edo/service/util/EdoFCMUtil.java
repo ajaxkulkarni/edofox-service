@@ -13,6 +13,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -120,21 +122,25 @@ public class EdoFCMUtil implements Runnable, EdoConstants {
 			
 			List<String> registrationIds = prepareRegistrationIds(devices);
 			//More than 1000 IDs are not allowed
+			EdoEmailSmsSummary summary = new EdoEmailSmsSummary();
+			summary.setSuccessCount(0);
+			summary.setFailureCount(0);
+			
 			if(CollectionUtils.isNotEmpty(registrationIds)) {
 				session = this.sessionFactory.openSession();
 				Transaction tx = session.beginTransaction();
 				if(registrationIds.size() < 1000) {
 					request.setRegistration_ids(registrationIds);
-					notify(request, bodyText, titleText);
+					notify(request, bodyText, titleText, summary);
 				} else {
 					int i = 0;
 					while(i < registrationIds.size()) {
 						request.setRegistration_ids(registrationIds.subList(i, i + 999));
-						notify(request, bodyText, titleText);
+						notify(request, bodyText, titleText, summary);
 						i = i + 1000;
 					}
 				}
-				EdoEmailSmsSummary summary = new EdoEmailSmsSummary();
+				
 				summary.setChannel("fcm");
 				summary.setCreatedDate(new Date());
 				summary.setNoOfStudents(devices.size());
@@ -158,7 +164,7 @@ public class EdoFCMUtil implements Runnable, EdoConstants {
 		}
 	}
 	
-	private void notify(EdoGoogleNotificationRequest request, String bodyText, String titleText) throws IOException, JsonGenerationException, JsonMappingException {
+	private void notify(EdoGoogleNotificationRequest request, String bodyText, String titleText, EdoEmailSmsSummary summary) throws IOException, JsonGenerationException, JsonMappingException {
 		EdoGoogleNotification notification = new EdoGoogleNotification();
 		notification.setBody(bodyText);
 		notification.setTitle(titleText);
@@ -173,7 +179,7 @@ public class EdoFCMUtil implements Runnable, EdoConstants {
 		data.setTitle(titleText);
 		data.setText(bodyText);
 		request.setData(data);
-		postNotification(request);
+		postNotification(request, summary);
 	}
 
 	/*
@@ -184,7 +190,7 @@ public class EdoFCMUtil implements Runnable, EdoConstants {
 	 * StringUtils.replace(bodyText, "{status}", "Failed"); } return bodyText; }
 	 */
 
-	private void postNotification(EdoGoogleNotificationRequest request) throws IOException, JsonGenerationException, JsonMappingException {
+	private void postNotification(EdoGoogleNotificationRequest request, EdoEmailSmsSummary summary) throws IOException, JsonGenerationException, JsonMappingException {
 		String url = EdoPropertyUtil.getProperty(EdoPropertyUtil.FCM_URL);
 		ClientConfig config = new DefaultClientConfig();
 		config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
@@ -203,8 +209,25 @@ public class EdoFCMUtil implements Runnable, EdoConstants {
 			LoggingUtil.logMessage("Failed in FCM URL : HTTP error code : " + response.getStatus(), LoggingUtil.emailLogger);
 		}
 		String output = response.getEntity(String.class);
+		//Get success and failure count from output JSON output JSON
+		try {
+			JSONObject obj = new JSONObject(output);
+			if(obj != null) {
+				if(obj.has("success")) {
+					summary.setSuccessCount(summary.getSuccessCount() + obj.getInt("success"));
+				}
+				if(obj.has("failure")) {
+					summary.setFailureCount(summary.getFailureCount() + obj.getInt("failure"));
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
 		LoggingUtil.logMessage("Output from FCM URL : " + response.getStatus() + ".... \n " + output, LoggingUtil.emailLogger);
 	}
+	
+	// {"multicast_id":5621341575207509158,"success":1,"failure":11,"canonical_ids":0,"results":[{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"error":"NotRegistered"},{"message_id":"0:1624979690721883%5f8ca52c5f8ca52c"}]}
 
 	private List<String> prepareRegistrationIds(List<EdoStudent> devices) {
 		if (CollectionUtils.isNotEmpty(devices)) {
