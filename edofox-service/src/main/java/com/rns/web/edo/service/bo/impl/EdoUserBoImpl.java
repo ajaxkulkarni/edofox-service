@@ -332,7 +332,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				
 				writeSession = this.sessionFactory.openSession();
 				
-				List<EdoTestStatusEntity> studentMaps = session.createCriteria(EdoTestStatusEntity.class)
+				List<EdoTestStatusEntity> studentMaps = writeSession.createCriteria(EdoTestStatusEntity.class)
 														.add(Restrictions.eq("studentId", studenId))
 														.add(Restrictions.eq("testId", testId)).list();
 				
