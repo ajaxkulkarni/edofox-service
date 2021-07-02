@@ -330,7 +330,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				inputMap.setStudent(new EdoStudent(studenId));
 				//List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
 				
-				//writeSession = this.sessionFactory.openSession();
+				writeSession = this.sessionFactory.openSession();
 				
 				List<EdoTestStatusEntity> studentMaps = session.createCriteria(EdoTestStatusEntity.class)
 														.add(Restrictions.eq("studentId", studenId))
@@ -353,7 +353,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				Integer startedCount = 0;
 				
-				//Transaction tx = writeSession.beginTransaction();
+				Transaction tx = writeSession.beginTransaction();
 				
 				//Added on 11/12/19
 				if(studentMap == null) {
@@ -408,16 +408,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						test.setLocationLong(req.getTest().getLocationLong());
 					}
 					request.setTest(test);
-					testsDao.updateTestStatus(request);
+					//TODO Chaned Old Code testsDao.updateTestStatus(request);
 					
-					/*studentMap.setStartedCount(studentMap.getStartedCount() + 1);
+					
+					//TODO New code using Hibernate
+					studentMap.setStartedCount(studentMap.getStartedCount() + 1);
 					studentMap.setUpdatedDate(new Date());
 					if(req.getTest().getLocationLat() != null && req.getTest().getLocationLong() != null) {
 						studentMap.setLatitude(req.getTest().getLocationLat());
 						studentMap.setLongitude(req.getTest().getLocationLong());
-					}*/
+					}
 					
-					//tx.commit();
+					tx.commit();
 					
 					
 					if(studentMap.getStartedCount() != null) {
