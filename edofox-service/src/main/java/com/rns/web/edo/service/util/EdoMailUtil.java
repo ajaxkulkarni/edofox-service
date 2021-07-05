@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -112,11 +113,24 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 				
 				int count = 0;
 				
+				Map<Integer,Integer> instituteCounts = null;
+				
 				for (EdoStudent stu : students) {
 					student = stu;
 					boolean sent = sendMail(message, dbSession);
 					if(sent) {
-						count++;
+						if(instituteId != null) {
+							count++;
+						} else if (student.getCurrentPackage() != null && student.getCurrentPackage().getInstitute() != null) {
+							if(instituteCounts == null) {
+								instituteCounts = new HashMap<Integer, Integer>();
+							}
+							if(instituteCounts.get(student.getCurrentPackage().getInstitute().getId()) == null) {
+								instituteCounts.put(student.getCurrentPackage().getInstitute().getId(), 0);
+							}
+							instituteCounts.put(student.getCurrentPackage().getInstitute().getId(), instituteCounts.get(student.getCurrentPackage().getInstitute().getId()) + 1);
+						}
+						
 					}
 				}
 				if(count > 0) {
@@ -133,6 +147,22 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 					}
 					summary.setNotificationType(type);
 					dbSession.persist(summary);
+				} else if (instituteCounts != null && CollectionUtils.isNotEmpty(instituteCounts.keySet())) {
+					for(Entry<Integer, Integer> e: instituteCounts.entrySet()) {
+						EdoEmailSmsSummary summary = new EdoEmailSmsSummary();
+						summary.setChannel("email");
+						summary.setCreatedDate(new Date());
+						summary.setNoOfStudents(e.getValue());
+						summary.setInstituteId(e.getKey());
+						if(exam != null) {
+							summary.setExamId(exam.getId());
+						}
+						if(classwork != null && classwork.getLecture() != null) {
+							summary.setClassworkId(classwork.getLecture().getId());
+						}
+						summary.setNotificationType(type);
+						dbSession.persist(summary);
+					}
 				}
 			} else {
 				sendMail(message, dbSession);
@@ -171,7 +201,11 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 		EdoEmailSmsLog smsLog = new EdoEmailSmsLog();
 		smsLog.setChannel("email");
 		smsLog.setCreatedDate(new Date());
-		smsLog.setInstituteId(instituteId);
+		if(instituteId != null) {
+			smsLog.setInstituteId(instituteId);
+		} else if (student != null && student.getCurrentPackage() != null && student.getCurrentPackage().getInstitute() != null) {
+			smsLog.setInstituteId(student.getCurrentPackage().getInstitute().getId());
+		}
 		smsLog.setSentTo(student.getEmail());
 		smsLog.setText(message.getSubject());
 		smsLog.setStudentId(student.getId());
@@ -235,6 +269,34 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			result = CommonUtils.prepareClassworkNotification(result, classwork);
 			result = CommonUtils.prepareFeedbackNotification(result, feedbackData, student);
 			result = CommonUtils.prepareInstituteReport(result, analytics);
+			
+			if(StringUtils.equals(type, MAIL_TYPE_NEW_CONTENT)) {
+				//Show list of content
+				if(CollectionUtils.isNotEmpty(student.getVideos())) {
+					String classworkItem = CommonUtils.readFile("email/classwork_item.html");
+					int count = 1;
+					StringBuilder classworkDiv = new StringBuilder();
+					for(EdoVideoLectureMap map: student.getVideos()) {
+						String itemData = new String(classworkItem);
+						itemData = CommonUtils.prepareClassworkNotification(itemData, map);
+						itemData = StringUtils.replace(itemData, "{srNo}", count + " . ");
+						if(StringUtils.equalsIgnoreCase(map.getLecture().getType(), "DOC")) {
+							itemData = StringUtils.replace(itemData, "{iconUrl}", "https://edofox.s3.ap-south-1.amazonaws.com/public/statics/pdf_icon.png");
+						} else {
+							itemData = StringUtils.replace(itemData, "{iconUrl}", "https://edofox.s3.ap-south-1.amazonaws.com/public/statics/video_icon.png");
+						}
+						itemData = StringUtils.replace(itemData, "{classroomName}", map.getClassroomNames());
+						classworkDiv.append(itemData);
+						count++;
+					}
+					result = StringUtils.replace(result, "{classworkList}", classworkDiv.toString());
+				} else {
+					result = StringUtils.replace(result, "{classworkList}", "");
+				}
+				if(student.getCurrentPackage() != null && student.getCurrentPackage().getInstitute() != null) {
+					result = CommonUtils.prepareInstituteNotification(result, student.getCurrentPackage().getInstitute());
+				}
+			}
 			
 			//Set action URL depending on notification type
 			if(mailer != null && StringUtils.isNotBlank(mailer.getActionUrl())) {
@@ -316,6 +378,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_PASSWORD_RESET, "password_reset.html");
 			put(MAIL_TYPE_TICKET_ACK, "ticket_ack.html");
 			put(MAIL_TYPE_WEEKLY_REPORT, "admin_exam_report.html");
+			put(MAIL_TYPE_NEW_CONTENT, "classwork_notification_bulk.html");
 		}
 	});
 
@@ -331,6 +394,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_PASSWORD_RESET, "Password reset request for your Edofox account");
 			put(MAIL_TYPE_TICKET_ACK, "Ticket #{ticketId} has been raised successfully");
 			put(MAIL_TYPE_WEEKLY_REPORT, "Your Edofox Weekly Report");
+			put(MAIL_TYPE_NEW_CONTENT, "New Content Added for You Today");
 		}
 	});
 

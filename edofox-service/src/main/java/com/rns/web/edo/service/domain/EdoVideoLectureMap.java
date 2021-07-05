@@ -20,6 +20,8 @@ public class EdoVideoLectureMap {
 	private EDOPackage classroom;
 	private List<EdoKeyword> keywords;
 	private EdoChapter chapter;
+	private String classrooms;
+	private String classroomNames;
 	
 	public EdoVideoLecture getLecture() {
 		return lecture;
@@ -50,6 +52,18 @@ public class EdoVideoLectureMap {
 	}
 	public void setChapter(EdoChapter chapter) {
 		this.chapter = chapter;
+	}
+	public String getClassrooms() {
+		return classrooms;
+	}
+	public void setClassrooms(String classrooms) {
+		this.classrooms = classrooms;
+	}
+	public String getClassroomNames() {
+		return classroomNames;
+	}
+	public void setClassroomNames(String classroomNames) {
+		this.classroomNames = classroomNames;
 	}
 	
 	

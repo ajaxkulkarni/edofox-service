@@ -74,5 +74,18 @@
 		expiry_date = '${expiryDateString}'
 		where id = ${id};
 	</insert>
-
+	
+	<select id="getVideosForDate" parameterType="com.rns.web.edo.service.domain.EdoAdminRequest" resultMap="videoLecture">
+		SELECT video_name,test_subjects.subject,chapters.chapter_name,video_lectures.created_date,video_url,video_lectures.type,
+		GROUP_CONCAT(dlp_chp_cls_content_map.classroom_id) as classrooms, GROUP_CONCAT(packages.package_name) as classroomNames
+		FROM `video_lectures` 
+		left join dlp_chp_cls_content_map on dlp_chp_cls_content_map.content_id = video_lectures.id 
+		left join packages on dlp_chp_cls_content_map.classroom_id = packages.id 
+		left join test_subjects on video_lectures.subject_id = test_subjects.subject_id 
+		left join chapters on dlp_chp_cls_content_map.chapter_id = chapters.id 
+		where video_lectures.created_date BETWEEN '${fromDate}' AND '${toDate}' 
+		AND (video_lectures.status IS NULL OR video_lectures.status = 'Completed') 
+		group by dlp_chp_cls_content_map.content_id
+	</select>
+	
 </mapper>

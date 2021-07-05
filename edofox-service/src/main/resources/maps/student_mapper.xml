@@ -40,6 +40,9 @@
 		<result column="status" property="lecture.status"/>
 		<result column="progress" property="lecture.progress"/>
 		<result column="chapter_name" property="chapter.chapterName"/>
+		<result column="classrooms" property="classrooms"/>
+		<result column="classroomNames" property="classroomNames"/>
+		<result column="institute_name" property="classroom.institute.name"/>
 	</resultMap>
 
 	<select id="getInstituePackages" resultMap="packages"
@@ -656,6 +659,15 @@
 		select * from student where id in (select distinct student_id from student_institute where package_id in 
 			( SELECT classroom_id FROM dlp_chp_cls_content_map where content_id = ${id})
 		)
+	</select>
+	
+	<select id="getStudentsForPackages" parameterType="String" resultMap="studentInfo">
+		SELECT student.id,student.name,student.email,student_login.institute_id,institute_name,GROUP_CONCAT(student_institute.package_id) as package_name FROM student_institute
+		join student_login on student_institute.student_id = student_login.student_id
+		join student on student.id = student_login.student_id
+		join institute on institute.id = student_login.institute_id
+		where (student_login.student_access = '' OR student_login.student_access IS NULL) 
+		AND student_institute.package_id in (${value}) GROUP by student_institute.student_id
 	</select>
 	
 	<select id="getStudentDevicesForDoubt" parameterType="com.rns.web.edo.service.domain.EdoFeedback" resultMap="studentInfo">

@@ -124,6 +124,8 @@ public interface EdoTestsDao {
 	List<EdoStudent> getStudentContactsForPackage(Integer packageId);
 	List<EdoStudent> getStudentContactsForVideo(EdoVideoLecture classworkInfo);
 	List<EdoTest> getExamsForDate(String value);
+	List<EdoVideoLectureMap> getVideosForDate(EdoAdminRequest request);
+	List<EdoStudent> getStudentsForPackages(String packageList);
 	
 	//Question queries
 	List<EdoSubject> getAllSubjects(Integer instituteId);

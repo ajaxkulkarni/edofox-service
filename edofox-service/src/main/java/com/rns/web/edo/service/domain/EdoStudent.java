@@ -5,8 +5,12 @@ import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_EMPTY)
 public class EdoStudent {
 
 	private Integer id;
@@ -37,6 +41,7 @@ public class EdoStudent {
 	private Integer teacherId;
 	private String proctorImageRef;
 	private String additionalDetails;
+	private List<EdoVideoLectureMap> videos;
 	
 	public EdoStudent() {
 
@@ -268,6 +273,14 @@ public class EdoStudent {
 
 	public void setAdditionalDetails(String additionalDetails) {
 		this.additionalDetails = additionalDetails;
+	}
+
+	public List<EdoVideoLectureMap> getVideos() {
+		return videos;
+	}
+
+	public void setVideos(List<EdoVideoLectureMap> videos) {
+		this.videos = videos;
 	}
 	
 }

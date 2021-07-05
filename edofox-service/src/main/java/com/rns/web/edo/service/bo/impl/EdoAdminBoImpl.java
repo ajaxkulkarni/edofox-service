@@ -2758,4 +2758,94 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 		}
 		return response;
 	}
+
+	public EdoApiStatus notifyForContent(EdoAdminRequest request) {
+		EdoApiStatus response = new EdoApiStatus();
+		try {
+			List<EdoVideoLectureMap> maps = testsDao.getVideosForDate(request);
+			List<EdoStudent> mailingList = new ArrayList<EdoStudent>();
+			if(CollectionUtils.isNotEmpty(maps)) {
+				//Prepare list of classrooms
+				StringBuilder builder = new StringBuilder();
+				for(EdoVideoLectureMap map: maps) {
+					if(map.getClassrooms() != null) {
+						builder.append(map.getClassrooms()).append(",");
+					}
+				}
+				if(StringUtils.isNotBlank(builder.toString())) {
+					String classRooms = StringUtils.removeEnd(builder.toString(), ",");
+					LoggingUtil.logMessage("Fetching students of New content job for classrooms .. " + classRooms, LoggingUtil.schedulerLogger);
+					List<EdoStudent> students = testsDao.getStudentsForPackages(classRooms);
+					if(CollectionUtils.isNotEmpty(students)) {
+						for(EdoStudent student: students) {
+							if(student.getCurrentPackage() != null && student.getCurrentPackage().getName() != null) {
+								student.setVideos(findStudentVideos(student.getCurrentPackage().getName(), maps));
+								if(CollectionUtils.isNotEmpty(student.getVideos())) {
+									mailingList.add(student);
+								}
+							}
+						}
+					}
+				}
+				
+				if(CollectionUtils.isNotEmpty(mailingList)) {
+					EdoMailUtil util = new EdoMailUtil(MAIL_TYPE_NEW_CONTENT);
+					util.setStudents(mailingList);
+					util.setSessionFactory(sessionFactory);
+					executor.execute(util);
+				}
+				
+			}
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			return new EdoApiStatus(-111, ERROR_IN_PROCESSING);
+		}
+		return response;
+	}
+
+	private List<EdoVideoLectureMap> findStudentVideos(String packages, List<EdoVideoLectureMap> maps) {
+		if(StringUtils.isBlank(packages) || CollectionUtils.isEmpty(maps)) {
+			return null;
+		}
+		String[] packagesArray = StringUtils.split(packages, ",");
+		if(ArrayUtils.isEmpty(packagesArray)) {
+			return null;
+		}
+		List<EdoVideoLectureMap> studentVideos = new ArrayList<EdoVideoLectureMap>();
+		for(EdoVideoLectureMap map: maps) {
+			String[] videoPackageArray = StringUtils.split(map.getClassrooms(), ",");
+			String[] videoPackageNameArray = StringUtils.split(map.getClassroomNames(), ",");
+			if(ArrayUtils.isNotEmpty(videoPackageArray)) {
+				boolean found = false;
+				String classroom = "";
+				String classroomName = "";
+				for(int i=0; i < videoPackageArray.length; i++) {
+					String pkg = videoPackageArray[i];
+					for(String stuPkg: packagesArray) {
+						if(StringUtils.equals(pkg, stuPkg)) {
+							found = true;
+							classroom = stuPkg;
+							classroomName = videoPackageNameArray[i];
+							break;
+						}
+					}
+					if(found) {
+						break;
+					}
+				}
+				if(found) {
+					//Add video to student list
+					EdoVideoLectureMap tmp = new EdoVideoLectureMap();
+					tmp.setChapter(map.getChapter());
+					tmp.setSubject(map.getSubject());
+					tmp.setLecture(map.getLecture());
+					tmp.setClassrooms(classroom);
+					tmp.setClassroomNames(classroomName);
+					studentVideos.add(tmp);
+				}
+			}
+			return studentVideos;
+		}
+		return null;
+	}
 }

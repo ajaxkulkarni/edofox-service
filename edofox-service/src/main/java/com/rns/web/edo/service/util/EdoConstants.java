@@ -76,6 +76,7 @@ public interface EdoConstants {
 	String MAIL_TYPE_TICKET_ACK = "TicketAck";
 	String MAIL_TYPE_TICKET_REPLY = "TicketReply";
 	String MAIL_TYPE_WEEKLY_REPORT = "WeeklyReport";
+	String MAIL_TYPE_NEW_CONTENT = "NewContent";
 	
 	Integer JEE_NEW_FORMAT_BEST_OF_VALUE = 5;
 	

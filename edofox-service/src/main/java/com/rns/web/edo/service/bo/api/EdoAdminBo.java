@@ -60,5 +60,6 @@ public interface EdoAdminBo {
 	EdoServiceResponse getProctoringVideo(EdoServiceRequest request);
 	EdoApiStatus updateEmailStatus(String request, String string);
 	EdoServiceResponse getExamSummary(EdoAdminRequest request);
+	EdoApiStatus notifyForContent(EdoAdminRequest request);
 	
 }
