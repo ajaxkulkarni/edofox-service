@@ -2744,6 +2744,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 						util.setAnalytics(analytic);
 						util.setInstituteId(analytic.getInstitute().getId());
 						util.setSessionFactory(sessionFactory);
+						if(analytic.getTestSubmits() != null && analytic.getTestSubmits() > 0) {
+							util.setCopyAdmins(true);
+						}
 						executor.execute(util);
 					}
 				}

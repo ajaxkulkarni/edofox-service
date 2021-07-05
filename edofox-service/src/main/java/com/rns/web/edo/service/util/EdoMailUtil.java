@@ -1,6 +1,7 @@
 package com.rns.web.edo.service.util;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +60,12 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private Integer instituteId;
 	private EDOAdminAnalytics analytics;
 	private SessionFactory sessionFactory;
+
+	private boolean copyAdmins;
+	
+	public void setCopyAdmins(boolean copyAdmins) {
+		this.copyAdmins = copyAdmins;
+	}
 	
 	public void setInstitute(EDOInstitute institute) {
 		this.institute = institute;
@@ -240,6 +247,10 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			message.setContent(result, "text/html; charset=utf-8");
 			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(student.getEmail()));
 			
+			if (copyAdmins) {
+				message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(getEmails(Arrays.asList(ADMIN_MAILS))));
+			}
+			
 			// Format subject
 			if (message.getSubject() != null) {
 				String subjectText = CommonUtils.prepareInstituteNotification(message.getSubject(), institute);
@@ -262,6 +273,20 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 	public void run() {
 		sendMail();
+	}
+	
+	private String getEmails(List<String> users) {
+		if (CollectionUtils.isEmpty(users)) {
+			return "";
+		}
+		StringBuilder builder = new StringBuilder();
+		for (String user : users) {
+			if (StringUtils.isEmpty(user)) {
+				continue;
+			}
+			builder.append(user).append(",");
+		}
+		return StringUtils.removeEnd(builder.toString(), ",");
 	}
 
 	private String readMailContent(Message message) throws FileNotFoundException, MessagingException {
