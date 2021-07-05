@@ -221,7 +221,7 @@ public class NotificationTask implements SchedulingConfigurer {
 			}
 			// logger.info("-------- Notifications job variable:" +
 			// notificationsJob);
-			LoggingUtil.logMessage("-------- New content job variable:" + time, LoggingUtil.schedulerLogger);
+			LoggingUtil.logMessage("-------- New content job variable:" + notificationsJob, LoggingUtil.schedulerLogger);
 			String times[] = StringUtils.split(notificationsJob, ":");
 			if (ArrayUtils.isNotEmpty(times)) {
 				Integer hour = new Integer(times[0]);
