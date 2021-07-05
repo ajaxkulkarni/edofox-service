@@ -194,7 +194,6 @@ public class NotificationTask implements SchedulingConfigurer {
 
 	private void weeklyReportJob() {
 		try {
-			LoggingUtil.logMessage("Running weekly report Job ... ", LoggingUtil.schedulerLogger);
 			EdoAdminBoImpl adminBo = new EdoAdminBoImpl();
 			adminBo.setSessionFactory(sessionFactory);
 			adminBo.setExecutor(executor);
@@ -204,6 +203,7 @@ public class NotificationTask implements SchedulingConfigurer {
 			request.setFromDate(CommonUtils.convertDate(DateUtils.addWeeks(new Date(), -1)));
 			request.setToDate(CommonUtils.convertDate(new Date()));
 			request.setRequestType("EMAIL");
+			LoggingUtil.logMessage("Running weekly report Job ... From " + request.getFromDate() + " To " + request.getToDate(), LoggingUtil.schedulerLogger);
 			adminBo.getExamSummary(request);
 			LoggingUtil.logMessage("Done with weekly report Job ... ", LoggingUtil.schedulerLogger);
 		} catch (Exception e) {
