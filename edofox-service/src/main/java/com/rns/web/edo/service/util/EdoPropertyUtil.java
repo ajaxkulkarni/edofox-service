@@ -44,6 +44,7 @@ public class EdoPropertyUtil {
 	public static final String FCM_SERVER_KEY = "fcm.key";
 	public static final String FCM_VIDEO_DELAY = "fcm.video.delay";
 	public static final String NOTIFICATIONS_JOB = "notifications.job";
+	public static final String WEEKLY_JOB = "weekly.job";
 	public static final String AWS_KEY = "aws.key";
 	public static final String AWS_SECRET = "aws.secret";
 	public static final String AWS_URL = "aws.url";
