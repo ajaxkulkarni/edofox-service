@@ -199,6 +199,7 @@ public class NotificationTask implements SchedulingConfigurer {
 			adminBo.setSessionFactory(sessionFactory);
 			adminBo.setExecutor(executor);
 			adminBo.setMailExecutor(executor);
+			adminBo.setTestsDao(testsDao);
 			EdoAdminRequest request = new EdoAdminRequest();
 			request.setFromDate(CommonUtils.convertDate(DateUtils.addWeeks(new Date(), -1)));
 			request.setToDate(CommonUtils.convertDate(new Date()));
@@ -251,6 +252,7 @@ public class NotificationTask implements SchedulingConfigurer {
 			adminBo.setSessionFactory(sessionFactory);
 			adminBo.setExecutor(executor);
 			adminBo.setMailExecutor(executor);
+			adminBo.setTestsDao(testsDao);
 			EdoAdminRequest request = new EdoAdminRequest();
 			request.setFromDate(CommonUtils.convertDate(DateUtils.addDays(new Date(), -1), "yyyy-MM-dd HH:mm"));
 			request.setToDate(CommonUtils.convertDate(new Date() , "yyyy-MM-dd HH:mm"));
