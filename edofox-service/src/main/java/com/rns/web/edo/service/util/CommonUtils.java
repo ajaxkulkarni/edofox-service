@@ -27,6 +27,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -34,6 +35,7 @@ import org.codehaus.jackson.map.ObjectWriter;
 import org.codehaus.jettison.json.JSONObject;
 import org.hibernate.Session;
 
+import com.rns.web.edo.service.domain.EDOAdminAnalytics;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EdoApiStatus;
@@ -178,15 +180,21 @@ public class CommonUtils {
 		return cal.get(value);
 	}
 
-	public static String getStringValue(Integer value) {
+	public static String getStringValue(Integer value, boolean setZero) {
 		if (value == null) {
+			if(setZero) {
+				return "0";
+			}
 			return "";
 		}
 		return value.toString();
 	}
 
-	public static String getStringValue(BigDecimal value) {
+	public static String getStringValue(BigDecimal value, boolean setZero) {
 		if (value == null) {
+			if(setZero) {
+				return "0";
+			}
 			return "";
 		}
 		return value.toString();
@@ -237,16 +245,16 @@ public class CommonUtils {
 					result = StringUtils.replace(result, "{paymentMessage}", "Please complete the payment in order to have full access to {instituteName} courses.");
 				}
 				result = StringUtils.replace(result, "{paymentId}", CommonUtils.getStringValue(student.getPayment().getPaymentId()));
-				result = StringUtils.replace(result, "{transactionId}", CommonUtils.getStringValue(student.getTransactionId()));
+				result = StringUtils.replace(result, "{transactionId}", CommonUtils.getStringValue(student.getTransactionId(), false));
 			} else {
 				result = StringUtils.replace(result, "{paymentMode}", "");
 				result = StringUtils.replace(result, "{paymentId}", "");
 				result = StringUtils.replace(result, "{transactionId}", "");
 			}
 			if(student.getAnalysis() != null) {
-				result = StringUtils.replace(result, "{rank}", CommonUtils.getStringValue(student.getAnalysis().getRank()));
-				result = StringUtils.replace(result, "{totalStudents}", CommonUtils.getStringValue(student.getAnalysis().getTotalStudents()));
-				result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(student.getAnalysis().getScore()));
+				result = StringUtils.replace(result, "{rank}", CommonUtils.getStringValue(student.getAnalysis().getRank(), false));
+				result = StringUtils.replace(result, "{totalStudents}", CommonUtils.getStringValue(student.getAnalysis().getTotalStudents(), false));
+				result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(student.getAnalysis().getScore(), false));
 			}
 		}
 		return result;
@@ -255,10 +263,10 @@ public class CommonUtils {
 	public static String prepareTestNotification(String result, EdoTest test, EDOInstitute institute, String additionalMessage) {
 		if (test != null) {
 			result = StringUtils.replace(result, "{testName}", CommonUtils.getStringValue(test.getName()));
-			result = StringUtils.replace(result, "{solved}", CommonUtils.getStringValue(test.getSolvedCount()));
-			result = StringUtils.replace(result, "{correctCount}", CommonUtils.getStringValue(test.getCorrectCount()));
-			result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(test.getScore()));
-			result = StringUtils.replace(result, "{totalMarks}", CommonUtils.getStringValue(test.getTotalMarks()));
+			result = StringUtils.replace(result, "{solved}", CommonUtils.getStringValue(test.getSolvedCount(), false));
+			result = StringUtils.replace(result, "{correctCount}", CommonUtils.getStringValue(test.getCorrectCount(), false));
+			result = StringUtils.replace(result, "{score}", CommonUtils.getStringValue(test.getScore(), false));
+			result = StringUtils.replace(result, "{totalMarks}", CommonUtils.getStringValue(test.getTotalMarks(), false));
 			result = StringUtils.replace(result, "{startDate}", CommonUtils.getStringValue(CommonUtils.convertDate(test.getStartDate(), "MMM dd hh:mm a")));
 		}
 		result = prepareInstituteNotification(result, institute);
@@ -266,6 +274,7 @@ public class CommonUtils {
 		return result;
 	}
 
+	
 	public static String prepareInstituteNotification(String result, EDOInstitute institute) {
 		if(institute != null) {
 			result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
@@ -290,6 +299,20 @@ public class CommonUtils {
 			} else {
 				result = StringUtils.replace(result, "{webUrl}", webUrl);
 			}
+			//Check for expiry and show expiry message
+			
+			if(StringUtils.contains(result, "{accountExpiryMessage}")) {
+				Date thirtyDaysLater = DateUtils.addDays(new Date(), 30);
+				if(institute.getExpiryDate() != null && institute.getExpiryDate().compareTo(thirtyDaysLater) < 0) {
+					long diffDays = (thirtyDaysLater.getTime() - institute.getExpiryDate().getTime())/1000 * 60 * 60 * 24;
+					result = StringUtils.replace(result, "{accountExpiryMessage}", "<div style=\"display: flex; justify-content: space-between;\">" +
+							"<div style=\"display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;\">" +
+							"<div style=\"color: #f44336;\">Your account will expire in <b>" + diffDays + "</b> days</div></div></div>");
+				} else {
+					result = StringUtils.replace(result, "{accountExpiryMessage}", "");
+				}
+			}
+			
 			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 		}
 		return result;
@@ -1160,6 +1183,22 @@ public class CommonUtils {
 			
 		}
 		return null;
+	}
+
+	public static String prepareInstituteReport(String result, EDOAdminAnalytics analytics) {
+		if(analytics != null) {
+			result = prepareInstituteNotification(result, analytics.getInstitute());
+			result = StringUtils.replace(result, "{activeTests}", getStringValue(analytics.getActiveTests(), true));
+			result = StringUtils.replace(result, "{presenty}", getStringValue(analytics.getPresenty(), true));
+			result = StringUtils.replace(result, "{absenty}", getStringValue(analytics.getAbsenty(), true));
+			result = StringUtils.replace(result, "{testSubmits}", getStringValue(analytics.getTestSubmits(), true));
+			result = StringUtils.replace(result, "{studentsAppeared}", getStringValue(analytics.getStudentsAppeared(), true));
+			result = StringUtils.replace(result, "{doubtsRaised}", getStringValue(analytics.getDoubtsRaised(), true));
+			result = StringUtils.replace(result, "{doubtsResolved}", getStringValue(analytics.getDoubtsRaised(), true));
+			result = StringUtils.replace(result, "{doubtsPending}", getStringValue(analytics.getDoubtsRaised(), true));
+			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
+		}
+		return result;
 	}
 	
 }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.rns.web.edo.service.dao.EdoTestsDao">
+
+	<resultMap id="adminAnalytics" type="com.rns.web.edo.service.domain.EDOAdminAnalytics">
+		<result column="institute_id" property="institute.id" />
+		<result column="institute_name" property="institute.name" />
+		<result column="expiry_date" property="institute.expiryDate"/>
+		<result column="email" property="institute.email"/>
+		<result column="totalTests" property="activeTests" />
+		<result column="totalAttempted" property="testSubmits" />
+		<result column="expectedCount" property="expectedCount"/>		
+		<result column="totalStudents" property="studentsAppeared"/>	
+		<result column="doubtsRaised" property="doubtsRaised"/>
+		<result column="resolved" property="doubtsResolved"/>
+		
+	</resultMap>
+
+	
+	<select id="getInstituteExamReport" parameterType="com.rns.web.edo.service.domain.EdoAdminRequest" resultMap="adminAnalytics">
+	select count(test_id) as totalTests,test.institute_id,testSubmits.totalAttempted,uniqueSubmits.totalStudents,expectedStudents.expectedCount,
+	institute.institute_name,institute.email,institute.expiry_date
+	from test 
+
+	join institute on test.institute_id = institute.id
+
+	left join (select count(id) as totalAttempted,institute_id from test_status join test on test_status.test_id = test.test_id where test.end_date between '${fromDate}' AND '${toDate}' group by test.institute_id) as testSubmits on testSubmits.institute_id = test.institute_id
+
+	left join (select count(DISTINCT student_id) as totalStudents,institute_id from test_status join test on test_status.test_id = test.test_id where test.end_date between '${fromDate}' AND '${toDate}' group by test.institute_id) as uniqueSubmits on uniqueSubmits.institute_id = test.institute_id
+
+	left join(select count(DISTINCT student_institute.student_id) as expectedCount,student_institute.institute_id from student_institute 
+    join student_login on student_login.student_id = student_institute.student_id
+    where (student_login.student_access IS NULL OR student_login.student_access = '') AND  package_id in (select package_id from test where test.end_date between '${fromDate}' AND '${toDate}') group by student_institute.institute_id) as expectedStudents on expectedStudents.institute_id = test.institute_id
+
+	where test.end_date between '${fromDate}' AND '${toDate}'
+	group by test.institute_id  
+	ORDER BY `testSubmits`.`totalAttempted`  DESC
+	</select>
+	
+	<select id="getInstituteDoubtsReport" parameterType="com.rns.web.edo.service.domain.EdoAdminRequest" resultMap="adminAnalytics">
+	 
+	SELECT count(exam_feedback.id) as doubtsRaised,exam_feedback.institute_id,institute_name,resolvedCount.resolved FROM `exam_feedback` 
+	join institute on institute.id = exam_feedback.institute_id
+	left join (SELECT count(id) as resolved,institute_id from exam_feedback where exam_feedback.created_date BETWEEN '${fromDate}' AND '${toDate}' AND resolution is not null group by institute_id)
+	as resolvedCount on resolvedCount.institute_id = exam_feedback.institute_id
+	where exam_feedback.created_date BETWEEN '${fromDate}' AND '${toDate}'
+	group by institute_id
+	
+	</select>
+	
+</mapper>

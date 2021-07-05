@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -48,6 +49,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import com.rns.web.edo.service.VideoExportScheduler;
 import com.rns.web.edo.service.bo.api.EdoAdminBo;
 import com.rns.web.edo.service.dao.EdoTestsDao;
+import com.rns.web.edo.service.domain.EDOAdminAnalytics;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
 import com.rns.web.edo.service.domain.EDOQuestionAnalysis;
@@ -2696,5 +2698,61 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 			}
 		}
 		return null;
+	}
+
+	public EdoServiceResponse getExamSummary(EdoAdminRequest request) {
+		EdoServiceResponse response = new EdoServiceResponse();
+		try {
+			List<EDOAdminAnalytics> analytics = testsDao.getInstituteExamReport(request);
+			List<EDOAdminAnalytics> doubtAnalytics = testsDao.getInstituteDoubtsReport(request);
+			if(CollectionUtils.isNotEmpty(analytics)) {
+				for(EDOAdminAnalytics analytic : analytics) {
+					if(analytic.getExpectedCount() != null && analytic.getExpectedCount() > 0) {
+						if(analytic.getStudentsAppeared() != null) {
+							analytic.setPresenty(new BigDecimal((Float.valueOf(analytic.getStudentsAppeared()) / Float.valueOf(analytic.getExpectedCount())) * 100).setScale(2, RoundingMode.HALF_UP));
+							analytic.setAbsenty(new BigDecimal(100).subtract(analytic.getPresenty()));
+						} else {
+							analytic.setPresenty(BigDecimal.ZERO);
+							analytic.setAbsenty(new BigDecimal(100));
+						}
+						
+					}
+					if(CollectionUtils.isNotEmpty(doubtAnalytics)) {
+						for(EDOAdminAnalytics doubAn: doubtAnalytics) {
+							if(doubAn.getInstitute() != null && doubAn.getInstitute().getId() != null && doubAn.getInstitute().getId().intValue() == analytic.getInstitute().getId().intValue()) {
+								analytic.setDoubtsRaised(doubAn.getDoubtsRaised());
+								analytic.setDoubtsResolved(doubAn.getDoubtsResolved());
+								if(analytic.getDoubtsRaised() != null) {
+									if(analytic.getDoubtsResolved() == null) {
+										analytic.setDoubtsResolved(0);
+									}
+									analytic.setDoubtsPending(analytic.getDoubtsRaised() - analytic.getDoubtsResolved());
+								} else {
+									analytic.setDoubtsResolved(0);
+									analytic.setDoubtsRaised(0);
+									analytic.setDoubtsPending(0);
+								}
+							}
+						}
+					}
+					if(StringUtils.equals(request.getRequestType(), "EMAIL") && analytic.getInstitute() != null) {
+						EdoMailUtil util = new EdoMailUtil(MAIL_TYPE_WEEKLY_REPORT);
+						EdoStudent student = new EdoStudent();
+						student.setName("Admin");
+						student.setEmail(analytic.getInstitute().getEmail());
+						util.setStudent(student);
+						util.setAnalytics(analytic);
+						util.setInstituteId(analytic.getInstitute().getId());
+						util.setSessionFactory(sessionFactory);
+						executor.execute(util);
+					}
+				}
+			}
+			response.setAdminAnalytics(analytics);
+		} catch (Exception e) {
+			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
+			response.setStatus(new EdoApiStatus(-111, ERROR_IN_PROCESSING));
+		}
+		return response;
 	}
 }

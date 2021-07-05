@@ -23,6 +23,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import com.rns.web.edo.service.domain.EDOAdminAnalytics;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EdoMailer;
 import com.rns.web.edo.service.domain.EdoQuestion;
@@ -56,6 +57,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 	private EdoQuestion feedbackData;
 	private EdoMailer mailer;
 	private Integer instituteId;
+	private EDOAdminAnalytics analytics;
 	private SessionFactory sessionFactory;
 	
 	public void setInstitute(EDOInstitute institute) {
@@ -225,6 +227,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			result = CommonUtils.prepareTestNotification(result, exam, institute, "");
 			result = CommonUtils.prepareClassworkNotification(result, classwork);
 			result = CommonUtils.prepareFeedbackNotification(result, feedbackData, student);
+			result = CommonUtils.prepareInstituteReport(result, analytics);
 			
 			//Set action URL depending on notification type
 			if(mailer != null && StringUtils.isNotBlank(mailer.getActionUrl())) {
@@ -287,6 +290,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_TEST_RESULT_RANK, "exam_result.html");
 			put(MAIL_TYPE_PASSWORD_RESET, "password_reset.html");
 			put(MAIL_TYPE_TICKET_ACK, "ticket_ack.html");
+			put(MAIL_TYPE_WEEKLY_REPORT, "admin_exam_report.html");
 		}
 	});
 
@@ -301,6 +305,7 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 			put(MAIL_TYPE_TEST_RESULT_RANK, "Your test result for {testName}");
 			put(MAIL_TYPE_PASSWORD_RESET, "Password reset request for your Edofox account");
 			put(MAIL_TYPE_TICKET_ACK, "Ticket #{ticketId} has been raised successfully");
+			put(MAIL_TYPE_WEEKLY_REPORT, "Your Edofox Weekly Report");
 		}
 	});
 
@@ -339,5 +344,13 @@ public class EdoMailUtil implements Runnable, EdoConstants {
 
 	public void setMailer(EdoMailer mailer) {
 		this.mailer = mailer;
+	}
+
+	public EDOAdminAnalytics getAnalytics() {
+		return analytics;
+	}
+
+	public void setAnalytics(EDOAdminAnalytics analytics) {
+		this.analytics = analytics;
 	}
 }

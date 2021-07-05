@@ -75,7 +75,7 @@ public interface EdoConstants {
 	String MAIL_TYPE_PASSWORD_RESET = "PasswordReset";
 	String MAIL_TYPE_TICKET_ACK = "TicketAck";
 	String MAIL_TYPE_TICKET_REPLY = "TicketReply";
-	
+	String MAIL_TYPE_WEEKLY_REPORT = "WeeklyReport";
 	
 	Integer JEE_NEW_FORMAT_BEST_OF_VALUE = 5;
 	

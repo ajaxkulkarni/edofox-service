@@ -215,9 +215,9 @@ public class EdoFirebaseUtil {
 		request.put("TestName", CommonUtils.getStringValue(test.getName()));
 		request.put("dateAdded", new Date());
 		request.put("examDate", test.getStartDate());
-		request.put("examDay", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.DAY_OF_MONTH)));
-		request.put("examMonth", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.MONTH) + 1));
-		request.put("examYear", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.YEAR)));
+		request.put("examDay", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.DAY_OF_MONTH), false));
+		request.put("examMonth", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.MONTH) + 1, false));
+		request.put("examYear", CommonUtils.getStringValue(CommonUtils.getCalendarValue(test.getStartDate(), Calendar.YEAR), false));
 		request.put("examName", CommonUtils.getStringValue(test.getName()));
 		request.put("correctedAnswerFileUrl", ""); //TODO
 		request.put("paperSolutionExamFileUrl", ""); //TODO
@@ -228,7 +228,7 @@ public class EdoFirebaseUtil {
 		if(student.getAnalysis() != null) {
 			request.put("rank", student.getAnalysis().getRank());
 			request.put("appearedStudents", student.getAnalysis().getTotalStudents());
-			request.put("score", CommonUtils.getStringValue(student.getAnalysis().getScore()));
+			request.put("score", CommonUtils.getStringValue(student.getAnalysis().getScore(), false));
 			
 		}
 		request.put("instituteId", CommonUtils.getStringValue(instituteId));

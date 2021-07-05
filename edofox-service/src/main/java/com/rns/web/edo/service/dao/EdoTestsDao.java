@@ -3,9 +3,10 @@ package com.rns.web.edo.service.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.rns.web.edo.service.domain.EDOAdminAnalytics;
 import com.rns.web.edo.service.domain.EDOInstitute;
 import com.rns.web.edo.service.domain.EDOPackage;
-import com.rns.web.edo.service.domain.EDOTestAnalysis;
+import com.rns.web.edo.service.domain.EdoAdminRequest;
 import com.rns.web.edo.service.domain.EdoFeedback;
 import com.rns.web.edo.service.domain.EdoPaymentStatus;
 import com.rns.web.edo.service.domain.EdoQuestion;
@@ -154,5 +155,9 @@ public interface EdoTestsDao {
 	List<EdoQuestion> getQuestionBank(EdoQuestion request);
 	List<EdoAnswerFileEntity> getAnswerFiles(EdoServiceRequest request);
 	
+	
+	//Super admin
+	List<EDOAdminAnalytics> getInstituteExamReport(EdoAdminRequest request);
+	List<EDOAdminAnalytics> getInstituteDoubtsReport(EdoAdminRequest request);
 	
 }

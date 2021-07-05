@@ -31,6 +31,7 @@ public class EdoServiceResponse {
 	private List<EdoSuggestion> suggestions;
 	private Date currentTime;
 	private List<EdoTest> exams;
+	private List<EDOAdminAnalytics> adminAnalytics;
 	
 	public EdoServiceResponse() {
 		setStatus(new EdoApiStatus());
@@ -171,5 +172,14 @@ public class EdoServiceResponse {
 	public void setExams(List<EdoTest> exams) {
 		this.exams = exams;
 	}
+	
+	public List<EDOAdminAnalytics> getAdminAnalytics() {
+		return adminAnalytics;
+	}
+
+	public void setAdminAnalytics(List<EDOAdminAnalytics> adminAnalytics) {
+		this.adminAnalytics = adminAnalytics;
+	}
+
 
 }

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #424242;
+            max-width: 540px;
+            margin: auto;
+        }
+        .social-media-links {
+            padding: 8px;
+        }
+        .social-media-icons {
+            width: 24px;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div style="text-align: center">
+        <a href="https://edofox.com/" target="_blank"><img src="https://edofox.s3.ap-south-1.amazonaws.com/public/statics/edofox-name-logo-black.png" style="height:50px; margin-top: 0px" /></a>
+    </div>
+
+    <div style="text-align: center">
+        <img src="https://edofox.s3.ap-south-1.amazonaws.com/public/statics/videos-analysis.jpg" style="width:250px; margin-top: 0px" />
+    </div>
+
+    <hr style="border: 1px solid #eee;" />
+
+    <h2 style="text-align: center;">Your weekly report</h2>
+
+
+    <h4 style="text-align: center; margin-bottom: 0px;">Tests</h4>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Tests conducted</div>
+            <h2 style="margin: 0;">{activeTests}</h2>
+        </div>
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Average Present %</div>
+            <h2 style="margin: 0;">{presenty}</h2>
+        </div>
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Average Absent %</div>
+            <h2 style="margin: 0;">{absenty}</h2>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Total Test Submits</div>
+            <h2 style="margin: 0;">{testSubmits}</h2>
+        </div>
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Total Students</div>
+            <h2 style="margin: 0;">{studentsAppeared}</h2>
+        </div>
+    </div>
+
+
+    <h4 style="text-align: center; margin-bottom: 0px;">Doubts</h4>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Doubts Raised</div>
+            <h2 style="margin: 0;">{doubtsRaised}</h2>
+        </div>
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Doubts Resolved</div>
+            <h2 style="margin: 0;">{doubtsResolved}</h2>
+        </div>
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Doubts Pending</div>
+            <h2 style="margin: 0;">{doubtsPending}</h2>
+        </div>
+    </div>
+
+
+    <!-- <h4 style="text-align: center; margin-bottom: 0px;">Videos</h4>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Average Videos Watched</div>
+            <h2 style="margin: 0;">10</h2>
+        </div>
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Total Streaming Hours</div>
+            <h2 style="margin: 0;">66</h2>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: space-between;">
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>Average Streaming Per Student</div>
+            <h2 style="margin: 0;">34</h2>
+        </div>
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div>% Video Completed</div>
+            <h2 style="margin: 0;">34</h2>
+        </div>
+    </div> -->
+
+
+	<!-- Expiry message -->
+    
+    {accountExpiryMessage}
+    
+    <!-- <div style="display: flex; justify-content: space-between;">
+        <div style="display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;">
+            <div style="color: #f44336;">Your account will expire in <b>30</b> days</div>
+        </div>
+    </div> -->
+
+
+    <hr style="border: 1px solid #eee;" />
+
+    <div style="display: flex; justify-content: center;">
+        <a class="social-media-links" href="https://www.facebook.com/edofoxonline" target="_blank"><img src="https://edofox.s3.ap-south-1.amazonaws.com/public/social-media/iconfinder_1217141_fb_icon_64px.png" class="social-media-icons"/></a>
+        
+        <a class="social-media-links" href="https://www.instagram.com/edofox_official/" target="_blank"><img src="https://edofox.s3.ap-south-1.amazonaws.com/public/social-media/iconfinder_1217174_instagram_icon_64px.png" class="social-media-icons"/></a>
+
+        <a class="social-media-links" href="https://www.linkedin.com/company/edofox/" target="_blank"><img src="https://edofox.s3.ap-south-1.amazonaws.com/public/social-media/iconfinder_1217173_linkedin_icon_64px.png" class="social-media-icons"/></a>
+
+        <a class="social-media-links" href="https://wa.me/917350182285" target="_blank"><img src="https://edofox.s3.ap-south-1.amazonaws.com/public/social-media/iconfinder_1217136_whatsapp_icon_64px.png" class="social-media-icons"/></a>
+
+        <a class="social-media-links" href="mailto:support@edofox.com" target="_blank"><img src="https://edofox.s3.ap-south-1.amazonaws.com/public/social-media/iconfinder_1217177_gmail_icon_64px.png" class="social-media-icons"/></a>
+
+        <!-- <a class="social-media-links" href="https://www.facebook.com/edofoxonline" target="_blank"><img src="https://edofox.s3.ap-south-1.amazonaws.com/public/social-media/iconfinder_1217163_twitter_icon_64px.png" class="social-media-icons"/></a> -->
+    </div>
+
+</body>
+
+</html>
