@@ -365,7 +365,9 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							EDOStudentAnalysis studentAnalysis = new EDOStudentAnalysis();
 							studentAnalysis.setSubjectScores(subjectAnalysis);
 							studentAnalysis.setStatus("Absent");
+							studentAnalysis.setRank(meritList.size() + 1);
 							student.setAnalysis(studentAnalysis);
+							meritList.add(student);
 							continue;
 						}
 						rank++;

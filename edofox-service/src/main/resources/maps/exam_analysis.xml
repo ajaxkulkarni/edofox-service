@@ -228,7 +228,7 @@ from test_status group by test_id) as result on test.test_id = result.testId whe
 		</if>
 		,student_id,subject_id from test_result 
 		join test_questions on test_result.question_id = test_questions.id
-		where test_id = ${test.id} AND option_selected != '' 
+		where test_id = ${test.id} <!--Removed as per Shahu suggestion 0607  AND option_selected != ''  -->
 		<if test="searchFilter == 'correctCount'">
 			AND marks &gt; 0
 		</if>

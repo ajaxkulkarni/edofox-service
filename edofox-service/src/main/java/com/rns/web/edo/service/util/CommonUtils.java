@@ -304,10 +304,17 @@ public class CommonUtils {
 			if(StringUtils.contains(result, "{accountExpiryMessage}")) {
 				Date thirtyDaysLater = DateUtils.addDays(new Date(), 30);
 				if(institute.getExpiryDate() != null && institute.getExpiryDate().compareTo(thirtyDaysLater) < 0) {
-					long diffDays = (thirtyDaysLater.getTime() - institute.getExpiryDate().getTime())/1000 * 60 * 60 * 24;
-					result = StringUtils.replace(result, "{accountExpiryMessage}", "<div style=\"display: flex; justify-content: space-between;\">" +
-							"<div style=\"display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;\">" +
-							"<div style=\"color: #f44336;\">Your account will expire in <b>" + diffDays + "</b> days</div></div></div>");
+					long diffDays = (institute.getExpiryDate().getTime() - new Date().getTime())/ (1000 * 60 * 60 * 24);
+					if(diffDays > 0) {
+						result = StringUtils.replace(result, "{accountExpiryMessage}", "<div style=\"display: flex; justify-content: space-between;\">" +
+								"<div style=\"display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;\">" +
+								"<div style=\"color: #f44336;\">Your account will expire in <b>" + diffDays + "</b> days</div></div></div>");
+					} else {
+						result = StringUtils.replace(result, "{accountExpiryMessage}", "<div style=\"display: flex; justify-content: space-between;\">" +
+								"<div style=\"display: inline-block; border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center;margin: 8px; flex: 1;\">" +
+								"<div style=\"color: #f44336;\">Your account is expired. Please complete the payment in order to proceed </div></div></div>");
+					}
+					
 				} else {
 					result = StringUtils.replace(result, "{accountExpiryMessage}", "");
 				}
@@ -779,7 +786,13 @@ public class CommonUtils {
 		// System.out.println(calculateMatchScore(question, answer));
 */		
 		//String languageCode = RakeLanguages.EN;
-		System.out.println("Physics".compareTo("Physics"));
+		
+		Date thirtyDaysLater = DateUtils.addDays(new Date(), 30);
+		Date actualDate = new Date();
+		
+		long diffDays = (thirtyDaysLater.getTime() - actualDate.getTime())/(1000 * 60 * 60 * 24);
+		
+		System.out.println(diffDays);
 	}
 	
 	public static void setQuestionURLs(EdoQuestion question) {
