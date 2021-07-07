@@ -85,6 +85,9 @@
 		<result column="test_ui" property="testUi"/>
 		<result column="startedDate" property="startedDate" />
 		<result column="offline_conduction" property="offlineConduction"/>
+		<result column="random_questions" property="randomQuestions"/>
+		<result column="time_constraint" property="timeConstraint"/>
+		<result column="student_time_constraint" property="studentTimeConstraint"/>
 	</resultMap>
 	
 	<resultMap id="questions" type="com.rns.web.edo.service.domain.EdoQuestion">

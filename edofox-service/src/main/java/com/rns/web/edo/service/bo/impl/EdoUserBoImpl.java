@@ -1637,8 +1637,9 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					.add(Restrictions.eq("testId", request.getTest().getId()))
 					.list();
 		
+			EdoTest test = new EdoTest();
+			
 			if(CollectionUtils.isNotEmpty(answers)) {
-				EdoTest test = new EdoTest();
 				List<EdoQuestion> solved = new ArrayList<EdoQuestion>();
 				Integer solvedCount = 0;
 				for(EdoAnswerEntity answer: answers) {
@@ -1663,18 +1664,47 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				test.setTest(solved);
 				test.setSolvedCount(solvedCount);
-				List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
-						.add(Restrictions.eq("testId", request.getTest().getId()))
-						.add(Restrictions.eq("studentId", request.getStudent().getId()))
-						.list();
-				if(CollectionUtils.isNotEmpty(maps)) {
-					if(maps.get(0).getTimeLeft() != null && maps.get(0).getTimeLeft() > 0) {
-						test.setMinLeft(maps.get(0).getTimeLeft() / 60);
-						test.setSecLeft(maps.get(0).getTimeLeft() % 60);
+				
+				
+			}
+			
+			List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+					.add(Restrictions.eq("testId", request.getTest().getId()))
+					.add(Restrictions.eq("studentId", request.getStudent().getId()))
+					.list();
+			if(CollectionUtils.isNotEmpty(maps)) {
+				EdoTestStatusEntity edoTestStatusEntity = maps.get(0);
+				if(edoTestStatusEntity.getTimeLeft() != null && edoTestStatusEntity.getTimeLeft() > 0) {
+					test.setMinLeft(edoTestStatusEntity.getTimeLeft() / 60);
+					test.setSecLeft(edoTestStatusEntity.getTimeLeft() % 60);
+				}
+				//Get time left based on exam time constraints
+				EdoTest result = testsDao.getTest(request.getTest().getId());
+				if(result != null) {
+					if(StringUtils.equals("1", result.getTimeConstraint())) {
+						Date startTime = result.getStartDate();
+						if(startTime != null) {
+							calculateTimeLeft(result, startTime);
+						}
+						if(result.getMinLeft() != null && result.getSecLeft() != null) {
+							test.setMinLeft(result.getMinLeft());
+							test.setSecLeft(result.getSecLeft());
+						}
+					} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
+						if(edoTestStatusEntity != null && edoTestStatusEntity.getCreatedDate() != null) {
+							calculateTimeLeft(result, edoTestStatusEntity.getCreatedDate());
+						}
+						if(result.getMinLeft() != null && result.getSecLeft() != null) {
+							test.setMinLeft(result.getMinLeft());
+							test.setSecLeft(result.getSecLeft());
+						}
 					}
 				}
-				response.setTest(test);
+				
 			}
+			
+			response.setTest(test);
+			
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));
 		} finally {

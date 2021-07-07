@@ -42,6 +42,7 @@ public interface EdoTestsDao {
 	Integer saveTestResult(EdoServiceRequest request);
 	Integer saveTestStatus(EdoServiceRequest request);
 	Integer updateTestStatus(EdoServiceRequest request);
+	Integer updateTestStatusEvaluation(EdoServiceRequest request);
 	Integer updateTestResult(Map<String, Object> requestMap);
 	Integer addTestResult(Map<String, Object> requestMap);
 	//public List<EdoQuestion> getTestUnsolved(EdoStudent student);

@@ -55,6 +55,21 @@
 		where test_id = ${test.id} AND student_id = ${student.id}
 	</update>
 	
+	<update id="updateTestStatusEvaluation" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
+		update test_status set 
+		<if test="test.solvedCount != null">
+		solved = ${test.solvedCount}, 
+		</if>
+		<if test="test.correctCount != null">
+		correct = ${test.correctCount},
+		</if>
+		<if test="test.score != null">
+		score = ${test.score}, 
+		</if>
+		evaluation_date = CURRENT_TIMESTAMP,
+		where test_id = ${test.id} AND student_id = ${student.id}
+	</update>
+	
 	<!-- <update id="updateTestResult" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		<foreach item="question" index="index" collection="test.test" separator=";" >
 		update test_result set marks = ${question.marks} where test_id = ${test.id} AND student_id = ${student.id} AND question_id = ${question.qn_id}

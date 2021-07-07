@@ -656,7 +656,7 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 				request.getTest().setSolvedCount(request.getTest().getSolvedCount() + bonusCount);
 				LoggingUtil.logMessage("Added bonus .." + bonus + " so total is - " + request.getTest().getScore());
 			}*/
-			testsDao.updateTestStatus(request);
+			testsDao.updateTestStatusEvaluation(request);
 			if(CollectionUtils.isNotEmpty(request.getTest().getTest())) {
 				for(EdoQuestion question: request.getTest().getTest()) {
 					if(StringUtils.equalsIgnoreCase(EdoConstants.QUESTION_TYPE_DESCRIPTIVE, question.getType())) {
