@@ -354,6 +354,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			EdoTestStudentMap studentMap = null;
 			Integer adminReset = null;
 			Integer timeLeft = null;
+			String randomQuestionOrder = null;
 			if(studenId != null) {
 				inputMap.setStudent(new EdoStudent(studenId));
 				List<EdoTestStudentMap> studentMaps = testsDao.getTestStatus(inputMap);
@@ -413,6 +414,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					if(studentMap.getTest() != null) {
 						adminReset = studentMap.getTest().getAdminReset();
 					}
+					randomQuestionOrder = studentMap.getRandomSequence();
 					timeLeft = studentMap.getTimeLeft();
 				}
 				addTestActivity(testId, studenId, "STARTED", req.getTest());
@@ -622,7 +624,16 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				if(isRandomizeQuestions(result) && studenId != null) {
 					//Randomize only for student NOT for Admin
-					randomizeQuestions(result, sectionSets, examQuestionCount, solvedSet);
+					String randomSequenceOutput = randomizeQuestions(result, sectionSets, examQuestionCount, solvedSet, randomQuestionOrder);
+					if(StringUtils.isNotBlank(randomSequenceOutput)) {
+						EdoTestStudentMap stuMap = new EdoTestStudentMap();
+						stuMap.setTest(result);
+						EdoStudent student = new EdoStudent();
+						student.setId(studenId);
+						stuMap.setStudent(student);
+						stuMap.setRandomSequence(randomSequenceOutput);
+						testsDao.updateTestStatusRandomSequence(stuMap);
+					}
 					
 					//If exam has random pool..make entries in test_result for student on first test load
 					if(examQuestionCount != null && CollectionUtils.isNotEmpty(examQuestionCount.entrySet()) && (solvedSet == null || CollectionUtils.isEmpty(solvedSet.entrySet()))) {
@@ -734,16 +745,43 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		}
 	}
 
-	private void randomizeQuestions(EdoTest result, Map<String, List<EdoQuestion>> sectionSets, Map<String,Integer> allowedCounts, Map<String,List<EdoQuestion>> solvedSets) {
+	private String randomizeQuestions(EdoTest result, Map<String, List<EdoQuestion>> sectionSets, Map<String,Integer> allowedCounts, Map<String,List<EdoQuestion>> solvedSets, String randomQuestionOrder) {
+		StringBuilder sequence = new StringBuilder();
 		if(CollectionUtils.isNotEmpty(sectionSets.keySet()) && result != null) {
 			List<EdoQuestion> shuffled = new ArrayList<EdoQuestion>();
 			Integer qNo = 1;
 			for(String section: result.getSections()) {
 				List<EdoQuestion> set = sectionSets.get(section);
-				if(!StringUtils.contains(set.get(0).getType(), QUESTION_TYPE_PASSAGE)) {
+				if(!StringUtils.contains(set.get(0).getType(), QUESTION_TYPE_PASSAGE) && CollectionUtils.isNotEmpty(set)) {
 					//No shuffle for comprehension type questions
 					//LoggingUtil.logMessage("Shuffling for section .." + section + " - list - " + set.size());
-					Collections.shuffle(set);
+					
+					//Shuffle if not already shuffled
+					if(StringUtils.isBlank(randomQuestionOrder)) {
+						Collections.shuffle(set);
+					} else {
+						//Use saved order for this student
+						String[] randomSequenceArray = StringUtils.split(randomQuestionOrder, ",");
+						for(String qnId: randomSequenceArray) {
+							if(StringUtils.isBlank(qnId) || !StringUtils.isNumeric(qnId)) {
+								continue;
+							}
+							List<EdoQuestion> newSequence = new ArrayList<EdoQuestion>();
+							for(EdoQuestion q: set) {
+								if(q.getQn_id() != null && StringUtils.equals(q.getQn_id().toString(), qnId)) {
+									newSequence.add(q);
+									break;
+								}
+							}
+							if(CollectionUtils.isNotEmpty(newSequence) && newSequence.size() == set.size()) {
+								set = newSequence;
+								solvedSets.put(section, newSequence);
+							}
+							
+						}
+					}
+					
+					
 				}
 				
 				//Populate already solved questions in case of random pool
@@ -804,12 +842,17 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					question.setQuestionNumber(qNo);
 					qNo++;
 					shuffled.add(question);
+					if(StringUtils.isBlank(randomQuestionOrder)) {
+						sequence.append(question.getQn_id()).append(",");
+					} 
+					
 					
 				}
 			}
 			result.setTest(shuffled);
 			//LoggingUtil.logMessage("Shuffled the questions for test .." + result.getId());
 		}
+		return sequence.toString();
 	}
 	
 

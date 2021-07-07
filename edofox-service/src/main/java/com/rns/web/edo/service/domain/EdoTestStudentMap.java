@@ -16,6 +16,7 @@ public class EdoTestStudentMap {
 	private Date createdDate;
 	private Integer startedCount;
 	private Integer timeLeft;
+	private String randomSequence;
 	
 	
 	public EdoTest getTest() {
@@ -89,6 +90,12 @@ public class EdoTestStudentMap {
 	}
 	public void setTimeLeft(Integer timeLeft) {
 		this.timeLeft = timeLeft;
+	}
+	public String getRandomSequence() {
+		return randomSequence;
+	}
+	public void setRandomSequence(String randomSequence) {
+		this.randomSequence = randomSequence;
 	}
 	
 }

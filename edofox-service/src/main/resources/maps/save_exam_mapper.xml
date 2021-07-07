@@ -70,6 +70,10 @@
 		where test_id = ${test.id} AND student_id = ${student.id}
 	</update>
 	
+	<update id="updateTestStatusRandomSequence" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
+		update test_status set random_sequence = '${randomSequence}' where test_id = ${test.id} AND student_id = ${student.id}
+	</update>
+	
 	<!-- <update id="updateTestResult" parameterType="com.rns.web.edo.service.domain.EdoServiceRequest">
 		<foreach item="question" index="index" collection="test.test" separator=";" >
 		update test_result set marks = ${question.marks} where test_id = ${test.id} AND student_id = ${student.id} AND question_id = ${question.qn_id}

@@ -88,6 +88,8 @@
 		<result column="created_date" property="createdDate"/>
 		<result column="admin_reset" property="test.adminReset"/>
 		<result column="time_left" property="timeLeft"/>
+		<result column="random_sequence" property="randomSequence"/>
+		
 	</resultMap>
 
 	<select id="getTestStatus" resultMap="testStudentMap" parameterType="com.rns.web.edo.service.domain.EdoTestStudentMap">
