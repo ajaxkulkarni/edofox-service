@@ -762,22 +762,22 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					} else {
 						//Use saved order for this student
 						String[] randomSequenceArray = StringUtils.split(randomQuestionOrder, ",");
+						List<EdoQuestion> newSequence = new ArrayList<EdoQuestion>();
 						for(String qnId: randomSequenceArray) {
 							if(StringUtils.isBlank(qnId) || !StringUtils.isNumeric(qnId)) {
 								continue;
 							}
-							List<EdoQuestion> newSequence = new ArrayList<EdoQuestion>();
 							for(EdoQuestion q: set) {
 								if(q.getQn_id() != null && StringUtils.equals(q.getQn_id().toString(), qnId)) {
 									newSequence.add(q);
 									break;
 								}
 							}
-							if(CollectionUtils.isNotEmpty(newSequence) && newSequence.size() == set.size()) {
-								set = newSequence;
-								solvedSets.put(section, newSequence);
-							}
 							
+						}
+						if(CollectionUtils.isNotEmpty(newSequence) && newSequence.size() == set.size()) {
+							set = newSequence;
+							sectionSets.put(section, newSequence);
 						}
 					}
 					
