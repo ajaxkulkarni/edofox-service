@@ -2677,6 +2677,27 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 					finalAnalysis.add(question);
 				}
 				
+				//Sort subject order
+				
+				
+				if(StringUtils.isNotBlank(request.getColumnSequence())) {
+					final List<String> colOrder = Arrays.asList(StringUtils.split(request.getColumnSequence(), ","));
+					Collections.sort(finalAnalysis, new Comparator<EdoQuestion>() {
+
+						public int compare(EdoQuestion o1, EdoQuestion o2) {
+							if(o1.getSubject() == null) {
+								return -1;
+							}
+							if(o2.getSubject() == null) {
+								return 1;
+							}
+							int index1 = colOrder.indexOf(o1.getSubject());
+							int index2 = colOrder.indexOf(o2.getSubject());
+							return index1 - index2;
+						}
+					});
+				}
+				
 				EdoTest test = new EdoTest();
 				test.setTest(finalAnalysis);
 				response.setTest(test);
