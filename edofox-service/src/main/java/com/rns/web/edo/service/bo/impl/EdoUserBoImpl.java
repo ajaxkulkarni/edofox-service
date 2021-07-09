@@ -906,7 +906,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		try {
 			session = this.sessionFactory.openSession();
 			Transaction tx = session.beginTransaction();
-			saveAnswer(request, session);
 			Long minLeft = request.getTest().getMinLeft();
 			Long secLeft = request.getTest().getSecLeft();
 			if(minLeft != null && secLeft != null) {
@@ -915,9 +914,20 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						.add(Restrictions.eq("studentId", request.getStudent().getId()))
 						.list();
 				if(CollectionUtils.isNotEmpty(maps)) {
-					maps.get(0).setTimeLeft((minLeft * 60) + secLeft);
+					EdoTestStatusEntity edoTestStatusEntity = maps.get(0);
+					if(!StringUtils.equals(request.getRequestType(), "SAVE_TIME") && StringUtils.equals(TEST_STATUS_COMPLETED, edoTestStatusEntity.getStatus())) {
+						if(StringUtils.equals(edoTestStatusEntity.getSubmissionType(), "admin")) {
+							status.setResponseText("Your answer cannot be saved as Admin has blocked your exam access. Please contact your institute Admin for more info");
+						} else {
+							status.setResponseText("Your answer cannot be saved as your exam was already submitted from another window. Please make sure not to login from more than one devices or Consider changing your password.");
+						}
+						status.setStatusCode(STATUS_TEST_SUBMITTED);
+						return status;
+					}
+					edoTestStatusEntity.setTimeLeft((minLeft * 60) + secLeft);
 				}
 			}
+			saveAnswer(request, session);
 			tx.commit();
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e), LoggingUtil.saveAnswerErrorLogger);
@@ -1042,12 +1052,14 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			}
 			
 			//Already submitted error removed from the code Jan 05 21 .. allow student to overwrite and submit again
-			/*if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
+			//If Already submitted, don't update test_status or test_result..Only update test_activity 09/07
+			if(map != null && StringUtils.equals(TEST_STATUS_COMPLETED, map.getStatus())) {
+				addTestActivity(test.getId(), request.getStudent().getId(), "COMPLETED", test);
 				status.setResponseText(ERROR_TEST_ALREADY_SUBMITTED);
-				status.setStatusCode(STATUS_ERROR);
+				status.setStatusCode(STATUS_OK);
 				LoggingUtil.logMessage("Already submitted this test for student=>" + request.getStudent().getId(), LoggingUtil.saveTestLogger);
 				return status;
-			}*/
+			}
 			
 			if(map == null) {
 				map = new EdoTestStatusEntity();

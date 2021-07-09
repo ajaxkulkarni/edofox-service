@@ -54,9 +54,17 @@ public class EdoTestStatusEntity {
 	private Integer evaluator;
 	@Column(name = "proctoring_remarks")
 	private String proctoringRemarks;
+	@Column(name = "admin_reset")
+	private boolean adminReset;
 	
 	
 	
+	public boolean isAdminReset() {
+		return adminReset;
+	}
+	public void setAdminReset(boolean adminReset) {
+		this.adminReset = adminReset;
+	}
 	public Integer getId() {
 		return id;
 	}
