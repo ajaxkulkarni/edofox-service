@@ -1734,27 +1734,30 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 					test.setSecLeft(edoTestStatusEntity.getTimeLeft() % 60);
 				}
 				//Get time left based on exam time constraints
-				EdoTest result = testsDao.getTest(request.getTest().getId());
-				if(result != null) {
-					if(StringUtils.equals("1", result.getTimeConstraint())) {
-						Date startTime = result.getStartDate();
-						if(startTime != null) {
-							calculateTimeLeft(result, startTime);
-						}
-						if(result.getMinLeft() != null && result.getSecLeft() != null) {
-							test.setMinLeft(result.getMinLeft());
-							test.setSecLeft(result.getSecLeft());
-						}
-					} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
-						if(edoTestStatusEntity != null && edoTestStatusEntity.getCreatedDate() != null) {
-							calculateTimeLeft(result, edoTestStatusEntity.getCreatedDate());
-						}
-						if(result.getMinLeft() != null && result.getSecLeft() != null) {
-							test.setMinLeft(result.getMinLeft());
-							test.setSecLeft(result.getSecLeft());
+				if(!edoTestStatusEntity.isAdminReset()) {
+					EdoTest result = testsDao.getTest(request.getTest().getId());
+					if(result != null) {
+						if(StringUtils.equals("1", result.getTimeConstraint())) {
+							Date startTime = result.getStartDate();
+							if(startTime != null) {
+								calculateTimeLeft(result, startTime);
+							}
+							if(result.getMinLeft() != null && result.getSecLeft() != null) {
+								test.setMinLeft(result.getMinLeft());
+								test.setSecLeft(result.getSecLeft());
+							}
+						} else if (StringUtils.equals("1", result.getStudentTimeConstraint())) {
+							if(edoTestStatusEntity != null && edoTestStatusEntity.getCreatedDate() != null) {
+								calculateTimeLeft(result, edoTestStatusEntity.getCreatedDate());
+							}
+							if(result.getMinLeft() != null && result.getSecLeft() != null) {
+								test.setMinLeft(result.getMinLeft());
+								test.setSecLeft(result.getSecLeft());
+							}
 						}
 					}
 				}
+				
 				
 			}
 			
