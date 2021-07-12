@@ -1207,7 +1207,7 @@ public class CommonUtils {
 			result = StringUtils.replace(result, "{testSubmits}", getStringValue(analytics.getTestSubmits(), true));
 			result = StringUtils.replace(result, "{studentsAppeared}", getStringValue(analytics.getStudentsAppeared(), true));
 			result = StringUtils.replace(result, "{doubtsRaised}", getStringValue(analytics.getDoubtsRaised(), true));
-			result = StringUtils.replace(result, "{doubtsResolved}", getStringValue(analytics.getDoubtsRaised(), true));
+			result = StringUtils.replace(result, "{doubtsResolved}", getStringValue(analytics.getDoubtsResolved(), true));
 			result = StringUtils.replace(result, "{doubtsPending}", getStringValue(analytics.getDoubtsRaised(), true));
 			//result = StringUtils.replace(result, "{instituteName}", CommonUtils.getStringValue(institute.getName()));
 		}
