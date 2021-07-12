@@ -27,6 +27,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -537,12 +538,58 @@ public class CommonUtils {
 				return altScore;
 			}
 			return matchScore;
+		} else if (StringUtils.equals(EdoConstants.QUESTION_TYPE_NUMBER, question.getType()))  {
+			//For number, compare decimals (12/07/2021)
+			Float numericScore = calculateNumericScore(question.getCorrectAnswer(), answered.getAnswer(), question);
+			if(StringUtils.isNotBlank(question.getAlternateAnswer())) {
+				String[] altAnswers = StringUtils.split(question.getAlternateAnswer(), ",");
+				if(ArrayUtils.isNotEmpty(altAnswers)) {
+					for(String ans: altAnswers) {
+						Float altScore = calculateNumericScore(ans, answered.getAnswer(), question);
+						if(altScore > numericScore) {
+							numericScore = altScore;
+						}
+					}
+				}
+			}
+			return numericScore;
 		} else if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getCorrectAnswer()))) {
 			return question.getWeightage();
-		} else if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(question.getAlternateAnswer()))) {
-			return question.getWeightage();
+		} else if (StringUtils.isNotBlank(question.getAlternateAnswer())) {
+			String[] altAnswers = StringUtils.split(question.getAlternateAnswer(), ",");
+			if(ArrayUtils.isNotEmpty(altAnswers)) {
+				for(String ans: altAnswers) {
+					if(StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(answered.getAnswer()), StringUtils.trimToEmpty(ans))) {
+						return question.getWeightage();
+					}
+				}
+			}
+			return getWrongScore(question);
 		}
 		return getWrongScore(question);
+	}
+
+	private static Float calculateNumericScore(String correctAns, String answer, EdoQuestion question) {
+		if(correctAns == null || answer == null) {
+			return null;
+		}
+		if(!NumberUtils.isNumber(correctAns) || !NumberUtils.isNumber(answer)) {
+			//If not a numeric answer, direct compare as string
+			if (StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(correctAns), StringUtils.trimToEmpty(answer))) {
+				return question.getWeightage();
+			} else {
+				return getWrongScore(question);
+			}
+		} else {
+			//Numeric answer, compare as decimal
+			Float cor = Float.parseFloat(correctAns);
+			Float ans = Float.parseFloat(answer);
+			if(cor.floatValue() == ans.floatValue()) {
+				return question.getWeightage();
+			} else {
+				return getWrongScore(question);
+			}
+		}
 	}
 
 	public static boolean isBonus(EdoQuestion question) {
@@ -601,21 +648,71 @@ public class CommonUtils {
 			
 			//New SIMPLIFIED logic for match column 29/05/21
 			String[] correctAnswers = StringUtils.split(correctAnswer, ",");
+			//Create list of left column entries
+			Map<String, Integer> leftCols = new HashMap<String, Integer>();
+			if(ArrayUtils.isNotEmpty(correctAnswers)) {
+				for(String ans: correctAnswers) {
+					String[] pairSplit = StringUtils.split(ans, "-");
+					String leftCol = "";
+					if(ArrayUtils.isNotEmpty(pairSplit)) {
+						leftCol = pairSplit[0];
+						if(leftCols.get(leftCol) == null) {
+							leftCols.put(leftCol, 0);
+						}
+						leftCols.put(leftCol, leftCols.get(leftCol) + 1);
+					}
+				}
+			}
 			String[] studentAnswers = StringUtils.split(answered.getAnswer(), ",");
 			int matchedCount = 0, unMatchedCount = 0;
 			if(ArrayUtils.isNotEmpty(studentAnswers)) {
+				Map<String, Integer> matchedLeftCols = new HashMap<String, Integer>();
+				Map<String, Integer> unmatchedLeftCols = new HashMap<String, Integer>();
 				for(String studentAnswer: studentAnswers) {
 					boolean matched = false;
+					String[] pairSplit = StringUtils.split(studentAnswer, "-");
+					String leftCol = "";
+					if(ArrayUtils.isNotEmpty(pairSplit)) {
+						leftCol = pairSplit[0];
+					}
 					for(String correctPair: correctAnswers) {
 						if(StringUtils.equalsIgnoreCase(studentAnswer, correctPair)) {
-							matched = true; 
+							matched = true;
 							break;
 						}
 					}
 					if(matched) {
-						matchedCount++;
+						//matchedCount++;
+						if(matchedLeftCols.get(leftCol) == null) {
+							matchedLeftCols.put(leftCol, 0);
+						}
+						matchedLeftCols.put(leftCol, matchedLeftCols.get(leftCol) + 1);
+						
 					} else {
-						unMatchedCount++;
+						//unMatchedCount++;
+						if(unmatchedLeftCols.get(leftCol) == null) {
+							unmatchedLeftCols.put(leftCol, 0);
+						}
+						unmatchedLeftCols.put(leftCol, unmatchedLeftCols.get(leftCol) + 1);						
+					}
+				}
+				
+				//Calculate score for each Left col
+				if(CollectionUtils.isNotEmpty(leftCols.keySet())) {
+					for(Entry<String, Integer> leftCol: leftCols.entrySet()) {
+						//If found in unmatched list..wrong
+						if(unmatchedLeftCols.keySet().contains(leftCol.getKey())) {
+							unMatchedCount++;
+							continue;
+						}
+						//If found in matched list..count also has to match..otherwise wrong
+						if(matchedLeftCols.get(leftCol.getKey()) != null) {
+							if(matchedLeftCols.get(leftCol.getKey()).intValue() == leftCol.getValue().intValue()) {
+								matchedCount++;
+							} else {
+								unMatchedCount++;
+							}
+						}
 					}
 				}
 				
