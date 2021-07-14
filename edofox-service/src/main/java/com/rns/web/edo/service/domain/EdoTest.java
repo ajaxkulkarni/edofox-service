@@ -28,6 +28,7 @@ public class EdoTest {
 	private Integer solvedCount;
 	private Integer correctCount;
 	private Integer flaggedCount;
+	private Integer visitedCount;
 	private BigDecimal score;
 	private boolean submitted;
 	private EDOTestAnalysis analysis;
@@ -501,6 +502,14 @@ public class EdoTest {
 
 	public void setAdminReset(Integer adminReset) {
 		this.adminReset = adminReset;
+	}
+
+	public Integer getVisitedCount() {
+		return visitedCount;
+	}
+
+	public void setVisitedCount(Integer visitedCount) {
+		this.visitedCount = visitedCount;
 	}
 	
 }

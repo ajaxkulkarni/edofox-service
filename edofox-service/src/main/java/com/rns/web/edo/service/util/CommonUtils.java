@@ -366,6 +366,8 @@ public class CommonUtils {
 		Integer solvedCount = 0;
 		Integer correctCount = 0;
 		Integer flaggedCount = 0;
+		Integer visitedCount = 0;
+		
 		BigDecimal score = BigDecimal.ZERO;
 		Map<String, Integer> numericCorrectCount = new HashMap<String, Integer>();
 		for (EdoQuestion answered : test.getTest()) {
@@ -406,10 +408,10 @@ public class CommonUtils {
 					flaggedCount++;
 				}
 			}
-
+			visitedCount++;
 		}
 		
-		
+		test.setVisitedCount(visitedCount);
 		test.setCorrectCount(correctCount);
 		test.setFlaggedCount(flaggedCount);
 		test.setSolvedCount(solvedCount);

@@ -1106,6 +1106,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 			}
 			
+			map.setVisited(test.getVisitedCount());
 			map.setSolved(test.getSolvedCount());
 			map.setCorrect(test.getCorrectCount());
 			map.setFlagged(test.getFlaggedCount());

@@ -30,6 +30,8 @@ public class EdoTestStatusEntity {
 	private String status;
 	@Column(name = "solved", unique = true)
 	private Integer solved;
+	@Column(name = "visited", unique = true)
+	private Integer visited;
 	@Column(name = "flagged", unique = true)
 	private Integer flagged;
 	@Column(name = "correct", unique = true)
@@ -167,5 +169,10 @@ public class EdoTestStatusEntity {
 	public void setProctoringRemarks(String proctoringRemarks) {
 		this.proctoringRemarks = proctoringRemarks;
 	}
-	
+	public Integer getVisited() {
+		return visited;
+	}
+	public void setVisited(Integer visited) {
+		this.visited = visited;
+	}
 }

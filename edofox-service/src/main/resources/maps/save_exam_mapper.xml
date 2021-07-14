@@ -66,6 +66,9 @@
 		<if test="test.score != null">
 		score = ${test.score}, 
 		</if>
+		<if test="test.visitedCount != null">
+		visited = ${test.visitedCount}, 
+		</if>
 		evaluation_date = CURRENT_TIMESTAMP
 		where test_id = ${test.id} AND student_id = ${student.id}
 	</update>
