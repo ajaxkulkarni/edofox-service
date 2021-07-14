@@ -241,7 +241,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				
 				//Calculate mcq parameters
 				if(test != null && StringUtils.equals(test.getTestUi(), EdoConstants.QUESTION_TYPE_DESCRIPTIVE)) {
-					if(!StringUtils.equals(EdoConstants.QUESTION_TYPE_DESCRIPTIVE, question.getType())) {
+					if(!StringUtils.equals(EdoConstants.QUESTION_TYPE_DESCRIPTIVE, question.getType()) && StringUtils.isNotBlank(question.getAnswer())) {
 						mcqSolved ++;
 						if(question.getMarks() != null && question.getMarks().compareTo(BigDecimal.ZERO) > 0) {
 							mcqCorrect++;
