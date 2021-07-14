@@ -3502,6 +3502,18 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			request.getQuestion().setQn_id(request.getQuestion().getId());
 			request.getQuestion().setFilesUploaded(1);
 			saveAnswer(request, session);
+			Long minLeft = request.getTest().getMinLeft();
+			Long secLeft = request.getTest().getSecLeft();
+			if(minLeft != null && secLeft != null) {
+				List<EdoTestStatusEntity> maps = /*testsDao.getTestStatus(inputMap)*/ session.createCriteria(EdoTestStatusEntity.class)
+						.add(Restrictions.eq("testId", request.getTest().getId()))
+						.add(Restrictions.eq("studentId", request.getStudent().getId()))
+						.list();
+				if(CollectionUtils.isNotEmpty(maps)) {
+					EdoTestStatusEntity edoTestStatusEntity = maps.get(0);
+					edoTestStatusEntity.setTimeLeft((minLeft * 60) + secLeft);
+				}
+			}
 			tx.commit();
 		} catch (Exception e) {
 			LoggingUtil.logError(ExceptionUtils.getStackTrace(e));

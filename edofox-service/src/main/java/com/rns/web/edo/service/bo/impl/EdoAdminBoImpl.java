@@ -2347,6 +2347,29 @@ public class EdoAdminBoImpl implements EdoAdminBo, EdoConstants {
 							.add(Restrictions.eq("studentId", answerFileEntity.getStudentId())).list();
 					if(CollectionUtils.isNotEmpty(testStatus)) {
 						testStatus.get(0).setScore(testMarks);
+						//Update correctCount and solvedCount
+						List<EdoAnswerEntity> answers = session.createCriteria(EdoAnswerEntity.class)
+								.add(Restrictions.eq("testId", answerFileEntity.getTestId()))
+								.add(Restrictions.eq("studentId", answerFileEntity.getStudentId()))
+								.list();
+						if(CollectionUtils.isNotEmpty(answers)) {
+							Integer solvedCount = 0, correctCount = 0;
+							for(EdoAnswerEntity ans: answers) {
+								if(ans.getFilesUploaded() != null && ans.getFilesUploaded() > 0) {
+									solvedCount++;
+									if(ans.getMarks() != null &&  ans.getMarks().compareTo(BigDecimal.ZERO) > 0) {
+										correctCount++;
+									}
+								} else if (StringUtils.isNotBlank(ans.getOptionSelected())) {
+									solvedCount++;
+									if(ans.getMarks() != null &&  ans.getMarks().compareTo(BigDecimal.ZERO) > 0) {
+										correctCount++;
+									}
+								}
+							}
+							testStatus.get(0).setSolved(solvedCount);
+							testStatus.get(0).setCorrect(correctCount);
+						}
 					}
 				}
 				
