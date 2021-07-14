@@ -977,6 +977,8 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 			if(answer.getOptionSelected() == null) {
 				answer.setOptionSelected("");
 			}
+			//Will update only for save test
+			answer.setMarks(request.getQuestion().getMarks());
 		} else if (answer.getId() == null) {
 			//New submission..first time submission
 			answer.setFlagged(0);
@@ -985,8 +987,6 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 		
 		
 		answer.setTimeTaken(request.getQuestion().getTimeSpent());
-		//Will update only for save test
-		answer.setMarks(request.getQuestion().getMarks());
 		answer.setUpdatedDate(new Date());
 		
 		//Save random question number
