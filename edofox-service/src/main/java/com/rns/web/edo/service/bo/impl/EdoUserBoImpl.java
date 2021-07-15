@@ -648,10 +648,13 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				//Get JEE sections eligible for JEE format
 				if(studenId != null) {
-					result.setJeeNewFormatSections(CommonUtils.sectionsEligibleForNewFormat(result, result.getTest()));
-					if(CollectionUtils.isNotEmpty(result.getJeeNewFormatSections())) {
-						result.setJeeMaxNumeric(JEE_NEW_FORMAT_BEST_OF_VALUE);
+					if(StringUtils.equals("JEEM", result.getTestUi())) {
+						result.setJeeNewFormatSections(CommonUtils.sectionsEligibleForNewFormat(result, result.getTest()));
+						if(CollectionUtils.isNotEmpty(result.getJeeNewFormatSections())) {
+							result.setJeeMaxNumeric(JEE_NEW_FORMAT_BEST_OF_VALUE);
+						}
 					}
+					
 					//Check for proctoring
 					if(StringUtils.equalsIgnoreCase(result.getTestUi(), "PROCTORING")) {
 						EdoStudent student = testsDao.getStudentById(studenId);
