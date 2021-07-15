@@ -93,12 +93,13 @@
 		<property name="maxTotal" value="2000" />
 		<property name="maxIdle" value="300" />
 		<property name="minIdle" value="100" />
+		<property name="jmxName" value="edofoxDbPool"></property>
 	</bean>
 
-	<bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+	<bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false" depends-on="dataSource">
 		<property name="beans">
 			<map>
-				<entry key="bean:name=DataSource" value="#{dataSource.getPool().getJmxPool()}" />
+				<entry key="bean:name=DataSource" value="dataSource" />
 			</map>
 		</property>
 	</bean>
