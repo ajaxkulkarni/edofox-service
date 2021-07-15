@@ -13,9 +13,11 @@
 	<task:annotation-driven></task:annotation-driven>
 
 	<context:component-scan base-package="com.rns.web.edo.service" />
-	
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="locations"  value="file:///home/service/properties/edofox-db.properties"/>
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations"
+			value="file:///home/service/properties/edofox-db.properties" />
 	</bean>
 
 	<bean id="userBo" class="com.rns.web.edo.service.bo.impl.EdoUserBoImpl">
@@ -34,17 +36,17 @@
 		<property name="txManager" ref="transactionManager" />
 		<property name="mailExecutor" ref="mailExecutor"></property>
 	</bean>
-	
+
 	<bean id="taskService" class="com.rns.web.edo.service.util.EdoBackupRoutine">
 		<property name="adminBo" ref="adminBo"></property>
 	</bean>
-	
+
 	<bean id="videoRoutine" class="com.rns.web.edo.service.VideoExportScheduler">
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
 		<property name="executor" ref="executor" />
 		<property name="testsDao" ref="testsDao" />
 	</bean>
-	
+
 	<bean id="notificationTask" class="com.rns.web.edo.service.NotificationTask">
 		<property name="sessionFactory" ref="hibernate4AnnotatedSessionFactory" />
 		<property name="executor" ref="executor" />
@@ -52,13 +54,15 @@
 	</bean>
 
 
-	<bean id="executor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+	<bean id="executor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="20" />
 		<property name="maxPoolSize" value="50" />
 		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
 	</bean>
-	
-	<bean id="mailExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+
+	<bean id="mailExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="5" />
 		<property name="maxPoolSize" value="10" />
 		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
@@ -78,26 +82,33 @@
 		<!-- <property name="url" value="jdbc:mysql://localhost:3306/edo_prod" 
 			/> <property name="username" value="root" /> <property name="password" value="" 
 			/> -->
-		<!-- <property name="testOnReturn" value="true" />
-		<property name="testOnBorrow" value="true" />
-		<property name="testWhileIdle" value="true" />
-		<property name="validationQuery" value="SELECT 1" /> -->
+		<!-- <property name="testOnReturn" value="true" /> <property name="testOnBorrow" 
+			value="true" /> <property name="testWhileIdle" value="true" /> <property 
+			name="validationQuery" value="SELECT 1" /> -->
 		<!-- <property name="initialSize" value="8" /> <property name="maxActive" 
 			value="20" /> <property name="maxIdle" value="20" /> <property name="minIdle" 
 			value="0" /> -->
 		<property name="initialSize" value="100" />
-		<!-- <property name="maxActive" value="5000" />
-		 -->
+		<!-- <property name="maxActive" value="5000" /> -->
 		<property name="maxTotal" value="2000" />
 		<property name="maxIdle" value="300" />
 		<property name="minIdle" value="100" />
+	</bean>
+
+	<bean id="jmxExporter" class="org.springframework.jmx.export.MBeanExporter" lazy-init="false">
+		<property name="beans">
+			<map>
+				<entry key="bean:name=DataSource" value="#{dataSource.getPool().getJmxPool()}" />
+			</map>
+		</property>
 	</bean>
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="configLocation" value="classpath:mybatis-config.xml" />
 		<property name="transactionFactory">
-			<bean class="org.mybatis.spring.transaction.SpringManagedTransactionFactory" />
+			<bean
+				class="org.mybatis.spring.transaction.SpringManagedTransactionFactory" />
 		</property>
 	</bean>
 
@@ -115,7 +126,8 @@
 			<list>
 				<value>com.rns.web.edo.service.domain.jpa.EdoQuestionEntity</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoAnswerEntity</value>
-				<value>com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoTestStatusEntity
+				</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoUplinkStatus</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoLiveSession</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoVideoLecture</value>
@@ -124,7 +136,8 @@
 				<value>com.rns.web.edo.service.domain.jpa.EdoDeviceId</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoContentMap</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoLiveToken</value>
-				<value>com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity</value>
+				<value>com.rns.web.edo.service.domain.jpa.EdoAnswerFileEntity
+				</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoProfileEntity</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoProctorImages</value>
 				<value>com.rns.web.edo.service.domain.jpa.EdoTestEntity</value>
