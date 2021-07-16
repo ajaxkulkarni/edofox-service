@@ -1588,6 +1588,11 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 	public EdoServiceResponse raiseDoubt(EdoServiceRequest request, InputStream data, FormDataContentDisposition fileDataDetails) {
 		EdoServiceResponse response = CommonUtils.initResponse();
 		Session session = null;
+		//Handled Error in Processing for student
+		if(request.getStudent() == null || request.getStudent().getId() == null) {
+			response.setStatus(new EdoApiStatus(-111, "Problem reading your profile. Please login and try again later."));
+			return response;
+		}
 		try {
 			if(request.getTest() != null && request.getTest().getCurrentQuestion() != null && request.getTest().getCurrentQuestion().getFeedback() != null) {
 				EdoQuestion currQ = request.getTest().getCurrentQuestion();
