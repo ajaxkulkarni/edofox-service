@@ -353,7 +353,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 				}
 				Integer startedCount = 0;
 				
-				//Transaction tx = writeSession.beginTransaction();
+				Transaction tx = writeSession.beginTransaction();
 				
 				//Added on 11/12/19
 				if(studentMap == null) {
@@ -420,7 +420,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						studentMap.setLongitude(req.getTest().getLocationLong());
 					}
 					
-					//TODO tx.commit();
+					tx.commit();
 					
 					
 					if(studentMap.getStartedCount() != null) {
