@@ -928,6 +928,7 @@ public class EdoUserBoImpl implements EdoUserBo, EdoConstants {
 						return status;
 					}
 					edoTestStatusEntity.setTimeLeft((minLeft * 60) + secLeft);
+					edoTestStatusEntity.setLastAnswered(new Date());
 				}
 			}
 			saveAnswer(request, session);

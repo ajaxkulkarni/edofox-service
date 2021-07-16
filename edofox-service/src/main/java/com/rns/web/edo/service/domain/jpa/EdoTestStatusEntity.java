@@ -58,7 +58,8 @@ public class EdoTestStatusEntity {
 	private String proctoringRemarks;
 	@Column(name = "admin_reset")
 	private boolean adminReset;
-	
+	@Column(name = "last_answered")
+	private Date lastAnswered;
 	
 	
 	public boolean isAdminReset() {
@@ -174,5 +175,11 @@ public class EdoTestStatusEntity {
 	}
 	public void setVisited(Integer visited) {
 		this.visited = visited;
+	}
+	public Date getLastAnswered() {
+		return lastAnswered;
+	}
+	public void setLastAnswered(Date lastAnswered) {
+		this.lastAnswered = lastAnswered;
 	}
 }
